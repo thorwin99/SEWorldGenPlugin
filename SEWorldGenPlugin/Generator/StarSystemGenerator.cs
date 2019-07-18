@@ -22,9 +22,9 @@ namespace SEWorldGenPlugin.Generator
     {
         private const int MAX_PLANETS = 15;
         private const int MIN_PLANETS = 5;
-        private const int MAX_PLANET_SIZE = 700000;
-        private const int MIN_PLANET_SIZE = 5000;
-        private const int MIN_PLANET_DISTANCE = 2000000;
+        private const int MAX_PLANET_SIZE = 1200000;
+        private const int MIN_PLANET_SIZE = 10000;
+        private const int MIN_PLANET_DISTANCE = 8000000;
         private const int MAX_PLANET_DISTANCE = 20000000;
 
         private const int REL_MOON_MAX_DIST = 3;
@@ -61,13 +61,26 @@ namespace SEWorldGenPlugin.Generator
 
                 int moonCount = planet.PlanetMoons.Length;
                 planet.CenterPosition = p.PositionComp.GetPosition();
+
+                List<Vector3D> spawnedMoonPos = new List<Vector3D>();
+
                 for(int i = 0; i < moonCount; i++)
                 {
                     PlanetMoonItem moon = planet.PlanetMoons[i];
                     MyPlanetGeneratorDefinition moonDef = GetDefByName(moon.DefName);
                     if (moonDef == null) continue;
-                    var position = Vector3D.Add(planet.CenterPosition, new Vector3D(moon.Distance * Math.Sin(360 / moonCount * i * Math.PI * 2), moon.Distance * Math.Cos(360 / moonCount * i * Math.PI * 2), moon.Distance * Math.Sin(MyRandom.Instance.GetRandomFloat(0, (float)Math.PI))));
-                    CreatePlanet(position, moon.Size, ref moonDef);
+                    var position = new Vector3D(0, 0, 0);
+                    var threshold = 0;
+                    do
+                    {
+
+                        double angle = MyRandom.Instance.GetRandomFloat(0, (float)Math.PI * 2f);
+                        position = new Vector3D(moon.Distance * Math.Sin(angle), moon.Distance * Math.Cos(angle), moon.Distance * Math.Sin(MyRandom.Instance.GetRandomFloat((float)-Math.PI / 2, (float)Math.PI / 2)));
+                        position = Vector3D.Add(planet.CenterPosition, position);
+                        threshold++;
+
+                    } while (ObstructedPlace(position, spawnedMoonPos, planet.Size) && threshold < 10000);
+                    spawnedMoonPos.Add(CreatePlanet(position, moon.Size, ref moonDef).PositionComp.GetPosition());
                 }
                 planet.Generated = true;
             }
@@ -100,11 +113,20 @@ namespace SEWorldGenPlugin.Generator
         private PlanetItem GeneratePlanetItem(int distance, int maxSize)
         {
             PlanetItem item = new PlanetItem();
-            MyPlanetGeneratorDefinition def = Planets[MyRandom.Instance.Next(0, Planets.Count - 1)];
-            var size = MyRandom.Instance.Next(MIN_PLANET_SIZE, MAX_PLANET_SIZE);
+
+            MyPlanetGeneratorDefinition def = null;
+            var size = int.MaxValue;
+            var threshold = 0;
+            do
+            {
+                def = Planets[MyRandom.Instance.Next(0, Planets.Count - 1)];
+                size = GetSizeByGrav(def.SurfaceGravity);
+                threshold++;
+            } while (size > maxSize && threshold < 10000);
+
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
-            var height = MyRandom.Instance.GetRandomFloat(-20, 20);
-            Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Tan(2 * Math.PI / 360 * height));
+            var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -20, (float)Math.PI / 180 * 20);
+            Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Tan(height));
             PlanetRingItem planetRing = new PlanetRingItem()
             {
                 Density = 0,
@@ -115,11 +137,11 @@ namespace SEWorldGenPlugin.Generator
             };
 
             List<PlanetMoonItem> moons = new List<PlanetMoonItem>();
-            moons.Add(GenerateMoonItem(size / 2f, 0));
-            moons.Add(GenerateMoonItem(size / 2f, 1));
-            moons.Add(GenerateMoonItem(size / 2f, 2));
-            moons.Add(GenerateMoonItem(size / 2f, 3));
-            moons.Add(GenerateMoonItem(size / 2f, 4));
+            int numMoons = MyRandom.Instance.Next(0, GetMaxMoonNumberByGravity(def.SurfaceGravity));
+            for(int i = 0; i < numMoons; i++)
+            {
+                moons.Add(GenerateMoonItem(size, i));
+            }
 
             item.DefName = def.Id.SubtypeId.String;
             item.CenterPosition = new Vector3D(0, 0, 0);
@@ -132,18 +154,35 @@ namespace SEWorldGenPlugin.Generator
             return item;
         }
 
-        private PlanetMoonItem GenerateMoonItem(float planetRad, int index)
+        private PlanetMoonItem GenerateMoonItem(float planetSize, int index)
         {
-            var dist = ((index + 1) * planetRad) + Math.Max(MIN_PLANET_SIZE, (int)planetRad / 2) * MyRandom.Instance.GetRandomFloat(REL_MOON_MIN_DIST, REL_MOON_MAX_DIST);
-            var scale = MyRandom.Instance.Next(2000, Math.Max(MIN_PLANET_SIZE, (int) planetRad / 2));
-            MyPlanetGeneratorDefinition def = Planets[MyRandom.Instance.Next(0, Planets.Count - 1)];
+            var dist = planetSize * (index + 1) + planetSize / 2 * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
+            MyPlanetGeneratorDefinition def = null;
+            var size = int.MaxValue;
+            var threshold = 0;
+            do
+            {
+                def = Planets[MyRandom.Instance.Next(0, Planets.Count - 1)];
+                size = GetSizeByGrav(def.SurfaceGravity);
+                threshold++;
+            } while (size > planetSize * 0.8 && threshold < 10000);
 
             PlanetMoonItem item = new PlanetMoonItem();
             item.DefName = def.Id.SubtypeId.String;
             item.Distance = dist;
-            item.Size = scale;
+            item.Size = size;
 
             return item;
+        }
+
+        private int GetMaxMoonNumberByGravity(float gravity)
+        {
+            return (int) Math.Pow(2, gravity);
+        }
+
+        private int GetSizeByGrav(float gravity)
+        {
+            return (int) Math.Min(Math.Sqrt(gravity * 240000 * 240000), MAX_PLANET_SIZE);
         }
 
         private bool ObstructedPlace(Vector3D position, List<Vector3D> other, int minDistance)
@@ -151,10 +190,10 @@ namespace SEWorldGenPlugin.Generator
             foreach(var obj in other)
             {
                 if (Vector3D.Subtract(position, obj).Length() < minDistance)
-                    return false;
+                    return true;
             }
 
-            return true;
+            return false;
         }
 
         public static ObjectBuilder_GeneratorSave GetDefaultSystem()
