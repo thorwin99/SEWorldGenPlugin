@@ -10,15 +10,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRage;
+using VRage.Game;
 using VRage.Game.Voxels;
 using VRage.Library.Utils;
+using VRage.ObjectBuilders;
+using VRage.Serialization;
 using VRage.Utils;
+using VRage.Voxels;
 using VRageMath;
 using VRageRender.Messages;
+using Sandbox.Game.World.Generator;
+using Sandbox.Game.World;
+using SEWorldGenPlugin.Generator.Composites;
 
 namespace SEWorldGenPlugin.Generator
 {
-    public class StarSystemGenerator
+    class StarSystemGenerator
     {
         private const int MAX_PLANETS = 15;
         private const int MIN_PLANETS = 5;
@@ -30,6 +37,8 @@ namespace SEWorldGenPlugin.Generator
         public List<MyPlanetGeneratorDefinition> Planets { private set; get; }
         public ObjectBuilder_GeneratorSave SaveData { set; get; }
 
+        private bool asteroid = false;
+
         public StarSystemGenerator(List<MyPlanetGeneratorDefinition> planets)
         {
             this.Planets = planets;
@@ -40,19 +49,21 @@ namespace SEWorldGenPlugin.Generator
         {
             List<PlanetItem> planets = ((StarSystemItem)SaveData.Components[0]).Planets;
 
-            MyLog.Default.WriteLine("Generating Possoble Planets for position " + playerPos);
+            if (!asteroid)
+            {
+                asteroid = true;
+                CreateProceduralAsteroid(123456, 120, new Vector3D(0,0,0));
+            }
+
 
             foreach(var planet in planets)
             {
-                MyLog.Default.WriteLine("Looking to generate " + planet.DefName);
                 if (planet.Generated) continue;
                 if (Vector3D.Subtract(playerPos, planet.OffsetPosition).Length() > 100000000) continue;
                 MyPlanetGeneratorDefinition def = GetDefByName(planet.DefName);
                 if (def == null) continue;
 
                 MyPlanet p = CreatePlanet(planet.OffsetPosition, planet.Size, ref def);
-
-                MyLog.Default.WriteLine("Generating Planet " + p.EntityId);
 
                 int moonCount = planet.PlanetMoons.Length;
                 planet.CenterPosition = p.PositionComp.GetPosition();
@@ -90,7 +101,7 @@ namespace SEWorldGenPlugin.Generator
             var starSystem = new StarSystemItem();
             using (MyRandom.Instance.PushSeed(seed))
             {
-                int amountPlanets = MyRandom.Instance.Next(MIN_PLANETS, MAX_PLANETS);
+                int amountPlanets = 0;//MyRandom.Instance.Next(MIN_PLANETS, MAX_PLANETS);
                 int currentDistance = 0;
                 for(int i = 0; i < amountPlanets; i++)
                 {
@@ -290,6 +301,66 @@ namespace SEWorldGenPlugin.Generator
 
                 return planet;
             }
+        }
+
+        private static void CreateProceduralAsteroid(int seed, float radius, Vector3D position)
+        {
+            var storageNameBase = "ProcAsteroid" + "-" + seed + "r" + radius;
+            var storageName = MakeStorageName(storageNameBase);
+
+            var provider = MySEWGCompositeShapeProvider.CreateAsteroidShape(seed, radius, MySession.Static.Settings.VoxelGeneratorVersion);
+            var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(radius));
+            
+            MyVoxelMap voxelMap = new MyVoxelMap();
+
+            voxelMap.EntityId = MyRandom.Instance.NextLong();
+            voxelMap.Init(storageName, storage, position - storage.Size * 0.5f);
+            MyEntities.RaiseEntityCreated(voxelMap);
+            MyEntities.Add(voxelMap);
+
+            voxelMap.Save = false;
+            MyVoxelBase.StorageChanged OnStorageRangeChanged = null;
+            OnStorageRangeChanged = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
+            {
+                voxelMap.Save = true;
+                voxelMap.RangeChanged -= OnStorageRangeChanged;
+            };
+            voxelMap.RangeChanged += OnStorageRangeChanged;
+        }
+
+        public static String MakeStorageName(String storageNameBase)
+        {
+            String storageName = storageNameBase;
+
+            int i = 0;
+
+            bool collision;
+            do
+            {
+                collision = false;
+                foreach (var voxelMap in MySession.Static.VoxelMaps.Instances)
+                {
+                    if (voxelMap.StorageName == storageName)
+                    {
+                        collision = true;
+                        break;
+                    }
+                }
+
+                if (collision)
+                {
+                    storageName = storageNameBase + "-" + i++;
+                }
+            }
+            while (collision);
+
+            return storageName;
+        }
+
+        private static Vector3I GetAsteroidVoxelSize(double asteroidRadius)
+        {
+            int radius = Math.Max(64, (int)Math.Ceiling(asteroidRadius));
+            return new Vector3I(radius);
         }
     }
 }
