@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace SEWorldGenPlugin.Generator.Composites
 {
-    internal delegate IMySEWGCompositionInfoProvider MyCompositeShapeGeneratorDelegate(int generatorSeed, int seed, float size);
+    internal delegate IMySEWGCompositionInfoProvider MySEWGCompositeShapeGeneratorDelegate(int generatorSeed, int seed, float size);
 }

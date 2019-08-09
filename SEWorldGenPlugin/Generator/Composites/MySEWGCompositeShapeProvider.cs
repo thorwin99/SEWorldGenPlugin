@@ -297,7 +297,7 @@ namespace SEWorldGenPlugin.Generator.Composites
         private void InitFromState(State state)
         {
             m_state = state;
-            MyCompositeShapeGeneratorDelegate myCompositeShapeGeneratorDelegate = MySEWGCompositeShapes.AsteroidGenerators[state.Generator];
+            MySEWGCompositeShapeGeneratorDelegate myCompositeShapeGeneratorDelegate = MySEWGCompositeShapes.AsteroidGenerators[state.Generator];
             m_infoProvider = myCompositeShapeGeneratorDelegate(state.GeneratorSeed, state.Seed, state.Size);
         }
 

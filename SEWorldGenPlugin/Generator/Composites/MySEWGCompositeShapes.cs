@@ -25,7 +25,7 @@ namespace SEWorldGenPlugin.Generator.Composites
 
         private List<MyVoxelMaterialDefinition> m_depositMaterials;
 
-        public static readonly MyCompositeShapeGeneratorDelegate[] AsteroidGenerators;
+        public static readonly MySEWGCompositeShapeGeneratorDelegate[] AsteroidGenerators;
 
         private List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> m_primarySelections;
 
@@ -45,8 +45,8 @@ namespace SEWorldGenPlugin.Generator.Composites
                 4
             };
             AsteroidGenerators = (from x in source
-                select MyTuple.Create(x, arg2: false)).Concat(from x in source2
-            select MyTuple.Create(x, arg2: true)).Select((Func<MyTuple<int, bool>, MyCompositeShapeGeneratorDelegate>)delegate (MyTuple<int, bool> info)
+            select MyTuple.Create(x, arg2: false)).Concat(from x in source2
+            select MyTuple.Create(x, arg2: true)).Select((Func<MyTuple<int, bool>, MySEWGCompositeShapeGeneratorDelegate>)delegate (MyTuple<int, bool> info)
             {
                 int version = info.Item1;
                 bool combined = info.Item2;
@@ -116,7 +116,7 @@ namespace SEWorldGenPlugin.Generator.Composites
             data.Deposits = Array.Empty<MySEWGCompositeShapeOreDeposit>();
             data.FilledShapes = new MySEWGCsgShapeBase[num];
             IMyCompositeShape[] array = new IMyCompositeShape[6];
-            FillSpan(instance, size, new Span<IMyCompositeShape>(array, 0, 1), MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralPrimaryAdditions(), prefferOnlyBestFittingSize: true);
+            FillSpan(instance, size, array.Span(0, 1), MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralPrimaryAdditions(), prefferOnlyBestFittingSize: true);
             size = ((MyOctreeStorage)array[0]).Size.AbsMax();
             float idealSize = size / 2f;
             float idealSize2 = size / 2f;
@@ -132,7 +132,7 @@ namespace SEWorldGenPlugin.Generator.Composites
             FillSpan(instance, idealSize2, array, MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralAdditions());
             FillSpan(instance, idealSize, array2, MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralRemovals());
             TranslateShapes(array2, size, instance);
-            TranslateShapes(new Span<IMyCompositeShape>(array, 1, array.Length - 1), size, instance);
+            TranslateShapes(array.Span(1), size, instance);
             if (size > 512f)
             {
                 size /= 2f;
@@ -236,7 +236,7 @@ namespace SEWorldGenPlugin.Generator.Composites
                                 }
                                 shapes[j] = list.MaxBy((MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> x) => x.Item1.SpawnProbability).Item2;
                             }
-                        IL_0221:;
+                            IL_0221:;
                         }
                     }
                 }
@@ -411,14 +411,14 @@ namespace SEWorldGenPlugin.Generator.Composites
             }
             Action<List<MyVoxelMaterialDefinition>> action = delegate (List<MyVoxelMaterialDefinition> list)
             {
-                int num10 = list.Count;
-                while (num10 > 1)
+                int num9 = list.Count;
+                while (num9 > 1)
                 {
-                    int index = random.Next() % num10;
-                    num10--;
+                    int index = random.Next() % num9;
+                    num9--;
                     MyVoxelMaterialDefinition value = list[index];
-                    list[index] = list[num10];
-                    list[num10] = value;
+                    list[index] = list[num9];
+                    list[num9] = value;
                 }
             };
             action(m_depositMaterials);
@@ -440,9 +440,7 @@ namespace SEWorldGenPlugin.Generator.Composites
             int val;
             if (flag)
             {
-                int num = 0;
-                num = ((size <= 64f) ? 1 : ((size <= 128f) ? 2 : ((size <= 256f) ? 3 : ((!(size <= 512f)) ? 5 : 4))));
-                val = (int)(MySession.Static.Settings.DepositsCountCoefficient * (float)num);
+                val = ((size <= 64f) ? 2 : ((size <= 128f) ? 4 : ((size <= 256f) ? 6 : ((!(size <= 512f)) ? 10 : 8))));
                 if (m_depositMaterials.Count == 0)
                 {
                     val = 0;
@@ -454,10 +452,9 @@ namespace SEWorldGenPlugin.Generator.Composites
             }
             val = Math.Max(val, filledShapes.Length);
             deposits = new MySEWGCompositeShapeOreDeposit[val];
-            float depositSizeDenominator = MySession.Static.Settings.DepositSizeDenominator;
-            float num2 = (!flag || !(depositSizeDenominator > 0f)) ? (size / 10f) : (size / depositSizeDenominator + 8f);
+            float num = (!flag) ? (size / 10f) : (size / 30f + 8f);
             MyVoxelMaterialDefinition material = defaultMaterial;
-            int num3 = 0;
+            int num2 = 0;
             for (int i = 0; i < filledShapes.Length; i++)
             {
                 if (i == 0)
@@ -473,7 +470,7 @@ namespace SEWorldGenPlugin.Generator.Composites
                         }
                         else
                         {
-                            material = m_depositMaterials[num3++];
+                            material = m_depositMaterials[num2++];
                         }
                     }
                     else
@@ -490,30 +487,30 @@ namespace SEWorldGenPlugin.Generator.Composites
                 }
                 else
                 {
-                    material = m_depositMaterials[num3++];
+                    material = m_depositMaterials[num2++];
                 }
                 deposits[i] = new MySEWGCompositeShapeOreDeposit(filledShapes[i].DeepCopy(), material);
                 deposits[i].Shape.ShrinkTo(random.NextFloat() * (flag ? 0.6f : 0.15f) + (flag ? 0.1f : 0.6f));
-                if (num3 == m_depositMaterials.Count)
+                if (num2 == m_depositMaterials.Count)
                 {
-                    num3 = 0;
+                    num2 = 0;
                     action(m_depositMaterials);
                 }
             }
             for (int j = filledShapes.Length; j < val; j++)
             {
-                float num6 = 0f;
+                float num5 = 0f;
                 Vector3 vector = Vector3.Zero;
                 for (int k = 0; k < 10; k++)
                 {
                     vector = CreateRandomPointInBox(random, size * (flag ? 0.6f : 0.7f)) + storageOffset + size * 0.15f;
-                    num6 = random.NextFloat() * num2 + (flag ? 5f : 8f);
+                    num5 = random.NextFloat() * num + (flag ? 5f : 8f);
                     if (shapeInfo == null)
                     {
                         break;
                     }
-                    double num7 = Math.Sqrt(num6 * num6 / 2f) * 0.5;
-                    Vector3I b = new Vector3I((int)num7);
+                    double num6 = Math.Sqrt(num5 * num5 / 2f) * 0.5;
+                    Vector3I b = new Vector3I((int)num6);
                     BoundingBoxI box = new BoundingBoxI((Vector3I)vector - b, (Vector3I)vector + b);
                     if (MySEWGCompositeShapeProvider.Intersect(shapeInfo, box, 0) != 0)
                     {
@@ -522,20 +519,20 @@ namespace SEWorldGenPlugin.Generator.Composites
                 }
                 random.NextFloat();
                 random.NextFloat();
-                MySEWGCsgShapeBase shape = new MySEWGCsgSphere(vector, num6);
-                material = ((m_depositMaterials.Count != 0) ? m_depositMaterials[num3++] : m_surfaceMaterials[num3++]);
+                MySEWGCsgShapeBase shape = new MySEWGCsgSphere(vector, num5);
+                material = ((m_depositMaterials.Count != 0) ? m_depositMaterials[num2++] : m_surfaceMaterials[num2++]);
                 deposits[j] = new MySEWGCompositeShapeOreDeposit(shape, material);
                 if (m_depositMaterials.Count == 0)
                 {
-                    if (num3 == m_surfaceMaterials.Count)
+                    if (num2 == m_surfaceMaterials.Count)
                     {
-                        num3 = 0;
+                        num2 = 0;
                         action(m_surfaceMaterials);
                     }
                 }
-                else if (num3 == m_depositMaterials.Count)
+                else if (num2 == m_depositMaterials.Count)
                 {
-                    num3 = 0;
+                    num2 = 0;
                     action(m_depositMaterials);
                 }
             }
