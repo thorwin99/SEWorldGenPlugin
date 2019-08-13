@@ -61,7 +61,7 @@ namespace SEWorldGenPlugin.Generator
                 int moonCount = planet.PlanetMoons.Length;
                 planet.CenterPosition = p.PositionComp.GetPosition();
 
-                SpawnRing(planet.CenterPosition, planet.PlanetRing);
+                //SpawnRing(planet.CenterPosition, planet.PlanetRing);
 
                 List<Vector3D> spawnedMoonPos = new List<Vector3D>();
 
@@ -98,7 +98,6 @@ namespace SEWorldGenPlugin.Generator
                 Vector3D offsetPosition = new Vector3D(MyRandom.Instance.Next(0, ring.Width), MyRandom.Instance.Next(0, ring.Width), MyRandom.Instance.Next(-ring.Height / 2, ring.Height / 2));
                 Vector3D finalPosition = Vector3D.Add(Vector3D.Multiply(normalizedPosition, offsetPosition), relPosition);
                 float size = MyRandom.Instance.GetRandomFloat(ring.RoidSize * 0.5f, ring.RoidSize * 1.5f);
-                //MyLog.Default.Critical(finalPosition + "pos");
                 CreateProceduralAsteroid(MyRandom.Instance.CreateRandomSeed(), size / 2, finalPosition);
             }
         }
@@ -110,7 +109,7 @@ namespace SEWorldGenPlugin.Generator
             SaveData = new ObjectBuilder_GeneratorSave();
             SaveData.Components = new List<Ob_GeneratorSaveItem>();
             var starSystem = new StarSystemItem();
-            /*using (MyRandom.Instance.PushSeed(seed))
+            using (MyRandom.Instance.PushSeed(seed))
             {
                 int amountPlanets = MyRandom.Instance.Next(MIN_PLANETS, MAX_PLANETS);
                 int currentDistance = 0;
@@ -120,7 +119,7 @@ namespace SEWorldGenPlugin.Generator
                     starSystem.Planets.Add(GeneratePlanetItem(currentDistance + dist, GetMaxSize(i, amountPlanets)));
                     currentDistance += dist;
                 }
-            }*/
+            }
 
             starSystem.Planets.Add(GeneratePlanetItem(0, MIN_PLANET_SIZE));
             SaveData.Components.Add(starSystem);
@@ -190,7 +189,7 @@ namespace SEWorldGenPlugin.Generator
             ring.Height = MyRandom.Instance.Next(MIN_RING_HEIGHT, ring.Width / 10);
             ring.AngleDegrees = MyRandom.Instance.Next(-180, 180);
             ring.RoidSize = roidSize;
-            ring.AsteroidCount = 162897;//(double)((((ring.Radius + ring.Width) * (ring.Radius + ring.Width) * Math.PI) - (ring.Radius * ring.Radius * Math.PI)) * ring.Height / roidSize / roidSize / roidSize / 27);
+            ring.AsteroidCount = (double)((((ring.Radius + ring.Width) * (ring.Radius + ring.Width) * Math.PI) - (ring.Radius * ring.Radius * Math.PI)) * ring.Height / roidSize / roidSize / roidSize / 27);
             return ring;
         }
 
