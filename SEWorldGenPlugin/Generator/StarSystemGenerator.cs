@@ -21,24 +21,24 @@ using VRageMath;
 using VRageRender.Messages;
 using Sandbox.Game.World.Generator;
 using Sandbox.Game.World;
-using SEWorldGenPlugin.Generator.Composites;
+using SEWorldGenPlugin.Generator.Asteroids;
 
 namespace SEWorldGenPlugin.Generator
 {
     class StarSystemGenerator
     {
-        private const int MAX_PLANETS = 15;
+        private const int MAX_PLANETS = 25;
         private const int MIN_PLANETS = 5;
         private const int MAX_PLANET_SIZE = 1200000;
         private const int MIN_PLANET_SIZE = 10000;
         private const int MIN_PLANET_DISTANCE = 8000000;
         private const int MAX_PLANET_DISTANCE = 20000000;
+        private const int MIN_RING_WIDTH = 10000;
+        private const int MAX_RING_WIDTH = 100000;
+        private const int MIN_RING_HEIGHT = 1000;
 
         public List<MyPlanetGeneratorDefinition> Planets { private set; get; }
         public ObjectBuilder_GeneratorSave SaveData { set; get; }
-
-        private bool asteroid = false;
-
         public StarSystemGenerator(List<MyPlanetGeneratorDefinition> planets)
         {
             this.Planets = planets;
@@ -48,13 +48,6 @@ namespace SEWorldGenPlugin.Generator
         public void GeneratePossiblePlanets(Vector3D playerPos)
         {
             List<PlanetItem> planets = ((StarSystemItem)SaveData.Components[0]).Planets;
-
-            if (!asteroid)
-            {
-                asteroid = true;
-                CreateProceduralAsteroid(123456, 120, new Vector3D(0,0,0));
-            }
-
 
             foreach(var planet in planets)
             {
@@ -67,6 +60,8 @@ namespace SEWorldGenPlugin.Generator
 
                 int moonCount = planet.PlanetMoons.Length;
                 planet.CenterPosition = p.PositionComp.GetPosition();
+
+                SpawnRing(planet.CenterPosition, planet.PlanetRing);
 
                 List<Vector3D> spawnedMoonPos = new List<Vector3D>();
 
@@ -85,10 +80,26 @@ namespace SEWorldGenPlugin.Generator
                         position = Vector3D.Add(planet.CenterPosition, position);
                         threshold++;
 
-                    } while (ObstructedPlace(position, spawnedMoonPos, planet.Size) && threshold < 10000);
+                    } while (ObstructedPlace(position, spawnedMoonPos, planet.Size, planet.PlanetRing) && threshold < 10000);
                     spawnedMoonPos.Add(CreatePlanet(position, moon.Size, ref moonDef).PositionComp.GetPosition());
                 }
                 planet.Generated = true;
+            }
+        }
+
+        private void SpawnRing(Vector3D center, PlanetRingItem ring)
+        {
+            for(long i = 0; i < ring.AsteroidCount; i++)
+            {
+                double angle = 2 * Math.PI / 360 * ring.AngleDegrees;
+                double horAngle = 2 * Math.PI * i / ring.AsteroidCount;
+                Vector3D normalizedPosition = new Vector3D(Math.Cos(angle * Math.Cos(horAngle)), Math.Sin(horAngle), Math.Sin(angle * Math.Cos(horAngle)));
+                Vector3D relPosition = Vector3D.Multiply(normalizedPosition, ring.Radius);
+                Vector3D offsetPosition = new Vector3D(MyRandom.Instance.Next(0, ring.Width), MyRandom.Instance.Next(0, ring.Width), MyRandom.Instance.Next(-ring.Height / 2, ring.Height / 2));
+                Vector3D finalPosition = Vector3D.Add(Vector3D.Multiply(normalizedPosition, offsetPosition), relPosition);
+                float size = MyRandom.Instance.GetRandomFloat(ring.RoidSize * 0.5f, ring.RoidSize * 1.5f);
+                //MyLog.Default.Critical(finalPosition + "pos");
+                CreateProceduralAsteroid(MyRandom.Instance.CreateRandomSeed(), size / 2, finalPosition);
             }
         }
 
@@ -99,9 +110,9 @@ namespace SEWorldGenPlugin.Generator
             SaveData = new ObjectBuilder_GeneratorSave();
             SaveData.Components = new List<Ob_GeneratorSaveItem>();
             var starSystem = new StarSystemItem();
-            using (MyRandom.Instance.PushSeed(seed))
+            /*using (MyRandom.Instance.PushSeed(seed))
             {
-                int amountPlanets = 0;//MyRandom.Instance.Next(MIN_PLANETS, MAX_PLANETS);
+                int amountPlanets = MyRandom.Instance.Next(MIN_PLANETS, MAX_PLANETS);
                 int currentDistance = 0;
                 for(int i = 0; i < amountPlanets; i++)
                 {
@@ -109,8 +120,9 @@ namespace SEWorldGenPlugin.Generator
                     starSystem.Planets.Add(GeneratePlanetItem(currentDistance + dist, GetMaxSize(i, amountPlanets)));
                     currentDistance += dist;
                 }
-            }
+            }*/
 
+            starSystem.Planets.Add(GeneratePlanetItem(0, MIN_PLANET_SIZE));
             SaveData.Components.Add(starSystem);
 
             return SaveData;
@@ -133,14 +145,23 @@ namespace SEWorldGenPlugin.Generator
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -20, (float)Math.PI / 180 * 20);
             Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Tan(height));
-            PlanetRingItem planetRing = new PlanetRingItem()
+            PlanetRingItem planetRing;
+            if(MyRandom.Instance.NextFloat() * def.SurfaceGravity > 0.5 || true)
             {
-                Density = 0,
-                Radius = 0,
-                Width = 0,
-                Height = 0,
-                AngleDegrees = 0
-            };
+                planetRing = GeneratePlanetRing(size, def);
+            }
+            else
+            {
+                planetRing = new PlanetRingItem()
+                {
+                    AsteroidCount = 0,
+                    Radius = 0,
+                    Width = 0,
+                    Height = 0,
+                    AngleDegrees = 0,
+                    RoidSize = 0
+                };
+            }
 
             List<PlanetMoonItem> moons = new List<PlanetMoonItem>();
             int numMoons = MyRandom.Instance.Next(0, GetMaxMoonNumberByGravity(def.SurfaceGravity));
@@ -158,6 +179,19 @@ namespace SEWorldGenPlugin.Generator
             item.Size = size;
 
             return item;
+        }
+
+        private PlanetRingItem GeneratePlanetRing(float planetSize, MyPlanetGeneratorDefinition def)
+        {
+            int roidSize = MyRandom.Instance.Next(100, Math.Min((int)(def.SurfaceGravity * 0.5 * 1000), 2000));
+            PlanetRingItem ring = new PlanetRingItem();
+            ring.Radius = MyRandom.Instance.Next((int)(planetSize * 0.5 * 0.75), (int)(planetSize));
+            ring.Width = MyRandom.Instance.Next(MIN_RING_WIDTH, MAX_RING_WIDTH);
+            ring.Height = MyRandom.Instance.Next(MIN_RING_HEIGHT, ring.Width / 10);
+            ring.AngleDegrees = MyRandom.Instance.Next(-180, 180);
+            ring.RoidSize = roidSize;
+            ring.AsteroidCount = 162897;//(double)((((ring.Radius + ring.Width) * (ring.Radius + ring.Width) * Math.PI) - (ring.Radius * ring.Radius * Math.PI)) * ring.Height / roidSize / roidSize / roidSize / 27);
+            return ring;
         }
 
         private PlanetMoonItem GenerateMoonItem(float planetSize, int index)
@@ -191,8 +225,9 @@ namespace SEWorldGenPlugin.Generator
             return (int) Math.Min(Math.Sqrt(gravity * 240000 * 240000), MAX_PLANET_SIZE);
         }
 
-        private bool ObstructedPlace(Vector3D position, List<Vector3D> other, int minDistance)
+        private bool ObstructedPlace(Vector3D position, List<Vector3D> other, int minDistance, PlanetRingItem ring)
         {
+
             foreach(var obj in other)
             {
                 if (Vector3D.Subtract(position, obj).Length() < minDistance)
@@ -308,7 +343,7 @@ namespace SEWorldGenPlugin.Generator
             var storageNameBase = "ProcAsteroid" + "-" + seed + "r" + radius;
             var storageName = MakeStorageName(storageNameBase);
 
-            var provider = MySEWGCompositeShapeProvider.CreateAsteroidShape(seed, radius, MySession.Static.Settings.VoxelGeneratorVersion);
+            var provider = MyCompositeShapeProvider.CreateAsteroidShape(seed, radius, MySession.Static.Settings.VoxelGeneratorVersion);
             var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(radius));
             
             MyVoxelMap voxelMap = new MyVoxelMap();

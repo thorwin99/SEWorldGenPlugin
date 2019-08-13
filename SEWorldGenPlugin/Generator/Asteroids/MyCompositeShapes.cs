@@ -1,8 +1,15 @@
 ﻿using Sandbox.Definitions;
+using Sandbox.Engine.Voxels;
+using Sandbox.Game.World.Generator;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using VRage;
+using VRage.Collections;
+using VRage.FileSystem;
 using VRage.Game;
 using VRage.Library.Utils;
 using VRage.Noise;
@@ -11,484 +18,718 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    /**
-     *
-     * Code from Space engineers github:
-     * https://github.com/KeenSoftwareHouse/SpaceEngineers/
-     * Original class name is MyCompositeShapes
-     *
-    */
-    internal delegate void MyCompositeShapeGeneratorDelegate(int seed, float size, out MyCompositeShapeGeneratedData data);
-
-    internal static class MyCompositeShapes
+    internal struct MyCompositeShapes
     {
-        public const float PLANET_SCALE_FACTOR = 1.2f;
+        private List<MyVoxelMaterialDefinition> m_coreMaterials;
 
-        private static readonly List<MyVoxelMaterialDefinition> m_surfaceMaterials = new List<MyVoxelMaterialDefinition>();
-        private static readonly List<MyVoxelMaterialDefinition> m_depositMaterials = new List<MyVoxelMaterialDefinition>();
-        private static readonly List<MyVoxelMaterialDefinition> m_coreMaterials = new List<MyVoxelMaterialDefinition>();
+        private List<MyVoxelMaterialDefinition> m_surfaceMaterials;
 
-        /// <summary>
-        /// Table of methods that take care of creation of asteroids and possibly other composite shapes.
-        /// Backwards compatibility! Do not change indices of these entries!
-        /// </summary>
-        public static readonly MyCompositeShapeGeneratorDelegate[] AsteroidGenerators = new MyCompositeShapeGeneratorDelegate[]
+        private List<MyVoxelMaterialDefinition> m_depositMaterials;
+
+        public static readonly MyCompositeShapeGeneratorDelegate[] AsteroidGenerators;
+
+        private List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> m_primarySelections;
+
+        private List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> m_secondarySelections;
+
+        static MyCompositeShapes()
         {
-            Generator0,
-            Generator1,
-            Generator2,
-        };
-
-        private static void Generator0(int seed, float size, out MyCompositeShapeGeneratedData data)
-        {
-            Generator(0, seed, size, out data);
-        }
-
-        //Added ice material
-        private static void Generator1(int seed, float size, out MyCompositeShapeGeneratedData data)
-        {
-            Generator(1, seed, size, out data);
-        }
-
-        private static void Generator2(int seed, float size, out MyCompositeShapeGeneratedData data)
-        {
-            Generator(2, seed, size, out data);
-        }
-
-        private static MyVoxelMaterialDefinition GetMaterialByName(String name)
-        {
-            foreach (var material in MyDefinitionManager.Static.GetVoxelMaterialDefinitions())
+            int[] source = new int[3]
             {
-                if (material.Id.SubtypeName == name)
+                0,
+                1,
+                2
+            };
+            int[] source2 = new int[2]
+            {
+                3,
+                4
+            };
+            AsteroidGenerators = (from x in source
+                                  select MyTuple.Create(x, arg2: false)).Concat(from x in source2
+                                                                                select MyTuple.Create(x, arg2: true)).Select((Func<MyTuple<int, bool>, MyCompositeShapeGeneratorDelegate>)delegate (MyTuple<int, bool> info)
+                                                                                {
+                                                                                    int version = info.Item1;
+                                                                                    bool combined = info.Item2;
+                                                                                    return delegate (int generatorSeed, int seed, float size)
+                                                                                    {
+                                                                                        if (size == 0f)
+                                                                                        {
+                                                                                            size = MyUtils.GetRandomFloat(128f, 512f);
+                                                                                        }
+                                                                                        MyCompositeShapes myCompositeShapes = new MyCompositeShapes(generatorSeed, seed, version);
+                                                                                        using (MyRandom.Instance.PushSeed(seed))
+                                                                                        {
+                                                                                            if (combined)
+                                                                                            {
+                                                                                                return myCompositeShapes.CombinedGenerator(version, seed, size);
+                                                                                            }
+                                                                                            return myCompositeShapes.ProceduralGenerator(version, seed, size);
+                                                                                        }
+                                                                                    };
+                                                                                }).ToArray();
+        }
+
+        private MyCompositeShapes(int generatorSeed, int asteroidSeed, int version)
+        {
+            this = default(MyCompositeShapes);
+            if (version > 2)
+            {
+                m_coreMaterials = new List<MyVoxelMaterialDefinition>();
+                m_depositMaterials = new List<MyVoxelMaterialDefinition>();
+                m_surfaceMaterials = new List<MyVoxelMaterialDefinition>();
+                using (MyRandom.Instance.PushSeed(generatorSeed))
                 {
-                    return material;
+                    MyRandom instance = MyRandom.Instance;
+                    FillMaterials(version);
+                    FilterKindDuplicates(m_coreMaterials, instance);
+                    FilterKindDuplicates(m_depositMaterials, instance);
+                    FilterKindDuplicates(m_surfaceMaterials, instance);
+                    ProcessMaterialSpawnProbabilities(m_coreMaterials);
+                    ProcessMaterialSpawnProbabilities(m_depositMaterials);
+                    ProcessMaterialSpawnProbabilities(m_surfaceMaterials);
+                    if (instance.Next(100) < 1)
+                    {
+                        MakeIceAsteroid(version, instance);
+                    }
+                    else if (version >= 4)
+                    {
+                        int maxCount = (instance.NextDouble() > 0.800000011920929) ? 4 : 2;
+                        int maxCount2 = (!(instance.NextDouble() > 0.40000000596046448)) ? 1 : 2;
+                        LimitMaterials(m_coreMaterials, maxCount, instance);
+                        LimitMaterials(m_depositMaterials, maxCount, instance);
+                        using (MyRandom.Instance.PushSeed(asteroidSeed))
+                        {
+                            LimitMaterials(m_coreMaterials, maxCount2, instance);
+                            LimitMaterials(m_depositMaterials, maxCount2, instance);
+                        }
+                    }
                 }
             }
-            return null;
         }
 
-        private static void Generator(int version, int seed, float size, out MyCompositeShapeGeneratedData data)
+        private IMyCompositionInfoProvider CombinedGenerator(int version, int seed, float size)
         {
-            Debug.Assert(size != 0, "Size could not be zero.");
-            if (size == 0)
-                size = MyUtils.GetRandomFloat(128, 512);
-            var random = MyRandom.Instance;
-            using (var stateToken = random.PushSeed(seed))
+            int num = 0;
+            MyRandom instance = MyRandom.Instance;
+            MyCompositeShapeProvider.MyProceduralCompositeInfoProvider.ConstructionData data = default(MyCompositeShapeProvider.MyProceduralCompositeInfoProvider.ConstructionData);
+            data.DefaultMaterial = null;
+            data.Deposits = Array.Empty<MyCompositeShapeOreDeposit>();
+            data.FilledShapes = new MyCsgShapeBase[num];
+            IMyCompositeShape[] array = new IMyCompositeShape[6];
+            FillSpan(instance, size, array.Span(0, 1), MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralPrimaryAdditions(), prefferOnlyBestFittingSize: true);
+            size = ((MyOctreeStorage)array[0]).Size.AbsMax();
+            float idealSize = size / 2f;
+            float idealSize2 = size / 2f;
+            int num2 = 5 / ((size > 200f) ? 1 : 2);
+            int num3 = 1;
+            if (size <= 64f)
             {
-                data = new MyCompositeShapeGeneratedData();
-                data.FilledShapes = new MyCsgShapeBase[2];
-                data.RemovedShapes = new MyCsgShapeBase[2];
-                data.MacroModule = new MySimplexFast(seed: seed, frequency: 7f / size);
-                switch (random.Next() & 0x1)
+                num2 = 0;
+                num3 = 0;
+            }
+            IMyCompositeShape[] array2 = new IMyCompositeShape[num2];
+            data.RemovedShapes = new MyCsgShapeBase[num3];
+            FillSpan(instance, idealSize2, array, MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralAdditions());
+            FillSpan(instance, idealSize, array2, MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralRemovals());
+            TranslateShapes(array2, size, instance);
+            TranslateShapes(array.Span(1), size, instance);
+            if (size > 512f)
+            {
+                size /= 2f;
+            }
+            float num4 = size * 0.5f;
+            float storageOffset = (float)MathHelper.GetNearestBiggerPowerOfTwo(size) * 0.5f - num4;
+            GetProceduralModules(seed, size, instance, out data.MacroModule, out data.DetailModule);
+            GenerateProceduralAdditions(version, size, data.FilledShapes, instance, storageOffset);
+            GenerateProceduralRemovals(version, size, data.RemovedShapes, instance, storageOffset);
+            MyCompositeShapeProvider.MyCombinedCompositeInfoProvider myCombinedCompositeInfoProvider = new MyCompositeShapeProvider.MyCombinedCompositeInfoProvider(ref data, array, array2);
+            GenerateMaterials(version, size, instance, data.FilledShapes, storageOffset, out MyVoxelMaterialDefinition defaultMaterial, out MyCompositeShapeOreDeposit[] deposits, myCombinedCompositeInfoProvider);
+            myCombinedCompositeInfoProvider.UpdateMaterials(defaultMaterial, deposits);
+            return myCombinedCompositeInfoProvider;
+        }
+
+        private void TranslateShapes(Span<IMyCompositeShape> array, float size, MyRandom random)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                int num = 0;
+                MyStorageBase myStorageBase = array[i] as MyStorageBase;
+                if (myStorageBase != null)
+                {
+                    num = myStorageBase.Size.AbsMax();
+                }
+                array[i] = new MyCompositeTranslateShape(array[i], CreateRandomPointInBox(random, size - (float)num));
+            }
+        }
+
+        private void FillSpan(MyRandom random, float idealSize, Span<IMyCompositeShape> shapes, ListReader<MyVoxelMapStorageDefinition> voxelMaps, bool prefferOnlyBestFittingSize = false)
+        {
+            bool flag = false;
+            for (int i = 0; i < shapes.Length; i++)
+            {
+                if (shapes[i] == null)
+                {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag)
+            {
+                using (MyUtils.ReuseCollection(ref m_primarySelections))
+                {
+                    using (MyUtils.ReuseCollection(ref m_secondarySelections))
+                    {
+                        m_primarySelections.EnsureCapacity(voxelMaps.Count);
+                        m_secondarySelections.EnsureCapacity(voxelMaps.Count);
+                        int num = int.MinValue;
+                        int num2 = int.MaxValue;
+                        foreach (MyVoxelMapStorageDefinition item in voxelMaps)
+                        {
+                            MyOctreeStorage myOctreeStorage = CreateAsteroidStorage(item);
+                            int num3 = myOctreeStorage.Size.AbsMax();
+                            if ((float)num3 > idealSize)
+                            {
+                                if (num3 <= num2)
+                                {
+                                    if (num3 < num2)
+                                    {
+                                        num2 = num3;
+                                        m_secondarySelections.Clear();
+                                    }
+                                    m_secondarySelections.Add(MyTuple.Create(item, myOctreeStorage));
+                                }
+                            }
+                            else
+                            {
+                                if (prefferOnlyBestFittingSize)
+                                {
+                                    if (num3 < num)
+                                    {
+                                        continue;
+                                    }
+                                    if (num3 > num)
+                                    {
+                                        num = num3;
+                                        m_primarySelections.Clear();
+                                    }
+                                }
+                                m_primarySelections.Add(MyTuple.Create(item, myOctreeStorage));
+                            }
+                        }
+                        List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> list = (m_primarySelections.Count > 0) ? m_primarySelections : m_secondarySelections;
+                        float num4 = list.Sum((MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> x) => x.Item1.SpawnProbability);
+                        for (int j = 0; j < shapes.Length; j++)
+                        {
+                            if (shapes[j] == null)
+                            {
+                                float num5 = num4 * random.NextFloat();
+                                foreach (MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> item2 in list)
+                                {
+                                    float spawnProbability = item2.Item1.SpawnProbability;
+                                    if (!(num5 < spawnProbability))
+                                    {
+                                        num5 -= spawnProbability;
+                                        continue;
+                                    }
+                                    shapes[j] = item2.Item2;
+                                    goto IL_0221;
+                                }
+                                shapes[j] = list.MaxBy((MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> x) => x.Item1.SpawnProbability).Item2;
+                            }
+                            IL_0221:;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static MyOctreeStorage CreateAsteroidStorage(MyVoxelMapStorageDefinition definition)
+        {
+            return (MyOctreeStorage)MyStorageBase.LoadFromFile(Path.Combine(definition.Context.IsBaseGame ? MyFileSystem.ContentPath : definition.Context.ModPath, definition.StorageFile));
+        }
+
+        private IMyCompositionInfoProvider ProceduralGenerator(int version, int seed, float size)
+        {
+            MyRandom instance = MyRandom.Instance;
+            MyCompositeShapeProvider.MyProceduralCompositeInfoProvider.ConstructionData data = default(MyCompositeShapeProvider.MyProceduralCompositeInfoProvider.ConstructionData);
+            data.FilledShapes = new MyCsgShapeBase[2];
+            data.RemovedShapes = new MyCsgShapeBase[2];
+            GetProceduralModules(seed, size, instance, out data.MacroModule, out data.DetailModule);
+            float num = size * 0.5f;
+            float num2 = (float)MathHelper.GetNearestBiggerPowerOfTwo(size) * 0.5f;
+            float storageOffset = num2 - num;
+            MyCsgShapeBase myCsgShapeBase;
+            switch (instance.Next() % 3)
+            {
+                case 0:
+                    {
+                        float num3 = (instance.NextFloat() * 0.05f + 0.1f) * size;
+                        myCsgShapeBase = new MyCsgTorus(new Vector3(num2), CreateRandomRotation(instance), (instance.NextFloat() * 0.1f + 0.2f) * size, num3, (instance.NextFloat() * 0.4f + 0.4f) * num3, instance.NextFloat() * 0.8f + 0.2f, instance.NextFloat() * 0.6f + 0.4f);
+                        break;
+                    }
+                default:
+                    myCsgShapeBase = new MyCsgSphere(new Vector3(num2), (instance.NextFloat() * 0.1f + 0.35f) * size * ((version > 2) ? 0.8f : 1f), (instance.NextFloat() * 0.05f + 0.05f) * size + 1f, instance.NextFloat() * 0.8f + 0.2f, instance.NextFloat() * 0.6f + 0.4f);
+                    break;
+            }
+            data.FilledShapes[0] = myCsgShapeBase;
+            GenerateProceduralAdditions(version, size, data.FilledShapes, instance, storageOffset);
+            GenerateProceduralRemovals(version, size, data.RemovedShapes, instance, storageOffset);
+            GenerateMaterials(version, size, instance, data.FilledShapes, storageOffset, out data.DefaultMaterial, out data.Deposits);
+            return new MyCompositeShapeProvider.MyProceduralCompositeInfoProvider(ref data);
+        }
+
+        private static void GetProceduralModules(int seed, float size, MyRandom random, out IMyModule macroModule, out IMyModule detailModule)
+        {
+            macroModule = new MySimplexFast(seed, 7f / size);
+            switch (random.Next() & 1)
+            {
+                case 0:
+                    detailModule = new MyRidgedMultifractalFast(MyNoiseQuality.Low, 1, seed, random.NextFloat() * 0.09f + 0.11f);
+                    break;
+                default:
+                    detailModule = new MyBillowFast(MyNoiseQuality.Low, 1, seed, random.NextFloat() * 0.07f + 0.13f);
+                    break;
+            }
+        }
+
+        private static void GenerateProceduralAdditions(int version, float size, MyCsgShapeBase[] filledShapes, MyRandom random, float storageOffset)
+        {
+            bool flag = version > 2;
+            for (int i = 0; i < filledShapes.Length; i++)
+            {
+                if (filledShapes[i] != null)
+                {
+                    continue;
+                }
+                float num = size * (random.NextFloat() * 0.2f + 0.1f) + 2f;
+                float num2 = 2f * num;
+                float boxSize = size - num2;
+                switch (random.Next() % (flag ? 2 : 3))
                 {
                     case 0:
-                        data.DetailModule = new MyRidgedMultifractalFast(
-                            seed: seed,
-                            quality: MyNoiseQuality.Low,
-                            frequency: random.NextFloat() * 0.09f + 0.11f,
-                            layerCount: 1);
-                        break;
-
+                        {
+                            Vector3 value2 = CreateRandomPointOnBox(random, boxSize, version) + num;
+                            float num6 = num * (random.NextFloat() * 0.4f + 0.35f) * (flag ? 0.8f : 1f);
+                            MyCsgSphere myCsgSphere = (MyCsgSphere)(filledShapes[i] = new MyCsgSphere(value2 + storageOffset, num6, num6 * (random.NextFloat() * 0.1f + 0.1f), random.NextFloat() * 0.8f + 0.2f, random.NextFloat() * 0.6f + 0.4f));
+                            break;
+                        }
                     case 1:
-                    default:
-                        data.DetailModule = new MyBillowFast(
-                            seed: seed,
-                            quality: MyNoiseQuality.Low,
-                            frequency: random.NextFloat() * 0.07f + 0.13f,
-                            layerCount: 1);
-                        break;
-                }
-
-                float halfSize = size * 0.5f;
-                float storageSize = VRageMath.MathHelper.GetNearestBiggerPowerOfTwo(size);
-                float halfStorageSize = storageSize * 0.5f;
-                float storageOffset = halfStorageSize - halfSize;
-
-                MyCsgShapeBase primaryShape;
-                { // determine primary shape
-                    var primaryType = random.Next() % 3;
-                    switch (primaryType)
-                    {
-                        case 0: //ShapeType.Torus
+                        {
+                            Vector3 vector2 = CreateRandomPointOnBox(random, boxSize, version) + num;
+                            Vector3 value = new Vector3(size) - vector2;
+                            if (random.Next() % 2 == 0)
                             {
-                                var secondaryRadius = (random.NextFloat() * 0.05f + 0.1f) * size;
-                                var torus = new MyCsgTorus(
-                                    translation: new Vector3(halfStorageSize),
-                                    invRotation: CreateRandomRotation(random),
-                                    primaryRadius: (random.NextFloat() * 0.1f + 0.2f) * size,
-                                    secondaryRadius: secondaryRadius,
-                                    secondaryHalfDeviation: (random.NextFloat() * 0.4f + 0.4f) * secondaryRadius,
-                                    deviationFrequency: random.NextFloat() * 0.8f + 0.2f,
-                                    detailFrequency: random.NextFloat() * 0.6f + 0.4f);
-                                primaryShape = torus;
+                                MyUtils.Swap(ref vector2.X, ref value.X);
                             }
-                            break;
-
-                        case 1: //ShapeType.Sphere
-                        default:
+                            if (random.Next() % 2 == 0)
                             {
-                                var sphere = new MyCsgSphere(
-                                    translation: new Vector3(halfStorageSize),
-                                    radius: (random.NextFloat() * 0.1f + 0.35f) * size,
-                                    halfDeviation: (random.NextFloat() * 0.05f + 0.05f) * size + 1f,
-                                    deviationFrequency: random.NextFloat() * 0.8f + 0.2f,
-                                    detailFrequency: random.NextFloat() * 0.6f + 0.4f);
-                                primaryShape = sphere;
+                                MyUtils.Swap(ref vector2.Y, ref value.Y);
                             }
+                            if (random.Next() % 2 == 0)
+                            {
+                                MyUtils.Swap(ref vector2.Z, ref value.Z);
+                            }
+                            float num5 = (random.NextFloat() * 0.25f + 0.5f) * num * (flag ? 0.5f : 1f);
+                            MyCsgCapsule myCsgCapsule = (MyCsgCapsule)(filledShapes[i] = new MyCsgCapsule(vector2 + storageOffset, value + storageOffset, num5, (random.NextFloat() * 0.25f + 0.5f) * (flag ? 1f : num5), random.NextFloat() * 0.4f + 0.4f, random.NextFloat() * 0.6f + 0.4f));
                             break;
-                    }
-                }
-
-                { // add some additional shapes
-                    int filledShapeCount = 0;
-                    data.FilledShapes[filledShapeCount++] = primaryShape;
-                    while (filledShapeCount < data.FilledShapes.Length)
-                    {
-                        var fromBorders = size * (random.NextFloat() * 0.2f + 0.1f) + 2f;
-                        var fromBorders2 = 2f * fromBorders;
-                        var sizeMinusFromBorders2 = size - fromBorders2;
-                        var shapeType = random.Next() % 3;
-                        switch (shapeType)
-                        {
-                            case 0: //ShapeType.Sphere
-                                {
-                                    Vector3 center = CreateRandomPointOnBox(random, sizeMinusFromBorders2) + fromBorders;
-                                    float radius = fromBorders * (random.NextFloat() * 0.4f + 0.35f);
-
-                                    MyCsgSphere sphere = new MyCsgSphere(
-                                        translation: center + storageOffset,
-                                        radius: radius,
-                                        halfDeviation: radius * (random.NextFloat() * 0.1f + 0.1f),
-                                        deviationFrequency: random.NextFloat() * 0.8f + 0.2f,
-                                        detailFrequency: random.NextFloat() * 0.6f + 0.4f);
-
-                                    data.FilledShapes[filledShapeCount++] = sphere;
-                                }
-                                break;
-
-                            case 1: //ShapeType.Capsule
-                                {
-                                    var start = CreateRandomPointOnBox(random, sizeMinusFromBorders2) + fromBorders;
-                                    var end = new Vector3(size) - start;
-                                    if ((random.Next() % 2) == 0) MyUtils.Swap(ref start.X, ref end.X);
-                                    if ((random.Next() % 2) == 0) MyUtils.Swap(ref start.Y, ref end.Y);
-                                    if ((random.Next() % 2) == 0) MyUtils.Swap(ref start.Z, ref end.Z);
-                                    float radius = (random.NextFloat() * 0.25f + 0.5f) * fromBorders;
-
-                                    MyCsgCapsule capsule = new MyCsgCapsule(
-                                        pointA: start + storageOffset,
-                                        pointB: end + storageOffset,
-                                        radius: radius,
-                                        halfDeviation: (random.NextFloat() * 0.25f + 0.5f) * radius,
-                                        deviationFrequency: (random.NextFloat() * 0.4f + 0.4f),
-                                        detailFrequency: (random.NextFloat() * 0.6f + 0.4f));
-
-                                    data.FilledShapes[filledShapeCount++] = capsule;
-                                }
-                                break;
-
-                            case 2: //ShapeType.Torus
-                                {
-                                    Vector3 center = CreateRandomPointInBox(random, sizeMinusFromBorders2) + fromBorders;
-                                    var rotation = CreateRandomRotation(random);
-                                    var borderDistance = ComputeBoxSideDistance(center, size);
-                                    var secondaryRadius = (random.NextFloat() * 0.15f + 0.1f) * borderDistance;
-
-                                    var torus = new MyCsgTorus(
-                                        translation: center + storageOffset,
-                                        invRotation: rotation,
-                                        primaryRadius: (random.NextFloat() * 0.2f + 0.5f) * borderDistance,
-                                        secondaryRadius: secondaryRadius,
-                                        secondaryHalfDeviation: (random.NextFloat() * 0.25f + 0.2f) * secondaryRadius,
-                                        deviationFrequency: random.NextFloat() * 0.8f + 0.2f,
-                                        detailFrequency: random.NextFloat() * 0.6f + 0.4f);
-
-                                    data.FilledShapes[filledShapeCount++] = torus;
-                                }
-                                break;
                         }
-                    }
-                }
-
-                { // make some holes
-                    int removedShapesCount = 0;
-
-                    while (removedShapesCount < data.RemovedShapes.Length)
-                    {
-                        var fromBorders = size * (random.NextFloat() * 0.2f + 0.1f) + 2f;
-                        var fromBorders2 = 2f * fromBorders;
-                        var sizeMinusFromBorders2 = size - fromBorders2;
-                        var shapeType = random.Next() % 7;
-                        switch (shapeType)
+                    case 2:
                         {
-                            // Sphere
-                            case 0:
-                                {
-                                    Vector3 center = CreateRandomPointInBox(random, sizeMinusFromBorders2) + fromBorders;
-
-                                    float borderDistance = ComputeBoxSideDistance(center, size);
-                                    float radius = (random.NextFloat() * 0.4f + 0.3f) * borderDistance;
-                                    MyCsgSphere sphere = new MyCsgSphere(
-                                        translation: center + storageOffset,
-                                        radius: radius,
-                                        halfDeviation: (random.NextFloat() * 0.3f + 0.35f) * radius,
-                                        deviationFrequency: (random.NextFloat() * 0.8f + 0.2f),
-                                        detailFrequency: (random.NextFloat() * 0.6f + 0.4f));
-
-                                    data.RemovedShapes[removedShapesCount++] = sphere;
-                                    break;
-                                }
-
-                            // Torus
-                            case 1:
-                            case 2:
-                            case 3:
-                                {
-                                    Vector3 center = CreateRandomPointInBox(random, sizeMinusFromBorders2) + fromBorders;
-                                    var rotation = CreateRandomRotation(random);
-                                    var borderDistance = ComputeBoxSideDistance(center, size);
-                                    var secondaryRadius = (random.NextFloat() * 0.15f + 0.1f) * borderDistance;
-
-                                    var torus = new MyCsgTorus(
-                                        translation: center + storageOffset,
-                                        invRotation: rotation,
-                                        primaryRadius: (random.NextFloat() * 0.2f + 0.5f) * borderDistance,
-                                        secondaryRadius: secondaryRadius,
-                                        secondaryHalfDeviation: (random.NextFloat() * 0.25f + 0.2f) * secondaryRadius,
-                                        deviationFrequency: random.NextFloat() * 0.8f + 0.2f,
-                                        detailFrequency: random.NextFloat() * 0.6f + 0.4f);
-
-                                    data.RemovedShapes[removedShapesCount++] = torus;
-                                }
-                                break;
-
-                            // Capsule
-                            default:
-                                {
-                                    var start = CreateRandomPointOnBox(random, sizeMinusFromBorders2) + fromBorders;
-                                    var end = new Vector3(size) - start;
-                                    if ((random.Next() % 2) == 0) MyUtils.Swap(ref start.X, ref end.X);
-                                    if ((random.Next() % 2) == 0) MyUtils.Swap(ref start.Y, ref end.Y);
-                                    if ((random.Next() % 2) == 0) MyUtils.Swap(ref start.Z, ref end.Z);
-                                    float radius = (random.NextFloat() * 0.25f + 0.5f) * fromBorders;
-
-                                    MyCsgCapsule capsule = new MyCsgCapsule(
-                                        pointA: start + storageOffset,
-                                        pointB: end + storageOffset,
-                                        radius: radius,
-                                        halfDeviation: (random.NextFloat() * 0.25f + 0.5f) * radius,
-                                        deviationFrequency: random.NextFloat() * 0.4f + 0.4f,
-                                        detailFrequency: random.NextFloat() * 0.6f + 0.4f);
-
-                                    data.RemovedShapes[removedShapesCount++] = capsule;
-                                }
-                                break;
+                            Vector3 vector = CreateRandomPointInBox(random, boxSize) + num;
+                            Quaternion invRotation = CreateRandomRotation(random);
+                            float num3 = ComputeBoxSideDistance(vector, size);
+                            float num4 = (random.NextFloat() * 0.15f + 0.1f) * num3;
+                            MyCsgTorus myCsgTorus = (MyCsgTorus)(filledShapes[i] = new MyCsgTorus(vector + storageOffset, invRotation, (random.NextFloat() * 0.2f + 0.5f) * num3, num4, (random.NextFloat() * 0.25f + 0.2f) * num4, random.NextFloat() * 0.8f + 0.2f, random.NextFloat() * 0.6f + 0.4f));
+                            break;
                         }
-                    }
                 }
+            }
+        }
 
-                { // generating materials
-                    // What to do when we (or mods) change the number of materials? Same seed will then produce different results.
-                    FillMaterials(version);
-
-                    Action<List<MyVoxelMaterialDefinition>> shuffleMaterials = (list) =>
-                    {
-                        int n = list.Count;
-                        while (n > 1)
+        private static void GenerateProceduralRemovals(int version, float size, MyCsgShapeBase[] removedShapes, MyRandom random, float storageOffset)
+        {
+            bool flag = version > 2;
+            for (int i = 0; i < removedShapes.Length; i++)
+            {
+                if (removedShapes[i] != null)
+                {
+                    continue;
+                }
+                float num = size * (random.NextFloat() * 0.2f + 0.1f) + 2f;
+                float num2 = 2f * num;
+                float boxSize = size - num2;
+                switch (random.Next() % 7)
+                {
+                    case 0:
                         {
-                            int k = (int)random.Next() % n;
-                            n--;
-                            var value = list[k];
-                            list[k] = list[n];
-                            list[n] = value;
+                            Vector3 vector = CreateRandomPointInBox(random, boxSize) + num;
+                            float num3 = ComputeBoxSideDistance(vector, size);
+                            float num4 = (random.NextFloat() * (flag ? 0.3f : 0.4f) + (flag ? 0.1f : 0.3f)) * num3;
+                            MyCsgSphere myCsgSphere = (MyCsgSphere)(removedShapes[i] = new MyCsgSphere(vector + storageOffset, num4, (random.NextFloat() * (flag ? 0.2f : 0.3f) + (flag ? 0.45f : 0.35f)) * num4, random.NextFloat() * (flag ? 0.2f : 0.8f) + (flag ? 1f : 0.2f), random.NextFloat() * (flag ? 0.1f : 0.6f) + 0.4f));
+                            continue;
                         }
-                    };
-                    shuffleMaterials(m_depositMaterials);
+                    case 1:
+                    case 2:
+                    case 3:
+                        {
+                            Vector3 vector2 = CreateRandomPointInBox(random, boxSize) + num;
+                            Quaternion invRotation = CreateRandomRotation(random);
+                            float num5 = ComputeBoxSideDistance(vector2, size);
+                            float num6 = (random.NextFloat() * (flag ? 0.1f : 0.15f) + (flag ? 0.2f : 0.1f)) * num5;
+                            MyCsgTorus myCsgTorus = (MyCsgTorus)(removedShapes[i] = new MyCsgTorus(vector2 + storageOffset, invRotation, (random.NextFloat() * 0.2f + (flag ? 0.3f : 0.5f)) * num5, num6, (random.NextFloat() * (flag ? 0.2f : 0.25f) + (flag ? 1f : 0.2f)) * num6, random.NextFloat() * (flag ? 0.2f : 0.8f) + (flag ? 1f : 0.2f), random.NextFloat() * (flag ? 0.2f : 0.6f) + 0.4f));
+                            continue;
+                        }
+                }
+                Vector3 vector3 = CreateRandomPointOnBox(random, boxSize, version) + num;
+                Vector3 value = new Vector3(size) - vector3;
+                if (random.Next() % 2 == 0)
+                {
+                    MyUtils.Swap(ref vector3.X, ref value.X);
+                }
+                if (random.Next() % 2 == 0)
+                {
+                    MyUtils.Swap(ref vector3.Y, ref value.Y);
+                }
+                if (random.Next() % 2 == 0)
+                {
+                    MyUtils.Swap(ref vector3.Z, ref value.Z);
+                }
+                float num7 = (random.NextFloat() * (flag ? 0.3f : 0.25f) + (flag ? 0.1f : 0.5f)) * num;
+                MyCsgCapsule myCsgCapsule = (MyCsgCapsule)(removedShapes[i] = new MyCsgCapsule(vector3 + storageOffset, value + storageOffset, num7, (random.NextFloat() * (flag ? 0.5f : 0.25f) + (flag ? 1f : 0.5f)) * (flag ? 1f : num7), random.NextFloat() * (flag ? 0.5f : 0.4f) + (flag ? 1f : 0.4f), random.NextFloat() * (flag ? 0.2f : 0.6f) + 0.4f));
+            }
+        }
 
-                    if (m_surfaceMaterials.Count == 0)
+        private void GenerateMaterials(int version, float size, MyRandom random, MyCsgShapeBase[] filledShapes, float storageOffset, out MyVoxelMaterialDefinition defaultMaterial, out MyCompositeShapeOreDeposit[] deposits, MyCompositeShapeProvider.MyCombinedCompositeInfoProvider shapeInfo = null)
+        {
+            bool flag = version > 2;
+            if (m_coreMaterials == null)
+            {
+                m_coreMaterials = new List<MyVoxelMaterialDefinition>();
+                m_depositMaterials = new List<MyVoxelMaterialDefinition>();
+                m_surfaceMaterials = new List<MyVoxelMaterialDefinition>();
+                FillMaterials(version);
+            }
+            Action<List<MyVoxelMaterialDefinition>> action = delegate (List<MyVoxelMaterialDefinition> list)
+            {
+                int num9 = list.Count;
+                while (num9 > 1)
+                {
+                    int index = random.Next() % num9;
+                    num9--;
+                    MyVoxelMaterialDefinition value = list[index];
+                    list[index] = list[num9];
+                    list[num9] = value;
+                }
+            };
+            action(m_depositMaterials);
+            if (m_surfaceMaterials.Count == 0)
+            {
+                if (m_depositMaterials.Count == 0)
+                {
+                    defaultMaterial = m_coreMaterials[random.Next() % m_coreMaterials.Count];
+                }
+                else
+                {
+                    defaultMaterial = m_depositMaterials[random.Next() % m_depositMaterials.Count];
+                }
+            }
+            else
+            {
+                defaultMaterial = m_surfaceMaterials[random.Next() % m_surfaceMaterials.Count];
+            }
+            int val;
+            if (flag)
+            {
+                val = ((size <= 64f) ? 2 : ((size <= 128f) ? 4 : ((size <= 256f) ? 6 : ((!(size <= 512f)) ? 10 : 8))));
+                if (m_depositMaterials.Count == 0)
+                {
+                    val = 0;
+                }
+            }
+            else
+            {
+                val = (int)Math.Log(size);
+            }
+            val = Math.Max(val, filledShapes.Length);
+            deposits = new MyCompositeShapeOreDeposit[val];
+            float num = (!flag) ? (size / 10f) : (size / 30f + 8f);
+            MyVoxelMaterialDefinition material = defaultMaterial;
+            int num2 = 0;
+            for (int i = 0; i < filledShapes.Length; i++)
+            {
+                if (i == 0)
+                {
+                    if (m_coreMaterials.Count == 0)
                     {
                         if (m_depositMaterials.Count == 0)
                         {
-                            data.DefaultMaterial = m_coreMaterials[(int)random.Next() % m_coreMaterials.Count];
+                            if (m_surfaceMaterials.Count != 0)
+                            {
+                                material = m_surfaceMaterials[random.Next() % m_surfaceMaterials.Count];
+                            }
                         }
                         else
                         {
-                            data.DefaultMaterial = m_depositMaterials[(int)random.Next() % m_depositMaterials.Count];
+                            material = m_depositMaterials[num2++];
                         }
                     }
                     else
                     {
-                        data.DefaultMaterial = m_surfaceMaterials[(int)random.Next() % m_surfaceMaterials.Count];
+                        material = m_coreMaterials[random.Next() % m_coreMaterials.Count];
                     }
-
-
-                    int depositCount = Math.Max((int)Math.Log(size), data.FilledShapes.Length);
-                    data.Deposits = new MyCompositeShapeOreDeposit[depositCount];
-
-                    var depositSize = size / 10f;
-
-                    MyVoxelMaterialDefinition material = data.DefaultMaterial;
-                    int currentMaterial = 0;
-                    for (int i = 0; i < data.FilledShapes.Length; ++i)
-                    {
-
-                        if (i == 0)
-                        {
-                            if (m_coreMaterials.Count == 0)
-                            {
-                                if (m_depositMaterials.Count == 0)
-                                {
-                                    if (m_surfaceMaterials.Count != 0)
-                                        material = m_surfaceMaterials[(int)random.Next() % m_surfaceMaterials.Count];
-                                }
-                                else
-                                {
-                                    material = m_depositMaterials[currentMaterial++];
-                                }
-                            }
-                            else
-                            {
-                                material = m_coreMaterials[(int)random.Next() % m_coreMaterials.Count];
-                            }
-                        }
-                        else
-                        {
-                            if (m_depositMaterials.Count == 0)
-                            {
-                                if (m_surfaceMaterials.Count != 0)
-                                    material = m_surfaceMaterials[(int)random.Next() % m_surfaceMaterials.Count];
-                            }
-                            else
-                            {
-                                material = m_depositMaterials[currentMaterial++];
-                            }
-                        }
-                        data.Deposits[i] = new MyCompositeShapeOreDeposit(data.FilledShapes[i].DeepCopy(), material);
-                        data.Deposits[i].Shape.ShrinkTo(random.NextFloat() * 0.15f + 0.6f);
-                        if (currentMaterial == m_depositMaterials.Count)
-                        {
-                            currentMaterial = 0;
-                            shuffleMaterials(m_depositMaterials);
-                        }
-                    }
-                    for (int i = data.FilledShapes.Length; i < depositCount; ++i)
-                    {
-                        var center = CreateRandomPointInBox(random, size * 0.7f) + storageOffset + size * 0.15f;
-                        var radius = random.NextFloat() * depositSize + 8f;
-                        random.NextFloat(); random.NextFloat();//backwards compatibility
-                        MyCsgShapeBase shape = new MyCsgSphere(center, radius);
-
-                        if (m_depositMaterials.Count == 0)
-                        {
-                            material = m_surfaceMaterials[currentMaterial++];
-                        }
-                        else
-                        {
-                            material = m_depositMaterials[currentMaterial++];
-                        }
-
-                        data.Deposits[i] = new MyCompositeShapeOreDeposit(shape, material);
-
-                        if (m_depositMaterials.Count == 0)
-                        {
-                            if (currentMaterial == m_surfaceMaterials.Count)
-                            {
-                                currentMaterial = 0;
-                                shuffleMaterials(m_surfaceMaterials);
-                            }
-                        }
-                        else
-                        {
-
-                            if (currentMaterial == m_depositMaterials.Count)
-                            {
-                                currentMaterial = 0;
-                                shuffleMaterials(m_depositMaterials);
-                            }
-                        }
-                    }
-
-
-                    m_surfaceMaterials.Clear();
-                    m_coreMaterials.Clear();
-                    m_depositMaterials.Clear();
                 }
-            }
-        }
-
-        private static void FillMaterials(int version)
-        {
-            m_depositMaterials.Clear();
-            m_surfaceMaterials.Clear();
-            m_coreMaterials.Clear();
-
-            foreach (var material in MyDefinitionManager.Static.GetVoxelMaterialDefinitions())
-            {
-                if (!material.SpawnsInAsteroids || material.MinVersion > version) // filter out non-natural and version-incompatible materials
-                    continue;
-
-                if (material.MinedOre == "Stone") // Surface
-                    m_surfaceMaterials.Add(material);
-                else if (material.MinedOre == "Iron") // Core
-                    m_coreMaterials.Add(material);
-                else if (material.MinedOre == "Uranium") // Uranium
+                else if (m_depositMaterials.Count == 0)
                 {
-                    // We want more uranium, by design
-                    m_depositMaterials.Add(material);
-                    m_depositMaterials.Add(material);
-                }
-                else if (material.MinedOre == "Ice")
-                {
-                    // We also want more ice, by design
-                    m_depositMaterials.Add(material);
-                    m_depositMaterials.Add(material);
+                    if (m_surfaceMaterials.Count != 0)
+                    {
+                        material = m_surfaceMaterials[random.Next() % m_surfaceMaterials.Count];
+                    }
                 }
                 else
-                    m_depositMaterials.Add(material);
+                {
+                    material = m_depositMaterials[num2++];
+                }
+                deposits[i] = new MyCompositeShapeOreDeposit(filledShapes[i].DeepCopy(), material);
+                deposits[i].Shape.ShrinkTo(random.NextFloat() * (flag ? 0.6f : 0.15f) + (flag ? 0.1f : 0.6f));
+                if (num2 == m_depositMaterials.Count)
+                {
+                    num2 = 0;
+                    action(m_depositMaterials);
+                }
             }
+            for (int j = filledShapes.Length; j < val; j++)
+            {
+                float num5 = 0f;
+                Vector3 vector = Vector3.Zero;
+                for (int k = 0; k < 10; k++)
+                {
+                    vector = CreateRandomPointInBox(random, size * (flag ? 0.6f : 0.7f)) + storageOffset + size * 0.15f;
+                    num5 = random.NextFloat() * num + (flag ? 5f : 8f);
+                    if (shapeInfo == null)
+                    {
+                        break;
+                    }
+                    double num6 = Math.Sqrt(num5 * num5 / 2f) * 0.5;
+                    Vector3I b = new Vector3I((int)num6);
+                    BoundingBoxI box = new BoundingBoxI((Vector3I)vector - b, (Vector3I)vector + b);
+                    if (MyCompositeShapeProvider.Intersect(shapeInfo, box, 0) != 0)
+                    {
+                        break;
+                    }
+                }
+                random.NextFloat();
+                random.NextFloat();
+                MyCsgShapeBase shape = new MyCsgSphere(vector, num5);
+                material = ((m_depositMaterials.Count != 0) ? m_depositMaterials[num2++] : m_surfaceMaterials[num2++]);
+                deposits[j] = new MyCompositeShapeOreDeposit(shape, material);
+                if (m_depositMaterials.Count == 0)
+                {
+                    if (num2 == m_surfaceMaterials.Count)
+                    {
+                        num2 = 0;
+                        action(m_surfaceMaterials);
+                    }
+                }
+                else if (num2 == m_depositMaterials.Count)
+                {
+                    num2 = 0;
+                    action(m_depositMaterials);
+                }
+            }
+        }
 
-            if (m_surfaceMaterials.Count == 0 && m_depositMaterials.Count == 0) // this can happen if all materials are disabled or set to not spawn in asteroids
+        private void FillMaterials(int version)
+        {
+            foreach (MyVoxelMaterialDefinition voxelMaterialDefinition in MyDefinitionManager.Static.GetVoxelMaterialDefinitions())
+            {
+                if (IsAcceptedAsteroidMaterial(voxelMaterialDefinition, version))
+                {
+                    if (version > 2)
+                    {
+                        if (voxelMaterialDefinition.MinedOre == "Stone")
+                        {
+                            m_surfaceMaterials.Add(voxelMaterialDefinition);
+                        }
+                        else
+                        {
+                            m_depositMaterials.Add(voxelMaterialDefinition);
+                        }
+                    }
+                    else if (voxelMaterialDefinition.MinedOre == "Stone")
+                    {
+                        m_surfaceMaterials.Add(voxelMaterialDefinition);
+                    }
+                    else if (voxelMaterialDefinition.MinedOre == "Iron")
+                    {
+                        m_coreMaterials.Add(voxelMaterialDefinition);
+                    }
+                    else if (voxelMaterialDefinition.MinedOre == "Uranium")
+                    {
+                        m_depositMaterials.Add(voxelMaterialDefinition);
+                        m_depositMaterials.Add(voxelMaterialDefinition);
+                    }
+                    else if (voxelMaterialDefinition.MinedOre == "Ice")
+                    {
+                        m_depositMaterials.Add(voxelMaterialDefinition);
+                        m_depositMaterials.Add(voxelMaterialDefinition);
+                    }
+                    else
+                    {
+                        m_depositMaterials.Add(voxelMaterialDefinition);
+                    }
+                }
+            }
+            if (m_surfaceMaterials.Count == 0 && m_depositMaterials.Count == 0)
+            {
                 throw new Exception("There are no voxel materials allowed to spawn in asteroids!");
-        }
-
-        private static Vector3 CreateRandomPointInBox(MyRandom self, float boxSize)
-        {
-            return new Vector3(
-                self.NextFloat() * boxSize,
-                self.NextFloat() * boxSize,
-                self.NextFloat() * boxSize);
-        }
-
-        private static Vector3 CreateRandomPointOnBox(MyRandom self, float boxSize)
-        {
-            Vector3 result = Vector3.Zero;
-            switch (self.Next() & 6)
-            {// each side of a box
-                case 0: return new Vector3(0f, self.NextFloat(), self.NextFloat());
-                case 1: return new Vector3(1f, self.NextFloat(), self.NextFloat());
-                case 2: return new Vector3(self.NextFloat(), 0f, self.NextFloat());
-                case 3: return new Vector3(self.NextFloat(), 1f, self.NextFloat());
-                case 4: return new Vector3(self.NextFloat(), self.NextFloat(), 0f);
-                case 5: return new Vector3(self.NextFloat(), self.NextFloat(), 1f);
             }
-            result *= boxSize;
-            return result;
+        }
+
+        private static Vector3 CreateRandomPointInBox(MyRandom random, float boxSize)
+        {
+            return new Vector3(random.NextFloat() * boxSize, random.NextFloat() * boxSize, random.NextFloat() * boxSize);
+        }
+
+        private static Vector3 CreateRandomPointOnBox(MyRandom random, float boxSize, int version)
+        {
+            Vector3 value = Vector3.Zero;
+            if (version <= 2)
+            {
+                switch (random.Next() & 6)
+                {
+                    case 0:
+                        return new Vector3(0f, random.NextFloat(), random.NextFloat());
+                    case 1:
+                        return new Vector3(1f, random.NextFloat(), random.NextFloat());
+                    case 2:
+                        return new Vector3(random.NextFloat(), 0f, random.NextFloat());
+                    case 3:
+                        return new Vector3(random.NextFloat(), 1f, random.NextFloat());
+                    case 4:
+                        return new Vector3(random.NextFloat(), random.NextFloat(), 0f);
+                    case 5:
+                        return new Vector3(random.NextFloat(), random.NextFloat(), 1f);
+                }
+            }
+            else
+            {
+                float num = random.NextFloat();
+                float num2 = random.NextFloat();
+                switch (random.Next() % 6)
+                {
+                    case 0:
+                        value = new Vector3(0f, num, num2);
+                        break;
+                    case 1:
+                        value = new Vector3(1f, num, num2);
+                        break;
+                    case 2:
+                        value = new Vector3(num, 0f, num2);
+                        break;
+                    case 3:
+                        value = new Vector3(num, 1f, num2);
+                        break;
+                    case 4:
+                        value = new Vector3(num, num2, 0f);
+                        break;
+                    case 5:
+                        value = new Vector3(num, num2, 1f);
+                        break;
+                }
+            }
+            return value * boxSize;
         }
 
         private static Quaternion CreateRandomRotation(MyRandom self)
         {
-            Quaternion q = new Quaternion(
-                self.NextFloat() * 2f - 1f,
-                self.NextFloat() * 2f - 1f,
-                self.NextFloat() * 2f - 1f,
-                self.NextFloat() * 2f - 1f);
-            q.Normalize();
-            return q;
+            Quaternion result = new Quaternion(self.NextFloat() * 2f - 1f, self.NextFloat() * 2f - 1f, self.NextFloat() * 2f - 1f, self.NextFloat() * 2f - 1f);
+            result.Normalize();
+            return result;
         }
 
         private static float ComputeBoxSideDistance(Vector3 point, float boxSize)
         {
             return Vector3.Min(point, new Vector3(boxSize) - point).Min();
+        }
+
+        private static void FilterKindDuplicates(List<MyVoxelMaterialDefinition> materials, MyRandom random)
+        {
+            materials.SortNoAlloc((MyVoxelMaterialDefinition x, MyVoxelMaterialDefinition y) => string.Compare(x.MinedOre, y.MinedOre, StringComparison.InvariantCultureIgnoreCase));
+            int num = 0;
+            for (int i = 1; i <= materials.Count; i++)
+            {
+                if (i != materials.Count && !(materials[i].MinedOre != materials[num].MinedOre))
+                {
+                    continue;
+                }
+                int num2 = random.Next(num, i);
+                for (int num3 = i - 1; num3 >= num; num3--)
+                {
+                    if (num3 != num2)
+                    {
+                        materials.RemoveAt(num3);
+                    }
+                }
+                num++;
+                i = num;
+            }
+        }
+
+        private static void LimitMaterials(List<MyVoxelMaterialDefinition> materials, int maxCount, MyRandom random)
+        {
+            while (materials.Count > maxCount)
+            {
+                materials.RemoveAt(random.Next(materials.Count));
+            }
+        }
+
+        private static void ProcessMaterialSpawnProbabilities(List<MyVoxelMaterialDefinition> materials)
+        {
+            int count = materials.Count;
+            for (int i = 0; i < count; i++)
+            {
+                MyVoxelMaterialDefinition myVoxelMaterialDefinition = materials[i];
+                int num = myVoxelMaterialDefinition.AsteroidGeneratorSpawnProbabilityMultiplier - 1;
+                for (int j = 0; j < num; j++)
+                {
+                    materials.Add(myVoxelMaterialDefinition);
+                }
+            }
+        }
+
+        private void MakeIceAsteroid(int version, MyRandom random)
+        {
+            List<MyVoxelMaterialDefinition> list = new List<MyVoxelMaterialDefinition>();
+            foreach (MyVoxelMaterialDefinition voxelMaterialDefinition in MyDefinitionManager.Static.GetVoxelMaterialDefinitions())
+            {
+                if (IsAcceptedAsteroidMaterial(voxelMaterialDefinition, version) && voxelMaterialDefinition.MinedOre == "Ice")
+                {
+                    list.Add(voxelMaterialDefinition);
+                }
+            }
+            if (list.Count == 0)
+            {
+                MyLog.Default.Log(MyLogSeverity.Error, "No ice material suitable for ice cluster. Ice cluster will not be generated!");
+                return;
+            }
+            m_coreMaterials.Clear();
+            m_depositMaterials.Clear();
+            m_surfaceMaterials = list;
+            FilterKindDuplicates(m_surfaceMaterials, random);
+        }
+
+        private static bool IsAcceptedAsteroidMaterial(MyVoxelMaterialDefinition material, int version)
+        {
+            if (!material.SpawnsInAsteroids)
+            {
+                return false;
+            }
+            if (material.MinVersion > version || material.MaxVersion < version)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

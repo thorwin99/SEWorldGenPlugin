@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using VRage.Game;
 
-namespace SEWorldGenPlugin.Generator.Composites
+namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    internal interface IMySEWGCompositionInfoProvider
+    internal interface IMyCompositionInfoProvider
     {
         IMyCompositeDeposit[] Deposits
         {

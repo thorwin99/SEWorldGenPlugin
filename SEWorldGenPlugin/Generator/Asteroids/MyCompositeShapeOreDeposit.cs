@@ -1,33 +1,32 @@
-﻿using System;
+﻿using Sandbox.Engine.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRage.Game;
 using VRageMath;
+using VRageRender;
 
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    /**
-     *
-     * Code from Space engineers github:
-     * https://github.com/KeenSoftwareHouse/SpaceEngineers/
-     *
-    */
-    class MyCompositeShapeOreDeposit
+    internal class MyCompositeShapeOreDeposit
     {
         public readonly MyCsgShapeBase Shape;
+
         protected readonly MyVoxelMaterialDefinition m_material;
 
-        virtual public void DebugDraw(ref Vector3D translation, ref Color materialColor)
+        public virtual void DebugDraw(ref MatrixD translation, Color materialColor)
         {
-            Shape.DebugDraw(ref translation, materialColor);
-            VRageRender.MyRenderProxy.DebugDrawText3D(Shape.Center() + translation, m_material.Id.SubtypeName, Color.White, 1f, false);
+            if (MyDebugDrawSettings.DEBUG_DRAW_ASTEROID_ORES)
+            {
+                Shape.DebugDraw(ref translation, materialColor);
+                MyRenderProxy.DebugDrawText3D((Matrix.CreateTranslation(Shape.Center()) * translation).Translation, m_material.Id.SubtypeName, Color.White, 1f, depthRead: false);
+            }
         }
 
         public MyCompositeShapeOreDeposit(MyCsgShapeBase shape, MyVoxelMaterialDefinition material)
         {
-            System.Diagnostics.Debug.Assert(material != null, "Shape must have material");
             Shape = shape;
             m_material = material;
         }

@@ -19,7 +19,7 @@ using VRageRender.Messages;
 
 namespace SEWorldGenPlugin
 {
-    /**[MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
     class WorldSession : MySessionComponentBase
     {
         public const string STORAGE_FILE = "WorldData.xml";
@@ -124,5 +124,5 @@ namespace SEWorldGenPlugin
             gen = null;
             loaded = false;
         }
-    }*/
+    }
 }

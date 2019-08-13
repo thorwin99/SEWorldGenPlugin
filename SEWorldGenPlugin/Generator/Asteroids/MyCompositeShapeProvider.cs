@@ -1,352 +1,618 @@
 ﻿using Sandbox.Engine.Utils;
+using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using VRage.Game;
 using VRage.Noise;
-using VRage.Profiler;
+using VRage.Utils;
 using VRage.Voxels;
 using VRageMath;
+using VRageRender;
 
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    /**
-     *
-     * Code from Space engineers github:
-     * https://github.com/KeenSoftwareHouse/SpaceEngineers/
-     * Original class name is MyCompositeShapeProvider
-     *
-    */
-    struct MyCompositeShapeGeneratedData
+    [MyStorageDataProvider(10004)]
+    internal sealed class MyCompositeShapeProvider : IMyStorageDataProvider
     {
-        public IMyModule MacroModule;
-        public IMyModule DetailModule;
-        public MyCsgShapeBase[] FilledShapes;
-        public MyCsgShapeBase[] RemovedShapes;
-        public MyVoxelMaterialDefinition DefaultMaterial;
-        public MyCompositeShapeOreDeposit[] Deposits;
-    }
-
-    [MyStorageDataProvider(10002)]
-    class MyCompositeShapeProvider : IMyStorageDataProvider
-    {
-        const uint CURRENT_VERSION = 2;
-        const uint VERSION_WITHOUT_PLANETS = 1;
-
-        [ThreadStatic]
-        private static List<MyCsgShapeBase> m_overlappedRemovedShapes;
-        private static List<MyCsgShapeBase> OverlappedRemovedShapes
+        public class MyCombinedCompositeInfoProvider : MyProceduralCompositeInfoProvider, IMyCompositionInfoProvider
         {
-            get
+            private new readonly IMyCompositeShape[] m_filledShapes;
+
+            private new readonly IMyCompositeShape[] m_removedShapes;
+
+            IMyCompositeShape[] IMyCompositionInfoProvider.FilledShapes
             {
-                if (m_overlappedRemovedShapes == null)
-                    m_overlappedRemovedShapes = new List<MyCsgShapeBase>();
-                return m_overlappedRemovedShapes;
+                get
+                {
+                    return m_filledShapes;
+                }
+            }
+
+            IMyCompositeShape[] IMyCompositionInfoProvider.RemovedShapes
+            {
+                get
+                {
+                    return m_removedShapes;
+                }
+            }
+
+            public MyCombinedCompositeInfoProvider(ref ConstructionData data, IMyCompositeShape[] filledShapes, IMyCompositeShape[] removedShapes)
+                : base(ref data)
+            {
+                m_filledShapes = base.m_filledShapes.Concat(filledShapes).ToArray();
+                m_removedShapes = base.m_removedShapes.Concat(removedShapes).ToArray();
+            }
+
+            public new void UpdateMaterials(MyVoxelMaterialDefinition defaultMaterial, MyCompositeShapeOreDeposit[] deposits)
+            {
+                base.UpdateMaterials(defaultMaterial, deposits);
             }
         }
 
-        [ThreadStatic]
-        private static List<MyCsgShapeBase> m_overlappedFilledShapes;
-        private static List<MyCsgShapeBase> OverlappedFilledShapes
-        {
-            get
-            {
-                if (m_overlappedFilledShapes == null)
-                    m_overlappedFilledShapes = new List<MyCsgShapeBase>();
-                return m_overlappedFilledShapes;
-            }
-        }
-
-        [ThreadStatic]
-        private static List<MyCompositeShapeOreDeposit> m_overlappedDeposits;
-        private static List<MyCompositeShapeOreDeposit> OverlappedDeposits
-        {
-            get
-            {
-                if (m_overlappedDeposits == null)
-                    m_overlappedDeposits = new List<MyCompositeShapeOreDeposit>();
-                return m_overlappedDeposits;
-            }
-        }
-
-        struct State
+        private struct State
         {
             public uint Version;
+
             public int Generator;
+
             public int Seed;
+
             public float Size;
+
             public uint UnusedCompat;
+
+            public int GeneratorSeed;
         }
+
+        [StructLayout(LayoutKind.Sequential, Size = 1)]
+        private struct MaxOp : MyStorageData.IOperator
+        {
+            public void Op(ref byte a, byte b)
+            {
+                a = Math.Max(a, b);
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential, Size = 1)]
+        private struct DiffOp : MyStorageData.IOperator
+        {
+            public void Op(ref byte a, byte b)
+            {
+                a = (byte)Math.Min(a, 255 - b);
+            }
+        }
+
+        public class MyProceduralCompositeInfoProvider : IMyCompositionInfoProvider
+        {
+            public struct ConstructionData
+            {
+                public IMyModule MacroModule;
+
+                public IMyModule DetailModule;
+
+                public MyCsgShapeBase[] FilledShapes;
+
+                public MyCsgShapeBase[] RemovedShapes;
+
+                public MyCompositeShapeOreDeposit[] Deposits;
+
+                public MyVoxelMaterialDefinition DefaultMaterial;
+            }
+
+            protected class ProceduralCompositeShape : IMyCompositeShape
+            {
+                private MyCsgShapeBase m_shape;
+
+                private MyProceduralCompositeInfoProvider m_context;
+
+                public ProceduralCompositeShape(MyProceduralCompositeInfoProvider context, MyCsgShapeBase shape)
+                {
+                    m_shape = shape;
+                    m_context = context;
+                }
+
+                public ContainmentType Contains(ref BoundingBox queryBox, ref BoundingSphere querySphere, int lodVoxelSize)
+                {
+                    return m_shape.Contains(ref queryBox, ref querySphere, lodVoxelSize);
+                }
+
+                public float SignedDistance(ref Vector3 localPos, int lodVoxelSize)
+                {
+                    return m_shape.SignedDistance(ref localPos, lodVoxelSize, m_context.MacroModule, m_context.DetailModule);
+                }
+
+                public unsafe void ComputeContent(MyStorageData target, int lodIndex, Vector3I minInLod, Vector3I maxInLod, int lodVoxelSize)
+                {
+                    Vector3I vector3I = minInLod;
+                    Vector3I vector3I2 = vector3I * lodVoxelSize;
+                    Vector3I vector3I3 = vector3I2;
+                    fixed (byte* ptr = target[MyStorageDataTypeEnum.Content])
+                    {
+                        byte* ptr2 = ptr;
+                        int sizeLinear = target.SizeLinear;
+                        vector3I.Z = minInLod.Z;
+                        while (vector3I.Z <= maxInLod.Z)
+                        {
+                            vector3I.Y = minInLod.Y;
+                            while (vector3I.Y <= maxInLod.Y)
+                            {
+                                vector3I.X = minInLod.X;
+                                while (vector3I.X <= maxInLod.X)
+                                {
+                                    Vector3 localPos = new Vector3(vector3I2);
+                                    float signedDistance = SignedDistance(ref localPos, lodVoxelSize);
+                                    *ptr2 = SignedDistanceToContent(signedDistance);
+                                    ptr2 += target.StepLinear;
+                                    vector3I2.X += lodVoxelSize;
+                                    vector3I.X++;
+                                }
+                                vector3I2.Y += lodVoxelSize;
+                                vector3I2.X = vector3I3.X;
+                                vector3I.Y++;
+                            }
+                            vector3I2.Z += lodVoxelSize;
+                            vector3I2.Y = vector3I3.Y;
+                            vector3I.Z++;
+                        }
+                    }
+                }
+
+                public void DebugDraw(ref MatrixD worldMatrix, Color color)
+                {
+                    m_shape.DebugDraw(ref worldMatrix, color);
+                }
+
+                public void Close()
+                {
+                }
+            }
+
+            protected class ProceduralCompositeOreDeposit : ProceduralCompositeShape, IMyCompositeDeposit, IMyCompositeShape
+            {
+                private readonly MyCompositeShapeOreDeposit m_deposit;
+
+                public ProceduralCompositeOreDeposit(MyProceduralCompositeInfoProvider context, MyCompositeShapeOreDeposit deposit)
+                    : base(context, deposit.Shape)
+                {
+                    m_deposit = deposit;
+                }
+
+                public MyVoxelMaterialDefinition GetMaterialForPosition(ref Vector3 localPos, float lodVoxelSize)
+                {
+                    return m_deposit.GetMaterialForPosition(ref localPos, lodVoxelSize);
+                }
+
+                public new void DebugDraw(ref MatrixD worldMatrix, Color color)
+                {
+                    m_deposit.DebugDraw(ref worldMatrix, color);
+                }
+            }
+
+            public readonly IMyModule MacroModule;
+
+            public readonly IMyModule DetailModule;
+
+            protected ProceduralCompositeOreDeposit[] m_deposits;
+
+            protected MyVoxelMaterialDefinition m_defaultMaterial;
+
+            protected readonly ProceduralCompositeShape[] m_filledShapes;
+
+            protected readonly ProceduralCompositeShape[] m_removedShapes;
+
+            IMyCompositeDeposit[] IMyCompositionInfoProvider.Deposits
+            {
+                get
+                {
+                    return m_deposits;
+                }
+            }
+
+            IMyCompositeShape[] IMyCompositionInfoProvider.FilledShapes
+            {
+                get
+                {
+                    return m_filledShapes;
+                }
+            }
+
+            IMyCompositeShape[] IMyCompositionInfoProvider.RemovedShapes
+            {
+                get
+                {
+                    return m_removedShapes;
+                }
+            }
+
+            MyVoxelMaterialDefinition IMyCompositionInfoProvider.DefaultMaterial
+            {
+                get
+                {
+                    return m_defaultMaterial;
+                }
+            }
+
+            public MyProceduralCompositeInfoProvider(ref ConstructionData data)
+            {
+                MacroModule = data.MacroModule;
+                DetailModule = data.DetailModule;
+                m_defaultMaterial = data.DefaultMaterial;
+                m_deposits = (from x in data.Deposits
+                              select new ProceduralCompositeOreDeposit(this, x)).ToArray();
+                m_filledShapes = (from x in data.FilledShapes
+                                  select new ProceduralCompositeShape(this, x)).ToArray();
+                m_removedShapes = (from x in data.RemovedShapes
+                                   select new ProceduralCompositeShape(this, x)).ToArray();
+            }
+
+            void IMyCompositionInfoProvider.Close()
+            {
+            }
+
+            protected void UpdateMaterials(MyVoxelMaterialDefinition defaultMaterial, MyCompositeShapeOreDeposit[] deposits)
+            {
+                m_defaultMaterial = defaultMaterial;
+                m_deposits = (from x in deposits
+                              select new ProceduralCompositeOreDeposit(this, x)).ToArray();
+            }
+        }
+
+        private const uint CURRENT_VERSION = 3u;
+
+        private const uint VERSION_WITHOUT_PLANETS = 1u;
+
+        private const uint VERSION_WITHOUT_GENERATOR_SEED = 2u;
 
         private State m_state;
 
-        private MyCompositeShapeGeneratedData m_data;
+        private IMyCompositionInfoProvider m_infoProvider;
 
-        // for deserialization
-        public MyCompositeShapeProvider()
+        [ThreadStatic]
+        private static List<IMyCompositeDeposit> m_overlappedDeposits;
+
+        [ThreadStatic]
+        private static List<IMyCompositeShape> m_overlappedFilledShapes;
+
+        [ThreadStatic]
+        private static List<IMyCompositeShape> m_overlappedRemovedShapes;
+
+        [ThreadStatic]
+        private static MyStorageData m_storageCache;
+
+        unsafe int IMyStorageDataProvider.SerializedSize
         {
-        }
-
-        public static MyCompositeShapeProvider CreateAsteroidShape(int seed, float size, int generatorEntry)
-        {
-            var result = new MyCompositeShapeProvider();
-            result.m_state.Version = CURRENT_VERSION;
-            if (generatorEntry > MyCompositeShapes.AsteroidGenerators.Length - 1)
-                generatorEntry = MyCompositeShapes.AsteroidGenerators.Length - 1;
-            else if (generatorEntry < 0)
-                generatorEntry = 0;
-            result.m_state.Generator = generatorEntry;
-            result.m_state.Seed = seed;
-            result.m_state.Size = size;
-            result.m_state.UnusedCompat = 0;
-
-            var gen = MyCompositeShapes.AsteroidGenerators[result.m_state.Generator];
-            gen(seed, size, out result.m_data);
-
-            return result;
-        }
-
-        private static void SetupReading(
-            int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod,
-            out float lodVoxelSizeHalf, out BoundingBox queryBox, out BoundingSphere querySphere)
-        {
-            ProfilerShort.Begin("SetupReading");
-            lodVoxelSizeHalf = MyVoxelConstants.VOXEL_SIZE_IN_METRES_HALF * (1 << lodIndex);
-            Vector3 localMin, localMax;
+            get
             {
-                Vector3D localPositionD;
-                var min = minInLod << lodIndex;
-                var max = maxInLod << lodIndex;
-                MyVoxelCoordSystems.VoxelCoordToLocalPosition(ref min, out localPositionD);
-                localMin = localPositionD;
-                MyVoxelCoordSystems.VoxelCoordToLocalPosition(ref max, out localPositionD);
-                localMax = localPositionD;
-
-                localMin -= lodVoxelSizeHalf;
-                localMax += lodVoxelSizeHalf;
+                return sizeof(State);
             }
-            queryBox = new BoundingBox(localMin, localMax);
-            BoundingSphere.CreateFromBoundingBox(ref queryBox, out querySphere);
-            ProfilerShort.End();
         }
 
-        internal void ReadContentRange(MyStorageData target, ref Vector3I writeOffset, int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod)
+        private void InitFromState(State state)
         {
-            float lodVoxelSizeHalf;
-            BoundingBox queryBox;
-            BoundingSphere querySphere;
-            SetupReading(lodIndex, ref minInLod, ref maxInLod, out lodVoxelSizeHalf, out queryBox, out querySphere);
-            float lodVoxelSize = 2f * lodVoxelSizeHalf;
+            m_state = state;
+            MyCompositeShapeGeneratorDelegate myCompositeShapeGeneratorDelegate = MyCompositeShapes.AsteroidGenerators[state.Generator];
+            m_infoProvider = myCompositeShapeGeneratorDelegate(state.GeneratorSeed, state.Seed, state.Size);
+        }
 
-            ProfilerShort.Begin("Testing removed shapes");
-            var overlappedRemovedShapes = OverlappedRemovedShapes;
-            overlappedRemovedShapes.Clear();
-            ContainmentType testRemove = ContainmentType.Disjoint;
-            for (int i = 0; i < m_data.RemovedShapes.Length; ++i)
+        bool IMyStorageDataProvider.Intersect(ref LineD line, out double startOffset, out double endOffset)
+        {
+            startOffset = 0.0;
+            endOffset = 0.0;
+            return true;
+        }
+
+        public ContainmentType Intersect(BoundingBoxI box, int lod)
+        {
+            return Intersect(m_infoProvider, box, lod);
+        }
+
+        public static ContainmentType Intersect(IMyCompositionInfoProvider infoProvider, BoundingBoxI box, int lod)
+        {
+            ContainmentType containmentType = ContainmentType.Disjoint;
+            BoundingBox queryBox = new BoundingBox(box);
+            BoundingSphere querySphere = new BoundingSphere(queryBox.Center, queryBox.Extents.Length() / 2f);
+            IMyCompositeShape[] filledShapes = infoProvider.FilledShapes;
+            for (int i = 0; i < filledShapes.Length; i++)
             {
-                var test = m_data.RemovedShapes[i].Contains(ref queryBox, ref querySphere, lodVoxelSize);
-                if (test == ContainmentType.Contains)
+                ContainmentType containmentType2 = filledShapes[i].Contains(ref queryBox, ref querySphere, 1);
+                switch (containmentType2)
                 {
-                    testRemove = ContainmentType.Contains;
-                    break; // completely empty so we can leave
+                    case ContainmentType.Contains:
+                        break;
+                    case ContainmentType.Intersects:
+                        containmentType = ContainmentType.Intersects;
+                        continue;
+                    default:
+                        continue;
                 }
-                else if (test == ContainmentType.Intersects)
-                {
-                    testRemove = ContainmentType.Intersects;
-                    overlappedRemovedShapes.Add(m_data.RemovedShapes[i]);
-                }
+                containmentType = containmentType2;
+                break;
             }
-            ProfilerShort.End();
-            if (testRemove == ContainmentType.Contains)
+            if (containmentType != 0)
             {
-                ProfilerShort.Begin("target.BlockFillContent");
-                target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), MyVoxelConstants.VOXEL_CONTENT_EMPTY);
-                ProfilerShort.End();
-                return;
-            }
-
-            ProfilerShort.Begin("Testing filled shapes");
-            var overlappedFilledShapes = OverlappedFilledShapes;
-            overlappedFilledShapes.Clear();
-            ContainmentType testFill = ContainmentType.Disjoint;
-            for (int i = 0; i < m_data.FilledShapes.Length; ++i)
-            {
-                var test = m_data.FilledShapes[i].Contains(ref queryBox, ref querySphere, lodVoxelSize);
-                if (test == ContainmentType.Contains)
+                filledShapes = infoProvider.RemovedShapes;
+                for (int i = 0; i < filledShapes.Length; i++)
                 {
-                    overlappedFilledShapes.Clear();
-                    testFill = ContainmentType.Contains;
+                    switch (filledShapes[i].Contains(ref queryBox, ref querySphere, 1))
+                    {
+                        case ContainmentType.Contains:
+                            break;
+                        case ContainmentType.Intersects:
+                            containmentType = ContainmentType.Intersects;
+                            continue;
+                        default:
+                            continue;
+                    }
+                    containmentType = ContainmentType.Disjoint;
                     break;
                 }
-                else if (test == ContainmentType.Intersects)
+            }
+            return containmentType;
+        }
+
+        void IMyStorageDataProvider.ReadRange(ref MyVoxelDataRequest req, bool detectOnly = false)
+        {
+            if (req.RequestedData.Requests(MyStorageDataTypeEnum.Content))
+            {
+                req.Flags = ReadContentRange(req.Target, ref req.Offset, req.Lod, ref req.MinInLod, ref req.MaxInLod, detectOnly);
+            }
+            else
+            {
+                req.Flags = ReadMaterialRange(req.Target, ref req.Offset, req.Lod, ref req.MinInLod, ref req.MaxInLod, detectOnly, (req.RequestFlags & MyVoxelRequestFlags.ConsiderContent) > (MyVoxelRequestFlags)0);
+            }
+            req.Flags |= (req.RequestFlags & MyVoxelRequestFlags.RequestFlags);
+        }
+
+        void IMyStorageDataProvider.ReadRange(MyStorageData target, MyStorageDataTypeFlags dataType, ref Vector3I writeOffset, int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod)
+        {
+            if (dataType.Requests(MyStorageDataTypeEnum.Content))
+            {
+                ReadContentRange(target, ref writeOffset, lodIndex, ref minInLod, ref maxInLod, detectOnly: false);
+            }
+            else
+            {
+                ReadMaterialRange(target, ref writeOffset, lodIndex, ref minInLod, ref maxInLod, detectOnly: false, considerContent: false);
+            }
+        }
+
+        void IMyStorageDataProvider.DebugDraw(ref MatrixD worldMatrix)
+        {
+            if (MyDebugDrawSettings.DEBUG_DRAW_ASTEROID_SEEDS)
+            {
+                MyRenderProxy.DebugDrawText3D(worldMatrix.Translation, "Size: " + m_state.Size + Environment.NewLine + "Seed: " + m_state.Seed + Environment.NewLine + "GeneratorSeed: " + m_state.GeneratorSeed, Color.Red, 0.7f, depthRead: false);
+            }
+            Color green = Color.Green;
+            Color red = Color.Red;
+            Color cornflowerBlue = Color.CornflowerBlue;
+            IMyCompositeShape[] filledShapes = m_infoProvider.FilledShapes;
+            for (int i = 0; i < filledShapes.Length; i++)
+            {
+                filledShapes[i].DebugDraw(ref worldMatrix, green);
+            }
+            filledShapes = m_infoProvider.RemovedShapes;
+            for (int i = 0; i < filledShapes.Length; i++)
+            {
+                filledShapes[i].DebugDraw(ref worldMatrix, red);
+            }
+            IMyCompositeDeposit[] deposits = m_infoProvider.Deposits;
+            for (int i = 0; i < deposits.Length; i++)
+            {
+                deposits[i].DebugDraw(ref worldMatrix, cornflowerBlue);
+            }
+        }
+
+        void IMyStorageDataProvider.ReindexMaterials(Dictionary<byte, byte> oldToNewIndexMap)
+        {
+        }
+
+        void IMyStorageDataProvider.PostProcess(VrVoxelMesh mesh, MyStorageDataTypeFlags dataTypes)
+        {
+        }
+
+        void IMyStorageDataProvider.Close()
+        {
+            foreach (IMyCompositeShape item in m_infoProvider.Deposits.Concat(m_infoProvider.FilledShapes).Concat(m_infoProvider.RemovedShapes))
+            {
+                item.Close();
+            }
+            m_infoProvider.Close();
+            m_infoProvider = null;
+        }
+
+        private static MyStorageData GetTempStorage(ref Vector3I min, ref Vector3I max)
+        {
+            MyStorageData myStorageData = m_storageCache;
+            if (myStorageData == null)
+            {
+                myStorageData = (m_storageCache = new MyStorageData(MyStorageDataTypeFlags.Content));
+            }
+            myStorageData.Resize(min, max);
+            return myStorageData;
+        }
+
+        internal MyVoxelRequestFlags ReadContentRange(MyStorageData target, ref Vector3I writeOffset, int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod, bool detectOnly)
+        {
+            SetupReading(lodIndex, ref minInLod, ref maxInLod, out int lodVoxelSize, out BoundingBox queryBox, out BoundingSphere querySphere);
+            using (MyUtils.ReuseCollection(ref m_overlappedFilledShapes))
+            {
+                using (MyUtils.ReuseCollection(ref m_overlappedRemovedShapes))
                 {
-                    overlappedFilledShapes.Add(m_data.FilledShapes[i]);
-                    testFill = ContainmentType.Intersects;
+                    List<IMyCompositeShape> overlappedFilledShapes = m_overlappedFilledShapes;
+                    List<IMyCompositeShape> overlappedRemovedShapes = m_overlappedRemovedShapes;
+                    ContainmentType containmentType = ContainmentType.Disjoint;
+                    IMyCompositeShape[] removedShapes = m_infoProvider.RemovedShapes;
+                    foreach (IMyCompositeShape myCompositeShape in removedShapes)
+                    {
+                        switch (myCompositeShape.Contains(ref queryBox, ref querySphere, lodVoxelSize))
+                        {
+                            case ContainmentType.Contains:
+                                break;
+                            case ContainmentType.Intersects:
+                                containmentType = ContainmentType.Intersects;
+                                overlappedRemovedShapes.Add(myCompositeShape);
+                                continue;
+                            default:
+                                continue;
+                        }
+                        containmentType = ContainmentType.Contains;
+                        break;
+                    }
+                    if (containmentType == ContainmentType.Contains)
+                    {
+                        if (!detectOnly)
+                        {
+                            target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), 0);
+                        }
+                        return MyVoxelRequestFlags.EmptyData;
+                    }
+                    ContainmentType containmentType2 = ContainmentType.Disjoint;
+                    removedShapes = m_infoProvider.FilledShapes;
+                    foreach (IMyCompositeShape myCompositeShape2 in removedShapes)
+                    {
+                        switch (myCompositeShape2.Contains(ref queryBox, ref querySphere, lodVoxelSize))
+                        {
+                            case ContainmentType.Contains:
+                                break;
+                            case ContainmentType.Intersects:
+                                overlappedFilledShapes.Add(myCompositeShape2);
+                                containmentType2 = ContainmentType.Intersects;
+                                continue;
+                            default:
+                                continue;
+                        }
+                        overlappedFilledShapes.Clear();
+                        containmentType2 = ContainmentType.Contains;
+                        break;
+                    }
+                    if (containmentType2 == ContainmentType.Disjoint)
+                    {
+                        if (!detectOnly)
+                        {
+                            target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), 0);
+                        }
+                        return MyVoxelRequestFlags.EmptyData;
+                    }
+                    if (containmentType == ContainmentType.Disjoint && containmentType2 == ContainmentType.Contains)
+                    {
+                        if (!detectOnly)
+                        {
+                            target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), byte.MaxValue);
+                        }
+                        return MyVoxelRequestFlags.FullContent;
+                    }
+                    if (detectOnly)
+                    {
+                        return (MyVoxelRequestFlags)0;
+                    }
+                    MyStorageData tempStorage = GetTempStorage(ref minInLod, ref maxInLod);
+                    bool flag = containmentType2 == ContainmentType.Contains;
+                    target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), (byte)(flag ? byte.MaxValue : 0));
+                    if (!flag)
+                    {
+                        foreach (IMyCompositeShape item in overlappedFilledShapes)
+                        {
+                            item.ComputeContent(tempStorage, lodIndex, minInLod, maxInLod, lodVoxelSize);
+                            target.OpRange<MaxOp>(tempStorage, Vector3I.Zero, maxInLod - minInLod, writeOffset, MyStorageDataTypeEnum.Content);
+                        }
+                    }
+                    if (containmentType != 0)
+                    {
+                        foreach (IMyCompositeShape item2 in overlappedRemovedShapes)
+                        {
+                            item2.ComputeContent(tempStorage, lodIndex, minInLod, maxInLod, lodVoxelSize);
+                            target.OpRange<DiffOp>(tempStorage, Vector3I.Zero, maxInLod - minInLod, writeOffset, MyStorageDataTypeEnum.Content);
+                        }
+                    }
                 }
             }
-            ProfilerShort.End();
+            return (MyVoxelRequestFlags)0;
+        }
 
-            if (testFill == ContainmentType.Disjoint)
+        internal MyVoxelRequestFlags ReadMaterialRange(MyStorageData target, ref Vector3I writeOffset, int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod, bool detectOnly, bool considerContent)
+        {
+            SetupReading(lodIndex, ref minInLod, ref maxInLod, out int lodVoxelSize, out BoundingBox queryBox, out BoundingSphere querySphere);
+            using (MyUtils.ReuseCollection(ref m_overlappedDeposits))
             {
-                ProfilerShort.Begin("target.BlockFillContent");
-                target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), MyVoxelConstants.VOXEL_CONTENT_EMPTY);
-                ProfilerShort.End();
-                return;
-            }
-            else if (testRemove == ContainmentType.Disjoint && testFill == ContainmentType.Contains)
-            {
-                ProfilerShort.Begin("target.BlockFillContent");
-                target.BlockFillContent(writeOffset, writeOffset + (maxInLod - minInLod), MyVoxelConstants.VOXEL_CONTENT_FULL);
-                ProfilerShort.End();
-                return;
-            }
-
-            ProfilerShort.Begin("Distance field computation");
-            Vector3I v = minInLod;
-            Vector3 localPos = v * lodVoxelSize;
-            Vector3 localPosStart = v * lodVoxelSize;
-            var writeOffsetLoc = writeOffset - minInLod;
-            for (v.Z = minInLod.Z; v.Z <= maxInLod.Z; ++v.Z)
-            {
-                for (v.Y = minInLod.Y; v.Y <= maxInLod.Y; ++v.Y)
+                List<IMyCompositeDeposit> overlappedDeposits = m_overlappedDeposits;
+                MyVoxelMaterialDefinition defaultMaterial = m_infoProvider.DefaultMaterial;
+                ContainmentType containmentType = ContainmentType.Disjoint;
+                IMyCompositeDeposit[] deposits = m_infoProvider.Deposits;
+                foreach (IMyCompositeDeposit myCompositeDeposit in deposits)
                 {
-                    v.X = minInLod.X;
-                    var write2 = v + writeOffsetLoc;
-                    var write = target.ComputeLinear(ref write2);
-                    for (; v.X <= maxInLod.X; ++v.X)
+                    if (myCompositeDeposit.Contains(ref queryBox, ref querySphere, lodVoxelSize) != 0)
                     {
-                        //Vector3 localPos = v * lodVoxelSize;
-
-                        //ProfilerShort.Begin("Dist filled");
-                        float distFill;
-                        if (testFill == ContainmentType.Contains)
+                        overlappedDeposits.Add(myCompositeDeposit);
+                        containmentType = ContainmentType.Intersects;
+                    }
+                }
+                if (containmentType == ContainmentType.Disjoint)
+                {
+                    if (!detectOnly)
+                    {
+                        if (considerContent)
                         {
-                            distFill = -1f;
+                            target.BlockFillMaterialConsiderContent(writeOffset, writeOffset + (maxInLod - minInLod), defaultMaterial.Index);
                         }
                         else
                         {
-                            //ProfilerShort.Begin("shape distances");
-                            distFill = 1f;
-                            foreach (var shape in overlappedFilledShapes)
-                            {
-                                distFill = Math.Min(distFill, shape.SignedDistance(ref localPos, lodVoxelSize, m_data.MacroModule, m_data.DetailModule));
-                                if (distFill <= -1)
-                                    break;
-
-                            }
-                            //ProfilerShort.End();
+                            target.BlockFillMaterial(writeOffset, writeOffset + (maxInLod - minInLod), defaultMaterial.Index);
                         }
-
-                        //ProfilerShort.BeginNextBlock("Dist removed");
-                        float distRemoved = 1f;
-                        if (testRemove != ContainmentType.Disjoint)
+                    }
+                    return MyVoxelRequestFlags.EmptyData;
+                }
+                if (detectOnly)
+                {
+                    return (MyVoxelRequestFlags)0;
+                }
+                Vector3I vector3I = default(Vector3I);
+                vector3I.Z = minInLod.Z;
+                while (vector3I.Z <= maxInLod.Z)
+                {
+                    vector3I.Y = minInLod.Y;
+                    while (vector3I.Y <= maxInLod.Y)
+                    {
+                        vector3I.X = minInLod.X;
+                        while (vector3I.X <= maxInLod.X)
                         {
-                            foreach (var shape in overlappedRemovedShapes)
+                            Vector3I p = vector3I - minInLod + writeOffset;
+                            if (considerContent && target.Content(ref p) == 0)
                             {
-                                distRemoved = Math.Min(distRemoved, shape.SignedDistance(ref localPos, lodVoxelSize, m_data.MacroModule, m_data.DetailModule));
-                                if (distRemoved <= -1)
-                                    break;
+                                target.Material(ref p, byte.MaxValue);
                             }
-                        }
-                        //ProfilerShort.BeginNextBlock("content");
-                        float signedDist = MathHelper.Max(distFill, -distRemoved);
-
-                        var fillRatio = MathHelper.Clamp(-signedDist, -1f, 1f) * 0.5f + 0.5f;
-                        byte content = (byte)(fillRatio * MyVoxelConstants.VOXEL_CONTENT_FULL);
-                        target.Content(write, content);
-                        Debug.Assert(Math.Abs((((float)content) / MyVoxelConstants.VOXEL_CONTENT_FULL) - fillRatio) <= 0.5f);
-                        //ProfilerShort.End();
-                        write += target.StepLinear;
-                        localPos.X += lodVoxelSize;
-                    }
-                    localPos.Y += lodVoxelSize;
-                    localPos.X = localPosStart.X;
-                }
-                localPos.Z += lodVoxelSize;
-                localPos.Y = localPosStart.Y;
-            }
-            ProfilerShort.End();
-        }
-
-        internal void ReadMaterialRange(MyStorageData target, ref Vector3I writeOffset, int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod)
-        {
-            float lodVoxelSizeHalf;
-            BoundingBox queryBox;
-            BoundingSphere querySphere;
-            SetupReading(lodIndex, ref minInLod, ref maxInLod, out lodVoxelSizeHalf, out queryBox, out querySphere);
-            float lodVoxelSize = 2f * lodVoxelSizeHalf;
-
-            var overlappedDeposits = OverlappedDeposits;
-            {
-                ProfilerShort.Begin("Testing deposit shapes");
-                overlappedDeposits.Clear();
-                ContainmentType testDeposits = ContainmentType.Disjoint;
-                for (int i = 0; i < m_data.Deposits.Length; ++i)
-                {
-                    var test = m_data.Deposits[i].Shape.Contains(ref queryBox, ref querySphere, lodVoxelSize);
-                    if (test != ContainmentType.Disjoint)
-                    {
-                        overlappedDeposits.Add(m_data.Deposits[i]);
-                        testDeposits = ContainmentType.Intersects;
-                    }
-                }
-                ProfilerShort.End();
-
-                if (testDeposits == ContainmentType.Disjoint)
-                {
-                    ProfilerShort.Begin("target.BlockFillMaterial");
-                    target.BlockFillMaterial(writeOffset, writeOffset + (maxInLod - minInLod), m_data.DefaultMaterial.Index);
-                    ProfilerShort.End();
-                    return;
-                }
-            }
-
-
-            ProfilerShort.Begin("Material computation");
-
-            Vector3I v;
-            for (v.Z = minInLod.Z; v.Z <= maxInLod.Z; ++v.Z)
-            {
-                for (v.Y = minInLod.Y; v.Y <= maxInLod.Y; ++v.Y)
-                {
-                    for (v.X = minInLod.X; v.X <= maxInLod.X; ++v.X)
-                    {
-                        Vector3 localPos = v * lodVoxelSize;
-
-                        float closestDistance = 1f;
-                        byte closestMaterialIdx = m_data.DefaultMaterial.Index;
-                        if (!MyFakes.DISABLE_COMPOSITE_MATERIAL)
-                        {
-                            foreach (var deposit in overlappedDeposits)
+                            else
                             {
-                                float distance = deposit.Shape.SignedDistance(ref localPos, MyVoxelConstants.VOXEL_SIZE_IN_METRES, m_data.MacroModule, m_data.DetailModule);
-                                if (distance < 0f && distance <= closestDistance)
+                                Vector3 localPos = vector3I * lodVoxelSize;
+                                float num = 1f;
+                                byte materialIdx = defaultMaterial.Index;
+                                if (!MyFakes.DISABLE_COMPOSITE_MATERIAL)
                                 {
-                                    closestDistance = distance;
-                                    // DA: Pass default material to the layered deposit so only that does these if-s.
-                                    var materialDef = deposit.GetMaterialForPosition(ref localPos, lodVoxelSize);
-                                    closestMaterialIdx = materialDef == null ? m_data.DefaultMaterial.Index : materialDef.Index;
+                                    foreach (IMyCompositeDeposit item in overlappedDeposits)
+                                    {
+                                        float num2 = item.SignedDistance(ref localPos, 1);
+                                        if (num2 < 0f && num2 <= num)
+                                        {
+                                            num = num2;
+                                            materialIdx = (item.GetMaterialForPosition(ref localPos, lodVoxelSize)?.Index ?? defaultMaterial.Index);
+                                        }
+                                    }
                                 }
+                                target.Material(ref p, materialIdx);
                             }
+                            vector3I.X++;
                         }
-
-                        var write = v - minInLod + writeOffset;
-                        target.Material(ref write, closestMaterialIdx);
+                        vector3I.Y++;
                     }
+                    vector3I.Z++;
                 }
-
             }
-            ProfilerShort.End();
-        }
-
-        int IMyStorageDataProvider.SerializedSize
-        {
-            get { unsafe { return sizeof(State); } }
+            return (MyVoxelRequestFlags)0;
         }
 
         void IMyStorageDataProvider.WriteTo(Stream stream)
@@ -356,170 +622,87 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             stream.WriteNoAlloc(m_state.Seed);
             stream.WriteNoAlloc(m_state.Size);
             stream.WriteNoAlloc(m_state.UnusedCompat);
+            stream.WriteNoAlloc(m_state.GeneratorSeed);
         }
 
-        void IMyStorageDataProvider.ReadFrom(ref MyOctreeStorage.ChunkHeader header, Stream stream, ref bool isOldFormat)
+        void IMyStorageDataProvider.ReadFrom(int storageVersion, Stream stream, int size, ref bool isOldFormat)
         {
-            m_state.Version = stream.ReadUInt32();
-            if (m_state.Version != CURRENT_VERSION)
+            State state = default(State);
+            state.Version = stream.ReadUInt32();
+            if (state.Version != 3)
             {
-                // Making sure this gets saved in new format and serialized cache holding old format is discarded.
                 isOldFormat = true;
             }
-
-            m_state.Generator = stream.ReadInt32();
-            m_state.Seed = stream.ReadInt32();
-            m_state.Size = stream.ReadFloat();
-
-            if (m_state.Version == VERSION_WITHOUT_PLANETS)
+            state.Generator = stream.ReadInt32();
+            state.Seed = stream.ReadInt32();
+            state.Size = stream.ReadFloat();
+            if (state.Version == 1)
             {
-                m_state.UnusedCompat = 0;
+                state.UnusedCompat = 0u;
+                state.GeneratorSeed = 0;
             }
             else
             {
-                m_state.UnusedCompat = stream.ReadUInt32();
-
-                if (m_state.UnusedCompat == 1)
+                state.UnusedCompat = stream.ReadUInt32();
+                if (state.UnusedCompat == 1)
                 {
-                    Debug.Fail("This storage is from a prototype version of planets and is no longer supported.");
                     throw new InvalidBranchException();
                 }
-            }
-
-            var gen = MyCompositeShapes.AsteroidGenerators[m_state.Generator];
-            gen(m_state.Seed, m_state.Size, out m_data);
-
-            m_state.Version = CURRENT_VERSION;
-        }
-
-        void IMyStorageDataProvider.ReadRange(MyStorageData target, MyStorageDataTypeFlags dataType, ref Vector3I writeOffset, int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod)
-        {
-            if (dataType.Requests(MyStorageDataTypeEnum.Content))
-                ReadContentRange(target, ref writeOffset, lodIndex, ref minInLod, ref maxInLod);
-            else
-                ReadMaterialRange(target, ref writeOffset, lodIndex, ref minInLod, ref maxInLod);
-        }
-
-        void IMyStorageDataProvider.DebugDraw(ref MatrixD worldMatrix)
-        {
-            var translation = worldMatrix.Translation;
-            var filledColor = Color.Red;
-            var removedColor = Color.Green;
-            var materialColor = Color.CornflowerBlue;
-            foreach (var shape in m_data.FilledShapes)
-            {
-                shape.DebugDraw(ref translation, filledColor);
-            }
-
-            foreach (var shape in m_data.RemovedShapes)
-            {
-                shape.DebugDraw(ref translation, removedColor);
-            }
-
-            foreach (var deposit in m_data.Deposits)
-            {
-                deposit.DebugDraw(ref translation, ref materialColor);
-            }
-        }
-
-        void ReindexMaterials(Dictionary<byte, byte> oldToNewIndexMap)
-        {
-            // To be able to handle changes in materials, I would need to store more than just arguments used to generate this shape,
-            // as even with the same seed I will get different results.
-            // Ignoring for now.
-        }
-
-        public float GetDistanceToPoint(ref Vector3D localPosition)
-        {
-            float nearest = float.MaxValue;
-            Vector3 localFloat = (Vector3)localPosition;
-            for (int i = 0; i < m_data.FilledShapes.Length; ++i)
-            {
-                float current = m_data.FilledShapes[i].SignedDistanceUnchecked(ref localFloat, 1, m_data.MacroModule, m_data.DetailModule);
-                if (current < nearest)
+                if (state.Version <= 2)
                 {
-                    nearest = current;
+                    isOldFormat = true;
+                    state.GeneratorSeed = 0;
+                }
+                else
+                {
+                    state.GeneratorSeed = stream.ReadInt32();
                 }
             }
-
-            return nearest;
+            InitFromState(state);
+            m_state.Version = 3u;
         }
 
-        public MyVoxelMaterialDefinition GetMaterialAtPosition(ref Vector3D worldPosition)
+        private static void SetupReading(int lodIndex, ref Vector3I minInLod, ref Vector3I maxInLod, out int lodVoxelSize, out BoundingBox queryBox, out BoundingSphere querySphere)
         {
-            Vector3 localFloat = (Vector3)worldPosition;
-            var materialDef = m_data.Deposits[0].GetMaterialForPosition(ref localFloat, 1);
-            return materialDef == null ? m_data.DefaultMaterial : materialDef;
+            float num = 0.5f * (float)(1 << lodIndex);
+            lodVoxelSize = (int)(num * 2f);
+            Vector3I voxelCoord = minInLod << lodIndex;
+            Vector3I voxelCoord2 = maxInLod << lodIndex;
+            MyVoxelCoordSystems.VoxelCoordToLocalPosition(ref voxelCoord, out Vector3 localPosition);
+            Vector3 value = localPosition;
+            MyVoxelCoordSystems.VoxelCoordToLocalPosition(ref voxelCoord2, out localPosition);
+            Vector3 value2 = localPosition;
+            value -= num;
+            value2 += num;
+            queryBox = new BoundingBox(value, value2);
+            BoundingSphere.CreateFromBoundingBox(ref queryBox, out querySphere);
         }
 
-        public void ReadRange(ref MyVoxelDataRequest req)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float ContentToSignedDistance(byte content)
         {
-            if (req.RequestedData.Requests(MyStorageDataTypeEnum.Content))
-                ReadContentRange(req.Target, ref req.Offset, req.Lod, ref req.MinInLod, ref req.MaxInLod);
-            else
-                ReadMaterialRange(req.Target, ref req.Offset, req.Lod, ref req.MinInLod, ref req.MaxInLod);
-
-            req.Flags = req.RequestFlags & (MyVoxelRequestFlags.RequestFlags);
+            return ((float)(int)content / 255f - 0.5f) * -2f;
         }
 
-        public MyVoxelRequestFlags SupportedFlags()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static byte SignedDistanceToContent(float signedDistance)
         {
-            return 0;
+            signedDistance = MathHelper.Clamp(signedDistance, -1f, 1f);
+            return (byte)((signedDistance / -2f + 0.5f) * 255f);
         }
 
-
-        public ContainmentType Intersect(BoundingBoxI box, bool lazy)
+        public static MyCompositeShapeProvider CreateAsteroidShape(int seed, float size, int generatorSeed = 0, int? generator = default(int?))
         {
-            ContainmentType ct = ContainmentType.Disjoint;
-
-            BoundingBox bb = new BoundingBox(box);
-            BoundingSphere sp = new BoundingSphere(bb.Center, bb.Extents.Length() / 2f);
-
-            // Check filled shapes.
-            foreach (var shape in m_data.FilledShapes)
-            {
-                var c = shape.Contains(ref bb, ref sp, 1f);
-
-                if (c == ContainmentType.Contains) ct = c;
-                else if (c == ContainmentType.Intersects && ct == ContainmentType.Disjoint) ct = c;
-            }
-
-            // Check shapes removed, we don't check how they are removed so we only discard if the removed shape covers the whole bb.
-            if (ct != ContainmentType.Disjoint)
-            {
-                foreach (var shape in m_data.RemovedShapes)
-                {
-                    var c = shape.Contains(ref bb, ref sp, 1f);
-
-                    if (c == ContainmentType.Contains)
-                    {
-                        ct = ContainmentType.Disjoint;
-                        break;
-                    }
-
-                    else if (c == ContainmentType.Intersects)
-                    {
-                        ct = ContainmentType.Intersects;
-                    }
-                }
-            }
-
-            return ct;
+            State state = default(State);
+            state.Version = 3u;
+            state.Generator = generator.GetValueOrDefault(MySession.Static.Settings.VoxelGeneratorVersion);
+            state.Seed = seed;
+            state.Size = size;
+            state.UnusedCompat = 0u;
+            state.GeneratorSeed = generatorSeed;
+            MyCompositeShapeProvider myCompositeShapeProvider = new MyCompositeShapeProvider();
+            myCompositeShapeProvider.InitFromState(state);
+            return myCompositeShapeProvider;
         }
-
-        public bool Intersect(ref LineD line, out double startOffset, out double endOffset)
-        {
-            startOffset = 0;
-            endOffset = 0;
-
-            return true;
-        }
-
-
-        public void Close()
-        {
-        }
-
-        public bool ProvidesAmbient { get { return false; } }
     }
 }

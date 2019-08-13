@@ -37,7 +37,7 @@ namespace SEWorldGenPlugin.SaveItems
     public class PlanetRingItem
     {
         [ProtoMember(1)]
-        public float Density;
+        public double AsteroidCount;
 
         [ProtoMember(2)]
         public int Radius;
@@ -50,6 +50,9 @@ namespace SEWorldGenPlugin.SaveItems
 
         [ProtoMember(5)]
         public float AngleDegrees;
+
+        [ProtoMember(6)]
+        public int RoidSize;
     }
 
     [ProtoContract]
