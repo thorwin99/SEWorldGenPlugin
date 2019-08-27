@@ -53,6 +53,9 @@ namespace SEWorldGenPlugin.SaveItems
 
         [ProtoMember(6)]
         public int RoidSize;
+
+        [ProtoMember(7)]
+        public SerializableVector3D Center;
     }
 
     [ProtoContract]

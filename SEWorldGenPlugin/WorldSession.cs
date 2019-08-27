@@ -2,8 +2,10 @@
 using Sandbox.Engine.Utils;
 using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
+using Sandbox.Game.World.Generator;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.Generator.ProceduralWorld;
 using SEWorldGenPlugin.SaveItems;
 using System;
 using System.Collections.Generic;
@@ -88,6 +90,13 @@ namespace SEWorldGenPlugin
                 WriteStarSystem();
             }
             loaded = true;
+            foreach(PlanetItem planet in ((StarSystemItem)gen.SaveData.Components[0]).Planets)
+            {
+                if(planet.PlanetRing != null)
+                {
+                    MyCustomProceduralWorldGenerator.StaticGen.AddRing(planet.PlanetRing);
+                }
+            }
         }
 
         private void WriteStarSystem()

@@ -193,6 +193,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
     <Compile Include="Generator\Asteroids\IMyCompositionInfoProvider.cs" />
     <Compile Include="Generator\Asteroids\MyCompositeShapeGeneratorDelegate.cs" />
     <Compile Include="Generator\Asteroids\MyCompositeShapeOreDeposit.cs" />
@@ -202,8 +203,11 @@
     <Compile Include="Generator\Asteroids\MyCsgShapeBase.cs" />
     <Compile Include="Generator\Asteroids\MyCsgSphere.cs" />
     <Compile Include="Generator\Asteroids\MyCsgTorus.cs" />
+    <Compile Include="Generator\ProceduralWorld\MyCustomProceduralWorldGenerator.cs" />
+    <Compile Include="Generator\ProceduralWorld\MyEntityExtensionCustom.cs" />
     <Compile Include="Generator\ProceduralWorld\MyInfiniteDensityFunction.cs" />
     <Compile Include="Generator\ProceduralWorld\MyProceduralAsteroidRingCellGenerator.cs" />
+    <Compile Include="Generator\ProceduralWorld\MySphereDensityFunction.cs" />
     <Compile Include="Generator\StarSystemGenerator.cs" />
     <Compile Include="ObjectBuilder_GeneratorSave.cs" />
     <Compile Include="Ob_GeneratorSaveItem.cs" />

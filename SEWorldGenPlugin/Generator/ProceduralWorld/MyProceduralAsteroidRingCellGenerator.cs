@@ -7,6 +7,7 @@ using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
+using SEWorldGenPlugin.SaveItems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +36,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralWorld
 
         private List<BoundingBoxD> m_tmpClusterBoxes;
 
-        private bool m_enabled;
+        private List<PlanetRingItem> m_asteroidFields;
 
-        public MyProceduralAsteroidRingCellGenerator(int seed, double density, MyProceduralWorldModule parent = null)
+        public MyProceduralAsteroidRingCellGenerator(List<PlanetRingItem> rings, int seed, double density, MyProceduralWorldModule parent = null)
             : base(GetSubCellInfo(), 1, seed, density, parent)
         {
-            m_enabled = MyFakes.ENABLE_ASTEROIDS;
             m_data = GetData();
             AddDensityFunctionFilled(new MyInfiniteDensityFunction(MyRandom.Instance, 0.003));
             m_seedTypeProbabilitySum = 0.0;
@@ -53,11 +53,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralWorld
             {
                 m_seedClusterTypeProbabilitySum += value2;
             }
+
+            m_asteroidFields = new List<PlanetRingItem>();
+            if(rings != null)
+             m_asteroidFields = rings;
         }
 
-        private void AddDensityFunctionFilled(MyInfiniteDensityFunction myInfiniteDensityFunction)
+        public void AddRing(PlanetRingItem ring)
         {
-            throw new NotImplementedException();
+            m_asteroidFields.Add(ring);
         }
 
         public static long GetAsteroidEntityId(string storageName)
@@ -87,8 +91,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralWorld
                     value += (Vector3D)next / (double)m_data.SubcellSize;
                     value += cellId;
                     value *= CELL_SIZE;
-                    if (MyEntities.IsInsideWorld(value))
+
+                    int asteroidField = IsInsideField(value);
+                    if (MyEntities.IsInsideWorld(value) && asteroidField >= 0)
                     {
+                        MyLog.Default.WriteLine(value.ToString() + " is inside asteroid ring");
                         double num = -1.0;
                         if (cellDensityFunctionRemoved != null)
                         {
@@ -115,7 +122,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralWorld
 
         public override void GenerateObjects(List<MyObjectSeed> objectsList, HashSet<MyObjectSeedParams> existingObjectsSeeds)
         {
-            if (m_enabled)
+            if (true)
             {
                 foreach (MyObjectSeed objects in objectsList)
                 {
@@ -304,6 +311,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralWorld
                 d -= item.Value;
             }
             return MyObjectSeedType.Asteroid;
+        }
+
+        private int IsInsideField(Vector3D position)
+        {
+            foreach(PlanetRingItem ring in m_asteroidFields)
+            {
+                MyLog.Default.WriteLine(ring.Center + " Ring Center");
+                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(ring);
+                if (shape.Contains(position) == ContainmentType.Contains) return m_asteroidFields.IndexOf(ring);
+            }
+
+            return -1;
         }
 
         private double GetObjectSize(double noise)

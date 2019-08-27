@@ -10,6 +10,9 @@ using VRage;
 using VRage.Plugins;
 using VRage.Utils;
 using Sandbox.Game;
+using Sandbox.Game.Entities;
+using VRage.Game.Entity;
+using SEWorldGenPlugin.Generator.ProceduralWorld;
 
 namespace SEWorldGenPlugin
 {
@@ -21,6 +24,7 @@ namespace SEWorldGenPlugin
 
         public void Init(object gameInstance)
         {
+            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += MyEntityExtensionCustom.CustomProceduralWorldGeneratorTrackEntity;
         }
 
         public void Update()

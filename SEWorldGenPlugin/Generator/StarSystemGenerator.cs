@@ -60,6 +60,8 @@ namespace SEWorldGenPlugin.Generator
 
                 int moonCount = planet.PlanetMoons.Length;
                 planet.CenterPosition = p.PositionComp.GetPosition();
+                if(planet.PlanetRing != null)
+                    planet.PlanetRing.Center = planet.CenterPosition;
 
                 //SpawnRing(planet.CenterPosition, planet.PlanetRing);
 
