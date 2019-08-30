@@ -1,4 +1,4 @@
-﻿using Sandbox;
+﻿/*using Sandbox;
 using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
@@ -222,4 +222,4 @@ namespace SEWorldGenPlugin.Generator.ProceduralWorld
             m_asteroidRingModule.AddRing(ring);
         }
     }
-}
+}*/

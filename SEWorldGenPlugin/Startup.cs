@@ -24,7 +24,7 @@ namespace SEWorldGenPlugin
 
         public void Init(object gameInstance)
         {
-            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += MyEntityExtensionCustom.CustomProceduralWorldGeneratorTrackEntity;
+            //MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += MyEntityExtensionCustom.CustomProceduralWorldGeneratorTrackEntity;
         }
 
         public void Update()
