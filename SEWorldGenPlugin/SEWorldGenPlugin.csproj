@@ -175,6 +175,8 @@
     <Compile Include="Generator\Asteroids\MyCsgShapeBase.cs" />
     <Compile Include="Generator\Asteroids\MyCsgSphere.cs" />
     <Compile Include="Generator\Asteroids\MyCsgTorus.cs" />
+    <Compile Include="Generator\ProceduralGen\ProceduralAsteroidsRingModule.cs" />
+    <Compile Include="Generator\ProceduralGen\ProceduralCell.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralModule.cs" />
     <Compile Include="Generator\ProceduralWorld\MyCustomProceduralWorldGenerator.cs" />

@@ -3,6 +3,7 @@ using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using System.Collections.Generic;
+using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
 using VRage.Library.Utils;
@@ -11,7 +12,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 500)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 500, typeof(MyObjectBuilder_WorldGenerator)]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
@@ -20,6 +21,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private Dictionary<MyEntity, MyEntityTracker> m_toTrackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
+        private HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
+        private ProceduralModule module;
 
         private bool Loaded = false;
 
@@ -53,16 +56,27 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             {
                 if (tracker.ShouldGenerate())
                 {
+                    List<CellObject> cellObjects = new List<CellObject>();
+
                     var oldBounding = tracker.BoundingVolume;
                     tracker.UpdateLastPosition();
-                    
 
+                    module.GetObjectsInSphere(tracker.BoundingVolume, cellObjects);
+                    module.GenerateObjects(cellObjects, m_existingObjectSeeds);
+
+                    module.UnloadCellObjects(oldBounding, tracker.BoundingVolume);
                 }
             }
         }
 
         protected override void UnloadData()
         {
+            Loaded = false;
+
+            module = null;
+
+            m_trackedEntities.Clear();
+            Static = null;
         }
 
         public override void SaveData()
@@ -103,5 +117,21 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 };
             }
         }
+
+        public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
+        {
+            base.Init(sessionComponent);
+
+            MyObjectBuilder_WorldGenerator b = (MyObjectBuilder_WorldGenerator)sessionComponent;
+
+            m_existingObjectSeeds = b.ExistingObjectsSeeds;
+        }
+
+        override public bool UpdatedBeforeInit()
+        {
+            return true;
+        }
+
+
     }
 }
