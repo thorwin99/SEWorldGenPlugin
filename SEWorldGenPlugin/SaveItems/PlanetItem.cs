@@ -56,6 +56,9 @@ namespace SEWorldGenPlugin.SaveItems
 
         [ProtoMember(7)]
         public SerializableVector3D Center;
+
+        [ProtoMember(8)]
+        public double Density;
     }
 
     [ProtoContract]

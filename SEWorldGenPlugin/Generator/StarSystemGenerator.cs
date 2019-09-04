@@ -190,6 +190,7 @@ namespace SEWorldGenPlugin.Generator
             ring.Width = MyRandom.Instance.Next(MIN_RING_WIDTH, MAX_RING_WIDTH);
             ring.Height = MyRandom.Instance.Next(MIN_RING_HEIGHT, ring.Width / 10);
             ring.AngleDegrees = MyRandom.Instance.Next(-180, 180);
+            ring.Density = MyRandom.Instance.NextDouble();
             ring.RoidSize = roidSize;
             ring.AsteroidCount = (double)((((ring.Radius + ring.Width) * (ring.Radius + ring.Width) * Math.PI) - (ring.Radius * ring.Radius * Math.PI)) * ring.Height / roidSize / roidSize / roidSize / 27);
             return ring;

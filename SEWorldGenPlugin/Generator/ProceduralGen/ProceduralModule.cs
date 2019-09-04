@@ -82,5 +82,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return new Vector3I_RangeIterator(ref min, ref max);
         }
 
+        protected int GetCellSeed(ref Vector3I cellId)
+        {
+            unchecked
+            {
+                return m_seed + cellId.X * 16785407 + cellId.Y * 39916801 + cellId.Z * 479001599;
+            }
+        }
+
     }
 }
