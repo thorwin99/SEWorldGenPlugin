@@ -1,4 +1,6 @@
-﻿using Sandbox.Game.Entities;
+﻿using Sandbox.Engine.Voxels;
+using Sandbox.Game.Entities;
+using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.SaveItems;
 using System;
@@ -6,9 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VRage;
 using VRage.Game;
 using VRage.Library.Utils;
 using VRage.Noise;
+using VRage.Profiler;
+using VRage.Voxels;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
@@ -68,7 +73,60 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void GenerateObjects(List<CellObject> objects, HashSet<MyObjectSeedParams> existingObjectSeeds)
         {
-            throw new NotImplementedException();
+            ProfilerShort.Begin("GenerateAsteroids");
+
+            List<MyVoxelBase> tmp_voxelMaps = new List<MyVoxelBase>();
+
+            foreach(var obj in objects)
+            {
+                if (obj.Params.Generated || existingObjectSeeds.Contains(obj.Params)) continue;
+
+                using (MyRandom.Instance.PushSeed(GetObjectIdSeed(obj)))
+                {
+                    if (obj.Params.Type != MyObjectSeedType.Asteroid) continue;
+
+                    var bounds = obj.BoundingVolume;
+                    MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, tmp_voxelMaps);
+
+                    String storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", obj.CellId.X, obj.CellId.Y, obj.CellId.Z, obj.Params.Index, obj.Params.Seed);
+
+                    bool exists = false;
+                    foreach(var voxelMap in tmp_voxelMaps)
+                    {
+                        if(voxelMap.StorageName == storageName)
+                        {
+                            existingObjectSeeds.Add(obj.Params);
+                            exists = true;
+                        }
+                    }
+
+                    if (!exists)
+                    {
+                        var provider = MyCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, MySession.Static.Settings.VoxelGeneratorVersion);
+                        var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(obj.Size));
+
+                        MyVoxelMap voxelMap = new MyVoxelMap();
+
+                        voxelMap.EntityId = MyRandom.Instance.NextLong();
+                        voxelMap.Init(storageName, storage, obj.BoundingVolume.Center - VRageMath.MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2);
+                        MyEntities.RaiseEntityCreated(voxelMap);
+                        MyEntities.Add(voxelMap);
+
+                        voxelMap.Save = false;
+                        MyVoxelBase.StorageChanged OnStorageRangeChanged = null;
+                        OnStorageRangeChanged = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
+                        {
+                            voxelMap.Save = true;
+                            voxelMap.RangeChanged -= OnStorageRangeChanged;
+                        };
+                        voxelMap.RangeChanged += OnStorageRangeChanged;
+                    }
+                    tmp_voxelMaps.Clear();
+                }
+
+                obj.Params.Generated = true;
+            }
+            ProfilerShort.End();
         }
 
         public override void UnloadCellObjects(BoundingSphereD toUnload, BoundingSphereD toExclude)
@@ -84,6 +142,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 if (shape.Contains(position) == ContainmentType.Contains) return m_asteroidRings.IndexOf(ring);
             }
             return -1;
+        }
+
+        private Vector3I GetAsteroidVoxelSize(double asteroidRadius)
+        {
+            int radius = Math.Max(64, (int)Math.Ceiling(asteroidRadius));
+            return new Vector3I(radius);
         }
     }
 }

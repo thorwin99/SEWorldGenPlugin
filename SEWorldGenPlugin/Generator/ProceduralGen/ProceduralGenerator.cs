@@ -1,4 +1,5 @@
-﻿using Sandbox.Game.Entities;
+﻿using Sandbox.Engine.Utils;
+using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
@@ -22,7 +23,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private Dictionary<MyEntity, MyEntityTracker> m_toTrackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
-        private ProceduralModule module;
+        private ProceduralModule module = null;
 
         private bool Loaded = false;
 
@@ -32,13 +33,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             Static = this;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
-
+            MyLog.Default.WriteLine("Asteroid setting set to " + MyFakes.ENABLE_ASTEROIDS + " and " + MyFakes.ENABLE_ASTEROID_FIELDS);
             Loaded = true;
         }
 
         public override void UpdateBeforeSimulation()
         {
-            if (!Loaded)
+            if (!Loaded || module == null)
                 return;
 
             foreach(var entity in m_toTrackedEntities)

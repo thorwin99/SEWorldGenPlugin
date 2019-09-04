@@ -90,5 +90,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        protected int GetObjectIdSeed(CellObject obj)
+        {
+            int hash = obj.CellId.GetHashCode();
+            hash = (hash * 397) ^ m_seed;
+            hash = (hash * 397) ^ obj.Params.Index;
+            hash = (hash * 397) ^ obj.Params.Seed;
+            return hash;
+        }
+
     }
 }
