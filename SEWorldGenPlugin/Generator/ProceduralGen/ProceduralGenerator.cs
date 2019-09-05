@@ -65,7 +65,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     module.GetObjectsInSphere(tracker.BoundingVolume, cellObjects);
                     module.GenerateObjects(cellObjects, m_existingObjectSeeds);
 
-                    module.UnloadCellObjects(oldBounding, tracker.BoundingVolume);
+                    module.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
                 }
             }
         }

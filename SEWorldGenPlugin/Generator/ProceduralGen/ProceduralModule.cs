@@ -14,6 +14,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         protected int m_seed;
         protected Dictionary<Vector3I, ProceduralCell> m_cells = new Dictionary<Vector3I, ProceduralCell>();
         protected MyDynamicAABBTreeD m_cellsTree = new MyDynamicAABBTreeD(Vector3D.Zero);
+        protected List<ProceduralCell> m_toUnloadCells;
 
         public readonly double CELL_SIZE;
 
@@ -21,9 +22,26 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             m_seed = seed;
             CELL_SIZE = Math.Max(cellSize, 25000);
+            m_toUnloadCells = new List<ProceduralCell>();
         }
 
-        public abstract void UnloadCellObjects(BoundingSphereD toUnload, BoundingSphereD toExclude);
+        public void MarkToUnloadCells(BoundingSphereD toUnload, BoundingSphereD toExclude)
+        {
+            Vector3I cellId = Vector3I.Floor((toUnload.Center - toUnload.Radius) / CELL_SIZE);
+            for (var iter = GetCellsIterator(toUnload); iter.IsValid(); iter.GetNext(out cellId))
+            {
+                ProceduralCell cell;
+                if (m_cells.TryGetValue(cellId, out cell))
+                {
+                    if (toExclude == null || toExclude.Contains(cell.BoundingVolume) == ContainmentType.Disjoint)
+                    {
+                        m_toUnloadCells.Add(cell);
+                    }
+                }
+            }
+        }
+
+        public abstract void UnloadCells();
 
         public void GetObjectsInSphere(BoundingSphereD sphere, List<CellObject> outObjects)
         {

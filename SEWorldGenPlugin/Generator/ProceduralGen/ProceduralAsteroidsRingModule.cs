@@ -25,7 +25,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private const int SUBCELL_SIZE = 4 * 1024 + OBJECT_SIZE_MAX * 2;
         private const int SUBCELLS = 3;
 
-        List<PlanetRingItem> m_asteroidRings;
+        private List<PlanetRingItem> m_asteroidRings;
 
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
         {
@@ -88,7 +88,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     var bounds = obj.BoundingVolume;
                     MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, tmp_voxelMaps);
 
-                    String storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", obj.CellId.X, obj.CellId.Y, obj.CellId.Z, obj.Params.Index, obj.Params.Seed);
+                    string storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", obj.CellId.X, obj.CellId.Y, obj.CellId.Z, obj.Params.Index, obj.Params.Seed);
 
                     bool exists = false;
                     foreach(var voxelMap in tmp_voxelMaps)
@@ -129,11 +129,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             ProfilerShort.End();
         }
 
-        public override void UnloadCellObjects(BoundingSphereD toUnload, BoundingSphereD toExclude)
-        {
-            throw new NotImplementedException();
-        }
-
         private int IsInsideRing(Vector3D position)
         {
             foreach(PlanetRingItem ring in m_asteroidRings)
@@ -148,6 +143,52 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             int radius = Math.Max(64, (int)Math.Ceiling(asteroidRadius));
             return new Vector3I(radius);
+        }
+
+        public override void UnloadCells()
+        {
+            if (m_toUnloadCells.Count == 0) return;
+
+            List<CellObject> cellObjects = new List<CellObject>();
+
+            foreach (var cell in m_toUnloadCells)
+            {
+                cell.GetAllObjects(cellObjects);
+
+                foreach(CellObject obj in cellObjects)
+                {
+                    if (obj.Params.Generated)
+                    {
+                        UnloadAsteroid(obj);
+                    }
+                }
+                cellObjects.Clear();
+            }
+            m_toUnloadCells.Clear();
+        }
+
+        private void UnloadAsteroid(CellObject obj)
+        {
+            List<MyVoxelBase> voxelMaps = new List<MyVoxelBase>();
+            var bounds = obj.BoundingVolume;
+
+            MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, voxelMaps);
+
+            string storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", obj.CellId.X, obj.CellId.Y, obj.CellId.Z, obj.Params.Index, obj.Params.Seed);
+
+            foreach(MyVoxelBase map in voxelMaps)
+            {
+                if(map.StorageName == storageName)
+                {
+                    if (!map.Save)
+                    {
+                        map.Close();
+                    }
+                    break;
+                }
+            }
+
+            voxelMaps.Clear();
         }
     }
 }
