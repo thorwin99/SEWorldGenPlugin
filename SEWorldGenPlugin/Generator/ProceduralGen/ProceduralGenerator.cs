@@ -13,7 +13,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 500, typeof(MyObjectBuilder_WorldGenerator)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 500, typeof(MyObjectBuilder_WorldGenerator))]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
@@ -23,23 +23,23 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private Dictionary<MyEntity, MyEntityTracker> m_toTrackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
+        private HashSet<EmptyArea> m_areas = new HashSet<EmptyArea>();
         private ProceduralModule module = null;
 
-        private bool Loaded = false;
+        private bool Enabled = false;
 
         public override void LoadData()
         {
-            //TODO: Load asteroid module
             Static = this;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
             MyLog.Default.WriteLine("Asteroid setting set to " + MyFakes.ENABLE_ASTEROIDS + " and " + MyFakes.ENABLE_ASTEROID_FIELDS);
-            Loaded = true;
+            Enabled = true;
         }
 
         public override void UpdateBeforeSimulation()
         {
-            if (!Loaded || module == null)
+            if (!Enabled || module == null)
                 return;
 
             foreach(var entity in m_toTrackedEntities)
@@ -72,7 +72,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         protected override void UnloadData()
         {
-            Loaded = false;
+            Enabled = false;
 
             module = null;
 
@@ -86,7 +86,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public void TrackEntity(MyEntity entity)
         {
-            if (!Loaded)
+            if (!Enabled)
                 return;
 
             if(entity is MyCharacter)
@@ -126,6 +126,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             MyObjectBuilder_WorldGenerator b = (MyObjectBuilder_WorldGenerator)sessionComponent;
 
             m_existingObjectSeeds = b.ExistingObjectsSeeds;
+            m_areas = b.MarkedAreas;
         }
 
         override public bool UpdatedBeforeInit()
@@ -133,6 +134,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return true;
         }
 
-
+        public override MyObjectBuilder_SessionComponent GetObjectBuilder()
+        {
+            MyObjectBuilder_WorldGenerator builder = (MyObjectBuilder_WorldGenerator)base.GetObjectBuilder();
+            builder.MarkedAreas = m_areas;
+            builder.ExistingObjectsSeeds = m_existingObjectSeeds;
+            return builder;
+        }
     }
 }

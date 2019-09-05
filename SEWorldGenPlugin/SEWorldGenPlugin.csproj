@@ -179,11 +179,6 @@
     <Compile Include="Generator\ProceduralGen\ProceduralCell.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralModule.cs" />
-    <Compile Include="Generator\ProceduralWorld\MyCustomProceduralWorldGenerator.cs" />
-    <Compile Include="Generator\ProceduralWorld\MyEntityExtensionCustom.cs" />
-    <Compile Include="Generator\ProceduralWorld\MyInfiniteDensityFunction.cs" />
-    <Compile Include="Generator\ProceduralWorld\MyProceduralAsteroidRingCellGenerator.cs" />
-    <Compile Include="Generator\ProceduralWorld\MySphereDensityFunction.cs" />
     <Compile Include="Generator\StarSystemGenerator.cs" />
     <Compile Include="ObjectBuilder_GeneratorSave.cs" />
     <Compile Include="Ob_GeneratorSaveItem.cs" />
