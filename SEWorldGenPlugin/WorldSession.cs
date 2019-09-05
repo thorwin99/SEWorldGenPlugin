@@ -1,23 +1,13 @@
 ﻿using Sandbox.Definitions;
-using Sandbox.Engine.Utils;
-using Sandbox.Engine.Voxels;
-using Sandbox.Game.Entities;
-using Sandbox.Game.World.Generator;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator;
-using SEWorldGenPlugin.Generator.ProceduralWorld;
-using SEWorldGenPlugin.SaveItems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using VRage;
 using VRage.Game.Components;
 using VRage.Game.ModAPI;
-using VRage.Game.Voxels;
 using VRage.Library.Utils;
 using VRage.Utils;
-using VRageMath;
-using VRageRender.Messages;
 
 namespace SEWorldGenPlugin
 {
@@ -29,6 +19,7 @@ namespace SEWorldGenPlugin
         List<MyPlanetGeneratorDefinition> defs;
         StarSystemGenerator gen;
         bool loaded = false;
+
         public override void BeforeStart()
         {
             MyLog.Default.WriteLine("Loaded Session");

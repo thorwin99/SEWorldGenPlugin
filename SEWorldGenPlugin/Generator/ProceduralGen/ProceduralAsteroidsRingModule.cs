@@ -13,6 +13,7 @@ using VRage.Game;
 using VRage.Library.Utils;
 using VRage.Noise;
 using VRage.Profiler;
+using VRage.Utils;
 using VRage.Voxels;
 using VRageMath;
 
@@ -20,9 +21,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
     public class ProceduralAsteroidsRingModule : ProceduralModule
     {
-        private const int OBJECT_SIZE_MIN = 64;
-        private const int OBJECT_SIZE_MAX = 512;
-        private const int SUBCELL_SIZE = 4 * 1024 + OBJECT_SIZE_MAX * 2;
+        private const int OBJECT_SIZE_MIN = 128;
+        private const int OBJECT_SIZE_MAX = 2048;
+        private const int SUBCELL_SIZE = OBJECT_SIZE_MAX;
         private const int SUBCELLS = 3;
 
         private List<PlanetRingItem> m_asteroidRings;
@@ -30,6 +31,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
         {
             m_asteroidRings = new List<PlanetRingItem>();
+
+            MyLog.Default.WriteLine("Cell Size is " + (SUBCELLS * SUBCELL_SIZE));
         }
 
         public override ProceduralCell GenerateCell(ref Vector3I id)
@@ -55,16 +58,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     int ringIndex = IsInsideRing(position);
 
-                    if (ringIndex == -1) continue;
+                    //if (ringIndex == -1) continue;
 
-                    double density = m_asteroidRings[ringIndex].Density;//Currently useless...
+                    //double density = m_asteroidRings[ringIndex].Density;//Currently useless...
 
                     //TODO: Add density functionality.
 
-                    var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(OBJECT_SIZE_MIN, OBJECT_SIZE_MAX));
+                    var cellObject = new CellObject(cell, position, OBJECT_SIZE_MAX/*MyRandom.Instance.Next(OBJECT_SIZE_MIN, OBJECT_SIZE_MAX)*/);
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
                     cellObject.Params.Seed = MyRandom.Instance.Next();
                     cellObject.Params.Index = index++;
+
+                    cell.AddObject(cellObject);
                 }
             }
 
@@ -107,7 +112,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                         MyVoxelMap voxelMap = new MyVoxelMap();
 
-                        voxelMap.EntityId = MyRandom.Instance.NextLong();
+                        voxelMap.EntityId = GetAsteroidEntityId(storageName);
                         voxelMap.Init(storageName, storage, obj.BoundingVolume.Center - VRageMath.MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2);
                         MyEntities.RaiseEntityCreated(voxelMap);
                         MyEntities.Add(voxelMap);
@@ -189,6 +194,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
 
             voxelMaps.Clear();
+        }
+
+        private long GetAsteroidEntityId(string storageName)
+        {
+            long hash = storageName.GetHashCode64();
+            return hash & 0x00FFFFFFFFFFFFFF | ((long)MyEntityIdentifier.ID_OBJECT_TYPE.ASTEROID << 56);
         }
     }
 }

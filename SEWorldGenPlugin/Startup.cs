@@ -1,18 +1,7 @@
-﻿using Sandbox.Graphics.GUI;
-using SpaceEngineers.Game;
-using Sandbox.Game.Screens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VRage;
-using VRage.Plugins;
-using VRage.Utils;
-using Sandbox.Game;
-using Sandbox.Game.Entities;
+﻿using Sandbox.Game.Entities;
+using SEWorldGenPlugin.Generator.ProceduralGen;
 using VRage.Game.Entity;
-using SEWorldGenPlugin.Generator.ProceduralWorld;
+using VRage.Plugins;
 
 namespace SEWorldGenPlugin
 {
@@ -24,7 +13,7 @@ namespace SEWorldGenPlugin
 
         public void Init(object gameInstance)
         {
-            //MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += MyEntityExtensionCustom.CustomProceduralWorldGeneratorTrackEntity;
+            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
         }
 
         public void Update()

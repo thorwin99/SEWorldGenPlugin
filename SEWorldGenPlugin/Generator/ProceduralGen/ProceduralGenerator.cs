@@ -33,7 +33,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             Static = this;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
-            MyLog.Default.WriteLine("Asteroid setting set to " + MyFakes.ENABLE_ASTEROIDS + " and " + MyFakes.ENABLE_ASTEROID_FIELDS);
+
+            //Currently so that the original Procedural world generator still works
+            if (MySession.Static.Settings.ProceduralDensity != 0) return;
+
+            module = new ProceduralAsteroidsRingModule(m_seed);
+
             Enabled = true;
         }
 
