@@ -181,6 +181,7 @@
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralModule.cs" />
     <Compile Include="Generator\StarSystemGenerator.cs" />
+    <Compile Include="Generator\SystemGenerator.cs" />
     <Compile Include="ObjectBuilder_GeneratorSave.cs" />
     <Compile Include="Ob_GeneratorSaveItem.cs" />
     <Compile Include="SaveItems\PlanetItem.cs" />

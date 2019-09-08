@@ -1,8 +1,10 @@
 ﻿using Sandbox.Definitions;
+using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using VRage.Game.Components;
 using VRage.Game.ModAPI;
@@ -25,7 +27,10 @@ namespace SEWorldGenPlugin
             MyLog.Default.WriteLine("Loaded Session");
             defs = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             CleanPlanetDefs();
-            MyLog.Default.WriteLine(defs.Count + " Definitionen an Planeten");
+
+            MyLog.Default.WriteLine("BeforeStart Definitions are ");
+            foreach (var d in defs) MyLog.Default.WriteLine(d.ToString());
+            MyLog.Default.WriteLine("BeforeStart Folder is " + Path.Combine(MySession.Static.CurrentPath, "Storage", "SEWorldGenPlugin", STORAGE_FILE));
         }
 
         public override void UpdateBeforeSimulation()
@@ -116,6 +121,14 @@ namespace SEWorldGenPlugin
             defs = null;
             gen = null;
             loaded = false;
+        }
+
+        public override void LoadData()
+        {
+            defs = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
+            MyLog.Default.WriteLine("LoadData Folder is " + Path.Combine(MySession.Static.CurrentPath, "Storage", "SEWorldGenPlugin", STORAGE_FILE));
+            MyLog.Default.WriteLine("LoadData Definitions are ");
+            foreach (var d in defs) MyLog.Default.WriteLine(d.ToString());
         }
     }
 }

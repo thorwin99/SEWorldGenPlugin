@@ -256,7 +256,6 @@ namespace SEWorldGenPlugin.Generator
         {
             foreach(MyPlanetGeneratorDefinition def in Planets)
             {
-                MyLog.Default.WriteLine("Checking if " + def.Id.SubtypeId.String + " equals " + name);
                 if (def.Id.SubtypeId.String.Equals(name)) return def;
             }
             return null;
@@ -284,7 +283,6 @@ namespace SEWorldGenPlugin.Generator
                 provider.Init(seed, generatorDef, size.Value / 2f);
 
                 IMyStorage storage = new MyOctreeStorage(provider, provider.StorageSize);
-                MyLog.Default.WriteLine("Normal Position ");
                 float minHillSize = provider.Radius * generatorDef.HillParams.Min;
                 float maxHillSize = provider.Radius * generatorDef.HillParams.Max;
 

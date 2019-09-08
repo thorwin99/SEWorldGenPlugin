@@ -22,9 +22,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     public class ProceduralAsteroidsRingModule : ProceduralModule
     {
         private const int OBJECT_SIZE_MIN = 128;
-        private const int OBJECT_SIZE_MAX = 2048;
-        private const int SUBCELL_SIZE = OBJECT_SIZE_MAX;
-        private const int SUBCELLS = 3;
+        private const int OBJECT_SIZE_MAX = 512;
+        private const int SUBCELL_SIZE = OBJECT_SIZE_MAX * 4;
+        private const int SUBCELLS = 6;
 
         private List<PlanetRingItem> m_asteroidRings;
 
@@ -50,9 +50,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 for(var it = new Vector3I_RangeIterator(ref Vector3I.Zero, ref max); it.IsValid(); it.GetNext(out subcellId))
                 {
                     Vector3D position = new Vector3D(MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble());
-                    position += (Vector3D)subcellId / SUBCELL_SIZE;
-                    position += id;
-                    position *= CELL_SIZE;
+                    position += (Vector3D)subcellId;
+                    position *= SUBCELL_SIZE;
+                    position += id * CELL_SIZE;
 
                     if (!MyEntities.IsInsideWorld(position)) continue;
 
@@ -64,7 +64,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     //TODO: Add density functionality.
 
-                    var cellObject = new CellObject(cell, position, OBJECT_SIZE_MAX/*MyRandom.Instance.Next(OBJECT_SIZE_MIN, OBJECT_SIZE_MAX)*/);
+                    var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(OBJECT_SIZE_MIN, OBJECT_SIZE_MAX));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
                     cellObject.Params.Seed = MyRandom.Instance.Next();
                     cellObject.Params.Index = index++;

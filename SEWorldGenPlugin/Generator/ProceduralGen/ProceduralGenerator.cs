@@ -13,7 +13,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 500, typeof(MyObjectBuilder_WorldGenerator))]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501, typeof(MyObjectBuilder_WorldGenerator))]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
@@ -30,6 +30,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void LoadData()
         {
+            MyLog.Default.WriteLine("Loading World Generator");
             Static = this;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
@@ -94,6 +95,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Enabled)
                 return;
 
+            if (entity == null)
+                return;
+
             if(entity is MyCharacter)
             {
                 TrackEntityRanged(entity, MySession.Static.Settings.ViewDistance);
@@ -120,6 +124,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 {
                     m_trackedEntities.Remove(e);
                     m_toTrackedEntities.Remove(e);
+                    module.MarkToUnloadCells(tracker.BoundingVolume);
                 };
             }
         }
