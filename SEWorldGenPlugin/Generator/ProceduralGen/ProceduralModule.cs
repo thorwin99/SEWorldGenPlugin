@@ -10,7 +10,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
     public abstract class ProceduralModule
     {
-
         protected int m_seed;
         protected Dictionary<Vector3I, ProceduralCell> m_cells = new Dictionary<Vector3I, ProceduralCell>();
         protected MyDynamicAABBTreeD m_cellsTree = new MyDynamicAABBTreeD(Vector3D.Zero);

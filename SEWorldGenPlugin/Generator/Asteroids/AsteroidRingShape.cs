@@ -1,5 +1,6 @@
-﻿using SEWorldGenPlugin.SaveItems;
+﻿using SEWorldGenPlugin.ObjectBuilders;
 using System;
+using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.Asteroids
@@ -12,7 +13,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public int height;
         public Vector3D rotation;
 
-        public static AsteroidRingShape CreateFromRingItem(PlanetRingItem ring)
+        public static AsteroidRingShape CreateFromRingItem(MyPlanetRingItem ring)
         {
             AsteroidRingShape shape = new AsteroidRingShape();
             shape.center = ring.Center;

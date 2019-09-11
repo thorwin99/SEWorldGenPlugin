@@ -2,16 +2,12 @@
 using Sandbox.Game.Entities;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.Asteroids;
-using SEWorldGenPlugin.SaveItems;
+using SEWorldGenPlugin.ObjectBuilders;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VRage;
 using VRage.Game;
 using VRage.Library.Utils;
-using VRage.Noise;
 using VRage.Profiler;
 using VRage.Utils;
 using VRage.Voxels;
@@ -23,15 +19,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     {
         private const int OBJECT_SIZE_MIN = 128;
         private const int OBJECT_SIZE_MAX = 512;
-        private const int SUBCELL_SIZE = OBJECT_SIZE_MAX * 4;
+        private const int SUBCELL_SIZE = (int)(OBJECT_SIZE_MAX * 1.5);
         private const int SUBCELLS = 6;
-
-        private List<PlanetRingItem> m_asteroidRings;
 
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
         {
-            m_asteroidRings = new List<PlanetRingItem>();
-
             MyLog.Default.WriteLine("Cell Size is " + (SUBCELLS * SUBCELL_SIZE));
         }
 
@@ -56,13 +48,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (!MyEntities.IsInsideWorld(position)) continue;
 
-                    int ringIndex = IsInsideRing(position);
-
-                    //if (ringIndex == -1) continue;
-
-                    //double density = m_asteroidRings[ringIndex].Density;//Currently useless...
-
-                    //TODO: Add density functionality.
+                    if (!IsInsideRing(position)) continue;
 
                     var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(OBJECT_SIZE_MIN, OBJECT_SIZE_MAX));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
@@ -134,14 +120,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             ProfilerShort.End();
         }
 
-        private int IsInsideRing(Vector3D position)
+        private bool IsInsideRing(Vector3D position)
         {
-            foreach(PlanetRingItem ring in m_asteroidRings)
+            foreach(MyPlanetItem p in SystemGenerator.Static.m_planets)
             {
-                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(ring);
-                if (shape.Contains(position) == ContainmentType.Contains) return m_asteroidRings.IndexOf(ring);
+                if (p.PlanetRing == null) continue;
+                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(p.PlanetRing);
+                if (shape.Contains(position) == ContainmentType.Contains) return true;
             }
-            return -1;
+            return false;
         }
 
         private Vector3I GetAsteroidVoxelSize(double asteroidRadius)

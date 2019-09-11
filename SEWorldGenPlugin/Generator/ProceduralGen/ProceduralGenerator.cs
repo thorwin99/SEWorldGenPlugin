@@ -24,7 +24,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private Dictionary<MyEntity, MyEntityTracker> m_toTrackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
         private HashSet<EmptyArea> m_areas = new HashSet<EmptyArea>();
-        private ProceduralModule module = null;
+        private ProceduralAsteroidsRingModule asteroidModule = null;
+        private ProceduralPlanetModule planetModule = null;
 
         private bool Enabled = false;
 
@@ -38,14 +39,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             //Currently so that the original Procedural world generator still works
             if (MySession.Static.Settings.ProceduralDensity != 0) return;
 
-            module = new ProceduralAsteroidsRingModule(m_seed);
+            asteroidModule = new ProceduralAsteroidsRingModule(m_seed);
+            planetModule = new ProceduralPlanetModule(m_seed);
 
             Enabled = true;
         }
 
         public override void UpdateBeforeSimulation()
         {
-            if (!Enabled || module == null)
+            if (!Enabled || asteroidModule == null)
                 return;
 
             foreach(var entity in m_toTrackedEntities)
@@ -68,10 +70,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     var oldBounding = tracker.BoundingVolume;
                     tracker.UpdateLastPosition();
 
-                    module.GetObjectsInSphere(tracker.BoundingVolume, cellObjects);
-                    module.GenerateObjects(cellObjects, m_existingObjectSeeds);
+                    planetModule.GeneratePlanets(tracker.Entity);
 
-                    module.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
+                    asteroidModule.GetObjectsInSphere(tracker.BoundingVolume, cellObjects);
+                    asteroidModule.GenerateObjects(cellObjects, m_existingObjectSeeds);
+
+                    asteroidModule.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
                 }
             }
         }
@@ -80,7 +84,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             Enabled = false;
 
-            module = null;
+            asteroidModule = null;
 
             m_trackedEntities.Clear();
             Static = null;
@@ -124,7 +128,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 {
                     m_trackedEntities.Remove(e);
                     m_toTrackedEntities.Remove(e);
-                    module.MarkToUnloadCells(tracker.BoundingVolume);
+                    asteroidModule.MarkToUnloadCells(tracker.BoundingVolume);
                 };
             }
         }

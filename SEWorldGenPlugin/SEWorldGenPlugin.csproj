@@ -63,9 +63,6 @@
     <Reference Include="Sandbox.Game">
       <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Game.dll</HintPath>
     </Reference>
-    <Reference Include="Sandbox.Game.XmlSerializers">
-      <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Game.XmlSerializers.dll</HintPath>
-    </Reference>
     <Reference Include="Sandbox.Graphics">
       <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Graphics.dll</HintPath>
     </Reference>
@@ -77,12 +74,6 @@
     </Reference>
     <Reference Include="SpaceEngineers.Game">
       <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.Game.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers.ObjectBuilders">
-      <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.ObjectBuilders.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers">
-      <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -130,9 +121,6 @@
     <Reference Include="VRage.Math">
       <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.Math.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Math.XmlSerializers">
-      <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.Math.XmlSerializers.dll</HintPath>
-    </Reference>
     <Reference Include="VRage.NativeAftermath">
       <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.NativeAftermath.dll</HintPath>
     </Reference>
@@ -160,9 +148,6 @@
     <Reference Include="VRage.UserInterface">
       <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.UserInterface.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.XmlSerializers">
-      <HintPath>F:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.XmlSerializers.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
@@ -180,14 +165,10 @@
     <Compile Include="Generator\ProceduralGen\ProceduralCell.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralModule.cs" />
-    <Compile Include="Generator\StarSystemGenerator.cs" />
+    <Compile Include="Generator\ProceduralGen\ProceduralPlanetModule.cs" />
     <Compile Include="Generator\SystemGenerator.cs" />
-    <Compile Include="ObjectBuilder_GeneratorSave.cs" />
-    <Compile Include="Ob_GeneratorSaveItem.cs" />
-    <Compile Include="SaveItems\PlanetItem.cs" />
-    <Compile Include="SaveItems\StarSystemItem.cs" />
+    <Compile Include="ObjectBuilders\MyObjectBuilder_StarSystem.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="WorldSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
