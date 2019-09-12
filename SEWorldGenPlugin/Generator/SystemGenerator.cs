@@ -107,7 +107,7 @@ namespace SEWorldGenPlugin.Generator
                     int distToPrev = MyRandom.Instance.Next(MIN_PLANET_DISTANCE, MAX_PLANET_DISTANCE);
                     tmp_distance += distToPrev;
 
-                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i & 6) / 12.5) < 0.5){
+                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i % 6) / 12.5) < 0.5){
                         GeneratePlanet(i, tmp_distance);
                     }
                     else
