@@ -13,13 +13,17 @@ using VRage.Utils;
 using VRage.Voxels;
 using VRageMath;
 
+/*
+ * Code is primarily taken from the Space Engineers GitHub repository. 
+ */
+
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
     public class ProceduralAsteroidsRingModule : ProceduralModule
     {
         private const int OBJECT_SIZE_MIN = 128;
         private const int OBJECT_SIZE_MAX = 512;
-        private const int SUBCELL_SIZE = (int)(OBJECT_SIZE_MAX * 1.5);
+        private const int SUBCELL_SIZE = (int)(OBJECT_SIZE_MAX * 2);
         private const int SUBCELLS = 6;
 
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
@@ -48,9 +52,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (!MyEntities.IsInsideWorld(position)) continue;
 
-                    if (!IsInsideRing(position)) continue;
+                    MySystemItem obj = IsInsideRing(position);
 
-                    var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(OBJECT_SIZE_MIN, OBJECT_SIZE_MAX));
+                    if (obj == null) continue;
+                    int minSize = OBJECT_SIZE_MIN;
+
+                    if (obj.Type == SystemObjectType.BELT)
+                        minSize = ((MySystemBeltItem)obj).RoidSize;
+
+                    if (obj.Type == SystemObjectType.RING)
+                        minSize = ((MyPlanetRingItem)obj).RoidSize;
+
+                    var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(Math.Min(OBJECT_SIZE_MAX, minSize), OBJECT_SIZE_MAX));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
                     cellObject.Params.Seed = MyRandom.Instance.Next();
                     cellObject.Params.Index = index++;
@@ -120,15 +133,27 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             ProfilerShort.End();
         }
 
-        private bool IsInsideRing(Vector3D position)
+        private MySystemItem IsInsideRing(Vector3D position)
         {
-            foreach(MyPlanetItem p in SystemGenerator.Static.m_planets)
+            foreach(MySystemItem p in SystemGenerator.Static.m_objects)
             {
-                if (p.PlanetRing == null) continue;
-                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(p.PlanetRing);
-                if (shape.Contains(position) == ContainmentType.Contains) return true;
+                if(p.Type == SystemObjectType.PLANET)
+                {
+                    MyPlanetItem planet = (MyPlanetItem)p;
+
+                    if (planet.PlanetRing == null) continue;
+                    AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(planet.PlanetRing);
+                    if (shape.Contains(position) == ContainmentType.Contains) return planet.PlanetRing;
+                }
+                else if(p.Type == SystemObjectType.BELT)
+                {
+                    MySystemBeltItem belt = (MySystemBeltItem)p;
+                    AsteroidBeltShape shape = AsteroidBeltShape.CreateFromRingItem(belt);
+                    if (shape.Contains(position) == ContainmentType.Contains) return belt;
+                }
+
             }
-            return false;
+            return null;
         }
 
         private Vector3I GetAsteroidVoxelSize(double asteroidRadius)

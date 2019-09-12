@@ -16,6 +16,9 @@ using VRage.Voxels;
 using VRageMath;
 using VRageRender;
 
+/*
+ * Code is taken from the Space Engineers code base, since this class is not viewable for mods but is needed to generate Asteroids/Planets
+ */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
     [MyStorageDataProvider(10004)]

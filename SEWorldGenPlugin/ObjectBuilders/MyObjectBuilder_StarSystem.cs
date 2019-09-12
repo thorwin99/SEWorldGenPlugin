@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using VRage;
 using VRage.Game;
 using VRage.ObjectBuilders;
+using VRageMath;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
@@ -12,31 +13,54 @@ namespace SEWorldGenPlugin.ObjectBuilders
     public class MyObjectBuilder_StarSystem : MyObjectBuilder_SessionComponent
     {
         [ProtoMember(3010)]
-        public HashSet<MyPlanetItem> SystemPlanets = new HashSet<MyPlanetItem>();
+        public HashSet<MySystemItem> SystemObjects = new HashSet<MySystemItem>();
     }
 
     [ProtoContract]
-    public class MyPlanetItem
+    [ProtoInclude(1501, typeof(MyPlanetItem))]
+    [ProtoInclude(1502, typeof(MySystemBeltItem))]
+    [ProtoInclude(1503, typeof(MyPlanetMoonItem))]
+    [ProtoInclude(1504, typeof(MyPlanetRingItem))]
+    [XmlInclude(typeof(MyPlanetItem))]
+    [XmlInclude(typeof(MySystemBeltItem))]
+    [XmlInclude(typeof(MyPlanetMoonItem))]
+    [XmlInclude(typeof(MyPlanetRingItem))]
+    public class MySystemItem
     {
         [ProtoMember(1)]
+        public SystemObjectType Type;
+    }
+
+    public enum SystemObjectType
+    {
+        PLANET,
+        RING,
+        MOON,
+        BELT
+    }
+
+    [ProtoContract]
+    public class MyPlanetItem : MySystemItem
+    {
+        [ProtoMember(2)]
         public string DefName;
 
-        [ProtoMember(2)]
+        [ProtoMember(3)]
         public int Size;
 
-        [ProtoMember(3)]
+        [ProtoMember(4)]
         public SerializableVector3D CenterPosition;
 
-        [ProtoMember(4)]
+        [ProtoMember(5)]
         public SerializableVector3D OffsetPosition;
 
-        [ProtoMember(5)]
+        [ProtoMember(6)]
         public bool Generated;
 
-        [ProtoMember(6)]
+        [ProtoMember(7)]
         public MyPlanetRingItem PlanetRing;
 
-        [ProtoMember(7)]
+        [ProtoMember(8)]
         [DefaultValue(null)]
         [XmlArrayItem("MyPlanetMoon")]
         public MyPlanetMoonItem[] PlanetMoons;
@@ -48,37 +72,53 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     [ProtoContract]
-    public class MyPlanetMoonItem
+    public class MyPlanetMoonItem : MySystemItem
     {
-        [ProtoMember(1)]
+        [ProtoMember(2)]
         public int Size;
 
-        [ProtoMember(2)]
+        [ProtoMember(3)]
         public float Distance;
 
-        [ProtoMember(3)]
+        [ProtoMember(4)]
         public string DefName;
     }
 
     [ProtoContract]
-    public class MyPlanetRingItem
+    public class MyPlanetRingItem : MySystemItem
     {
-        [ProtoMember(1)]
-        public int Radius;
-
         [ProtoMember(2)]
-        public int Width;
+        public long Radius;
 
         [ProtoMember(3)]
-        public int Height;
+        public int Width;
 
         [ProtoMember(4)]
+        public int Height;
+
+        [ProtoMember(5)]
         public float AngleDegrees;
+
+        [ProtoMember(6)]
+        public int RoidSize;
+
+        [ProtoMember(7)]
+        public SerializableVector3D Center;
+    }
+
+    [ProtoContract]
+    public class MySystemBeltItem : MySystemItem
+    {
+        [ProtoMember(2)]
+        public long Radius;
+
+        [ProtoMember(3)]
+        public int Width;
+
+        [ProtoMember(4)]
+        public int Height;
 
         [ProtoMember(5)]
         public int RoidSize;
-
-        [ProtoMember(6)]
-        public SerializableVector3D Center;
     }
 }

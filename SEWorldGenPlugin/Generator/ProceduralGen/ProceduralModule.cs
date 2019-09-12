@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using VRage.Game;
 using VRageMath;
 
+
+/*
+ * Code is primarily taken from the Space Engineers GitHub repository. 
+ */
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
     public abstract class ProceduralModule

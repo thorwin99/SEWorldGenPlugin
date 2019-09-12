@@ -1,4 +1,5 @@
-﻿using Sandbox.Engine.Utils;
+﻿using Sandbox.Engine.Multiplayer;
+using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
@@ -10,6 +11,10 @@ using VRage.Game.Entity;
 using VRage.Library.Utils;
 using VRage.Utils;
 using VRageMath;
+
+/*
+ * Code is primarily taken from the Space Engineers GitHub repository. 
+ */
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
@@ -49,6 +54,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             if (!Enabled || asteroidModule == null)
                 return;
+
+            if (MyMultiplayer.Static != null && !MyMultiplayer.Static.IsServer) return;
 
             foreach(var entity in m_toTrackedEntities)
             {

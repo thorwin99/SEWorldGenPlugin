@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VRage.Noise;
+﻿using VRage.Noise;
 using VRageMath;
 using VRageRender;
 
+/*
+ * Code is taken from the Space Engineers code base, since this class is not viewable for mods but is needed to generate Asteroids/Planets
+ */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
     internal class MyCsgSphere : MyCsgShapeBase

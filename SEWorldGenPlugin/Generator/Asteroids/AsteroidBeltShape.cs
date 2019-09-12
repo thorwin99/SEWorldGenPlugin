@@ -1,40 +1,35 @@
 ﻿using SEWorldGenPlugin.ObjectBuilders;
 using System;
-using VRage.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    public struct AsteroidRingShape
+    public struct AsteroidBeltShape
     {
         public Vector3D center;
         public long radius;
         public int width;
         public int height;
-        public Vector3D rotation;
 
-        public static AsteroidRingShape CreateFromRingItem(MyPlanetRingItem ring)
+        public static AsteroidBeltShape CreateFromRingItem(MySystemBeltItem ring)
         {
-            AsteroidRingShape shape = new AsteroidRingShape();
-            shape.center = ring.Center;
+            AsteroidBeltShape shape = new AsteroidBeltShape();
+            shape.center = Vector3D.Zero;
             shape.radius = ring.Radius;
             shape.width = ring.Width;
             shape.height = ring.Height;
-            shape.rotation = new Vector3D(0, 1, 0);
-
-            double angle = 2 * Math.PI / 360 * ring.AngleDegrees;
-            shape.rotation.X = Math.Cos(angle);
-            shape.rotation.Z = Math.Sin(angle);
 
             return shape;
         }
 
         public ContainmentType Contains(Vector3D point)
         {
-            Vector3D relPosition = Vector3D.Subtract(point, center);
-            Vector3D planeNormal = new Vector3D(-rotation.Z, 0, rotation.X);
-            Vector3D horVector = Vector3D.ProjectOnPlane(ref relPosition, ref planeNormal);
-            Vector3D vertVector = Vector3D.Subtract(relPosition, horVector);
+            Vector3D vertVector = new Vector3D(0, 0, point.Z);
+            Vector3D horVector = new Vector3D(point.X, point.Y, 0);
 
             double length = horVector.Length();
 
@@ -51,7 +46,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         private double GetHeightAtRad(double rad)
         {
             if (rad < radius || rad > radius + width) throw new ArgumentOutOfRangeException("The radius " + rad + " has to be less than " + (radius + width) + " and larger than " + radius);
-            return Math.Sin((rad - radius) * Math.PI / width) * Math.Sin((rad - radius) * Math.PI / width) * 0.5 * height + 1;//Plus one to make asteroids on edges possible
+            return Math.Sin((rad - radius) * Math.PI / width) * Math.Sin((rad - radius) * Math.PI / width) * 0.5 * (height -100) + 100;//Plus 100 to make asteroids on edges possible
         }
     }
 }

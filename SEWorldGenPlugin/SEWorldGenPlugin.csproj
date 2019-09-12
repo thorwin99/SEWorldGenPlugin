@@ -150,6 +150,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator\Asteroids\AsteroidBeltShape.cs" />
     <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
     <Compile Include="Generator\Asteroids\IMyCompositionInfoProvider.cs" />
     <Compile Include="Generator\Asteroids\MyCompositeShapeGeneratorDelegate.cs" />

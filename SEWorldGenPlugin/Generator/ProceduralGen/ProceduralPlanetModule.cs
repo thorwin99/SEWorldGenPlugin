@@ -14,6 +14,7 @@ using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Game.Voxels;
 using VRage.Library.Utils;
+using VRage.Network;
 using VRage.Profiler;
 using VRage.Utils;
 using VRageMath;
@@ -34,12 +35,16 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public void GeneratePlanets(MyEntity e)
         {
-            MyLog.Default.WriteLine("Generating Planets" + SystemGenerator.Static.m_planets.Count);
+            MyLog.Default.WriteLine("Generating Planets" + SystemGenerator.Static.m_objects.Count);
 
             GetPlanets();
 
-            foreach(var planet in SystemGenerator.Static.m_planets)
+            foreach(var obj in SystemGenerator.Static.m_objects)
             {
+                if (obj.Type != SystemObjectType.PLANET) continue;
+
+                MyPlanetItem planet = (MyPlanetItem)obj;
+
                 MyLog.Default.WriteLine("Planet: " + planet.ToString());
 
                 if (planet.Generated || Vector3D.Distance(planet.OffsetPosition, e.PositionComp.GetPosition()) > GENERATOR_DISTANCE) continue;
@@ -166,7 +171,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 planetInitArguments.MarkAreaEmpty = true;
                 planetInitArguments.AtmosphereSettings = generatorDef.AtmosphereSettings.HasValue ? generatorDef.AtmosphereSettings.Value : MyAtmosphereSettings.Defaults();
                 planetInitArguments.SurfaceGravity = generatorDef.SurfaceGravity;
-                planetInitArguments.AddGps = false;
+                planetInitArguments.AddGps = true;
                 planetInitArguments.SpherizeWithDistance = true;
                 planetInitArguments.Generator = generatorDef;
                 planetInitArguments.UserCreated = false;
@@ -178,7 +183,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 MyEntities.Add(planet);
                 MyEntities.RaiseEntityCreated(planet);
-
                 return planet;
             }
         }

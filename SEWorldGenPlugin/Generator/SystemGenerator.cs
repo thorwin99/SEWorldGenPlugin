@@ -1,4 +1,5 @@
 ﻿using Sandbox.Definitions;
+using Sandbox.Engine.Multiplayer;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
@@ -18,14 +19,14 @@ namespace SEWorldGenPlugin.Generator
     {
         private const int MAX_PLANETS_COUNT = 25;
         private const int MIN_PLANETS_COUNT = 5;
-        private const int MIN_PLANET_DISTANCE = 8000000;
-        private const int MAX_PLANET_DISTANCE = 20000000;
+        private const int MIN_PLANET_DISTANCE = 4000000;
+        private const int MAX_PLANET_DISTANCE = 10000000;
         private const int MAX_PLANET_SIZE = 1200000;
         private const int MIN_RING_WIDTH = 10000;
         private const int MAX_RING_WIDTH = 100000;
         private const int MIN_RING_HEIGHT = 1000;
 
-        public HashSet<MyPlanetItem> m_planets
+        public HashSet<MySystemItem> m_objects
         {
             get;
             private set;
@@ -38,6 +39,7 @@ namespace SEWorldGenPlugin.Generator
         }
 
         private int m_seed;
+        private bool m_enabled = false;
 
         public static SystemGenerator Static;
 
@@ -45,22 +47,25 @@ namespace SEWorldGenPlugin.Generator
         {
             MyObjectBuilder_StarSystem builder = (MyObjectBuilder_StarSystem)base.GetObjectBuilder();
 
-            builder.SystemPlanets = new HashSet<MyPlanetItem>(m_planets);
+            builder.SystemObjects = new HashSet<MySystemItem>(m_objects);
 
             return builder;
         }
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
+            if (MyMultiplayer.Static != null && !MyMultiplayer.Static.IsServer) return;
+
             base.Init(sessionComponent);
 
             MyObjectBuilder_StarSystem b = (MyObjectBuilder_StarSystem)sessionComponent;
-            m_planets = b.SystemPlanets;
+            m_objects = b.SystemObjects;
 
-            if (m_planets == null || m_planets.Count == 0)
+            if (m_objects == null || m_objects.Count == 0)
             {
                 GenerateSystem();
             }
+            m_enabled = true;
         } 
 
         public override void LoadData()
@@ -81,11 +86,13 @@ namespace SEWorldGenPlugin.Generator
         protected override void UnloadData()
         {
             base.UnloadData();
+            m_enabled = false;
+            m_objects = new HashSet<MySystemItem>();
         }
 
         private void GenerateSystem()
         {
-            m_planets = new HashSet<MyPlanetItem>();
+            m_objects = new HashSet<MySystemItem>();
 
             using (MyRandom.Instance.PushSeed(m_seed))
             {
@@ -96,9 +103,29 @@ namespace SEWorldGenPlugin.Generator
                 {
                     int distToPrev = MyRandom.Instance.Next(MIN_PLANET_DISTANCE, MAX_PLANET_DISTANCE);
                     tmp_distance += distToPrev;
-                    GeneratePlanet(i, tmp_distance);
+
+                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i & 6) / 12.5) < 0.5){
+                        GeneratePlanet(i, tmp_distance);
+                    }
+                    else
+                    {
+                        GenerateBelt(tmp_distance);
+                    }
                 }
             }
+        }
+
+        private void GenerateBelt(long distance)
+        {
+            MySystemBeltItem belt = new MySystemBeltItem();
+
+            belt.Type = SystemObjectType.BELT;
+            belt.Height = MyRandom.Instance.Next(2000, 120000);
+            belt.Radius = distance;
+            belt.Width = MyRandom.Instance.Next(belt.Height * 10, belt.Height * 100);
+            belt.RoidSize = MyRandom.Instance.Next(256, 512);
+
+            m_objects.Add(belt);
         }
 
         private void GeneratePlanet(int maxSize, long distance)
@@ -108,9 +135,10 @@ namespace SEWorldGenPlugin.Generator
             var def = GetPlanetDefinition(maxSize);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
-            var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -20, (float)Math.PI / 180 * 20);
-            Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Tan(height));
+            var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
+            Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Sin(height));
 
+            planet.Type = SystemObjectType.PLANET;
             planet.DefName = def.Id.SubtypeId.String;
             planet.Size = SizeByGravity(def.SurfaceGravity);
             planet.PlanetRing = GenerateRing(def.SurfaceGravity, planet.Size);
@@ -119,7 +147,7 @@ namespace SEWorldGenPlugin.Generator
             planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity);
             planet.Generated = false;
 
-            m_planets.Add(planet);
+            m_objects.Add(planet);
         }
 
         private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity)
@@ -133,6 +161,7 @@ namespace SEWorldGenPlugin.Generator
                 var def = GetPlanetDefinition(planetSize * 0.8f);
 
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
+                item.Type = SystemObjectType.MOON;
                 item.DefName = def.Id.SubtypeName.ToString();
                 item.Distance = dist;
                 item.Size = SizeByGravity(def.SurfaceGravity);
@@ -149,6 +178,7 @@ namespace SEWorldGenPlugin.Generator
 
             MyPlanetRingItem ring = new MyPlanetRingItem();
 
+            ring.Type = SystemObjectType.RING;
             ring.RoidSize = MyRandom.Instance.Next(64, Math.Min((int)(Math.Max(surfaceGravity * 0.5 * 128, 64)), 512));
             ring.Width = MyRandom.Instance.Next(MIN_RING_WIDTH, MAX_RING_WIDTH);
             ring.Height = MyRandom.Instance.Next(MIN_RING_HEIGHT, ring.Width / 10);

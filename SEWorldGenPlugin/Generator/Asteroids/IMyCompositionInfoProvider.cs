@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using VRage.Game;
 
+/*
+ * Code is taken from the Space Engineers code base. 
+ */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
     internal interface IMyCompositionInfoProvider
