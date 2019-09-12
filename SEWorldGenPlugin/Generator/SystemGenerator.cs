@@ -1,5 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Multiplayer;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
@@ -54,7 +55,7 @@ namespace SEWorldGenPlugin.Generator
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            if (MyMultiplayer.Static != null && !MyMultiplayer.Static.IsServer) return;
+            if (!Sync.IsServer) return;
 
             base.Init(sessionComponent);
 

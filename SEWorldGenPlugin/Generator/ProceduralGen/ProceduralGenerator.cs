@@ -2,6 +2,7 @@
 using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Enabled || asteroidModule == null)
                 return;
 
-            if (MyMultiplayer.Static != null && !MyMultiplayer.Static.IsServer) return;
+            if (!Sync.IsServer) return;
 
             foreach(var entity in m_toTrackedEntities)
             {
@@ -85,6 +86,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     asteroidModule.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
                 }
             }
+
+            asteroidModule.UnloadCells();
         }
 
         protected override void UnloadData()

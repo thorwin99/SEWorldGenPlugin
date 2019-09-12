@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRage.Game;
+using VRage.Utils;
 using VRageMath;
 
 
@@ -30,14 +31,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public void MarkToUnloadCells(BoundingSphereD toUnload, BoundingSphereD? toExclude = null)
         {
+            MyLog.Default.WriteLine("marking cells to unload");
             Vector3I cellId = Vector3I.Floor((toUnload.Center - toUnload.Radius) / CELL_SIZE);
             for (var iter = GetCellsIterator(toUnload); iter.IsValid(); iter.GetNext(out cellId))
             {
+
                 ProceduralCell cell;
                 if (m_cells.TryGetValue(cellId, out cell))
                 {
+                    MyLog.Default.WriteLine("Got cell to unload");
                     if (toExclude == null || !toExclude.HasValue || toExclude.Value.Contains(cell.BoundingVolume) == ContainmentType.Disjoint)
                     {
+                        MyLog.Default.WriteLine("Cell is valid to unlaod");
                         m_toUnloadCells.Add(cell);
                     }
                 }

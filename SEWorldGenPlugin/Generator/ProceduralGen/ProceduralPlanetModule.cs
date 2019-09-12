@@ -45,13 +45,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 MyPlanetItem planet = (MyPlanetItem)obj;
 
-                MyLog.Default.WriteLine("Planet: " + planet.ToString());
-
                 if (planet.Generated || Vector3D.Distance(planet.OffsetPosition, e.PositionComp.GetPosition()) > GENERATOR_DISTANCE) continue;
 
                 MyPlanetGeneratorDefinition definition = GetDefinition(planet.DefName);
-
-                MyLog.Default.WriteLine("Definition" + definition);
                 if (definition == null) continue;
 
                 MyPlanet generatedPlanet = CreatePlanet(planet.OffsetPosition, planet.Size, ref definition);

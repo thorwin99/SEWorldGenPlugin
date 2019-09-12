@@ -1,5 +1,6 @@
 ﻿using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
@@ -83,7 +84,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             foreach(var obj in objects)
             {
-                if (obj.Params.Generated || existingObjectSeeds.Contains(obj.Params)) continue;
+                if (obj.Params.Generated) continue;
+
+                obj.Params.Generated = true;
 
                 using (MyRandom.Instance.PushSeed(GetObjectIdSeed(obj)))
                 {
@@ -99,8 +102,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     {
                         if(voxelMap.StorageName == storageName)
                         {
-                            existingObjectSeeds.Add(obj.Params);
+                            if (!existingObjectSeeds.Contains(obj.Params))
+                                existingObjectSeeds.Add(obj.Params);
                             exists = true;
+                            break;
                         }
                     }
 
@@ -120,6 +125,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         MyVoxelBase.StorageChanged OnStorageRangeChanged = null;
                         OnStorageRangeChanged = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
                         {
+                            MyLog.Default.WriteLine("Saving roid now");
                             voxelMap.Save = true;
                             voxelMap.RangeChanged -= OnStorageRangeChanged;
                         };
@@ -127,8 +133,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     }
                     tmp_voxelMaps.Clear();
                 }
-
-                obj.Params.Generated = true;
             }
             ProfilerShort.End();
         }
@@ -176,6 +180,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 {
                     if (obj.Params.Generated)
                     {
+                        MyLog.Default.WriteLine("unloading roid");
                         UnloadAsteroid(obj);
                     }
                 }
@@ -199,7 +204,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 {
                     if (!map.Save)
                     {
+                        MyLog.Default.WriteLine("Closing roid");
                         map.Close();
+                        map.OnClose += delegate
+                        {
+                            obj.Params.Generated = false;
+                        };
                     }
                     break;
                 }
