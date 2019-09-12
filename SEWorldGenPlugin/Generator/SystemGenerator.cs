@@ -62,6 +62,8 @@ namespace SEWorldGenPlugin.Generator
             MyObjectBuilder_StarSystem b = (MyObjectBuilder_StarSystem)sessionComponent;
             m_objects = b.SystemObjects;
 
+            m_seed = MySession.Static.Settings.ProceduralSeed;
+
             if (m_objects == null || m_objects.Count == 0)
             {
                 GenerateSystem();
