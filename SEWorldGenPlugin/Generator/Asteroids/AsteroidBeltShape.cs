@@ -46,7 +46,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         private double GetHeightAtRad(double rad)
         {
             if (rad < radius || rad > radius + width) throw new ArgumentOutOfRangeException("The radius " + rad + " has to be less than " + (radius + width) + " and larger than " + radius);
-            return rad * rad / (-width) + height;//Plus 100 to make asteroids on edges possible
+            return Math.Sin((rad - radius) * Math.PI / width) * 0.5 * (height - 100) + 100;//Plus 100 to make asteroids on edges possible
         }
     }
 }
