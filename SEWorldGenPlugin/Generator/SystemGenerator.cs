@@ -120,7 +120,7 @@ namespace SEWorldGenPlugin.Generator
             MySystemBeltItem belt = new MySystemBeltItem();
 
             belt.Type = SystemObjectType.BELT;
-            belt.Height = MyRandom.Instance.Next(2000, 120000);
+            belt.Height = MyRandom.Instance.Next(2000, 20000);
             belt.Radius = distance;
             belt.Width = MyRandom.Instance.Next(belt.Height * 10, belt.Height * 100);
             belt.RoidSize = MyRandom.Instance.Next(256, 512);
