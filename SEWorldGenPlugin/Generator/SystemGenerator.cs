@@ -46,11 +46,6 @@ namespace SEWorldGenPlugin.Generator
 
         public static SystemGenerator Static;
 
-        public override MyObjectBuilder_SessionComponent GetObjectBuilder()
-        {
-            return base.GetObjectBuilder();
-        }
-
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             if (!Sync.IsServer) return;
@@ -68,6 +63,8 @@ namespace SEWorldGenPlugin.Generator
 
         public override void LoadData()
         {
+            if (!Sync.IsServer) return;
+
             Static = this;
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
