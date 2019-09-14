@@ -1,6 +1,4 @@
-﻿using Sandbox.Engine.Multiplayer;
-using Sandbox.Engine.Utils;
-using Sandbox.Game.Entities;
+﻿using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
@@ -12,9 +10,7 @@ using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
-using VRage.Library.Utils;
 using VRage.Utils;
-using VRageMath;
 
 /*
  * Code is primarily taken from the Space Engineers GitHub repository. 

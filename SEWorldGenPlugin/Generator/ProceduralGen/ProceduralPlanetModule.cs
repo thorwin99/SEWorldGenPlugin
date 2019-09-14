@@ -54,7 +54,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
                 if (planet.PlanetRing != null)
                     planet.PlanetRing.Center = planet.CenterPosition;
-
                 List<Vector3D> spawnedMoons = new List<Vector3D>();
 
                 for(int i = 0; i < planet.PlanetMoons.Length; i++)
@@ -73,9 +72,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         threshold++;
 
                     } while (ObstructedPlace(position, spawnedMoons, planet.Size, planet.PlanetRing) && threshold < 10000);
-                    spawnedMoons.Add(CreatePlanet(position, moon.Size, ref moonDef).PositionComp.GetPosition());
+                    MyPlanet spawnedMoon = CreatePlanet(position, moon.Size, ref moonDef);
+                    spawnedMoons.Add(spawnedMoon.PositionComp.GetPosition());
+
+                    SystemGenerator.AddObjectGps(moon, spawnedMoon.PositionComp.GetPosition());
                 }
                 planet.Generated = true;
+                SystemGenerator.AddObjectGps(planet, planet.CenterPosition);
             }
         }
 
@@ -167,7 +170,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 planetInitArguments.MarkAreaEmpty = true;
                 planetInitArguments.AtmosphereSettings = generatorDef.AtmosphereSettings.HasValue ? generatorDef.AtmosphereSettings.Value : MyAtmosphereSettings.Defaults();
                 planetInitArguments.SurfaceGravity = generatorDef.SurfaceGravity;
-                planetInitArguments.AddGps = true;
+                planetInitArguments.AddGps = false;
                 planetInitArguments.SpherizeWithDistance = true;
                 planetInitArguments.Generator = generatorDef;
                 planetInitArguments.UserCreated = false;

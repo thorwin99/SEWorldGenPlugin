@@ -24,7 +24,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     {
         private const int OBJECT_SIZE_MIN = 128;
         private const int OBJECT_SIZE_MAX = 512;
-        private const int SUBCELL_SIZE = (int)(OBJECT_SIZE_MAX * 3);
+        private const int SUBCELL_SIZE = OBJECT_SIZE_MAX * 3;
         private const int SUBCELLS = 6;
 
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)

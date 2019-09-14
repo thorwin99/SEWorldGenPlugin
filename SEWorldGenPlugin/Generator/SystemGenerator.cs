@@ -1,6 +1,7 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Multiplayer;
 using Sandbox.Game.Multiplayer;
+using Sandbox.Game.Screens.Helpers;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.ObjectBuilders;
@@ -27,6 +28,7 @@ namespace SEWorldGenPlugin.Generator
         private const int MIN_RING_WIDTH = 10000;
         private const int MAX_RING_WIDTH = 100000;
         private const int MIN_RING_HEIGHT = 1000;
+        private string[] greek_letters = new string[10] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa"};
 
         private const string STORAGE_FILE = "SystemData.xml";
 
@@ -53,12 +55,17 @@ namespace SEWorldGenPlugin.Generator
             MyObjectBuilder_StarSystem b = GetConfig();
             m_objects = b.SystemObjects;
 
-            m_seed = MySession.Static.Settings.ProceduralSeed;
+            m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
 
             if (b == null || m_objects == null || m_objects.Count == 0)
             {
                 GenerateSystem();
             }
+
+            MySession.Static.OnReady += delegate
+            {
+                AddBeltsGpss();
+            };
         } 
 
         public override void LoadData()
@@ -69,9 +76,7 @@ namespace SEWorldGenPlugin.Generator
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             FilterDefinitions();
-
-            m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
-
+            
             MySession.Static.Settings.ProceduralDensity = 0;
         }
 
@@ -95,6 +100,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 int numberPlanets = MyRandom.Instance.Next(MIN_PLANETS_COUNT, MAX_PLANETS_COUNT);
                 long tmp_distance = 0;
+                int totalBelts = 0;
 
                 for (int i = 0; i < numberPlanets; i++)
                 {
@@ -102,20 +108,21 @@ namespace SEWorldGenPlugin.Generator
                     tmp_distance += distToPrev;
 
                     if(MyRandom.Instance.NextDouble() * ((i % 6) * (i & 6) / 12.5) < 0.5){
-                        GeneratePlanet(i, tmp_distance);
+                        GeneratePlanet(i, tmp_distance, numberPlanets);
                     }
                     else
                     {
-                        GenerateBelt(tmp_distance);
+                        GenerateBelt(tmp_distance, ref totalBelts);
                     }
                 }
             }
         }
 
-        private void GenerateBelt(long distance)
+        private void GenerateBelt(long distance, ref int beltIndex)
         {
             MySystemBeltItem belt = new MySystemBeltItem();
 
+            belt.DisplayName = "Belt " + greek_letters[beltIndex++];
             belt.Type = SystemObjectType.BELT;
             belt.Height = MyRandom.Instance.Next(4000, 40000);
             belt.Radius = distance;
@@ -125,29 +132,30 @@ namespace SEWorldGenPlugin.Generator
             m_objects.Add(belt);
         }
 
-        private void GeneratePlanet(int maxSize, long distance)
+        private void GeneratePlanet(int index, long distance, int totalObjects)
         {
             MyPlanetItem planet = new MyPlanetItem();
 
-            var def = GetPlanetDefinition(maxSize);
+            var def = GetPlanetDefinition((int)(MAX_PLANET_SIZE * Math.Sin(index * Math.PI / totalObjects)));
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
             Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Sin(height));
 
+            planet.DisplayName = "Planet " + (index + 1);
             planet.Type = SystemObjectType.PLANET;
             planet.DefName = def.Id.SubtypeId.String;
             planet.Size = SizeByGravity(def.SurfaceGravity);
             planet.PlanetRing = GenerateRing(def.SurfaceGravity, planet.Size);
             planet.OffsetPosition = pos;
             planet.CenterPosition = Vector3D.Zero;
-            planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity);
+            planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity, planet.DisplayName);
             planet.Generated = false;
 
             m_objects.Add(planet);
         }
 
-        private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity)
+        private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity, string planetName)
         {
             int numMoons = MyRandom.Instance.Next(0, GetMaxMoonCount(surfaceGravity));
             MyPlanetMoonItem[] moons = new MyPlanetMoonItem[numMoons];
@@ -162,6 +170,7 @@ namespace SEWorldGenPlugin.Generator
                 item.DefName = def.Id.SubtypeName.ToString();
                 item.Distance = dist;
                 item.Size = SizeByGravity(def.SurfaceGravity);
+                item.DisplayName = planetName + " " + (char)('A' + i);
 
                 moons[i] = item;
             }
@@ -181,6 +190,7 @@ namespace SEWorldGenPlugin.Generator
             ring.Height = MyRandom.Instance.Next(MIN_RING_HEIGHT, ring.Width / 10);
             ring.AngleDegrees = MyRandom.Instance.Next(-180, 180);
             ring.Radius = MyRandom.Instance.Next((int)(planetSize * 0.5 * 0.75), (int)(planetSize));
+            ring.DisplayName = "";
 
             return ring;
         }
@@ -269,6 +279,34 @@ namespace SEWorldGenPlugin.Generator
                 writer.Write(xml);
                 writer.Close();
             }
+        }
+
+        private void AddBeltsGpss()
+        {
+            foreach (var obj in m_objects)
+            {
+                if (obj.Type != SystemObjectType.BELT) continue;
+
+                Vector3D pos = new Vector3D(((MySystemBeltItem)obj).Radius + ((MySystemBeltItem)obj).Width / 2, 0, 0); ;
+
+                AddObjectGps(obj, pos);
+            }
+        }
+
+        public static void AddObjectGps(MySystemItem obj, Vector3D position)
+        {
+            MyGps gps = new MyGps()
+            {
+                Name = obj.DisplayName,
+                Coords = position,
+                ShowOnHud = true,
+                GPSColor = Color.LightGray,
+                AlwaysVisible = true,
+                DiscardAt = TimeSpan.FromDays(100)
+            };
+
+            gps.UpdateHash();
+            MySession.Static.Gpss.SendAddGps(MySession.Static.LocalPlayerId, ref gps);
         }
     }
 }
