@@ -22,7 +22,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 450)]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
