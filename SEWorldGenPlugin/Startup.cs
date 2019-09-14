@@ -13,7 +13,7 @@ namespace SEWorldGenPlugin
 
         public void Init(object gameInstance)
         {
-            //MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
+            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
         }
 
         public void Update()

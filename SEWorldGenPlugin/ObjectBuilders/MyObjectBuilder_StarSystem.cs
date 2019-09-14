@@ -8,7 +8,7 @@ using VRage.ObjectBuilders;
 namespace SEWorldGenPlugin.ObjectBuilders
 {
     [ProtoContract]
-    public class MyObjectBuilder_StarSystem : MyObjectBuilder_Base
+    public class MyObjectBuilder_StarSystem
     {
         [ProtoMember(3010)]
         public HashSet<MySystemItem> SystemObjects = new HashSet<MySystemItem>();
