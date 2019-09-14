@@ -168,6 +168,7 @@
     <Compile Include="Generator\ProceduralGen\ProceduralModule.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralPlanetModule.cs" />
     <Compile Include="Generator\SystemGenerator.cs" />
+    <Compile Include="ObjectBuilders\MyObjectBuilder_AsteroidGenerator.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_StarSystem.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

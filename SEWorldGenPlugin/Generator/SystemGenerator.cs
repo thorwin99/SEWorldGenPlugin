@@ -2,6 +2,7 @@
 using Sandbox.Engine.Multiplayer;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
+using Sandbox.ModAPI;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600, typeof(MyObjectBuilder_StarSystem))]
+    [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
     public class SystemGenerator : MySessionComponentBase
     {
         private const int MAX_PLANETS_COUNT = 25;
@@ -26,6 +27,8 @@ namespace SEWorldGenPlugin.Generator
         private const int MIN_RING_WIDTH = 10000;
         private const int MAX_RING_WIDTH = 100000;
         private const int MIN_RING_HEIGHT = 1000;
+
+        private const string STORAGE_FILE = "SystemData.xml";
 
         public HashSet<MySystemItem> m_objects
         {
@@ -40,39 +43,28 @@ namespace SEWorldGenPlugin.Generator
         }
 
         private int m_seed;
-        private bool m_enabled = false;
 
         public static SystemGenerator Static;
-
-        public override MyObjectBuilder_SessionComponent GetObjectBuilder()
-        {
-            MyObjectBuilder_StarSystem builder = (MyObjectBuilder_StarSystem)base.GetObjectBuilder();
-
-            builder.SystemObjects = new HashSet<MySystemItem>(m_objects);
-
-            return builder;
-        }
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             if (!Sync.IsServer) return;
 
-            base.Init(sessionComponent);
-
-            MyObjectBuilder_StarSystem b = (MyObjectBuilder_StarSystem)sessionComponent;
+            MyObjectBuilder_StarSystem b = GetConfig();
             m_objects = b.SystemObjects;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
 
-            if (m_objects == null || m_objects.Count == 0)
+            if (b == null || m_objects == null || m_objects.Count == 0)
             {
                 GenerateSystem();
             }
-            m_enabled = true;
         } 
 
         public override void LoadData()
         {
+            if (!Sync.IsServer) return;
+
             Static = this;
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
@@ -83,13 +75,13 @@ namespace SEWorldGenPlugin.Generator
 
         public override void SaveData()
         {
-            base.SaveData();
+            if (!Sync.IsServer) return;
+
+            SaveConfig();
         }
 
         protected override void UnloadData()
         {
-            base.UnloadData();
-            m_enabled = false;
             m_objects = new HashSet<MySystemItem>();
         }
 
@@ -107,7 +99,7 @@ namespace SEWorldGenPlugin.Generator
                     int distToPrev = MyRandom.Instance.Next(MIN_PLANET_DISTANCE, MAX_PLANET_DISTANCE);
                     tmp_distance += distToPrev;
 
-                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i % 6) / 12.5) < 0.5){
+                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i & 6) / 12.5) < 0.5){
                         GeneratePlanet(i, tmp_distance);
                     }
                     else
@@ -232,6 +224,48 @@ namespace SEWorldGenPlugin.Generator
             foreach(var r in toRemove)
             {
                 m_planetDefinitions.Remove(r);
+            }
+        }
+
+        private MyObjectBuilder_StarSystem GetConfig()
+        {
+            if (MyAPIGateway.Utilities.FileExistsInWorldStorage(STORAGE_FILE, typeof(SystemGenerator)))
+            {
+                try
+                {
+                    using (var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator)))
+                    {
+                        MyObjectBuilder_StarSystem saveFile = MyAPIGateway.Utilities.SerializeFromXML<MyObjectBuilder_StarSystem>(reader.ReadToEnd());
+                        return saveFile;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MyLog.Default.Error("Couldnt load Starsystem save file.");
+                    MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                    MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator));
+                    return null;
+                }
+            }
+            else
+            {
+                return new MyObjectBuilder_StarSystem();
+            }
+        }
+
+        private void SaveConfig()
+        {
+            MyObjectBuilder_StarSystem conf = new MyObjectBuilder_StarSystem();
+
+            conf.SystemObjects = m_objects;
+
+            MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator));
+
+            string xml = MyAPIGateway.Utilities.SerializeToXML(conf);
+            using(var writer = MyAPIGateway.Utilities.WriteFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator)))
+            {
+                writer.Write(xml);
+                writer.Close();
             }
         }
     }

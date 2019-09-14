@@ -5,6 +5,9 @@ using Sandbox.Game.Entities.Character;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
+using Sandbox.ModAPI;
+using SEWorldGenPlugin.ObjectBuilders;
+using System;
 using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
@@ -19,17 +22,18 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501, typeof(MyObjectBuilder_WorldGenerator))]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 450)]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
+
+        private const string STORAGE_FILE = "AsteroidGeneratorData.xml";
 
         private int m_seed;
 
         private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private Dictionary<MyEntity, MyEntityTracker> m_toTrackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
-        private HashSet<EmptyArea> m_areas = new HashSet<EmptyArea>();
         private ProceduralAsteroidsRingModule asteroidModule = null;
         private ProceduralPlanetModule planetModule = null;
 
@@ -47,8 +51,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             asteroidModule = new ProceduralAsteroidsRingModule(m_seed);
             planetModule = new ProceduralPlanetModule(m_seed);
-
-            Enabled = true;
         }
 
         public override void UpdateBeforeSimulation()
@@ -102,6 +104,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void SaveData()
         {
+            SaveConfig();
         }
 
         public void TrackEntity(MyEntity entity)
@@ -145,12 +148,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
+            if (!Sync.IsServer) return;
+
             base.Init(sessionComponent);
 
-            MyObjectBuilder_WorldGenerator b = (MyObjectBuilder_WorldGenerator)sessionComponent;
+            MyObjectBuilder_AsteroidGenerator b = GetConfig();
 
             m_existingObjectSeeds = b.ExistingObjectsSeeds;
-            m_areas = b.MarkedAreas;
+
+            Enabled = true;
         }
 
         override public bool UpdatedBeforeInit()
@@ -160,10 +166,49 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override MyObjectBuilder_SessionComponent GetObjectBuilder()
         {
-            MyObjectBuilder_WorldGenerator builder = (MyObjectBuilder_WorldGenerator)base.GetObjectBuilder();
-            builder.MarkedAreas = m_areas;
-            builder.ExistingObjectsSeeds = m_existingObjectSeeds;
-            return builder;
+            return base.GetObjectBuilder();
+        }
+
+        private MyObjectBuilder_AsteroidGenerator GetConfig()
+        {
+            if (MyAPIGateway.Utilities.FileExistsInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator)))
+            {
+                try
+                {
+                    using (var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator)))
+                    {
+                        MyObjectBuilder_AsteroidGenerator saveFile = MyAPIGateway.Utilities.SerializeFromXML<MyObjectBuilder_AsteroidGenerator>(reader.ReadToEnd());
+                        return saveFile;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MyLog.Default.Error("Couldnt load Starsystem save file.");
+                    MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                    MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator));
+                    return null;
+                }
+            }
+            else
+            {
+                return new MyObjectBuilder_AsteroidGenerator();
+            }
+        }
+
+        private void SaveConfig()
+        {
+            MyObjectBuilder_AsteroidGenerator conf = new MyObjectBuilder_AsteroidGenerator();
+
+            conf.ExistingObjectsSeeds = m_existingObjectSeeds;
+
+            MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator));
+
+            string xml = MyAPIGateway.Utilities.SerializeToXML(conf);
+            using (var writer = MyAPIGateway.Utilities.WriteFileInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator)))
+            {
+                writer.Write(xml);
+                writer.Close();
+            }
         }
     }
 }
