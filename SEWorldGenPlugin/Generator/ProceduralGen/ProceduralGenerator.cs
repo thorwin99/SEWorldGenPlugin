@@ -46,11 +46,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
 
+            planetModule = new ProceduralPlanetModule(m_seed);
+
             //Currently so that the original Procedural world generator still works
             if (MySession.Static.Settings.ProceduralDensity != 0) return;
 
             asteroidModule = new ProceduralAsteroidsRingModule(m_seed);
-            planetModule = new ProceduralPlanetModule(m_seed);
         }
 
         public override void UpdateBeforeSimulation()
