@@ -70,7 +70,7 @@ namespace SEWorldGenPlugin.Generator
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             FilterDefinitions();
 
-            m_seed = MySession.Static.Settings.ProceduralSeed;
+            m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
 
             MySession.Static.Settings.ProceduralDensity = 0;
         }
