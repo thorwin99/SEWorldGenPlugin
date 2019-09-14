@@ -71,6 +71,8 @@ namespace SEWorldGenPlugin.Generator
             FilterDefinitions();
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
+
+            MySession.Static.Settings.ProceduralDensity = 0;
         }
 
         public override void SaveData()

@@ -22,7 +22,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 450)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501)]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
@@ -56,7 +56,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void UpdateBeforeSimulation()
         {
-            if (!Enabled || asteroidModule == null)
+            if (!Enabled)
                 return;
 
             if (!Sync.IsServer) return;
@@ -83,12 +83,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     planetModule.GeneratePlanets(tracker.Entity);
 
+                    if (asteroidModule == null) continue;
+
                     asteroidModule.GetObjectsInSphere(tracker.BoundingVolume, cellObjects);
                     asteroidModule.GenerateObjects(cellObjects, m_existingObjectSeeds);
 
                     asteroidModule.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
                 }
             }
+            if (asteroidModule == null) return;
 
             asteroidModule.UnloadCells();
         }
@@ -99,7 +102,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             asteroidModule = null;
 
+            m_toTrackedEntities.Clear();
             m_trackedEntities.Clear();
+
             Static = null;
         }
 
