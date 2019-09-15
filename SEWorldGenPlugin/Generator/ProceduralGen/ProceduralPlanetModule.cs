@@ -1,7 +1,10 @@
 ﻿using Sandbox.Definitions;
+using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
 using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
+using Sandbox.Game.World;
+using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
@@ -49,8 +52,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 MyPlanetGeneratorDefinition definition = GetDefinition(planet.DefName);
                 if (definition == null) continue;
-
-                MyPlanet generatedPlanet = CreatePlanet(planet.OffsetPosition, planet.Size, ref definition);
+                long id = MyRandom.Instance.NextLong();
+                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(definition.Id.SubtypeId + "_" + planet.Size + id, planet.DisplayName, planet.DefName, planet.OffsetPosition, m_seed, planet.Size, true, id, false, false);
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
                 if (planet.PlanetRing != null)
                     planet.PlanetRing.Center = planet.CenterPosition;
@@ -62,6 +65,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     MyPlanetGeneratorDefinition moonDef = GetDefinition(moon.DefName);
                     if (moonDef == null) continue;
                     var position = new Vector3D(0, 0, 0);
+                    long mId = MyRandom.Instance.NextLong();
                     var threshold = 0;
                     do
                     {
@@ -72,7 +76,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         threshold++;
 
                     } while (ObstructedPlace(position, spawnedMoons, planet.Size, planet.PlanetRing) && threshold < 10000);
-                    MyPlanet spawnedMoon = CreatePlanet(position, moon.Size, ref moonDef);
+                    MyPlanet spawnedMoon = MyWorldGenerator.AddPlanet(moon.DefName + "_" + moon.Size + mId, moon.DisplayName, moon.DefName, position, m_seed, moon.Size, true, mId, false, false);
                     spawnedMoons.Add(spawnedMoon.PositionComp.GetPosition());
 
                     SystemGenerator.AddObjectGps(moon, spawnedMoon.PositionComp.GetPosition());
@@ -84,11 +88,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         private MyPlanetGeneratorDefinition GetDefinition(string name)
         {
-            foreach (MyPlanetGeneratorDefinition def in m_definitions)
+            return MyDefinitionManager.Static.GetDefinition<MyPlanetGeneratorDefinition>(MyStringHash.GetOrCompute(name));
+            /**foreach (MyPlanetGeneratorDefinition def in m_definitions)
             {
                 if (def.Id.SubtypeId.String.Equals(name)) return def;
             }
-            return null;
+            return null;*/
         }
 
         private void GetPlanets()

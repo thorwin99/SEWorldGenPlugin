@@ -59,7 +59,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     int minSize = OBJECT_SIZE_MIN;
 
                     if (obj.Type == SystemObjectType.BELT)
-                        minSize = ((MySystemBeltItem)obj).RoidSize;
+                       minSize = ((MySystemBeltItem)obj).RoidSize;
 
                     if (obj.Type == SystemObjectType.RING)
                         minSize = ((MyPlanetRingItem)obj).RoidSize;
@@ -114,12 +114,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         var provider = MyCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, MySession.Static.Settings.VoxelGeneratorVersion);
                         var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(obj.Size));
 
+                        Vector3D pos = obj.BoundingVolume.Center - VRageMath.MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2;
+
                         MyVoxelMap voxelMap = new MyVoxelMap();
 
-                        voxelMap.EntityId = GetAsteroidEntityId(storageName);
-                        voxelMap.Init(storageName, storage, obj.BoundingVolume.Center - VRageMath.MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2);
-                        MyEntities.RaiseEntityCreated(voxelMap);
-                        MyEntities.Add(voxelMap);
+                        MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
 
                         voxelMap.Save = false;
                         MyVoxelBase.StorageChanged OnStorageRangeChanged = null;
