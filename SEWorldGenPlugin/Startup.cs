@@ -1,4 +1,7 @@
-﻿using Sandbox.Game.Entities;
+﻿using Sandbox.Engine.Multiplayer;
+using Sandbox.Game.Entities;
+using Sandbox.Game.World;
+using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.ProceduralGen;
 using VRage.Game.Entity;
 using VRage.Plugins;

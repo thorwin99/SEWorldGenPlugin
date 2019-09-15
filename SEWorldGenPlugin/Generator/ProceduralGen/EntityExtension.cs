@@ -1,4 +1,5 @@
 ﻿using VRage.Game.Entity;
+using VRage.Utils;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
@@ -10,6 +11,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if(ProceduralGenerator.Static != null)
             {
                 ProceduralGenerator.Static.TrackEntity(thisEntity);
+                MyLog.Default.WriteLine("Tracking Entity" + thisEntity.DisplayName);
             }
         }
 

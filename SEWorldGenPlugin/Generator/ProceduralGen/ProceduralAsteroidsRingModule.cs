@@ -51,6 +51,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     position *= SUBCELL_SIZE;
                     position += id * CELL_SIZE;
 
+                    MyLog.Default.WriteLine("Check if inside world");
                     if (!MyEntities.IsInsideWorld(position)) continue;
 
                     MySystemItem obj = IsInsideRing(position);
@@ -59,10 +60,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     int minSize = OBJECT_SIZE_MIN;
 
                     if (obj.Type == SystemObjectType.BELT)
-                       minSize = ((MySystemBeltItem)obj).RoidSize;
+                        minSize = ((MySystemBeltItem)obj).RoidSize;
 
                     if (obj.Type == SystemObjectType.RING)
-                        minSize = ((MyPlanetRingItem)obj).RoidSize;
+                         minSize = ((MyPlanetRingItem)obj).RoidSize;
+
+                    MyLog.Default.WriteLine("Generating asteroid object data");
 
                     var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(Math.Min(OBJECT_SIZE_MAX, minSize), OBJECT_SIZE_MAX));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
@@ -78,12 +81,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void GenerateObjects(List<CellObject> objects, HashSet<MyObjectSeedParams> existingObjectSeeds)
         {
-            ProfilerShort.Begin("GenerateAsteroids");
-
             List<MyVoxelBase> tmp_voxelMaps = new List<MyVoxelBase>();
 
             foreach(var obj in objects)
             {
+                MyLog.Default.WriteLine("Generated: " + obj.Params.Generated);
                 if (obj.Params.Generated) continue;
 
                 obj.Params.Generated = true;
@@ -105,6 +107,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                             if (!existingObjectSeeds.Contains(obj.Params))
                                 existingObjectSeeds.Add(obj.Params);
                             exists = true;
+                            MyLog.Default.WriteLine("Already exists roid");
                             break;
                         }
                     }
@@ -120,6 +123,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                         MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
 
+                        MyLog.Default.WriteLine("Generated roid");
+
                         voxelMap.Save = false;
                         MyVoxelBase.StorageChanged OnStorageRangeChanged = null;
                         OnStorageRangeChanged = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
@@ -133,7 +138,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     tmp_voxelMaps.Clear();
                 }
             }
-            ProfilerShort.End();
         }
 
         private MySystemItem IsInsideRing(Vector3D position)

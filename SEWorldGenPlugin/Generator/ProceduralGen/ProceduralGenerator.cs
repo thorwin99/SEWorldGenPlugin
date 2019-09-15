@@ -77,8 +77,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     var oldBounding = tracker.BoundingVolume;
                     tracker.UpdateLastPosition();
 
-                    planetModule.GeneratePlanets(tracker.Entity);
-
                     if (asteroidModule == null) continue;
 
                     asteroidModule.GetObjectsInSphere(tracker.BoundingVolume, cellObjects);
@@ -159,6 +157,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_existingObjectSeeds = b.ExistingObjectsSeeds;
 
             Enabled = true;
+
+            planetModule.GeneratePlanets();
         }
 
         override public bool UpdatedBeforeInit()

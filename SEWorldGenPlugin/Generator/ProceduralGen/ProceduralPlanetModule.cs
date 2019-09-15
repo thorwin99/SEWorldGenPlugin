@@ -28,7 +28,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     public class ProceduralPlanetModule
     {
         private const int GENERATOR_DISTANCE = 100000000;
-        private List<MyPlanetGeneratorDefinition> m_definitions;
         private int m_seed;
 
         public ProceduralPlanetModule(int seed)
@@ -38,9 +37,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public void GeneratePlanets(MyEntity e)
         {
-            MyLog.Default.WriteLine("Generating Planets" + SystemGenerator.Static.m_objects.Count);
+            GeneratePlanets();
+        }
 
-            GetPlanets();
+        public void GeneratePlanets()
+        {
+            MyLog.Default.WriteLine("Generating Planets" + SystemGenerator.Static.m_objects.Count);
 
             foreach(var obj in SystemGenerator.Static.m_objects)
             {
@@ -48,7 +50,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 MyPlanetItem planet = (MyPlanetItem)obj;
 
-                if (planet.Generated || Vector3D.Distance(planet.OffsetPosition, e.PositionComp.GetPosition()) > GENERATOR_DISTANCE) continue;
+                if (planet.Generated) continue;
 
                 MyPlanetGeneratorDefinition definition = GetDefinition(planet.DefName);
                 if (definition == null) continue;
@@ -66,6 +68,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     if (moonDef == null) continue;
                     var position = new Vector3D(0, 0, 0);
                     long mId = MyRandom.Instance.NextLong();
+                    string storageNameMoon = moon.DefName + "_" + moon.Size + mId;
                     var threshold = 0;
                     do
                     {
@@ -76,7 +79,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         threshold++;
 
                     } while (ObstructedPlace(position, spawnedMoons, planet.Size, planet.PlanetRing) && threshold < 10000);
-                    MyPlanet spawnedMoon = MyWorldGenerator.AddPlanet(moon.DefName + "_" + moon.Size + mId, moon.DisplayName, moon.DefName, position, m_seed, moon.Size, true, mId, false, false);
+                    MyPlanet spawnedMoon = MyWorldGenerator.AddPlanet(storageNameMoon, moon.DisplayName, moon.DefName, position, m_seed, moon.Size, true, mId, false, true);
                     spawnedMoons.Add(spawnedMoon.PositionComp.GetPosition());
 
                     SystemGenerator.AddObjectGps(moon, spawnedMoon.PositionComp.GetPosition());
@@ -89,16 +92,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private MyPlanetGeneratorDefinition GetDefinition(string name)
         {
             return MyDefinitionManager.Static.GetDefinition<MyPlanetGeneratorDefinition>(MyStringHash.GetOrCompute(name));
-            /**foreach (MyPlanetGeneratorDefinition def in m_definitions)
-            {
-                if (def.Id.SubtypeId.String.Equals(name)) return def;
-            }
-            return null;*/
-        }
-
-        private void GetPlanets()
-        {
-            m_definitions = SystemGenerator.Static.m_planetDefinitions;
         }
 
         private bool ObstructedPlace(Vector3D position, List<Vector3D> other, int minDistance, MyPlanetRingItem ring)
