@@ -7,13 +7,17 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [ProtoContract]
     public class MyObjectBuilder_PluginSettings
     {
+        public MyObjectBuilder_PluginSettings()
+        {
+            Enable = true;
+            GeneratorSettings = new GeneratorSettings();
+        }
+
         [ProtoMember(1)]
-        [DefaultValue(true)]
-        public bool Enable = true;
+        public bool Enable;
 
         [ProtoMember(2)]
-        [DefaultValue(true)]
-        public GeneratorSettings GeneratorSettings = new GeneratorSettings();
+        public GeneratorSettings GeneratorSettings;
 
         public void Verify()
         {
@@ -22,7 +26,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     [ProtoContract]
-
     public class GeneratorSettings
     {
         [ProtoMember(1)]
@@ -35,11 +38,11 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(3)]
         [DefaultValue(true)]
-        public int MinOrbitDistance = 40000;
+        public int MinOrbitDistance = 4000000;
 
         [ProtoMember(4)]
         [DefaultValue(true)]
-        public int MaxOrbitDistance = 100000;
+        public int MaxOrbitDistance = 10000000;
 
         [ProtoMember(5)]
         [DefaultValue(true)]
@@ -70,7 +73,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(2)]
         [DefaultValue(true)]
-        public double PlanetSizeCap = 120000;
+        public double PlanetSizeCap = 1200000;
 
         [ProtoMember(3)]
         [DefaultValue(true)]

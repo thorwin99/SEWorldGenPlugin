@@ -15,6 +15,8 @@ namespace SEWorldGenPlugin.Session
     {
         public override void UpdateBeforeSimulation()
         {
+            if (!MySettings.Static.Settings.Enable) return;
+
             foreach(var player in MySession.Static.Players.GetAllPlayers())
             {
                 var p = player;

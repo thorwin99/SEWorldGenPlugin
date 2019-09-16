@@ -27,7 +27,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
     public class ProceduralPlanetModule
     {
-        private const int GENERATOR_DISTANCE = 100000000;
         private int m_seed;
 
         public ProceduralPlanetModule(int seed)
@@ -42,8 +41,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public void GeneratePlanets()
         {
-            MyLog.Default.WriteLine("Generating Planets" + SystemGenerator.Static.m_objects.Count);
-
             foreach(var obj in SystemGenerator.Static.m_objects)
             {
                 if (obj.Type != SystemObjectType.PLANET) continue;
@@ -125,7 +122,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             var random = MyRandom.Instance;
             using (random.PushSeed(random.CreateRandomSeed()))
             {
-                MyLog.Default.WriteLine("Generating world planet");
                 MyPlanetStorageProvider provider = new MyPlanetStorageProvider();
                 provider.Init(m_seed, generatorDef, size.Value / 2f);
 

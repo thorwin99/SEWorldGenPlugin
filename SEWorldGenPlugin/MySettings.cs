@@ -7,6 +7,8 @@ namespace SEWorldGenPlugin
 {
     public class MySettings
     {
+        private const string FILENAME = "SEWorldGenPlugin.xml";
+
         public static MySettings Static
         {
             get;
@@ -27,11 +29,11 @@ namespace SEWorldGenPlugin
 
         public void LoadSettings()
         {
-            if (FileUtils.FileExistsInGlobalStorage("SEWorldGenPlugin.cfg"))
+            if (FileUtils.FileExistsInGlobalStorage(FILENAME))
             {
                 try
                 {
-                    using (var reader = FileUtils.ReadFileInGlobalStorage("SEWorldGenPlugin.cfg"))
+                    using (var reader = FileUtils.ReadFileInGlobalStorage(FILENAME))
                     {
                         MyObjectBuilder_PluginSettings saveFile = FileUtils.SerializeFromXml<MyObjectBuilder_PluginSettings>(reader.ReadToEnd());
                         if (saveFile != null)
@@ -42,7 +44,7 @@ namespace SEWorldGenPlugin
                 {
                     MyLog.Default.Error("Couldnt load Plugin config file.");
                     MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
-                    FileUtils.DeleteFileInGlobalStorage("SEWorldGenPlugin.cfg");
+                    FileUtils.DeleteFileInGlobalStorage(FILENAME);
                     Settings = new MyObjectBuilder_PluginSettings();
                 }
             }
@@ -55,11 +57,11 @@ namespace SEWorldGenPlugin
 
         public void SaveSettings()
         {
-            FileUtils.DeleteFileInGlobalStorage("SEWorldGenPlugin.cfg");
+            FileUtils.DeleteFileInGlobalStorage(FILENAME);
 
             string xml = FileUtils.SerializeToXml(Settings);
 
-            using (var writer = FileUtils.WriteFileInGlobalStorage("SEWorldGenPlugin.cfg"))
+            using (var writer = FileUtils.WriteFileInGlobalStorage(FILENAME))
             {
                 writer.Write(xml);
                 writer.Close();

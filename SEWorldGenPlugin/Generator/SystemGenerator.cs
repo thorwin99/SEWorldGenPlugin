@@ -20,14 +20,6 @@ namespace SEWorldGenPlugin.Generator
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
     public class SystemGenerator : MySessionComponentBase
     {
-        private const int MAX_PLANETS_COUNT = 25;
-        private const int MIN_PLANETS_COUNT = 5;
-        private const int MIN_PLANET_DISTANCE = 4000000;
-        private const int MAX_PLANET_DISTANCE = 10000000;
-        private const int MAX_PLANET_SIZE = 1200000;
-        private const int MIN_RING_WIDTH = 10000;
-        private const int MAX_RING_WIDTH = 100000;
-        private const int MIN_RING_HEIGHT = 1000;
         private string[] greek_letters = new string[10] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa"};
 
         private const string STORAGE_FILE = "SystemData.xml";
@@ -45,17 +37,20 @@ namespace SEWorldGenPlugin.Generator
         }
 
         private int m_seed;
+        private GeneratorSettings settings;
 
         public static SystemGenerator Static;
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            if (!Sync.IsServer) return;
+            if (!Sync.IsServer || !MySettings.Static.Settings.Enable) return;
 
             MyObjectBuilder_StarSystem b = GetConfig();
             m_objects = b.SystemObjects;
 
             m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
+
+            settings = MySettings.Static.Settings.GeneratorSettings;
 
             if (b == null || m_objects == null || m_objects.Count == 0)
             {
@@ -71,18 +66,23 @@ namespace SEWorldGenPlugin.Generator
         public override void LoadData()
         {
             if (!Sync.IsServer) return;
-
             Static = this;
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             FilterDefinitions();
-            
+            if(MySettings.Static == null)
+            {
+                var s = new MySettings();
+                s.LoadSettings();
+            }
+            if (!MySettings.Static.Settings.Enable) return;
+
             MySession.Static.Settings.ProceduralDensity = 0;
         }
 
         public override void SaveData()
         {
-            if (!Sync.IsServer) return;
+            if (!Sync.IsServer || !MySettings.Static.Settings.Enable) return;
 
             SaveConfig();
         }
@@ -98,16 +98,16 @@ namespace SEWorldGenPlugin.Generator
 
             using (MyRandom.Instance.PushSeed(m_seed))
             {
-                int numberPlanets = MyRandom.Instance.Next(MIN_PLANETS_COUNT, MAX_PLANETS_COUNT);
+                int numberPlanets = MyRandom.Instance.Next(settings.MinObjectsInSystem, settings.MaxObjectsInSystem);
                 long tmp_distance = 0;
                 int totalBelts = 0;
 
                 for (int i = 0; i < numberPlanets; i++)
                 {
-                    int distToPrev = MyRandom.Instance.Next(MIN_PLANET_DISTANCE, MAX_PLANET_DISTANCE);
+                    int distToPrev = MyRandom.Instance.Next(settings.MinOrbitDistance, settings.MaxOrbitDistance);
                     tmp_distance += distToPrev;
 
-                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i & 6) / 12.5) < 0.5){
+                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i % 6) / 12.5) < 1 - settings.BeltSettings.BeltProbability){
                         GeneratePlanet(i, tmp_distance, numberPlanets);
                     }
                     else
@@ -124,7 +124,7 @@ namespace SEWorldGenPlugin.Generator
 
             belt.DisplayName = "Belt " + greek_letters[beltIndex++];
             belt.Type = SystemObjectType.BELT;
-            belt.Height = MyRandom.Instance.Next(4000, 40000);
+            belt.Height = MyRandom.Instance.Next(settings.BeltSettings.MinBeltHeight, settings.BeltSettings.MaxBeltHeight);
             belt.Radius = distance;
             belt.Width = MyRandom.Instance.Next(belt.Height * 10, belt.Height * 100);
             belt.RoidSize = MyRandom.Instance.Next(256, 512);
@@ -136,7 +136,7 @@ namespace SEWorldGenPlugin.Generator
         {
             MyPlanetItem planet = new MyPlanetItem();
 
-            var def = GetPlanetDefinition((int)(MAX_PLANET_SIZE * Math.Sin(index * Math.PI / totalObjects)));
+            var def = GetPlanetDefinition((int)(settings.PlanetSettings.PlanetSizeCap * Math.Sin(index * Math.PI / totalObjects)));
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
@@ -157,6 +157,8 @@ namespace SEWorldGenPlugin.Generator
 
         private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity, string planetName)
         {
+            if (MyRandom.Instance.NextFloat() > settings.PlanetSettings.MoonProbability) return new MyPlanetMoonItem[0];
+
             int numMoons = MyRandom.Instance.Next(0, GetMaxMoonCount(surfaceGravity));
             MyPlanetMoonItem[] moons = new MyPlanetMoonItem[numMoons];
 
@@ -186,8 +188,8 @@ namespace SEWorldGenPlugin.Generator
 
             ring.Type = SystemObjectType.RING;
             ring.RoidSize = MyRandom.Instance.Next(64, Math.Min((int)(Math.Max(surfaceGravity * 0.5 * 128, 64)), 512));
-            ring.Width = MyRandom.Instance.Next(MIN_RING_WIDTH, MAX_RING_WIDTH);
-            ring.Height = MyRandom.Instance.Next(MIN_RING_HEIGHT, ring.Width / 10);
+            ring.Width = MyRandom.Instance.Next(settings.PlanetSettings.RingSettings.MinPlanetRingWidth, settings.PlanetSettings.RingSettings.MaxPlanetRingWidth);
+            ring.Height = MyRandom.Instance.Next(settings.PlanetSettings.RingSettings.MinPlanetRingWidth / 10, ring.Width / 10);
             ring.AngleDegrees = MyRandom.Instance.Next(-180, 180);
             ring.Radius = MyRandom.Instance.Next((int)(planetSize * 0.5 * 0.75), (int)(planetSize));
             ring.DisplayName = "";
@@ -214,12 +216,12 @@ namespace SEWorldGenPlugin.Generator
 
         private int SizeByGravity(float gravity)
         {
-            return (int)Math.Min(Math.Sqrt(gravity * 240000 * 240000), MAX_PLANET_SIZE);
+            return (int)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * settings.PlanetSettings.SizeMultiplier * settings.PlanetSettings.SizeMultiplier), settings.PlanetSettings.PlanetSizeCap);
         }
 
         private int GetMaxMoonCount(float gravity)
         {
-            return (int)Math.Floor(gravity * 5);
+            return (int)Math.Floor(gravity * 5 * MyRandom.Instance.NextFloat());
         }
 
         private void FilterDefinitions()
