@@ -36,6 +36,7 @@ namespace SEWorldGenPlugin
                     using (var reader = FileUtils.ReadFileInGlobalStorage(FILENAME))
                     {
                         MyObjectBuilder_PluginSettings saveFile = FileUtils.SerializeFromXml<MyObjectBuilder_PluginSettings>(reader.ReadToEnd());
+                        MyLog.Default.WriteLine("Loading SEWorldGenPlugin config file: " + FileUtils.SerializeToXml(saveFile));
                         if (saveFile != null)
                             Settings = saveFile;
                     }
@@ -60,6 +61,8 @@ namespace SEWorldGenPlugin
             FileUtils.DeleteFileInGlobalStorage(FILENAME);
 
             string xml = FileUtils.SerializeToXml(Settings);
+
+            MyLog.Default.WriteLine("Saving SEWorldGenPlugin config file: " + xml);
 
             using (var writer = FileUtils.WriteFileInGlobalStorage(FILENAME))
             {
