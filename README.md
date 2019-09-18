@@ -10,3 +10,7 @@ To install the plugin, download the .dll file. Then go to your Space Engineers i
 `-plugin "../Plugins/SEWorldGenPlugin.dll"` 
 
 to it. With that, the game will be launched with the plugin installed.
+
+## More Info
+
+This readme only contains some information about the installation. The wiki contains more help and info. [Wiki](https://github.com/thorwin99/SEWorldGenPlugin/wiki/Installation)
