@@ -13,6 +13,9 @@ namespace SEWorldGenPlugin.Utilities
 
     namespace SEWorldGenPlugin.Utilities
     {
+        /*
+         * Taken form Keen Github, since ModAPI is not available at Plugin init, but methods are needed 
+         */
         public class FileUtils
         {
             private const string STORAGE_FOLDER = "Storage";
