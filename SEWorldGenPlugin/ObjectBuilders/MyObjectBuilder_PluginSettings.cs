@@ -28,29 +28,34 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [ProtoContract]
     public class GeneratorSettings
     {
+
+        public GeneratorSettings()
+        {
+            MinObjectsInSystem = 5;
+            MaxObjectsInSystem = 25;
+            MinOrbitDistance = 4000000;
+            MaxOrbitDistance = 10000000;
+            PlanetSettings = new PlanetSettings();
+            BeltSettings = new BeltSettings();
+        }
+
         [ProtoMember(1)]
-        [DefaultValue(true)]
-        public int MinObjectsInSystem = 5;
+        public int MinObjectsInSystem;
 
         [ProtoMember(2)]
-        [DefaultValue(true)]
-        public int MaxObjectsInSystem = 25;
+        public int MaxObjectsInSystem;
 
         [ProtoMember(3)]
-        [DefaultValue(true)]
-        public int MinOrbitDistance = 4000000;
+        public int MinOrbitDistance;
 
         [ProtoMember(4)]
-        [DefaultValue(true)]
-        public int MaxOrbitDistance = 10000000;
+        public int MaxOrbitDistance;
 
         [ProtoMember(5)]
-        [DefaultValue(true)]
-        public PlanetSettings PlanetSettings = new PlanetSettings();
+        public PlanetSettings PlanetSettings;
 
         [ProtoMember(6)]
-        [DefaultValue(true)]
-        public BeltSettings BeltSettings = new BeltSettings();
+        public BeltSettings BeltSettings;
 
         public void Verify()
         {
@@ -67,21 +72,25 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [ProtoContract]
     public class PlanetSettings
     {
+        public PlanetSettings()
+        {
+            SizeMultiplier = 2;
+            PlanetSizeCap = 1200000;
+            MoonProbability = 0.5f;
+            RingSettings = new PlanetRingSettings();
+        }
+
         [ProtoMember(1)]
-        [DefaultValue(true)]
-        public float SizeMultiplier = 2;
+        public float SizeMultiplier;
 
         [ProtoMember(2)]
-        [DefaultValue(true)]
-        public double PlanetSizeCap = 1200000;
+        public double PlanetSizeCap;
 
         [ProtoMember(3)]
-        [DefaultValue(true)]
-        public float MoonProbability = 0.5f;
+        public float MoonProbability;
 
         [ProtoMember(4)]
-        [DefaultValue(true)]
-        public PlanetRingSettings RingSettings = new PlanetRingSettings();
+        public PlanetRingSettings RingSettings;
 
         public void Verify()
         {
@@ -96,13 +105,17 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [ProtoContract]
     public class PlanetRingSettings
     {
+        public PlanetRingSettings()
+        {
+            MinPlanetRingWidth = 10000;
+            MaxPlanetRingWidth = 100000;
+        }
+
         [ProtoMember(1)]
-        [DefaultValue(true)]
-        public int MinPlanetRingWidth = 10000;
+        public int MinPlanetRingWidth;
 
         [ProtoMember(2)]
-        [DefaultValue(true)]
-        public int MaxPlanetRingWidth = 100000;
+        public int MaxPlanetRingWidth;
 
         public void Verify()
         {
@@ -114,17 +127,21 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [ProtoContract]
     public class BeltSettings
     {
+        public BeltSettings()
+        {
+            MinBeltHeight = 4000;
+            MaxBeltHeight = 40000;
+            BeltProbability = 0.4f;
+        }
+
         [ProtoMember(1)]
-        [DefaultValue(true)]
-        public int MinBeltHeight = 4000;
+        public int MinBeltHeight;
 
         [ProtoMember(2)]
-        [DefaultValue(true)]
-        public int MaxBeltHeight = 40000;
+        public int MaxBeltHeight;
 
         [ProtoMember(3)]
-        [DefaultValue(true)]
-        public float BeltProbability = 0.4f;
+        public float BeltProbability;
 
         public void Verify()
         {
