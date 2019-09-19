@@ -1,5 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Voxels;
+using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using System;
 using System.Collections.Generic;
@@ -48,29 +49,27 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 3,
                 4
             };
-            AsteroidGenerators = (from x in source
-                                  select MyTuple.Create(x, arg2: false)).Concat(from x in source2
-                                                                                select MyTuple.Create(x, arg2: true)).Select((Func<MyTuple<int, bool>, MyCompositeShapeGeneratorDelegate>)delegate (MyTuple<int, bool> info)
-                                                                                {
-                                                                                    int version = info.Item1;
-                                                                                    bool combined = info.Item2;
-                                                                                    return delegate (int generatorSeed, int seed, float size)
-                                                                                    {
-                                                                                        if (size == 0f)
-                                                                                        {
-                                                                                            size = MyUtils.GetRandomFloat(128f, 512f);
-                                                                                        }
-                                                                                        MyCompositeShapes myCompositeShapes = new MyCompositeShapes(generatorSeed, seed, version);
-                                                                                        using (MyRandom.Instance.PushSeed(seed))
-                                                                                        {
-                                                                                            if (combined)
-                                                                                            {
-                                                                                                return myCompositeShapes.CombinedGenerator(version, seed, size);
-                                                                                            }
-                                                                                            return myCompositeShapes.ProceduralGenerator(version, seed, size);
-                                                                                        }
-                                                                                    };
-                                                                                }).ToArray();
+            AsteroidGenerators = (from x in source select MyTuple.Create(x, arg2: false)).Concat(from x in source2 select MyTuple.Create(x, arg2: true)).Select((Func<MyTuple<int, bool>, MyCompositeShapeGeneratorDelegate>)delegate (MyTuple<int, bool> info)
+            {
+                int version = info.Item1;
+                bool combined = info.Item2;
+                return delegate (int generatorSeed, int seed, float size)
+                {
+                    if (size == 0f)
+                    {
+                        size = MyUtils.GetRandomFloat(128f, 512f);
+                    }
+                    MyCompositeShapes myCompositeShapes = new MyCompositeShapes(generatorSeed, seed, version);
+                    using (MyRandom.Instance.PushSeed(seed))
+                    {
+                        if (combined)
+                        {
+                            return myCompositeShapes.CombinedGenerator(version, seed, size);
+                        }
+                        return myCompositeShapes.ProceduralGenerator(version, seed, size);
+                    }
+                };
+            }).ToArray();
         }
 
         private MyCompositeShapes(int generatorSeed, int asteroidSeed, int version)
@@ -120,7 +119,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             data.Deposits = Array.Empty<MyCompositeShapeOreDeposit>();
             data.FilledShapes = new MyCsgShapeBase[num];
             IMyCompositeShape[] array = new IMyCompositeShape[6];
-            FillSpan(instance, size, array.Span(0, 1), MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralPrimaryAdditions(), prefferOnlyBestFittingSize: true);
+            FillSpan(instance, size, new Span<IMyCompositeShape>(array, 0, 1), MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralPrimaryAdditions(), prefferOnlyBestFittingSize: true);
             size = ((MyOctreeStorage)array[0]).Size.AbsMax();
             float idealSize = size / 2f;
             float idealSize2 = size / 2f;
@@ -136,7 +135,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             FillSpan(instance, idealSize2, array, MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralAdditions());
             FillSpan(instance, idealSize, array2, MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralRemovals());
             TranslateShapes(array2, size, instance);
-            TranslateShapes(array.Span(1), size, instance);
+            TranslateShapes(new Span<IMyCompositeShape>(array, 1, array.Length - 1), size, instance);
             if (size > 512f)
             {
                 size /= 2f;
@@ -415,14 +414,14 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             }
             Action<List<MyVoxelMaterialDefinition>> action = delegate (List<MyVoxelMaterialDefinition> list)
             {
-                int num9 = list.Count;
-                while (num9 > 1)
+                int num10 = list.Count;
+                while (num10 > 1)
                 {
-                    int index = random.Next() % num9;
-                    num9--;
+                    int index = random.Next() % num10;
+                    num10--;
                     MyVoxelMaterialDefinition value = list[index];
-                    list[index] = list[num9];
-                    list[num9] = value;
+                    list[index] = list[num10];
+                    list[num10] = value;
                 }
             };
             action(m_depositMaterials);
@@ -444,7 +443,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             int val;
             if (flag)
             {
-                val = ((size <= 64f) ? 2 : ((size <= 128f) ? 4 : ((size <= 256f) ? 6 : ((!(size <= 512f)) ? 10 : 8))));
+                int num = 0;
+                num = ((size <= 64f) ? 1 : ((size <= 128f) ? 2 : ((size <= 256f) ? 3 : ((!(size <= 512f)) ? 5 : 4))));
+                val = (int)(MySession.Static.Settings.DepositsCountCoefficient * (float)num);
                 if (m_depositMaterials.Count == 0)
                 {
                     val = 0;
@@ -456,9 +457,10 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             }
             val = Math.Max(val, filledShapes.Length);
             deposits = new MyCompositeShapeOreDeposit[val];
-            float num = (!flag) ? (size / 10f) : (size / 30f + 8f);
+            float depositSizeDenominator = MySession.Static.Settings.DepositSizeDenominator;
+            float num2 = (!flag || !(depositSizeDenominator > 0f)) ? (size / 10f) : (size / depositSizeDenominator + 8f);
             MyVoxelMaterialDefinition material = defaultMaterial;
-            int num2 = 0;
+            int num3 = 0;
             for (int i = 0; i < filledShapes.Length; i++)
             {
                 if (i == 0)
@@ -474,7 +476,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                         }
                         else
                         {
-                            material = m_depositMaterials[num2++];
+                            material = m_depositMaterials[num3++];
                         }
                     }
                     else
@@ -491,30 +493,30 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
                 else
                 {
-                    material = m_depositMaterials[num2++];
+                    material = m_depositMaterials[num3++];
                 }
                 deposits[i] = new MyCompositeShapeOreDeposit(filledShapes[i].DeepCopy(), material);
                 deposits[i].Shape.ShrinkTo(random.NextFloat() * (flag ? 0.6f : 0.15f) + (flag ? 0.1f : 0.6f));
-                if (num2 == m_depositMaterials.Count)
+                if (num3 == m_depositMaterials.Count)
                 {
-                    num2 = 0;
+                    num3 = 0;
                     action(m_depositMaterials);
                 }
             }
             for (int j = filledShapes.Length; j < val; j++)
             {
-                float num5 = 0f;
+                float num6 = 0f;
                 Vector3 vector = Vector3.Zero;
                 for (int k = 0; k < 10; k++)
                 {
                     vector = CreateRandomPointInBox(random, size * (flag ? 0.6f : 0.7f)) + storageOffset + size * 0.15f;
-                    num5 = random.NextFloat() * num + (flag ? 5f : 8f);
+                    num6 = random.NextFloat() * num2 + (flag ? 5f : 8f);
                     if (shapeInfo == null)
                     {
                         break;
                     }
-                    double num6 = Math.Sqrt(num5 * num5 / 2f) * 0.5;
-                    Vector3I b = new Vector3I((int)num6);
+                    double num7 = Math.Sqrt(num6 * num6 / 2f) * 0.5;
+                    Vector3I b = new Vector3I((int)num7);
                     BoundingBoxI box = new BoundingBoxI((Vector3I)vector - b, (Vector3I)vector + b);
                     if (MyCompositeShapeProvider.Intersect(shapeInfo, box, 0) != 0)
                     {
@@ -523,20 +525,20 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
                 random.NextFloat();
                 random.NextFloat();
-                MyCsgShapeBase shape = new MyCsgSphere(vector, num5);
-                material = ((m_depositMaterials.Count != 0) ? m_depositMaterials[num2++] : m_surfaceMaterials[num2++]);
+                MyCsgShapeBase shape = new MyCsgSphere(vector, num6);
+                material = ((m_depositMaterials.Count != 0) ? m_depositMaterials[num3++] : m_surfaceMaterials[num3++]);
                 deposits[j] = new MyCompositeShapeOreDeposit(shape, material);
                 if (m_depositMaterials.Count == 0)
                 {
-                    if (num2 == m_surfaceMaterials.Count)
+                    if (num3 == m_surfaceMaterials.Count)
                     {
-                        num2 = 0;
+                        num3 = 0;
                         action(m_surfaceMaterials);
                     }
                 }
-                else if (num2 == m_depositMaterials.Count)
+                else if (num3 == m_depositMaterials.Count)
                 {
-                    num2 = 0;
+                    num3 = 0;
                     action(m_depositMaterials);
                 }
             }

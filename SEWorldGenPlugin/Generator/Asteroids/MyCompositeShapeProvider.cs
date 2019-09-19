@@ -8,7 +8,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using VRage.Game;
 using VRage.Noise;
 using VRage.Utils;
@@ -21,7 +20,7 @@ using VRageRender;
  */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    [MyStorageDataProvider(10004)]
+    [MyStorageDataProvider(10003)]
     internal sealed class MyCompositeShapeProvider : IMyStorageDataProvider
     {
         public class MyCombinedCompositeInfoProvider : MyProceduralCompositeInfoProvider, IMyCompositionInfoProvider

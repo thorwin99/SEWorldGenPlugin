@@ -89,6 +89,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (asteroidModule == null) return;
 
             asteroidModule.UnloadCells();
+
+            asteroidModule.UpdateObjects();
         }
 
         protected override void UnloadData()

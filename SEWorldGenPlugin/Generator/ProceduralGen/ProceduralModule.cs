@@ -55,6 +55,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         }
 
         public abstract void GenerateObjects(List<CellObject> objects, HashSet<MyObjectSeedParams> existingObjectSeeds);
+        public abstract void UpdateObjects();
 
         protected void GenerateObjectsData(ref BoundingSphereD sphere)
         {

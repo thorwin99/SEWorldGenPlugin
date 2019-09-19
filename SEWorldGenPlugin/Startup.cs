@@ -6,6 +6,7 @@ using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.ProceduralGen;
 using SEWorldGenPlugin.GUI;
 using VRage.Game.Entity;
+using VRage.Network;
 using VRage.Plugins;
 
 namespace SEWorldGenPlugin

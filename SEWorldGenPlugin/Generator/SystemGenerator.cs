@@ -20,7 +20,7 @@ namespace SEWorldGenPlugin.Generator
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
     public class SystemGenerator : MySessionComponentBase
     {
-        private string[] greek_letters = new string[10] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa"};
+        private string[] greek_letters = new string[] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "My", "Ny", "Xi", "Omikron", "Pi", "Rho", "Sigma", "Tau", "Ypsilon", "Phi", "Chi", "Psi", "Omega"};
 
         private const string STORAGE_FILE = "SystemData.xml";
 
@@ -122,7 +122,7 @@ namespace SEWorldGenPlugin.Generator
         {
             MySystemBeltItem belt = new MySystemBeltItem();
 
-            belt.DisplayName = "Belt " + greek_letters[beltIndex++];
+            belt.DisplayName = "Belt " + greek_letters[beltIndex++ % greek_letters.Length];
             belt.Type = SystemObjectType.BELT;
             belt.Height = MyRandom.Instance.Next(settings.BeltSettings.MinBeltHeight, settings.BeltSettings.MaxBeltHeight);
             belt.Radius = distance;

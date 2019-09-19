@@ -1,4 +1,8 @@
-﻿using Sandbox.Engine.Voxels;
+﻿using Sandbox;
+using Sandbox.Definitions;
+using Sandbox.Engine.Multiplayer;
+using Sandbox.Engine.Voxels;
+using Sandbox.Game;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
@@ -27,8 +31,22 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private const int SUBCELL_SIZE = OBJECT_SIZE_MAX * 3;
         private const int SUBCELLS = 6;
 
+        private HashSet<MyVoxelBase> m_NotSavedMaps;
+        private bool m_saving;
+        private MyAsteroidGeneratorDefinition m_data;
+
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
         {
+            m_NotSavedMaps = new HashSet<MyVoxelBase>();
+            MySession.Static.OnSavingCheckpoint += delegate
+            {
+                foreach(var map in m_NotSavedMaps)
+                {
+                    map.Save = false;
+                }
+                m_saving = true;
+            };
+            m_data = GetData();
         }
 
         public override ProceduralCell GenerateCell(ref Vector3I id)
@@ -61,7 +79,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         minSize = ((MySystemBeltItem)obj).RoidSize;
 
                     if (obj.Type == SystemObjectType.RING)
-                         minSize = ((MyPlanetRingItem)obj).RoidSize;
+                        minSize = ((MyPlanetRingItem)obj).RoidSize;
 
                     var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(Math.Min(OBJECT_SIZE_MAX, minSize), OBJECT_SIZE_MAX));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
@@ -108,23 +126,28 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (!exists)
                     {
-                        var provider = MyCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, MySession.Static.Settings.VoxelGeneratorVersion);
+                        var provider = MyCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0);
                         var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(obj.Size));
 
-                        Vector3D pos = obj.BoundingVolume.Center - VRageMath.MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2;
+                        Vector3D pos = obj.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2;
 
-                        MyVoxelMap voxelMap = new MyVoxelMap();
+                        MyVoxelMap voxelMap;
 
-                        MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
+                        voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
+                        voxelMap.Save = true;
 
-                        voxelMap.Save = false;
+                        m_NotSavedMaps.Add(voxelMap);
+
                         MyVoxelBase.StorageChanged OnStorageRangeChanged = null;
                         OnStorageRangeChanged = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
                         {
                             voxelMap.Save = true;
+                            m_NotSavedMaps.Remove(voxelMap);
                             voxelMap.RangeChanged -= OnStorageRangeChanged;
                         };
+
                         voxelMap.RangeChanged += OnStorageRangeChanged;
+                        
                     }
                     tmp_voxelMaps.Clear();
                 }
@@ -179,6 +202,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
                 cellObjects.Clear();
             }
+            foreach(ProceduralCell cell in m_toUnloadCells)
+            {
+                m_cells.Remove(cell.CellId);
+                m_cellsTree.RemoveProxy(cell.proxyId);
+            }
             m_toUnloadCells.Clear();
         }
 
@@ -195,12 +223,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             {
                 if(map.StorageName == storageName)
                 {
-                    if (!map.Save)
+                    if (m_NotSavedMaps.Contains(map))
                     {
                         map.Close();
                         map.OnClose += delegate
                         {
                             obj.Params.Generated = false;
+                            m_NotSavedMaps.Remove(map);
+                            map.Save = false;
                         };
                     }
                     break;
@@ -215,5 +245,45 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             long hash = storageName.GetHashCode64();
             return hash & 0x00FFFFFFFFFFFFFF | ((long)MyEntityIdentifier.ID_OBJECT_TYPE.ASTEROID << 56);
         }
+
+        public override void UpdateObjects()
+        {
+            if (!m_saving) return;
+            foreach(var map in m_NotSavedMaps)
+            {
+                map.Save = true;
+            }
+            m_saving = false;
+        }
+
+        private static MyAsteroidGeneratorDefinition GetData()
+        {
+            MyAsteroidGeneratorDefinition myAsteroidGeneratorDefinition = null;
+            int voxelGeneratorVersion = MySession.Static.Settings.VoxelGeneratorVersion;
+            foreach (MyAsteroidGeneratorDefinition value in MyDefinitionManager.Static.GetAsteroidGeneratorDefinitions().Values)
+            {
+                if (value.Version == voxelGeneratorVersion)
+                {
+                    myAsteroidGeneratorDefinition = value;
+                    break;
+                }
+            }
+            if (myAsteroidGeneratorDefinition == null)
+            {
+                MyLog.Default.WriteLine("Generator of version " + voxelGeneratorVersion + "not found!");
+                {
+                    foreach (MyAsteroidGeneratorDefinition value2 in MyDefinitionManager.Static.GetAsteroidGeneratorDefinitions().Values)
+                    {
+                        if (myAsteroidGeneratorDefinition == null || (value2.Version > voxelGeneratorVersion && (myAsteroidGeneratorDefinition.Version < voxelGeneratorVersion || value2.Version < myAsteroidGeneratorDefinition.Version)))
+                        {
+                            myAsteroidGeneratorDefinition = value2;
+                        }
+                    }
+                    return myAsteroidGeneratorDefinition;
+                }
+            }
+            return myAsteroidGeneratorDefinition;
+        }
+
     }
 }
