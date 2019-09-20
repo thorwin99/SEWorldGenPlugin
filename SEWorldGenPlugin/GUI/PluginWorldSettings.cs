@@ -2,6 +2,8 @@
 using Sandbox.Graphics;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
+using System;
 using System.Text;
 using VRage;
 using VRage.Game;
@@ -29,6 +31,11 @@ namespace SEWorldGenPlugin.GUI
 
         private float MARGIN_LEFT_LIST = 90f / MyGuiConstants.GUI_OPTIMAL_SIZE.X;
 
+        internal PluginSettingsGui SettingsGui;
+
+        public MyObjectBuilder_PluginSettings PlSettings;
+        public bool UseGlobal;
+
         public PluginWorldSettings() : this(null, null)
         {
             MyLog.Default.WriteLine("Create custom settings screen");
@@ -38,6 +45,7 @@ namespace SEWorldGenPlugin.GUI
         {
             MyLog.Default.WriteLine("Create custom settings screen");
             Static = this;
+            PlSettings = null;
         }
 
         protected override void BuildControls()
@@ -56,6 +64,13 @@ namespace SEWorldGenPlugin.GUI
 
             m_enablePlugin = new MyGuiControlCheckbox();
             m_enablePlugin.SetToolTip("Enable the SEWorldGenPlugin for this world");
+            m_enablePlugin.IsCheckedChanged = (Action<MyGuiControlCheckbox>)Delegate.Combine(m_enablePlugin.IsCheckedChanged, (Action<MyGuiControlCheckbox>)delegate (MyGuiControlCheckbox s)
+            {
+                if (PlSettings != null)
+                {
+                    PlSettings.Enable = s.IsChecked;
+                }
+            });
 
             m_pluginSettingsButton = new MyGuiControlButton(null, MyGuiControlButtonStyleEnum.Small, null, null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Plugin settings"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_ACTIVE, OnSettingsClick);
             Controls.Add(m_enablePluginLabel);
@@ -70,9 +85,17 @@ namespace SEWorldGenPlugin.GUI
             m_pluginSettingsButton.PositionX += m_enablePlugin.Size.X + m_pluginSettingsButton.Size.X / 2;
         }
 
-        private void OnSettingsClick()
+        private void OnSettingsClick(object sender)
         {
+            SettingsGui = new PluginSettingsGui(this);
+            SettingsGui.OnOkButtonClicked += Settings_OnOkButtonClick;
+            SettingsGui.SetSettings(PlSettings, UseGlobal);
+            MyGuiSandbox.AddScreen(SettingsGui);
+        }
 
+        private void Settings_OnOkButtonClick()
+        {
+            UseGlobal = SettingsGui.GetSettings(ref PlSettings);
         }
     }
 }

@@ -182,6 +182,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\FileUtils.cs" />
+    <Compile Include="Utilities\MyTexts.cs" />
     <Compile Include="Utilities\Verifier.cs" />
   </ItemGroup>
   <ItemGroup>
