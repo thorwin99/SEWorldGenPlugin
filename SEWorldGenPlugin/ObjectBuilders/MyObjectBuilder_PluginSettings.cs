@@ -98,11 +98,11 @@ namespace SEWorldGenPlugin.ObjectBuilders
     {
         [ProtoMember(1)]
         [DefaultValue(true)]
-        public int MinPlanetRingWidth = 10000;
+        public int MinPlanetRingWidth = 1000;
 
         [ProtoMember(2)]
         [DefaultValue(true)]
-        public int MaxPlanetRingWidth = 100000;
+        public int MaxPlanetRingWidth = 10000;
 
         public void Verify()
         {

@@ -360,7 +360,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return containmentType;
         }
 
+#pragma warning disable CS1066 // Der angegebene Standardwert hat keine Auswirkungen, da es für ein Element gilt, das in Kontexten verwendet wird, die keine optionalen Argumente zulassen
         void IMyStorageDataProvider.ReadRange(ref MyVoxelDataRequest req, bool detectOnly = false)
+#pragma warning restore CS1066 // Der angegebene Standardwert hat keine Auswirkungen, da es für ein Element gilt, das in Kontexten verwendet wird, die keine optionalen Argumente zulassen
         {
             if (req.RequestedData.Requests(MyStorageDataTypeEnum.Content))
             {
