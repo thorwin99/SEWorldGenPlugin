@@ -9,7 +9,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     {
         public MyObjectBuilder_PluginSettings()
         {
-            Enable = true;
+            Enable = false;
             GeneratorSettings = new GeneratorSettings();
         }
 
