@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace SEWorldGenPlugin.Utilities
 {
+    using Sandbox.Game.World;
     using System.IO;
     using System.Xml;
     using System.Xml.Serialization;
     using VRage.FileSystem;
+    using VRage.Utils;
 
     namespace SEWorldGenPlugin.Utilities
     {
@@ -20,6 +22,28 @@ namespace SEWorldGenPlugin.Utilities
         {
             private const string STORAGE_FOLDER = "Storage";
 
+            private static string StripDllExtIfNecessary(string name)
+            {
+                string ext = ".dll";
+                if (name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return name.Substring(0, name.Length - ext.Length);
+                }
+                return name;
+            }
+
+            public static bool FileExistsInWorldStorage(string file, Type callingType)
+            {
+                if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+                {
+                    return false;
+                }
+
+                var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+
+                return File.Exists(path);
+            }
+
             public static bool FileExistsInGlobalStorage(string file)
             {
                 if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
@@ -29,6 +53,15 @@ namespace SEWorldGenPlugin.Utilities
                 return File.Exists(path);
             }
 
+            public static void DeleteFileInWorldStorage(string file, Type callingType)
+            {
+                if (FileExistsInWorldStorage(file, callingType))
+                {
+                    var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                    File.Delete(path);
+                }
+            }
+
             public static void DeleteFileInGlobalStorage(string file)
             {
                 if (FileExistsInGlobalStorage(file))
@@ -36,6 +69,21 @@ namespace SEWorldGenPlugin.Utilities
                     var path = Path.Combine(MyFileSystem.UserDataPath, STORAGE_FOLDER, file);
                     File.Delete(path);
                 }
+            }
+
+            public static TextReader ReadFileInWorldStorage(string file, Type callingType)
+            {
+                if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+                {
+                    throw new FileNotFoundException();
+                }
+                var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                var stream = MyFileSystem.OpenRead(path);
+                if (stream != null)
+                {
+                    return new StreamReader(stream);
+                }
+                throw new FileNotFoundException();
             }
 
             public static TextReader ReadFileInGlobalStorage(string file)
@@ -48,6 +96,22 @@ namespace SEWorldGenPlugin.Utilities
                 if (stream != null)
                 {
                     return new StreamReader(stream);
+                }
+                throw new FileNotFoundException();
+            }
+
+            public static TextWriter WriteFileInWorldStorage(string file, Type callingType)
+            {
+                if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+                {
+                    throw new FileNotFoundException();
+                }
+
+                var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                var stream = MyFileSystem.OpenWrite(path);
+                if (stream != null)
+                {
+                    return new StreamWriter(stream);
                 }
                 throw new FileNotFoundException();
             }
@@ -92,6 +156,39 @@ namespace SEWorldGenPlugin.Utilities
                 }
             }
 
+            public static T ReadXmlFileFromWorld<T>(string file, Type callingType)
+            {
+                if(FileExistsInWorldStorage(file, callingType))
+                {
+                    try
+                    {
+                        using(var reader = ReadFileInWorldStorage(file, callingType))
+                        {
+                            T saveFile = SerializeFromXml<T>(reader.ReadToEnd());
+                            return saveFile;
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        MyLog.Default.Error("Couldnt load save file.");
+                        MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                        DeleteFileInWorldStorage(file, callingType);
+                        return default(T);
+                    }
+                }
+                return default(T);
+            }
+
+            public static void WriteXmlFileToWorld<T>(T saveFile, string file, Type callingType)
+            {
+                DeleteFileInWorldStorage(file, callingType);
+                string xml = SerializeToXml<T>(saveFile);
+                using(var writer = WriteFileInWorldStorage(file, callingType))
+                {
+                    writer.Write(xml);
+                    writer.Close();
+                }
+            }
         }
     }
 }

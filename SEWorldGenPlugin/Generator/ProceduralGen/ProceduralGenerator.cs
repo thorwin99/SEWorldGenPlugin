@@ -5,6 +5,7 @@ using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
 using VRage.Game;
@@ -43,7 +44,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             planetModule = new ProceduralPlanetModule(m_seed);
 
-            if (!MySettings.Static.Settings.Enable) return;
+            if (!SettingsSession.Static.Settings.Enable) return;
 
             //Currently so that the original Procedural world generator still works
             if (MySession.Static.Settings.ProceduralDensity != 0) return;
@@ -56,7 +57,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Enabled)
                 return;
 
-            if (!Sync.IsServer || !MySettings.Static.Settings.Enable) return;
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
             foreach(var entity in m_toTrackedEntities)
             {
@@ -151,7 +152,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            if (!Sync.IsServer || !MySettings.Static.Settings.Enable) return;
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
             base.Init(sessionComponent);
 

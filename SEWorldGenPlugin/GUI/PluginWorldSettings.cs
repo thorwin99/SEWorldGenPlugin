@@ -1,7 +1,10 @@
-﻿using Sandbox.Game.Screens;
+﻿using Sandbox.Game.Localization;
+using Sandbox.Game.Screens;
+using Sandbox.Game.Screens.Helpers;
 using Sandbox.Graphics;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
 using System;
 using System.Text;
@@ -34,7 +37,11 @@ namespace SEWorldGenPlugin.GUI
         internal PluginSettingsGui SettingsGui;
 
         public MyObjectBuilder_PluginSettings PlSettings;
-        public bool UseGlobal;
+        public bool UseGlobal
+        {
+            get;
+            private set;
+        }
 
         public PluginWorldSettings() : this(null, null)
         {
@@ -46,6 +53,10 @@ namespace SEWorldGenPlugin.GUI
             MyLog.Default.WriteLine("Create custom settings screen");
             Static = this;
             PlSettings = null;
+            m_isNewGame = (checkpoint == null);
+            PlSettings = new MyObjectBuilder_PluginSettings();
+            PlSettings.Enable = false;
+            UseGlobal = false;
         }
 
         protected override void BuildControls()
@@ -83,6 +94,34 @@ namespace SEWorldGenPlugin.GUI
             m_enablePlugin.PositionX += m_enablePluginLabel.Size.X + m_enablePlugin.Size.X - 0.009f;
             m_pluginSettingsButton.Position = m_enablePlugin.Position;
             m_pluginSettingsButton.PositionX += m_enablePlugin.Size.X + m_pluginSettingsButton.Size.X / 2;
+
+            if (m_isNewGame)
+            {
+                foreach(var c in Controls)
+                {
+                    if(c is MyGuiControlButton)
+                    {
+                        MyGuiControlButton b = (MyGuiControlButton)c;
+                        if(b.Text == MyTexts.GetString(MyCommonTexts.Start))
+                        {
+
+                            b.ButtonClicked += delegate
+                            {
+                                if (!UseGlobal)
+                                {
+                                    MySettings.Static.SessionSettings = PlSettings;
+                                    MyLog.Default.WriteLine("Setting session settings");
+                                }
+                                else
+                                {
+                                    MySettings.Static.SessionSettings = null;
+                                    MyLog.Default.WriteLine("Setting session settings");
+                                }
+                            };
+                        }
+                    }
+                }
+            }
         }
 
         private void OnSettingsClick(object sender)
@@ -96,6 +135,95 @@ namespace SEWorldGenPlugin.GUI
         private void Settings_OnOkButtonClick()
         {
             UseGlobal = SettingsGui.GetSettings(ref PlSettings);
+        }
+
+        public override void RecreateControls(bool constructor)
+        {
+            base.RecreateControls(constructor);
+
+            MyGuiControlScreenSwitchPanel p = null;
+            MyGuiControlButton custom = null;
+            MyGuiControlButton newGame = null;
+            MyGuiControlButton workshop = null;
+
+            foreach (var c in Controls)
+            {
+                if (c is MyGuiControlScreenSwitchPanel)
+                {
+                    p = (MyGuiControlScreenSwitchPanel)c;
+                    break;
+                }
+            }
+            if (p == null) return;
+            foreach (var c in p.Controls)
+            {
+                if (c is MyGuiControlButton)
+                {
+                    if (((MyGuiControlButton)c).Text == MyTexts.GetString(MyCommonTexts.ScreenCaptionCustomWorld))
+                        custom = (MyGuiControlButton)c;
+                    if (((MyGuiControlButton)c).Text == MyTexts.GetString(MyCommonTexts.ScreenCaptionNewGame))
+                        newGame = (MyGuiControlButton)c;
+                    if (((MyGuiControlButton)c).Text == MyTexts.GetString(MyCommonTexts.ScreenCaptionWorkshop))
+                        workshop = (MyGuiControlButton)c;
+                }
+            }
+            if (custom != null)
+            {
+                p.Controls.Remove(custom);
+                MyGuiControlButton newButton = new MyGuiControlButton(custom.Position, custom.VisualStyle, custom.Size, custom.ColorMask, custom.OriginAlign, MyTexts.GetString(MySpaceTexts.ToolTipNewGame_CustomGame), new StringBuilder(custom.Text), custom.TextScale, custom.TextAlignment, custom.HighlightType, OnCustomWorldButtonClick, custom.CueEnum);
+                p.Controls.Add(newButton);
+                FocusedControl = newButton;
+                newButton.HighlightType = MyGuiControlHighlightType.FORCED;
+                newButton.HasHighlight = true;
+                newButton.Selected = true;
+            }
+            if (newGame != null)
+            {
+                p.Controls.Remove(newGame);
+                MyGuiControlButton newButton = new MyGuiControlButton(newGame.Position, newGame.VisualStyle, newGame.Size, newGame.ColorMask, newGame.OriginAlign, MyTexts.GetString(MySpaceTexts.ToolTipNewGame_Campaign), new StringBuilder(newGame.Text), newGame.TextScale, newGame.TextAlignment, newGame.HighlightType, OnCampaignButtonClick, newGame.CueEnum);
+                p.Controls.Add(newButton);
+            }
+            if (workshop != null)
+            {
+                p.Controls.Remove(workshop);
+                MyGuiControlButton newButton = new MyGuiControlButton(workshop.Position, workshop.VisualStyle, workshop.Size, workshop.ColorMask, workshop.OriginAlign, MyTexts.GetString(MySpaceTexts.ToolTipNewGame_WorkshopContent), new StringBuilder(workshop.Text), workshop.TextScale, workshop.TextAlignment, workshop.HighlightType, OnWorkshopButtonClick, workshop.CueEnum);
+                p.Controls.Add(newButton);
+            }
+        }
+
+        private void OnCustomWorldButtonClick(MyGuiControlButton myGuiControlButton)
+        {
+            MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
+            if (!(screenWithFocus is MyGuiScreenWorldSettings))
+            {
+                SeamlesslyChangeScreen(screenWithFocus, new PluginWorldSettings());
+            }
+        }
+
+        private void OnCampaignButtonClick(MyGuiControlButton myGuiControlButton)
+        {
+            MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
+            if (!(screenWithFocus is MyGuiScreenNewGame))
+            {
+                SeamlesslyChangeScreen(screenWithFocus, new PluginGuiScreenNewGame());
+            }
+        }
+
+        private void OnWorkshopButtonClick(MyGuiControlButton myGuiControlButton)
+        {
+            MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
+            if (!(screenWithFocus is MyGuiScreenNewWorkshopGame))
+            {
+                SeamlesslyChangeScreen(screenWithFocus, new PluginGuiScreenWorkshopGame());
+            }
+        }
+
+        private static void SeamlesslyChangeScreen(MyGuiScreenBase focusedScreen, MyGuiScreenBase exchangedFor)
+        {
+            focusedScreen.SkipTransition = true;
+            focusedScreen.CloseScreen();
+            exchangedFor.SkipTransition = true;
+            MyScreenManager.AddScreenNow(exchangedFor);
         }
     }
 }

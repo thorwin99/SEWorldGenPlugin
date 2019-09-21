@@ -7,6 +7,7 @@ using Sandbox.Graphics.GUI;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.ProceduralGen;
 using SEWorldGenPlugin.GUI;
+using SEWorldGenPlugin.Session;
 using SpaceEngineers.Game.GUI;
 using VRage.Game.Entity;
 using VRage.Plugins;
