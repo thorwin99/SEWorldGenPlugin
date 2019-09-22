@@ -28,8 +28,6 @@ namespace SEWorldGenPlugin.GUI
         private static readonly StringBuilder PLUGIN_ENABLED = new StringBuilder("ENABLED");
         private static readonly StringBuilder PLUGIN_DISABLED = new StringBuilder("DISABLED");
 
-        private bool m_pauseGame;
-
         public PluginMainMenu() : this(false)
         {
 
@@ -56,9 +54,12 @@ namespace SEWorldGenPlugin.GUI
             }
             if(button != null)
             {
+                int index = Controls.IndexOf(button);
                 Controls.Remove(button);
                 MyGuiControlButton newGameButton = new MyGuiControlButton(button.Position, button.VisualStyle, button.Size, button.ColorMask, button.OriginAlign, null, new StringBuilder(button.Text), button.TextScale, button.TextAlignment, button.HighlightType, OnNewGameClick, button.CueEnum);
-                Controls.Add(newGameButton);
+                //Controls.Add(newGameButton);
+                Controls[index] = newGameButton;
+                newGameButton.Name = button.Name;
             }
         }
 
