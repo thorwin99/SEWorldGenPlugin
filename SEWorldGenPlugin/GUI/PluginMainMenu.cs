@@ -28,6 +28,8 @@ namespace SEWorldGenPlugin.GUI
         private static readonly StringBuilder PLUGIN_ENABLED = new StringBuilder("ENABLED");
         private static readonly StringBuilder PLUGIN_DISABLED = new StringBuilder("DISABLED");
 
+        private MyGuiControlElementGroup m_elemtents;
+
         public PluginMainMenu() : this(false)
         {
 
@@ -42,24 +44,39 @@ namespace SEWorldGenPlugin.GUI
         {
             base.RecreateControls(constructor);
             if (m_pauseGame) return;
+            m_elemtents = new MyGuiControlElementGroup();
+            m_elemtents.HighlightChanged += OnHighlightChange;
             MyGuiControlButton button = null;
             foreach (var c in Controls)
             {
                 if(c is MyGuiControlButton)
                 {
-                    button = (MyGuiControlButton)c;
-                    if (button.Text == MyTexts.GetString(MyCommonTexts.ScreenMenuButtonCampaign))
-                        break;
+                    m_elemtents.Add(c);
+                    if (((MyGuiControlButton)c).Text == MyTexts.GetString(MyCommonTexts.ScreenMenuButtonCampaign))
+                        button = (MyGuiControlButton)c;
                 }
             }
             if(button != null)
             {
                 int index = Controls.IndexOf(button);
-                Controls.Remove(button);
-                MyGuiControlButton newGameButton = new MyGuiControlButton(button.Position, button.VisualStyle, button.Size, button.ColorMask, button.OriginAlign, null, new StringBuilder(button.Text), button.TextScale, button.TextAlignment, button.HighlightType, OnNewGameClick, button.CueEnum);
-                //Controls.Add(newGameButton);
-                Controls[index] = newGameButton;
+                MyGuiControlButton newGameButton = MakeButton(button.Position, MyCommonTexts.ScreenMenuButtonCampaign, OnNewGameClick);
+                Controls.Add(newGameButton);
+                m_elemtents.Add(newGameButton);
                 newGameButton.Name = button.Name;
+                Controls[index] = newGameButton;
+                newGameButton.SetToolTip(button.Tooltips);
+            }
+        }
+
+        private void OnHighlightChange(MyGuiControlElementGroup obj)
+        {
+            foreach(var c in m_elemtents)
+            {
+                if(c.HasFocus && c != obj.SelectedElement)
+                {
+                    base.FocusedControl = obj.SelectedElement;
+                    break;
+                }
             }
         }
 
