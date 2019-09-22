@@ -46,8 +46,6 @@ namespace SEWorldGenPlugin.GUI
         private PluginWorldSettings m_parent;
 
         private bool m_isNewGame;
-        private bool m_isConfirmed;
-        private bool m_recreatingControls;
 
         public event Action OnOkButtonClicked;
 
@@ -56,16 +54,13 @@ namespace SEWorldGenPlugin.GUI
             m_parent = parent;
             base.EnabledBackgroundFade = true;
             m_isNewGame = (parent.Checkpoint == null);
-            m_isConfirmed = false;
             RecreateControls(true);
         }
 
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
-            m_recreatingControls = true;
             BuildControls();
-            m_recreatingControls = false;
         }
 
         public void BuildControls()
@@ -249,6 +244,8 @@ namespace SEWorldGenPlugin.GUI
 
         public void SetSettings(MyObjectBuilder_PluginSettings settings, bool useGlobal)
         {
+            MyLog.Default.WriteLine(FileUtils.SerializeToXml(settings) + "  " + useGlobal);
+
             m_useGlobalCheck.IsChecked = useGlobal;
 
             if (useGlobal || settings == null) return;
@@ -310,7 +307,6 @@ namespace SEWorldGenPlugin.GUI
 
         private void OkButtonClicked(object sender)
         {
-            m_isConfirmed = true;
             this.OnOkButtonClicked?.Invoke();
             CloseScreen();
         }

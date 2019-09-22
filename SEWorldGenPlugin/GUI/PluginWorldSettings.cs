@@ -7,8 +7,10 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
 using System;
+using System.IO;
 using System.Text;
 using VRage;
+using VRage.FileSystem;
 using VRage.Game;
 using VRage.Utils;
 using VRageMath;
@@ -52,10 +54,7 @@ namespace SEWorldGenPlugin.GUI
         {
             MyLog.Default.WriteLine("Create custom settings screen");
             Static = this;
-            PlSettings = null;
             m_isNewGame = (checkpoint == null);
-            PlSettings = new MyObjectBuilder_PluginSettings();
-            PlSettings.Enable = false;
             UseGlobal = false;
         }
 
@@ -94,17 +93,15 @@ namespace SEWorldGenPlugin.GUI
             m_enablePlugin.PositionX += m_enablePluginLabel.Size.X + m_enablePlugin.Size.X - 0.009f;
             m_pluginSettingsButton.Position = m_enablePlugin.Position;
             m_pluginSettingsButton.PositionX += m_enablePlugin.Size.X + m_pluginSettingsButton.Size.X / 2;
-
-            if (m_isNewGame)
+            foreach(var c in Controls)
             {
-                foreach(var c in Controls)
+                if(c is MyGuiControlButton)
                 {
-                    if(c is MyGuiControlButton)
+                    MyGuiControlButton b = (MyGuiControlButton)c;
+                    if(b.Text == MyTexts.GetString(MyCommonTexts.Start) || b.Text == MyTexts.GetString(MyCommonTexts.Ok))
                     {
-                        MyGuiControlButton b = (MyGuiControlButton)c;
-                        if(b.Text == MyTexts.GetString(MyCommonTexts.Start))
+                        if (m_isNewGame)
                         {
-
                             b.ButtonClicked += delegate
                             {
                                 if (!UseGlobal)
@@ -119,16 +116,48 @@ namespace SEWorldGenPlugin.GUI
                                 }
                             };
                         }
+                        else
+                        {
+                            b.ButtonClicked += delegate
+                            {
+                                var name = Checkpoint.SessionName;
+                                var path = Path.Combine(MyFileSystem.SavesPath, name.Replace(":", "-"));
+                                FileUtils.WriteXmlFileToPath(PlSettings, path, SettingsSession.FILE_NAME, typeof(PluginWorldSettings));
+                            };
+                        }
                     }
                 }
             }
+
+            if (m_isNewGame)
+            {
+                PlSettings = new MyObjectBuilder_PluginSettings();
+            }
+            else
+            {
+                LoadValues();
+            }
+        }
+
+        private void LoadValues()
+        {
+            var path = Path.Combine(MyFileSystem.SavesPath, Checkpoint.SessionName.Replace(":", "-"));
+            if(FileUtils.FileExistsInPath(path, SettingsSession.FILE_NAME, typeof(PluginWorldSettings)))
+            {
+                PlSettings = FileUtils.ReadXmlFileFromPath<MyObjectBuilder_PluginSettings>(path, SettingsSession.FILE_NAME, typeof(PluginWorldSettings));
+            }
+            else
+            {
+                PlSettings = new MyObjectBuilder_PluginSettings();
+            }
+            m_enablePlugin.IsChecked = PlSettings.Enable;
         }
 
         private void OnSettingsClick(object sender)
         {
             SettingsGui = new PluginSettingsGui(this);
             SettingsGui.OnOkButtonClicked += Settings_OnOkButtonClick;
-            SettingsGui.SetSettings(PlSettings, UseGlobal);
+            SettingsGui.SetSettings(this.PlSettings, UseGlobal);
             MyGuiSandbox.AddScreen(SettingsGui);
         }
 

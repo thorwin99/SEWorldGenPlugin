@@ -9,7 +9,7 @@ namespace SEWorldGenPlugin.Session
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 1000)]
     public class SettingsSession : MySessionComponentBase
     {
-        private const string FILE_NAME = "worldSettings.xml";
+        public const string FILE_NAME = "worldSettings.xml";
 
         public static SettingsSession Static;
 
@@ -27,15 +27,13 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             Static = this;
-            MyLog.Default.WriteLine("Loading SettingsSession");
             if (FileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(SettingsSession)))
             {
-                MyLog.Default.WriteLine("Loading Settings file");
                 Settings = FileUtils.ReadXmlFileFromWorld<MyObjectBuilder_PluginSettings>(FILE_NAME, typeof(SettingsSession));
+                MyLog.Default.WriteLine(FileUtils.SerializeToXml(Settings));
             }
             else
             {
-                MyLog.Default.WriteLine("Loading SettingsSession from manager");
                 if (MySettings.Static == null)
                 {
                     var s = new MySettings();

@@ -44,6 +44,18 @@ namespace SEWorldGenPlugin.Utilities
                 return File.Exists(path);
             }
 
+            public static bool FileExistsInPath(string path, string file, Type callingType)
+            {
+                if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+                {
+                    return false;
+                }
+
+                var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                MyLog.Default.WriteLine(paths);
+                return File.Exists(paths);
+            }
+
             public static bool FileExistsInGlobalStorage(string file)
             {
                 if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
@@ -59,6 +71,15 @@ namespace SEWorldGenPlugin.Utilities
                 {
                     var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
                     File.Delete(path);
+                }
+            }
+
+            public static void DeleteFileInPath(string path, string file, Type callingType)
+            {
+                if (FileExistsInPath(path, file, callingType))
+                {
+                    var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                    File.Delete(paths);
                 }
             }
 
@@ -79,6 +100,21 @@ namespace SEWorldGenPlugin.Utilities
                 }
                 var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
                 var stream = MyFileSystem.OpenRead(path);
+                if (stream != null)
+                {
+                    return new StreamReader(stream);
+                }
+                throw new FileNotFoundException();
+            }
+
+            public static TextReader ReadFileInPath(string path, string file, Type callingType)
+            {
+                if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+                {
+                    throw new FileNotFoundException();
+                }
+                var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                var stream = MyFileSystem.OpenRead(paths);
                 if (stream != null)
                 {
                     return new StreamReader(stream);
@@ -109,6 +145,22 @@ namespace SEWorldGenPlugin.Utilities
 
                 var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
                 var stream = MyFileSystem.OpenWrite(path);
+                if (stream != null)
+                {
+                    return new StreamWriter(stream);
+                }
+                throw new FileNotFoundException();
+            }
+
+            public static TextWriter WriteFileInPath(string path, string file, Type callingType)
+            {
+                if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+                {
+                    throw new FileNotFoundException();
+                }
+
+                var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                var stream = MyFileSystem.OpenWrite(paths);
                 if (stream != null)
                 {
                     return new StreamWriter(stream);
@@ -184,6 +236,41 @@ namespace SEWorldGenPlugin.Utilities
                 DeleteFileInWorldStorage(file, callingType);
                 string xml = SerializeToXml<T>(saveFile);
                 using(var writer = WriteFileInWorldStorage(file, callingType))
+                {
+                    writer.Write(xml);
+                    writer.Close();
+                }
+            }
+
+            public static T ReadXmlFileFromPath<T>(string path, string file, Type callingType)
+            {
+                MyLog.Default.WriteLine(path + " PAth");
+                if(FileExistsInPath(path, file, callingType))
+                {
+                    try
+                    {
+                        using(var reader = ReadFileInPath(path, file, callingType))
+                        {
+                            T saveFile = SerializeFromXml<T>(reader.ReadToEnd());
+                            return saveFile;
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        MyLog.Default.Error("Couldnt load save file.");
+                        MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                        DeleteFileInPath(path, file, callingType);
+                        return default(T);
+                    }
+                }
+                return default(T);
+            }
+
+            public static void WriteXmlFileToPath<T>(T saveFile, string path, string file, Type callingType)
+            {
+                DeleteFileInPath(path, file, callingType);
+                string xml = SerializeToXml<T>(saveFile);
+                using(var writer = WriteFileInPath(path, file, callingType))
                 {
                     writer.Write(xml);
                     writer.Close();
