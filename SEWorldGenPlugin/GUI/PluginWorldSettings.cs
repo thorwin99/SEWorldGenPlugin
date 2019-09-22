@@ -89,10 +89,12 @@ namespace SEWorldGenPlugin.GUI
 
             m_enablePluginLabel.Position = vector + value * 5;
             m_enablePluginLabel.PositionY += MyGuiConstants.BACK_BUTTON_SIZE.Y * 2;
-            m_enablePlugin.Position = m_enablePluginLabel.Position;
-            m_enablePlugin.PositionX += m_enablePluginLabel.Size.X + m_enablePlugin.Size.X - 0.009f;
+            m_enablePlugin.Position = GetPosition();
+            m_enablePlugin.PositionY = m_enablePluginLabel.PositionY;
+            m_enablePlugin.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             m_pluginSettingsButton.Position = m_enablePlugin.Position;
-            m_pluginSettingsButton.PositionX += m_enablePlugin.Size.X + m_pluginSettingsButton.Size.X / 2;
+            m_pluginSettingsButton.PositionX += m_enablePlugin.Size.X + 0.009f;
+            m_pluginSettingsButton.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             foreach(var c in Controls)
             {
                 if(c is MyGuiControlButton)
@@ -137,6 +139,16 @@ namespace SEWorldGenPlugin.GUI
             {
                 LoadValues();
             }
+        }
+
+        private Vector2 GetPosition()
+        {
+            foreach(var c in Controls)
+            {
+                if (c is MyGuiControlCheckbox)
+                    return c.Position;
+            }
+            return Vector2.Zero;
         }
 
         private void LoadValues()

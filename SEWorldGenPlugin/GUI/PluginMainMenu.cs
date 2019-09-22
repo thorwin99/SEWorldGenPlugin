@@ -24,7 +24,7 @@ namespace SEWorldGenPlugin.GUI
 {
     public class PluginMainMenu : MyGuiScreenMainMenu
     {
-        private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin is loaded and ");
+        private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin is loaded and by default ");
         private static readonly StringBuilder PLUGIN_ENABLED = new StringBuilder("ENABLED");
         private static readonly StringBuilder PLUGIN_DISABLED = new StringBuilder("DISABLED");
 
