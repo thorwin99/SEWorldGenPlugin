@@ -6,7 +6,7 @@ using VRage.Game;
  */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    internal interface IMyCompositionInfoProvider
+    internal interface IMyPluginCompositionInfoProvider
     {
         IMyCompositeDeposit[] Deposits
         {

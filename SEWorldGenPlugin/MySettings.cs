@@ -21,6 +21,13 @@ namespace SEWorldGenPlugin
             private set;
         }
 
+        private MyObjectBuilder_PluginSettings m_sessonSettings;
+        public MyObjectBuilder_PluginSettings SessionSettings
+        {
+            get { return m_sessonSettings == null ? Settings : m_sessonSettings; }
+            set { m_sessonSettings = value; }
+        }
+
         public MySettings()
         {
             Static = this;

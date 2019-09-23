@@ -9,5 +9,5 @@ using System.Threading.Tasks;
  */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    internal delegate IMyCompositionInfoProvider MyCompositeShapeGeneratorDelegate(int generatorSeed, int seed, float size);
+    internal delegate IMyPluginCompositionInfoProvider MyCompositeShapeGeneratorDelegate(int generatorSeed, int seed, float size);
 }
