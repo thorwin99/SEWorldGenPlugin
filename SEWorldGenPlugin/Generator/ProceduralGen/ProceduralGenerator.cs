@@ -162,6 +162,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             Enabled = true;
 
+            m_seed = MySession.Static.Settings.ProceduralSeed;
+
             planetModule.GeneratePlanets();
         }
 
