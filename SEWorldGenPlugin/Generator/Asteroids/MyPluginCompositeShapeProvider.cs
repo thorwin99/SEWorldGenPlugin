@@ -21,15 +21,15 @@ using VRageRender;
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
     [MyStorageDataProvider(10003)]
-    internal sealed class MyCompositeShapeProvider : IMyStorageDataProvider
+    internal sealed class MyPluginCompositeShapeProvider : IMyStorageDataProvider
     {
-        public class MyCombinedCompositeInfoProvider : MyProceduralCompositeInfoProvider, IMyCompositionInfoProvider
+        public class MyPluginCombinedCompositeInfoProvider : MyProceduralCompositeInfoProvider, IMyPluginCompositionInfoProvider
         {
             private new readonly IMyCompositeShape[] m_filledShapes;
 
             private new readonly IMyCompositeShape[] m_removedShapes;
 
-            IMyCompositeShape[] IMyCompositionInfoProvider.FilledShapes
+            IMyCompositeShape[] IMyPluginCompositionInfoProvider.FilledShapes
             {
                 get
                 {
@@ -37,7 +37,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
             }
 
-            IMyCompositeShape[] IMyCompositionInfoProvider.RemovedShapes
+            IMyCompositeShape[] IMyPluginCompositionInfoProvider.RemovedShapes
             {
                 get
                 {
@@ -45,14 +45,14 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
             }
 
-            public MyCombinedCompositeInfoProvider(ref ConstructionData data, IMyCompositeShape[] filledShapes, IMyCompositeShape[] removedShapes)
+            public MyPluginCombinedCompositeInfoProvider(ref ConstructionData data, IMyCompositeShape[] filledShapes, IMyCompositeShape[] removedShapes)
                 : base(ref data)
             {
                 m_filledShapes = base.m_filledShapes.Concat(filledShapes).ToArray();
                 m_removedShapes = base.m_removedShapes.Concat(removedShapes).ToArray();
             }
 
-            public new void UpdateMaterials(MyVoxelMaterialDefinition defaultMaterial, MyCompositeShapeOreDeposit[] deposits)
+            public new void UpdateMaterials(MyVoxelMaterialDefinition defaultMaterial, MyPluginCompositeShapeOreDeposit[] deposits)
             {
                 base.UpdateMaterials(defaultMaterial, deposits);
             }
@@ -91,7 +91,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             }
         }
 
-        public class MyProceduralCompositeInfoProvider : IMyCompositionInfoProvider
+        public class MyProceduralCompositeInfoProvider : IMyPluginCompositionInfoProvider
         {
             public struct ConstructionData
             {
@@ -103,7 +103,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
 
                 public MyCsgShapeBase[] RemovedShapes;
 
-                public MyCompositeShapeOreDeposit[] Deposits;
+                public MyPluginCompositeShapeOreDeposit[] Deposits;
 
                 public MyVoxelMaterialDefinition DefaultMaterial;
             }
@@ -178,9 +178,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
 
             protected class ProceduralCompositeOreDeposit : ProceduralCompositeShape, IMyCompositeDeposit, IMyCompositeShape
             {
-                private readonly MyCompositeShapeOreDeposit m_deposit;
+                private readonly MyPluginCompositeShapeOreDeposit m_deposit;
 
-                public ProceduralCompositeOreDeposit(MyProceduralCompositeInfoProvider context, MyCompositeShapeOreDeposit deposit)
+                public ProceduralCompositeOreDeposit(MyProceduralCompositeInfoProvider context, MyPluginCompositeShapeOreDeposit deposit)
                     : base(context, deposit.Shape)
                 {
                     m_deposit = deposit;
@@ -209,7 +209,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
 
             protected readonly ProceduralCompositeShape[] m_removedShapes;
 
-            IMyCompositeDeposit[] IMyCompositionInfoProvider.Deposits
+            IMyCompositeDeposit[] IMyPluginCompositionInfoProvider.Deposits
             {
                 get
                 {
@@ -217,7 +217,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
             }
 
-            IMyCompositeShape[] IMyCompositionInfoProvider.FilledShapes
+            IMyCompositeShape[] IMyPluginCompositionInfoProvider.FilledShapes
             {
                 get
                 {
@@ -225,7 +225,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
             }
 
-            IMyCompositeShape[] IMyCompositionInfoProvider.RemovedShapes
+            IMyCompositeShape[] IMyPluginCompositionInfoProvider.RemovedShapes
             {
                 get
                 {
@@ -233,7 +233,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 }
             }
 
-            MyVoxelMaterialDefinition IMyCompositionInfoProvider.DefaultMaterial
+            MyVoxelMaterialDefinition IMyPluginCompositionInfoProvider.DefaultMaterial
             {
                 get
                 {
@@ -254,11 +254,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                                    select new ProceduralCompositeShape(this, x)).ToArray();
             }
 
-            void IMyCompositionInfoProvider.Close()
+            void IMyPluginCompositionInfoProvider.Close()
             {
             }
 
-            protected void UpdateMaterials(MyVoxelMaterialDefinition defaultMaterial, MyCompositeShapeOreDeposit[] deposits)
+            protected void UpdateMaterials(MyVoxelMaterialDefinition defaultMaterial, MyPluginCompositeShapeOreDeposit[] deposits)
             {
                 m_defaultMaterial = defaultMaterial;
                 m_deposits = (from x in deposits
@@ -274,7 +274,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
 
         private State m_state;
 
-        private IMyCompositionInfoProvider m_infoProvider;
+        private IMyPluginCompositionInfoProvider m_infoProvider;
 
         [ThreadStatic]
         private static List<IMyCompositeDeposit> m_overlappedDeposits;
@@ -299,7 +299,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         private void InitFromState(State state)
         {
             m_state = state;
-            MyCompositeShapeGeneratorDelegate myCompositeShapeGeneratorDelegate = MyCompositeShapes.AsteroidGenerators[state.Generator];
+            MyCompositeShapeGeneratorDelegate myCompositeShapeGeneratorDelegate = MyPluginCompositeShapes.AsteroidGenerators[state.Generator];
             m_infoProvider = myCompositeShapeGeneratorDelegate(state.GeneratorSeed, state.Seed, state.Size);
         }
 
@@ -315,7 +315,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return Intersect(m_infoProvider, box, lod);
         }
 
-        public static ContainmentType Intersect(IMyCompositionInfoProvider infoProvider, BoundingBoxI box, int lod)
+        public static ContainmentType Intersect(IMyPluginCompositionInfoProvider infoProvider, BoundingBoxI box, int lod)
         {
             ContainmentType containmentType = ContainmentType.Disjoint;
             BoundingBox queryBox = new BoundingBox(box);
@@ -695,7 +695,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return (byte)((signedDistance / -2f + 0.5f) * 255f);
         }
 
-        public static MyCompositeShapeProvider CreateAsteroidShape(int seed, float size, int generatorSeed = 0, int? generator = default(int?))
+        public static MyPluginCompositeShapeProvider CreateAsteroidShape(int seed, float size, int generatorSeed = 0, int? generator = default(int?))
         {
             State state = default(State);
             state.Version = 3u;
@@ -704,7 +704,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             state.Size = size;
             state.UnusedCompat = 0u;
             state.GeneratorSeed = generatorSeed;
-            MyCompositeShapeProvider myCompositeShapeProvider = new MyCompositeShapeProvider();
+            MyPluginCompositeShapeProvider myCompositeShapeProvider = new MyPluginCompositeShapeProvider();
             myCompositeShapeProvider.InitFromState(state);
             return myCompositeShapeProvider;
         }

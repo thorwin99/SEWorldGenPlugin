@@ -126,7 +126,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (!exists)
                     {
-                        var provider = MyCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0);
+                        var provider = MyPluginCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0);
                         var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(obj.Size));
 
                         Vector3D pos = obj.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2;

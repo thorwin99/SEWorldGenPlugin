@@ -13,7 +13,7 @@ using VRageRender;
  */
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
-    internal class MyCompositeShapeOreDeposit
+    internal class MyPluginCompositeShapeOreDeposit
     {
         public readonly MyCsgShapeBase Shape;
 
@@ -28,7 +28,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             }
         }
 
-        public MyCompositeShapeOreDeposit(MyCsgShapeBase shape, MyVoxelMaterialDefinition material)
+        public MyPluginCompositeShapeOreDeposit(MyCsgShapeBase shape, MyVoxelMaterialDefinition material)
         {
             Shape = shape;
             m_material = material;
