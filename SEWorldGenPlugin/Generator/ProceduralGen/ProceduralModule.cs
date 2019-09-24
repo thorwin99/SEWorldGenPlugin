@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Sandbox.Game.World.Generator;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using VRage.Collections;
 using VRage.Game;
-using VRage.Utils;
+using VRage.Game.Entity;
 using VRageMath;
 
 
@@ -16,9 +15,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     public abstract class ProceduralModule
     {
         protected int m_seed;
-        protected Dictionary<Vector3I, ProceduralCell> m_cells = new Dictionary<Vector3I, ProceduralCell>();
+        protected Dictionary<Vector3I, MyProceduralCell> m_cells = new Dictionary<Vector3I, MyProceduralCell>();
         protected MyDynamicAABBTreeD m_cellsTree = new MyDynamicAABBTreeD(Vector3D.Zero);
-        protected List<ProceduralCell> m_toUnloadCells;
+        protected CachingHashSet<MyProceduralCell> m_toUnloadCells;
 
         public readonly double CELL_SIZE;
 
@@ -26,7 +25,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             m_seed = seed;
             CELL_SIZE = Math.Min(cellSize, 25000);
-            m_toUnloadCells = new List<ProceduralCell>();
+            m_toUnloadCells = new CachingHashSet<MyProceduralCell>();
         }
 
         public void MarkToUnloadCells(BoundingSphereD toUnload, BoundingSphereD? toExclude = null)
@@ -34,8 +33,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             Vector3I cellId = Vector3I.Floor((toUnload.Center - toUnload.Radius) / CELL_SIZE);
             for (var iter = GetCellsIterator(toUnload); iter.IsValid(); iter.GetNext(out cellId))
             {
-
-                ProceduralCell cell;
+                MyProceduralCell cell;
                 if (m_cells.TryGetValue(cellId, out cell))
                 {
                     if (toExclude == null || !toExclude.HasValue || toExclude.Value.Contains(cell.BoundingVolume) == ContainmentType.Disjoint)
@@ -46,15 +44,56 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
-        public abstract void UnloadCells();
+        public void UnloadCells(Dictionary<MyEntity, MyEntityTracker> trackedEntities)
+        {
+            m_toUnloadCells.ApplyAdditions();
+            if (m_toUnloadCells.Count == 0) return;
 
-        public void GetObjectsInSphere(BoundingSphereD sphere, List<CellObject> outObjects)
+            List<MyObjectSeed> cellObjects = new List<MyObjectSeed>();
+
+            foreach (MyProceduralCell cell in m_toUnloadCells)
+            {
+                foreach (MyEntityTracker tracker in trackedEntities.Values)
+                {
+                    BoundingSphereD boundingVolume = tracker.BoundingVolume;
+                    if (boundingVolume.Contains(cell.BoundingVolume) != ContainmentType.Disjoint)
+                    {
+                        m_toUnloadCells.Remove(cell);
+                        break;
+                    }
+                }
+            }
+            m_toUnloadCells.ApplyRemovals();
+            foreach (var cell in m_toUnloadCells)
+            {
+                cell.GetAll(cellObjects);
+
+                foreach (MyObjectSeed obj in cellObjects)
+                {
+                    if (obj.Params.Generated)
+                    {
+                        CloseObject(obj);
+                    }
+                }
+                cellObjects.Clear();
+            }
+            foreach (MyProceduralCell cell in m_toUnloadCells)
+            {
+                m_cells.Remove(cell.CellId);
+                m_cellsTree.RemoveProxy(cell.proxyId);
+            }
+            m_toUnloadCells.Clear();
+        }
+
+        public abstract void CloseObject(MyObjectSeed seed);
+
+        public void GetObjectsInSphere(BoundingSphereD sphere, List<MyObjectSeed> outObjects)
         {
             GenerateObjectsData(ref sphere);
             GetAllObjectsInSphere(ref sphere, outObjects);
         }
 
-        public abstract void GenerateObjects(List<CellObject> objects, HashSet<MyObjectSeedParams> existingObjectSeeds);
+        public abstract void GenerateObjects(List<MyObjectSeed> objects, HashSet<MyObjectSeedParams> existingObjectSeeds);
         public abstract void UpdateObjects();
 
         protected void GenerateObjectsData(ref BoundingSphereD sphere)
@@ -68,22 +107,24 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 if (m_cells.ContainsKey(cellId)) continue;
 
                 BoundingBoxD cellBounds = new BoundingBoxD(cellId * CELL_SIZE, (cellId + 1) * CELL_SIZE);
-                if (sphere.Contains(cellBounds) == ContainmentType.Disjoint) continue;
+                if (!(sphere.Contains(cellBounds) != ContainmentType.Disjoint)) continue;
 
-                ProceduralCell cell = GenerateCell(ref cellId);
+                MyProceduralCell cell = GenerateCell(ref cellId);
                 if(cell != null)
                 {
                     m_cells.Add(cellId, cell);
-                    cell.proxyId = m_cellsTree.AddProxy(ref cellBounds, cell, 0);
+
+                    BoundingBoxD aabb = cell.BoundingVolume;
+                    cell.proxyId = m_cellsTree.AddProxy(ref aabb, cell, 0u);
                 }
             }
         }
 
-        public abstract ProceduralCell GenerateCell(ref Vector3I id);
+        public abstract MyProceduralCell GenerateCell(ref Vector3I id);
 
-        protected void GetAllObjectsInSphere(ref BoundingSphereD sphere, List<CellObject> outList)
+        protected void GetAllObjectsInSphere(ref BoundingSphereD sphere, List<MyObjectSeed> outList)
         {
-            List<ProceduralCell> cells = new List<ProceduralCell>();
+            List<MyProceduralCell> cells = new List<MyProceduralCell>();
 
             m_cellsTree.OverlapAllBoundingSphere(ref sphere, cells);
 
@@ -91,6 +132,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             {
                 cell.OverlapAllBoundingSphere(ref sphere, outList);
             }
+            cells.Clear();
         }
 
         protected Vector3I_RangeIterator GetCellsIterator(BoundingSphereD sphere)
@@ -114,7 +156,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
-        protected int GetObjectIdSeed(CellObject obj)
+        protected int GetObjectIdSeed(MyObjectSeed obj)
         {
             int hash = obj.CellId.GetHashCode();
             hash = (hash * 397) ^ m_seed;

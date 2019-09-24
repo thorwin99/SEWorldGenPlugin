@@ -74,7 +74,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             {
                 if (tracker.ShouldGenerate())
                 {
-                    List<CellObject> cellObjects = new List<CellObject>();
+                    List<MyObjectSeed> cellObjects = new List<MyObjectSeed>();
 
                     var oldBounding = tracker.BoundingVolume;
                     tracker.UpdateLastPosition();
@@ -89,7 +89,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
             if (asteroidModule == null) return;
 
-            asteroidModule.UnloadCells();
+            asteroidModule.UnloadCells(m_trackedEntities);
 
             asteroidModule.UpdateObjects();
         }

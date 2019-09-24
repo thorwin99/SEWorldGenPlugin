@@ -6,12 +6,14 @@ using Sandbox.Game;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
+using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
 using System.Collections.Generic;
 using VRage;
 using VRage.Game;
+using VRage.Game.Entity;
 using VRage.Library.Utils;
 using VRage.Profiler;
 using VRage.Utils;
@@ -49,9 +51,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_data = GetData();
         }
 
-        public override ProceduralCell GenerateCell(ref Vector3I id)
+        public override MyProceduralCell GenerateCell(ref Vector3I id)
         {
-            ProceduralCell cell = new ProceduralCell(id, CELL_SIZE);
+            MyProceduralCell cell = new MyProceduralCell(id, CELL_SIZE);
             int cellSeed = GetCellSeed(ref id);
 
             using (MyRandom.Instance.PushSeed(cellSeed))
@@ -81,7 +83,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     if (obj.Type == SystemObjectType.RING)
                         minSize = ((MyPlanetRingItem)obj).RoidSize;
 
-                    var cellObject = new CellObject(cell, position, MyRandom.Instance.Next(Math.Min(OBJECT_SIZE_MAX, minSize), OBJECT_SIZE_MAX));
+                    var cellObject = new MyObjectSeed(cell, position, MyRandom.Instance.Next(Math.Min(OBJECT_SIZE_MAX, minSize), OBJECT_SIZE_MAX));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
                     cellObject.Params.Seed = MyRandom.Instance.Next();
                     cellObject.Params.Index = index++;
@@ -93,7 +95,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return cell;
         }
 
-        public override void GenerateObjects(List<CellObject> objects, HashSet<MyObjectSeedParams> existingObjectSeeds)
+        public override void GenerateObjects(List<MyObjectSeed> objects, HashSet<MyObjectSeedParams> existingObjectSeeds)
         {
             List<MyVoxelBase> tmp_voxelMaps = new List<MyVoxelBase>();
 
@@ -183,55 +185,31 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return new Vector3I(radius);
         }
 
-        public override void UnloadCells()
-        {
-            if (m_toUnloadCells.Count == 0) return;
-
-            List<CellObject> cellObjects = new List<CellObject>();
-
-            foreach (var cell in m_toUnloadCells)
-            {
-                cell.GetAllObjects(cellObjects);
-
-                foreach(CellObject obj in cellObjects)
-                {
-                    if (obj.Params.Generated)
-                    {
-                        UnloadAsteroid(obj);
-                    }
-                }
-                cellObjects.Clear();
-            }
-            foreach(ProceduralCell cell in m_toUnloadCells)
-            {
-                m_cells.Remove(cell.CellId);
-                m_cellsTree.RemoveProxy(cell.proxyId);
-            }
-            m_toUnloadCells.Clear();
-        }
-
-        private void UnloadAsteroid(CellObject obj)
+        public override void CloseObject(MyObjectSeed obj)
         {
             List<MyVoxelBase> voxelMaps = new List<MyVoxelBase>();
             var bounds = obj.BoundingVolume;
 
-            MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, voxelMaps);
+            //MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, voxelMaps);
 
             string storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", obj.CellId.X, obj.CellId.Y, obj.CellId.Z, obj.Params.Index, obj.Params.Seed);
 
-            foreach(MyVoxelBase map in voxelMaps)
+            foreach(MyVoxelBase map in m_NotSavedMaps)
             {
                 if(map.StorageName == storageName)
                 {
                     if (m_NotSavedMaps.Contains(map))
                     {
-                        map.Close();
-                        map.OnClose += delegate
+                        Action<MyEntity> onClose = null;
+                        onClose = delegate
                         {
                             obj.Params.Generated = false;
                             m_NotSavedMaps.Remove(map);
                             map.Save = false;
+                            map.OnClose -= onClose;
                         };
+                        map.Close();
+                        map.OnClose += onClose;
                     }
                     break;
                 }
