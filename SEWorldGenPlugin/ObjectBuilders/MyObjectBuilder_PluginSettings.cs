@@ -109,6 +109,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             MinPlanetRingWidth = 10000;
             MaxPlanetRingWidth = 100000;
+            PlanetRingProbability = 0.5f;
         }
 
         [ProtoMember(1)]
@@ -116,11 +117,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(2)]
         public int MaxPlanetRingWidth;
+        [ProtoMember(2)]
+        public float PlanetRingProbability;
+
 
         public void Verify()
         {
             Verifier.VerifyInt(0, MaxPlanetRingWidth, 10000, "PlanetRingSettings.MinPlanetRingWidth", ref MinPlanetRingWidth);
             Verifier.VerifyInt(MinPlanetRingWidth, int.MaxValue, 100000, "PlanetRingSettings.MaxPlanetRingWidth", ref MaxPlanetRingWidth);
+            Verifier.VerifyFloat(0, 1, 0.5f, "PlanetRingSettings.PlanetRingProbability", ref PlanetRingProbability);
         }
     }
 
@@ -131,7 +136,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             MinBeltHeight = 4000;
             MaxBeltHeight = 40000;
-            BeltProbability = 0.4f;
+            BeltProbability = 0.2f;
         }
 
         [ProtoMember(1)]

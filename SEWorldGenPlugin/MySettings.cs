@@ -1,5 +1,5 @@
 ﻿using SEWorldGenPlugin.ObjectBuilders;
-using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
+using SEWorldGenPlugin.Utilities;
 using System;
 using VRage.Utils;
 

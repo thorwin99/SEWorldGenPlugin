@@ -6,7 +6,7 @@ using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
-using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,7 +106,7 @@ namespace SEWorldGenPlugin.Generator
                     int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
                     tmp_distance += distToPrev;
 
-                    if(MyRandom.Instance.NextDouble() * ((i % 6) * (i % 6) / 12.5) < 1 - m_settings.BeltSettings.BeltProbability){
+                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability){
                         GeneratePlanet(i, tmp_distance, numberPlanets);
                     }
                     else
@@ -181,7 +181,7 @@ namespace SEWorldGenPlugin.Generator
 
         private MyPlanetRingItem GenerateRing(float surfaceGravity, float planetSize)
         {
-            if (MyRandom.Instance.NextFloat() / surfaceGravity > 0.3 && false) return null;
+            if (MyRandom.Instance.NextFloat() > m_settings.PlanetSettings.RingSettings.PlanetRingProbability * surfaceGravity) return null;
 
             MyPlanetRingItem ring = new MyPlanetRingItem();
 
@@ -189,7 +189,7 @@ namespace SEWorldGenPlugin.Generator
             ring.RoidSize = MyRandom.Instance.Next(64, Math.Min((int)(Math.Max(surfaceGravity * 0.5 * 128, 64)), 512));
             ring.Width = MyRandom.Instance.Next(m_settings.PlanetSettings.RingSettings.MinPlanetRingWidth, m_settings.PlanetSettings.RingSettings.MaxPlanetRingWidth);
             ring.Height = MyRandom.Instance.Next(m_settings.PlanetSettings.RingSettings.MinPlanetRingWidth / 10, ring.Width / 10);
-            ring.AngleDegrees = MyRandom.Instance.Next(-180, 180);
+            ring.AngleDegrees = MyRandom.Instance.Next(-20, 20);
             ring.Radius = MyRandom.Instance.Next((int)(planetSize * 0.5 * 0.75), (int)(planetSize));
             ring.DisplayName = "";
 
@@ -215,7 +215,7 @@ namespace SEWorldGenPlugin.Generator
 
         private int SizeByGravity(float gravity)
         {
-            return (int)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * m_settings.PlanetSettings.SizeMultiplier * m_settings.PlanetSettings.SizeMultiplier), m_settings.PlanetSettings.PlanetSizeCap);
+           return (int)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * m_settings.PlanetSettings.SizeMultiplier * m_settings.PlanetSettings.SizeMultiplier), m_settings.PlanetSettings.PlanetSizeCap);
         }
 
         private int GetMaxMoonCount(float gravity)

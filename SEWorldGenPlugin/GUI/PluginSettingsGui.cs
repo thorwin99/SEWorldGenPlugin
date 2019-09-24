@@ -2,11 +2,10 @@
 using Sandbox.Game.Localization;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.ObjectBuilders;
-using SEWorldGenPlugin.Utilities;
-using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
 using System;
 using VRage.Utils;
 using VRageMath;
+using SEWorldGenPlugin.Utilities;
 
 namespace SEWorldGenPlugin.GUI
 {
@@ -19,6 +18,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_sizeCapLabel;
         private MyGuiControlLabel m_moonProbLabel;
         private MyGuiControlLabel m_ringWidthLabel;
+        private MyGuiControlLabel m_ringProbLabel;
         private MyGuiControlLabel m_beltHeightLabel;
         private MyGuiControlLabel m_beltProbLabel;
 
@@ -28,6 +28,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_sizeCapValue;
         private MyGuiControlLabel m_moonProbValue;
         private MyGuiControlLabel m_ringWidthValue;
+        private MyGuiControlLabel m_ringProbValue;
         private MyGuiControlLabel m_beltHeightValue;
         private MyGuiControlLabel m_beltProbValue;
 
@@ -38,6 +39,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlSlider m_sizeCapSlider;
         private MyGuiControlSlider m_moonProbSlider;
         private MyGuiControlSlider m_ringWidthSlider;
+        private MyGuiControlSlider m_ringProbSlider;
         private MyGuiControlSlider m_beltHeightSlider;
         private MyGuiControlSlider m_beltProbSlider;
 
@@ -82,18 +84,20 @@ namespace SEWorldGenPlugin.GUI
             m_sizeCapLabel = MakeLabel("Planet size cap");
             m_moonProbLabel = MakeLabel("Moon spawn probability");
             m_ringWidthLabel = MakeLabel("Average ring width");
+            m_ringProbLabel = MakeLabel("Ring spawn probability");
             m_beltHeightLabel = MakeLabel("Average belt height");
             m_beltProbLabel = MakeLabel("Belt spawn probability");
 
             m_useGlobalCheck = new MyGuiControlCheckbox();
-            m_objAmountSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 100f, x2, 15f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.SYS_OBJ_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_orbDistanceSlider = new MyGuiControlSlider(Vector2.Zero, 1000f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_sizeMultiplierSlider = new MyGuiControlSlider(Vector2.Zero, 1f, 10f, x2, 2f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.SIZE_MUL_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_sizeCapSlider = new MyGuiControlSlider(Vector2.Zero, 120f, 2400f, x2, 1200f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.SIZE_CAP_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_moonProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.MOON_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
-            m_ringWidthSlider = new MyGuiControlSlider(Vector2.Zero, 1000f, 10000f, x2, 5000f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.RING_WIDTH_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_beltHeightSlider = new MyGuiControlSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_beltProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_objAmountSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 100f, x2, 15f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SYS_OBJ_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_orbDistanceSlider = new MyGuiControlSlider(Vector2.Zero, 1000f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_sizeMultiplierSlider = new MyGuiControlSlider(Vector2.Zero, 1f, 10f, x2, 2f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_MUL_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_sizeCapSlider = new MyGuiControlSlider(Vector2.Zero, 120f, 2400f, x2, 1200f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_CAP_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_moonProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.MOON_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_ringWidthSlider = new MyGuiControlSlider(Vector2.Zero, 10000f, 100000f, x2, 15000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_WIDTH_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_ringProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_beltHeightSlider = new MyGuiControlSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_beltProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
 
             m_objAmountValue = MakeLabel(m_objAmountSlider.Value.ToString());
             m_objAmountValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
@@ -107,12 +111,14 @@ namespace SEWorldGenPlugin.GUI
             m_moonProbValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
             m_ringWidthValue = MakeLabel(m_ringWidthSlider.Value.ToString());
             m_ringWidthValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
+            m_ringProbValue = MakeLabel(m_ringProbSlider.Value.ToString());
+            m_ringProbValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
             m_beltHeightValue = MakeLabel(m_beltHeightSlider.Value.ToString());
             m_beltHeightValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
             m_beltProbValue = MakeLabel(String.Format("{0:0.00}", m_beltProbSlider.Value));
             m_beltProbValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
 
-            m_useGlobalCheck.SetToolTip(MyTexts.TOOLTIPS.USE_GLOBAL_CHECK);
+            m_useGlobalCheck.SetToolTip(MyPluginTexts.TOOLTIPS.USE_GLOBAL_CHECK);
             m_useGlobalCheck.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
 
             m_objAmountSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_objAmountSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
@@ -139,13 +145,17 @@ namespace SEWorldGenPlugin.GUI
             {
                 m_ringWidthValue.Text = s.Value.ToString();
             });
+            m_ringProbSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringProbSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                m_ringProbValue.Text = String.Format("{0:0.00}", s.Value);
+            });
             m_beltHeightSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_beltHeightSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
                 m_beltHeightValue.Text = s.Value.ToString();
             });
             m_beltProbSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_beltProbSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
-                m_beltProbValue.Text = String.Format("{0:0.00}", s.Value); ;
+                m_beltProbValue.Text = String.Format("{0:0.000}", s.Value); ;
             });
             m_useGlobalCheck.IsCheckedChanged = (Action<MyGuiControlCheckbox>)Delegate.Combine(m_useGlobalCheck.IsCheckedChanged, (Action<MyGuiControlCheckbox>)delegate (MyGuiControlCheckbox s)
             {
@@ -155,6 +165,7 @@ namespace SEWorldGenPlugin.GUI
                 m_sizeCapSlider.Enabled = !s.IsChecked;
                 m_moonProbSlider.Enabled = !s.IsChecked;
                 m_ringWidthSlider.Enabled = !s.IsChecked;
+                m_ringProbSlider.Enabled = !s.IsChecked;
                 m_beltHeightSlider.Enabled = !s.IsChecked;
                 m_beltProbSlider.Enabled = !s.IsChecked;
             });
@@ -185,6 +196,10 @@ namespace SEWorldGenPlugin.GUI
             Controls.Add(m_ringWidthLabel);
             Controls.Add(m_ringWidthSlider);
             Controls.Add(m_ringWidthValue);
+
+            Controls.Add(m_ringProbLabel);
+            Controls.Add(m_ringProbSlider);
+            Controls.Add(m_ringProbValue);
 
             Controls.Add(m_beltHeightLabel);
             Controls.Add(m_beltHeightSlider);
@@ -226,11 +241,15 @@ namespace SEWorldGenPlugin.GUI
             m_ringWidthSlider.Position = m_ringWidthLabel.Position + offset2;
             m_ringWidthValue.Position = m_ringWidthLabel.Position + offset3;
 
-            m_beltHeightLabel.Position = start + offset * 7;
+            m_ringProbLabel.Position = start + offset * 7;
+            m_ringProbSlider.Position = m_ringProbLabel.Position + offset2;
+            m_ringProbValue.Position = m_ringProbLabel.Position + offset3;
+
+            m_beltHeightLabel.Position = start + offset * 8;
             m_beltHeightSlider.Position = m_beltHeightLabel.Position + offset2;
             m_beltHeightValue.Position = m_beltHeightLabel.Position + offset3;
 
-            m_beltProbLabel.Position = start + offset * 8;
+            m_beltProbLabel.Position = start + offset * 9;
             m_beltProbSlider.Position = m_beltProbLabel.Position + offset2;
             m_beltProbValue.Position = m_beltProbLabel.Position + offset3;
 
@@ -262,6 +281,8 @@ namespace SEWorldGenPlugin.GUI
 
             m_ringWidthSlider.Value = (settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
 
+            m_ringProbSlider.Value = settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability;
+
             m_beltHeightSlider.Value = (settings.GeneratorSettings.BeltSettings.MinBeltHeight + settings.GeneratorSettings.BeltSettings.MaxBeltHeight) / 2;
         }
 
@@ -282,6 +303,7 @@ namespace SEWorldGenPlugin.GUI
 
             settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth = (int)m_ringWidthSlider.Value / 10;
             settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth = (int)m_ringWidthSlider.Value * 2 - settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth;
+            settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability = m_ringProbSlider.Value;
 
             settings.GeneratorSettings.BeltSettings.MinBeltHeight = (int)m_beltHeightSlider.Value / 10;
             settings.GeneratorSettings.BeltSettings.MaxBeltHeight = (int)m_beltHeightSlider.Value * 2 - settings.GeneratorSettings.BeltSettings.MinBeltHeight;

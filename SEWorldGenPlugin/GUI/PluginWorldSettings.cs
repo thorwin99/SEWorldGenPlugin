@@ -5,7 +5,7 @@ using Sandbox.Graphics;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
-using SEWorldGenPlugin.Utilities.SEWorldGenPlugin.Utilities;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.IO;
 using System.Text;
