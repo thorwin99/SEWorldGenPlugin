@@ -190,11 +190,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             List<MyVoxelBase> voxelMaps = new List<MyVoxelBase>();
             var bounds = obj.BoundingVolume;
 
-            //MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, voxelMaps);
+            MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, voxelMaps);
 
             string storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", obj.CellId.X, obj.CellId.Y, obj.CellId.Z, obj.Params.Index, obj.Params.Seed);
 
-            foreach(MyVoxelBase map in m_NotSavedMaps)
+            foreach(MyVoxelBase map in voxelMaps)
             {
                 if(map.StorageName == storageName)
                 {
@@ -204,12 +204,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         onClose = delegate
                         {
                             obj.Params.Generated = false;
-                            m_NotSavedMaps.Remove(map);
+                            //m_NotSavedMaps.Remove(map);
                             map.Save = false;
                             map.OnClose -= onClose;
                         };
                         map.Close();
                         map.OnClose += onClose;
+                        m_NotSavedMaps.Remove(map);
                     }
                     break;
                 }
