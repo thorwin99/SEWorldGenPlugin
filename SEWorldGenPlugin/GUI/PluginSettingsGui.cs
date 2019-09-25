@@ -90,7 +90,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_useGlobalCheck = new MyGuiControlCheckbox();
             m_objAmountSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 100f, x2, 15f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SYS_OBJ_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_orbDistanceSlider = new MyGuiControlSlider(Vector2.Zero, 1000f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_orbDistanceSlider = new MyGuiControlSlider(Vector2.Zero, 500f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_sizeMultiplierSlider = new MyGuiControlSlider(Vector2.Zero, 1f, 10f, x2, 2f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_MUL_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_sizeCapSlider = new MyGuiControlSlider(Vector2.Zero, 120f, 2400f, x2, 1200f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_CAP_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_moonProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.MOON_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
@@ -271,7 +271,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_objAmountSlider.Value = (settings.GeneratorSettings.MinObjectsInSystem + settings.GeneratorSettings.MaxObjectsInSystem) / 2;
 
-            m_orbDistanceSlider.Value = (settings.GeneratorSettings.MinOrbitDistance + settings.GeneratorSettings.MaxOrbitDistance) / 2;
+            m_orbDistanceSlider.Value = (settings.GeneratorSettings.MinOrbitDistance / 1000 + settings.GeneratorSettings.MaxOrbitDistance / 1000) / 2;
 
             m_sizeMultiplierSlider.Value = settings.GeneratorSettings.PlanetSettings.SizeMultiplier;
 
@@ -294,8 +294,8 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.MinObjectsInSystem = (int)m_objAmountSlider.Value;
             settings.GeneratorSettings.MaxObjectsInSystem = (int)m_objAmountSlider.Value;
 
-            settings.GeneratorSettings.MinOrbitDistance = (int)m_orbDistanceSlider.Value / 10;
-            settings.GeneratorSettings.MaxOrbitDistance = (int)m_orbDistanceSlider.Value * 2 - settings.GeneratorSettings.MinOrbitDistance;
+            settings.GeneratorSettings.MinOrbitDistance = (int)m_orbDistanceSlider.Value * 1000 / 10;
+            settings.GeneratorSettings.MaxOrbitDistance = (int)(m_orbDistanceSlider.Value * 1000 * 2 - settings.GeneratorSettings.MinOrbitDistance);
 
             settings.GeneratorSettings.PlanetSettings.SizeMultiplier = (int)m_sizeMultiplierSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_sizeCapSlider.Value * 1000;

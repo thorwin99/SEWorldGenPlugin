@@ -13,7 +13,7 @@ namespace SEWorldGenPlugin.Utilities
     public class ToolTips
     {
         public readonly string SYS_OBJ_SLIDER = "Objects that should be generated in the system";
-        public readonly string ORB_DIST_SLIDER = "Average distance between Orbits.";
+        public readonly string ORB_DIST_SLIDER = "Average distance between Orbits in kilometres.";
         public readonly string SIZE_MUL_SLIDER = "The diameter of each planet is scaled by this value";
         public readonly string SIZE_CAP_SLIDER = "The largest diameter a planet can have, if some planet would be larger, it will get this diameter. Value in kilometers";
         public readonly string MOON_PROB_SLIDER = "The probability a planet has moons";
