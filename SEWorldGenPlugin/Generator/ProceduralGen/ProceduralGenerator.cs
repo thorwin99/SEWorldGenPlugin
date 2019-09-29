@@ -102,10 +102,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             planetModule = null;
 
-            m_existingObjectSeeds.Clear();
+            m_existingObjectSeeds?.Clear();
 
-            m_toTrackedEntities.Clear();
-            m_trackedEntities.Clear();
+            m_toTrackedEntities?.Clear();
+            m_trackedEntities?.Clear();
 
             Static = null;
         }
