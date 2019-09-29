@@ -63,7 +63,8 @@ namespace SEWorldGenPlugin.Generator
 
             MySession.Static.OnReady += delegate
             {
-                AddBeltsGpss();
+                if(SettingsSession.Static.Settings.GeneratorSettings.BeltSettings.ShowBeltGPS)
+                    AddBeltsGpss();
             };
         } 
 
@@ -100,6 +101,7 @@ namespace SEWorldGenPlugin.Generator
                 int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem);
                 long tmp_distance = 0;
                 int totalBelts = 0;
+                int totalPlanets = 0;
 
                 for (int i = 0; i < numberPlanets; i++)
                 {
@@ -107,7 +109,7 @@ namespace SEWorldGenPlugin.Generator
                     tmp_distance += distToPrev;
 
                     if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability){
-                        GeneratePlanet(i, tmp_distance, numberPlanets);
+                        GeneratePlanet(i, tmp_distance, numberPlanets, ref totalPlanets);
                     }
                     else
                     {
@@ -131,7 +133,7 @@ namespace SEWorldGenPlugin.Generator
             m_objects.Add(belt);
         }
 
-        private void GeneratePlanet(int index, long distance, int totalObjects)
+        private void GeneratePlanet(int index, long distance, int totalObjects, ref int planetIndex)
         {
             MyPlanetItem planet = new MyPlanetItem();
 
@@ -141,7 +143,7 @@ namespace SEWorldGenPlugin.Generator
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
             Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Sin(height));
 
-            planet.DisplayName = "Planet " + (index + 1);
+            planet.DisplayName = "Planet " + (++planetIndex);
             planet.Type = SystemObjectType.PLANET;
             planet.DefName = def.Id.SubtypeId.String;
             planet.Size = SizeByGravity(def.SurfaceGravity);
@@ -290,24 +292,8 @@ namespace SEWorldGenPlugin.Generator
 
                 Vector3D pos = new Vector3D(((MySystemBeltItem)obj).Radius + ((MySystemBeltItem)obj).Width / 2, 0, 0); ;
 
-                AddObjectGps(obj, pos);
+                GlobalGpsManager.Static.AddGps(obj.DisplayName, Color.Aqua, pos);
             }
-        }
-
-        public static void AddObjectGps(MySystemItem obj, Vector3D position)
-        {
-            MyGps gps = new MyGps()
-            {
-                Name = obj.DisplayName,
-                Coords = position,
-                ShowOnHud = true,
-                GPSColor = Color.LightGray,
-                AlwaysVisible = true,
-                DiscardAt = TimeSpan.FromDays(100)
-            };
-
-            gps.UpdateHash();
-            MySession.Static.Gpss.SendAddGps(MySession.Static.LocalPlayerId, ref gps);
         }
     }
 }

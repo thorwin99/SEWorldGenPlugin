@@ -179,8 +179,10 @@
     <Compile Include="GUI\PluginWorldSettings.cs" />
     <Compile Include="MySettings.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_AsteroidGenerator.cs" />
+    <Compile Include="ObjectBuilders\MyObjectBuilder_GpsManager.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_PluginSettings.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_StarSystem.cs" />
+    <Compile Include="Session\GlobalGpsManager.cs" />
     <Compile Include="Session\PlayerTracker.cs" />
     <Compile Include="Session\SettingsSession.cs" />
     <Compile Include="Startup.cs" />

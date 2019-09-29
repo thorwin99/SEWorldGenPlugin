@@ -55,7 +55,6 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                 bool combined = info.Item2;
                 return delegate (int generatorSeed, int seed, float size)
                 {
-                    MyLog.Default.WriteLine(combined + " Combined");
                     if (size == 0f)
                     {
                         size = MyUtils.GetRandomFloat(128f, 512f);

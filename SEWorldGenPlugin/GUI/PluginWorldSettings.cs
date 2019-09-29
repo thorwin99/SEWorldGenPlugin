@@ -89,7 +89,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_enablePluginLabel.Position = vector + value * 5;
             m_enablePluginLabel.PositionY += MyGuiConstants.BACK_BUTTON_SIZE.Y * 2;
-            m_enablePlugin.Position = GetPosition();
+            m_enablePlugin.Position = GetControlPosition();
             m_enablePlugin.PositionY = m_enablePluginLabel.PositionY;
             m_enablePlugin.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             m_pluginSettingsButton.Position = m_enablePlugin.Position;
@@ -141,7 +141,7 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
-        private Vector2 GetPosition()
+        private Vector2 GetControlPosition()
         {
             foreach(var c in Controls)
             {

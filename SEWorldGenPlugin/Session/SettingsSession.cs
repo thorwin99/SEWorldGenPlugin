@@ -30,7 +30,6 @@ namespace SEWorldGenPlugin.Session
             if (FileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(SettingsSession)))
             {
                 Settings = FileUtils.ReadXmlFileFromWorld<MyObjectBuilder_PluginSettings>(FILE_NAME, typeof(SettingsSession));
-                MyLog.Default.WriteLine(FileUtils.SerializeToXml(Settings));
             }
             else
             {

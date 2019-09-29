@@ -78,6 +78,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             PlanetSizeCap = 1200000;
             MoonProbability = 0.5f;
             RingSettings = new PlanetRingSettings();
+            ShowPlanetGPS = true;
+            ShowMoonGPS = false;
         }
 
         [ProtoMember(1)]
@@ -91,6 +93,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(4)]
         public PlanetRingSettings RingSettings;
+
+        [ProtoMember(5)]
+        public bool ShowPlanetGPS;
+
+        [ProtoMember(6)]
+        public bool ShowMoonGPS;
 
         public void Verify()
         {
@@ -137,6 +145,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MinBeltHeight = 4000;
             MaxBeltHeight = 40000;
             BeltProbability = 0.2f;
+            ShowBeltGPS = true;
         }
 
         [ProtoMember(1)]
@@ -147,6 +156,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(3)]
         public float BeltProbability;
+
+        [ProtoMember(4)]
+        public bool ShowBeltGPS;
 
         public void Verify()
         {
