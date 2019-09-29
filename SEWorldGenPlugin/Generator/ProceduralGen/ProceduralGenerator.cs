@@ -100,6 +100,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             asteroidModule = null;
 
+            planetModule = null;
+
+            m_existingObjectSeeds.Clear();
+
             m_toTrackedEntities.Clear();
             m_trackedEntities.Clear();
 

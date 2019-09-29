@@ -88,8 +88,10 @@ namespace SEWorldGenPlugin.Generator
 
         protected override void UnloadData()
         {
-            m_objects = new HashSet<MySystemItem>();
+            m_objects.Clear();
+            m_planetDefinitions.Clear();
             m_settings = null;
+            Static = null;
         }
 
         private void GenerateSystem()
