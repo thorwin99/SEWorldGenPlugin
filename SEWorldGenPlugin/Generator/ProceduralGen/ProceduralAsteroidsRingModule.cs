@@ -204,10 +204,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         onClose = delegate
                         {
                             obj.Params.Generated = false;
-                            //m_NotSavedMaps.Remove(map);
-                            map.Save = false;
                             map.OnClose -= onClose;
                         };
+                        map.Save = false;
                         map.Close();
                         map.OnClose += onClose;
                         m_NotSavedMaps.Remove(map);
