@@ -110,11 +110,12 @@ namespace SEWorldGenPlugin.GUI
                                 {
                                     MySettings.Static.SessionSettings = PlSettings;
                                     MyLog.Default.WriteLine("Setting session settings");
+                                    MyLog.Default.WriteLine((PlSettings == null ? "" : FileUtils.SerializeToXml(PlSettings)));
                                 }
                                 else
                                 {
                                     MySettings.Static.SessionSettings = null;
-                                    MyLog.Default.WriteLine("Setting session settings");
+                                    MyLog.Default.WriteLine("Setting session settings global");
                                 }
                             };
                         }
@@ -169,6 +170,7 @@ namespace SEWorldGenPlugin.GUI
         {
             SettingsGui = new PluginSettingsGui(this);
             SettingsGui.OnOkButtonClicked += Settings_OnOkButtonClick;
+            MyLog.Default.WriteLine("Setting settings " + (PlSettings == null ? "" : FileUtils.SerializeToXml(PlSettings)));
             SettingsGui.SetSettings(this.PlSettings, UseGlobal);
             MyGuiSandbox.AddScreen(SettingsGui);
         }
@@ -176,6 +178,7 @@ namespace SEWorldGenPlugin.GUI
         private void Settings_OnOkButtonClick()
         {
             UseGlobal = SettingsGui.GetSettings(ref PlSettings);
+            MyLog.Default.WriteLine("Get settings " + (PlSettings == null ? "" : FileUtils.SerializeToXml(PlSettings)));
         }
 
         public override void RecreateControls(bool constructor)
