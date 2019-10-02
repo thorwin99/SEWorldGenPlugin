@@ -22,7 +22,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             shape.height = ring.Height;
             shape.rotation = new Vector3D(0, 1, 0);
 
-            double angle = 2 * Math.PI / 360 * ring.AngleDegrees;
+            double angle = 2 * Math.PI / 360 * (ring.AngleDegrees + 90);
             shape.rotation.X = Math.Cos(angle);
             shape.rotation.Z = Math.Sin(angle);
 
