@@ -20,11 +20,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             shape.radius = ring.Radius;
             shape.width = ring.Width;
             shape.height = ring.Height;
-            shape.rotation = new Vector3D(0, 1, 0);
+            shape.rotation = new Vector3D(1, 0, 0);
 
-            double angle = 2 * Math.PI / 360 * ring.AngleDegrees;
+            double angle = 2 * Math.PI / 360 * (ring.AngleDegrees);
             shape.rotation.X = Math.Cos(angle);
-            shape.rotation.Z = Math.Sin(angle);
+            shape.rotation.Y = Math.Sin(angle);
 
             return shape;
         }
@@ -32,7 +32,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public ContainmentType Contains(Vector3D point)
         {
             Vector3D relPosition = Vector3D.Subtract(point, center);
-            Vector3D planeNormal = new Vector3D(-rotation.Z, 0, rotation.X);
+            Vector3D planeNormal = new Vector3D(-rotation.Y, rotation.X, 0);
             Vector3D horVector = Vector3D.ProjectOnPlane(ref relPosition, ref planeNormal);
             Vector3D vertVector = Vector3D.Subtract(relPosition, horVector);
 

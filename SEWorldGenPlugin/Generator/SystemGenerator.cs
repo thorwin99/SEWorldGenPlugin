@@ -194,7 +194,7 @@ namespace SEWorldGenPlugin.Generator
             ring.Width = MyRandom.Instance.Next(m_settings.PlanetSettings.RingSettings.MinPlanetRingWidth, m_settings.PlanetSettings.RingSettings.MaxPlanetRingWidth);
             ring.Height = MyRandom.Instance.Next(m_settings.PlanetSettings.RingSettings.MinPlanetRingWidth / 10, ring.Width / 10);
             ring.AngleDegrees = MyRandom.Instance.Next(-20, 20);
-            ring.Radius = MyRandom.Instance.Next((int)(planetSize * 0.5 * 0.75), (int)(planetSize));
+            ring.Radius = MyRandom.Instance.Next((int)(planetSize * 0.75), (int)(planetSize * 2));
             ring.DisplayName = "";
 
             return ring;
