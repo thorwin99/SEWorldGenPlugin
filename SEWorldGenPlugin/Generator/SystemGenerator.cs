@@ -54,8 +54,6 @@ namespace SEWorldGenPlugin.Generator
 
             m_settings = SettingsSession.Static.Settings.GeneratorSettings;
 
-            MyLog.Default.WriteLine(FileUtils.SerializeToXml(m_settings));
-
             if (b == null || m_objects == null || m_objects.Count == 0)
             {
                 GenerateSystem();
@@ -75,8 +73,6 @@ namespace SEWorldGenPlugin.Generator
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             FilterDefinitions();
-
-            MySession.Static.Settings.ProceduralDensity = 0;
         }
 
         public override void SaveData()

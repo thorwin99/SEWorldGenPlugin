@@ -25,6 +25,7 @@ namespace SEWorldGenPlugin.Utilities
         public readonly string PLANET_GPSL_CHECK = "If a GPS signal should be generated for each planet on world generation.";
         public readonly string MOON_GPS_CHECK = "If a GPS signal should be generated for each moon on world generation.";
         public readonly string BELT_GPS_CHECK = "If a GPS signal should be generated for each asteroid belt.";
+        public readonly string ROID_GEN_COMBO = "Which asteroid generator should be used. If plugin, belts and rings will be generated, but nothing else. If vanilla, the default generation will be used, but no rings or belts are generated.";
     }
 
 }

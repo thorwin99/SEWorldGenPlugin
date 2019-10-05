@@ -19,7 +19,7 @@ using VRage.Utils;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 590)]
     public class ProceduralGenerator : MySessionComponentBase
     {
         public static ProceduralGenerator Static;
@@ -34,6 +34,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private ProceduralAsteroidsRingModule asteroidModule = null;
         private ProceduralPlanetModule planetModule = null;
 
+        private float proceduralDensity = 0;
         private bool Enabled = false;
 
         public override void LoadData()
@@ -46,8 +47,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             if (!SettingsSession.Static.Settings.Enable) return;
 
-            //Currently so that the original Procedural world generator still works
-            if (MySession.Static.Settings.ProceduralDensity != 0) return;
+            proceduralDensity = MySession.Static.Settings.ProceduralDensity + 1;
+
+            if(SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
+            {
+                MySession.Static.Settings.ProceduralDensity = 0;
+            }
+
+            //if (MySession.Static.Settings.ProceduralDensity != 0) return;
 
             asteroidModule = new ProceduralAsteroidsRingModule(m_seed);
         }
@@ -108,6 +115,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_trackedEntities?.Clear();
 
             Static = null;
+
+            MySession.Static.Settings.ProceduralDensity = proceduralDensity - 1;
         }
 
         public override void SaveData()
@@ -167,6 +176,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             Enabled = true;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
+
+            MySession.Static.Settings.ProceduralDensity = proceduralDensity - 1;
 
             planetModule.GeneratePlanets();
         }

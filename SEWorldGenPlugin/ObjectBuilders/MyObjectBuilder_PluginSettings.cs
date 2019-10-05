@@ -35,6 +35,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MaxObjectsInSystem = 25;
             MinOrbitDistance = 4000000;
             MaxOrbitDistance = 10000000;
+            AsteroidGenerator = AsteroidGenerator.PLUGIN;
             PlanetSettings = new PlanetSettings();
             BeltSettings = new BeltSettings();
         }
@@ -52,9 +53,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public int MaxOrbitDistance;
 
         [ProtoMember(5)]
-        public PlanetSettings PlanetSettings;
+        public AsteroidGenerator AsteroidGenerator;
 
         [ProtoMember(6)]
+        public PlanetSettings PlanetSettings;
+
+        [ProtoMember(7)]
         public BeltSettings BeltSettings;
 
         public void Verify()
@@ -166,5 +170,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
             Verifier.VerifyInt(MinBeltHeight, int.MaxValue, 40000, "BeltSettings.MaxBeltHeight", ref MaxBeltHeight);
             Verifier.VerifyFloat(0, 1, 0.4f, "BeltSettings.BeltProbability", ref BeltProbability);
         }
+    }
+
+    public enum AsteroidGenerator
+    {
+        PLUGIN,
+        VANILLA,
+        BOTH
     }
 }
