@@ -13,13 +13,14 @@ using System.Linq;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Library.Utils;
-using VRage.Profiler;
+using VRage.Network;
 using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
 {
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
+    [StaticEventOwner]
     public class SystemGenerator : MySessionComponentBase
     {
         private string[] greek_letters = new string[] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "My", "Ny", "Xi", "Omikron", "Pi", "Rho", "Sigma", "Tau", "Ypsilon", "Phi", "Chi", "Psi", "Omega"};
@@ -88,6 +89,21 @@ namespace SEWorldGenPlugin.Generator
             m_planetDefinitions?.Clear();
             m_settings = null;
             Static = null;
+        }
+
+        public void AddRingToPlanet(string name)
+        {
+            if (Static == null) return;
+
+        }
+
+        [Event]
+        [Reliable]
+        [Server]
+        static void SendAddRingToPlanet(string name)
+        {
+            MyPlanetRingItem ring = Static.GenerateRing(0, 0);
+
         }
 
         private void GenerateSystem()
