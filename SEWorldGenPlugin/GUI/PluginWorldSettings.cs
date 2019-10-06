@@ -134,6 +134,7 @@ namespace SEWorldGenPlugin.GUI
             if (m_isNewGame)
             {
                 PlSettings = new MyObjectBuilder_PluginSettings();
+                PlSettings.GeneratorSettings.PlanetSettings.BlacklistedPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets;
             }
             else
             {

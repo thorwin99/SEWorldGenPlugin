@@ -106,7 +106,7 @@ namespace SEWorldGenPlugin.Generator
                     int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
                     tmp_distance += distToPrev;
 
-                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability){
+                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability && m_planetDefinitions.Count != 0){
                         GeneratePlanet(i, tmp_distance, numberPlanets, ref totalPlanets);
                     }
                     else
@@ -229,6 +229,10 @@ namespace SEWorldGenPlugin.Generator
             foreach (var p in m_planetDefinitions)
             {
                 if (p.Id.SubtypeId.String.Contains("Tutorial") || p.Id.SubtypeId.String.Contains("TestMap") || p.Id.SubtypeId.String.Contains("ModExample"))
+                {
+                    toRemove.Add(p);
+                }
+                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets.Contains(p.Id.SubtypeId.String))
                 {
                     toRemove.Add(p);
                 }

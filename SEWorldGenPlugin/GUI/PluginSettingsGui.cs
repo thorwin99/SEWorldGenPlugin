@@ -77,12 +77,13 @@ namespace SEWorldGenPlugin.GUI
         {
             Vector2 vector = new Vector2(50f) / MyGuiConstants.GUI_OPTIMAL_SIZE;
             float x2 = 0.209375018f;
+            int mod = m_isNewGame ? 2 : 0;
             AddCaption("SEWorldGenPlugin Settings", null, new Vector2(0f, 0.003f));
 
-            MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0f));
+            MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (12 + mod)));
             if (!m_isNewGame)
             {
-                parent.Size = new Vector2(parent.Size.X, 0f);
+                parent.Size = new Vector2(parent.Size.X, 0.052f * (11 + mod));
             }
             parent.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
 
@@ -276,12 +277,10 @@ namespace SEWorldGenPlugin.GUI
             parent.Controls.Add(m_beltProbSlider);
             parent.Controls.Add(m_beltProbValue);
 
-            Vector2 start = (new Vector2(0f, 0.072f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
-            Vector2 offset = new Vector2(0f, 0.052f);
+            Vector2 start = (new Vector2(0f, 0.052f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
+            Vector2 offset = new Vector2(0f, 0.050f);//0.028f
             Vector2 offset2 = new Vector2(m_orbDistanceLabel.Size.X * 1.5f, 0f);
             Vector2 offset3 = new Vector2(0.4973214f, 0f);
-
-            int mod = m_isNewGame ? 2 : 0;
 
             m_useGlobalSettignsLabel.Position = start + offset * 0;
             m_useGlobalCheck.Position = m_useGlobalSettignsLabel.Position + offset2;
@@ -339,12 +338,10 @@ namespace SEWorldGenPlugin.GUI
             m_okButton.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_BOTTOM;
             m_okButton.Position = (m_size.Value / 2f - vector) * new Vector2(0f, 1f) + new Vector2(0f - 25f, 0f) / MyGuiConstants.GUI_OPTIMAL_SIZE;
 
-            parent.Size += new Vector2(0f, 0.052f * (12 + mod));
-
             MyGuiControlScrollablePanel scrollPane = new MyGuiControlScrollablePanel(parent);
             scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             scrollPane.ScrollbarVEnabled = true;
-            scrollPane.Size = new Vector2(base.Size.Value.X - vector.X * 2f - 0.035f, 0.5f);
+            scrollPane.Size = new Vector2(base.Size.Value.X - vector.X * 2f - 0.035f, 0.74f);
             scrollPane.Position = new Vector2(-0.27f, -0.394f);
             MyLog.Default.WriteLine(scrollPane.Size.X + "SIZE");
 

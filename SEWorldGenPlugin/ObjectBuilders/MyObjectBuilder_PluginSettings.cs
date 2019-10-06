@@ -1,5 +1,6 @@
 ﻿using ProtoBuf;
 using SEWorldGenPlugin.Utilities;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SEWorldGenPlugin.ObjectBuilders
@@ -84,6 +85,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             RingSettings = new PlanetRingSettings();
             ShowPlanetGPS = true;
             ShowMoonGPS = false;
+            BlacklistedPlanets = new HashSet<string>();
+            BlacklistedPlanets.Add("MoonTutorial");
         }
 
         [ProtoMember(1)]
@@ -103,6 +106,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(6)]
         public bool ShowMoonGPS;
+
+        [ProtoMember(7)]
+        public HashSet<string> BlacklistedPlanets;
 
         public void Verify()
         {
