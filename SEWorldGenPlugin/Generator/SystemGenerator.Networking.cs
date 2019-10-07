@@ -23,32 +23,6 @@ namespace SEWorldGenPlugin.Generator
         private bool m_handshakeDone;
         private ulong m_currentIndex;
 
-        public struct PlanetInfo
-        {
-            [Serialize(MyObjectFlags.Nullable)]
-            public SystemObjectType Type;
-            public string DisplayName;
-            public Vector3D CenterPos;
-            public Vector3D OffsetPos;
-            public float Size;
-            public bool Generated;
-            public string DefName;
-            public RingInfo Ring;
-        }
-
-        public struct RingInfo
-        {
-            [Serialize(MyObjectFlags.Nullable)]
-            public SystemObjectType Type;
-            public string DisplayName;
-            public long Radius;
-            public int Width;
-            public int Height;
-            public float AngleDegrees;
-            public int RoidSize;
-            public Vector3D Center;
-        }
-
         private void InitNet()
         {
             m_getCallacks = new Dictionary<ulong, Action<bool, MySystemItem>>();
@@ -87,7 +61,7 @@ namespace SEWorldGenPlugin.Generator
                     {
                         MyLog.Default.WriteLine("Got Pong");
                         m_handshakeDone = true;
-                        m_getCallacks.Add(m_currentIndex++, callback);
+                        m_getCallacks.Add(++m_currentIndex, callback);
                         MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetServer, Sync.MyId, name, m_currentIndex);
                     }
                 };
@@ -97,7 +71,7 @@ namespace SEWorldGenPlugin.Generator
             }
             else
             {
-                m_getCallacks.Add(m_currentIndex++, callback);
+                m_getCallacks.Add(++m_currentIndex, callback);
                 MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetServer, Sync.MyId, name, m_currentIndex);
             }
         }
@@ -142,18 +116,60 @@ namespace SEWorldGenPlugin.Generator
         {
             MyLog.Default.WriteLine("Sending answer to client to get object");
             bool success = Static.TryGetObject(name, out MySystemItem item);
-            MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetClient, success, /*Static.PlanetItemToInfo((MyPlanetItem)item),*/ callback, targetEndpoint: new EndpointId(client));
+
+            switch (item.Type)
+            {
+                case SystemObjectType.PLANET:
+                    MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetPlanetClient, success, (MyPlanetItem)item, callback, targetEndpoint: new EndpointId(client));
+                    break;
+                case SystemObjectType.BELT:
+                    MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetBeltClient, success, (MySystemBeltItem)item, callback, targetEndpoint: new EndpointId(client));
+                    break;
+                case SystemObjectType.RING:
+                    MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetRingClient, success, (MyPlanetRingItem)item, callback, targetEndpoint: new EndpointId(client));
+                    break;
+                case SystemObjectType.MOON:
+                    MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetMoonClient, success, (MyPlanetMoonItem)item, callback, targetEndpoint: new EndpointId(client));
+                    break;
+                default:
+                    break;
+            }
         }
 
         [Event]
         [Reliable]
         [Client]
-        static void SendGetClient(bool success,/* PlanetInfo info, */ulong callback)
+        static void SendGetPlanetClient(bool success, MyPlanetItem item, ulong callback)
         {
-            //MyPlanetItem item = Static.PlanetInfoToItem(info);
-            MyLog.Default.WriteLine("Got answer from server, object got: " + success + "  ");
-            //Static.m_getCallacks[callback](success, (MySystemItem)item);
-            //Static.m_getCallacks.Remove(callback);
+            Static.m_getCallacks[callback](success, item);
+            Static.m_getCallacks.Remove(callback);
+        }
+
+        [Event]
+        [Reliable]
+        [Client]
+        static void SendGetMoonClient(bool success, MyPlanetMoonItem item, ulong callback)
+        {
+            Static.m_getCallacks[callback](success, item);
+            Static.m_getCallacks.Remove(callback);
+        }
+
+        [Event]
+        [Reliable]
+        [Client]
+        static void SendGetBeltClient(bool success, MySystemBeltItem item, ulong callback)
+        {
+            Static.m_getCallacks[callback](success, item);
+            Static.m_getCallacks.Remove(callback);
+        }
+
+        [Event]
+        [Reliable]
+        [Client]
+        static void SendGetRingClient(bool success, MyPlanetRingItem item, ulong callback)
+        {
+            Static.m_getCallacks[callback](success, item);
+            Static.m_getCallacks.Remove(callback);
         }
 
         [Event]
@@ -203,69 +219,6 @@ namespace SEWorldGenPlugin.Generator
                 m_handshakeDone = true;
                 MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddRingToPlanet, name);
             }
-        }
-
-        private PlanetInfo PlanetItemToInfo(MyPlanetItem item)
-        {
-            PlanetInfo info = new PlanetInfo
-            {
-                CenterPos = item == null ? Vector3D.Zero : new Vector3D(item.CenterPosition.X, item.CenterPosition.Y, item.CenterPosition.Z),
-                DefName = item == null ? "" : item.DefName,
-                DisplayName = item == null ? "" : item.DisplayName,
-                Generated = item == null ? false : item.Generated,
-                OffsetPos = item == null ? Vector3D.Zero : new Vector3D(item.OffsetPosition.X, item.OffsetPosition.Y, item.OffsetPosition.Z),
-                Ring = RingItemToInfo(item == null? null : item.PlanetRing),
-                Size = item == null ? -1 : item.Size,
-                Type = item == null ? SystemObjectType.PLANET : item.Type
-            };
-            return info;
-        }
-
-        private RingInfo RingItemToInfo(MyPlanetRingItem item)
-        {
-            RingInfo info = new RingInfo
-            {
-                Center = (item == null ? Vector3D.Zero : new Vector3D(item.Center.X, item.Center.Y, item.Center.Z)),
-                AngleDegrees = item == null ? 0 : item.AngleDegrees,
-                DisplayName = item == null ? "" : item.DisplayName,
-                Height = item == null ? -1 : item.Height,
-                Radius = item == null ? -1 : item.Radius,
-                RoidSize = item == null ? -1 : item.RoidSize,
-                Type = item == null ? SystemObjectType.RING : item.Type,
-                Width = item == null ? -1 : item.Width
-            };
-            return info;
-        }
-
-        private MyPlanetItem PlanetInfoToItem(PlanetInfo info)
-        {
-            if (info.Size == -1) return null;
-            MyPlanetItem item = new MyPlanetItem();
-            item.Type = info.Type;
-            item.DisplayName = info.DisplayName;
-            item.DefName = info.DefName;
-            item.Generated = info.Generated;
-            item.CenterPosition = info.CenterPos;
-            item.OffsetPosition = info.OffsetPos;
-            item.PlanetMoons = new MyPlanetMoonItem[0];
-            item.Size = info.Size;
-            item.PlanetRing = RingInfoToItem(info.Ring);
-            return item;
-        }
-
-        private MyPlanetRingItem RingInfoToItem(RingInfo info)
-        {
-            if (info.Height == -1) return null;
-            MyPlanetRingItem item = new MyPlanetRingItem();
-            item.Type = info.Type;
-            item.DisplayName = info.DisplayName;
-            item.AngleDegrees = info.AngleDegrees;
-            item.Center = info.Center;
-            item.Height = info.Height;
-            item.Width = info.Width;
-            item.Radius = info.Radius;
-            item.RoidSize = info.RoidSize;
-            return item;
         }
     }
 }

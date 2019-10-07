@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using VRage;
 using VRage.ObjectBuilders;
+using VRage.Serialization;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
@@ -59,11 +60,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public bool Generated;
 
         [ProtoMember(8)]
+        [Serialize(MyObjectFlags.Nullable)]
         public MyPlanetRingItem PlanetRing;
 
         [ProtoMember(9)]
         [DefaultValue(null)]
         [XmlArrayItem("MyPlanetMoon")]
+        [Serialize(MyObjectFlags.Nullable)]
         public MyPlanetMoonItem[] PlanetMoons;
     }
 
