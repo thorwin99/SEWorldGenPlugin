@@ -53,7 +53,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 MyPlanetGeneratorDefinition definition = GetDefinition(planet.DefName);
                 if (definition == null) continue;
                 long id = MyRandom.Instance.NextLong();
-                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(definition.Id.SubtypeId + "_" + planet.Size + id, planet.DisplayName, planet.DefName, planet.OffsetPosition, m_seed, planet.Size, true, id, false, false);
+                string name = (planet.DisplayName + " - " + definition.Id.SubtypeId).Replace(" ", "_");
+                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, planet.OffsetPosition, m_seed, planet.Size, true, id, false, false);
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
                 generatedPlanet.DisplayNameText = planet.DisplayName;
                 generatedPlanet.AsteroidName = planet.DisplayName;
@@ -69,7 +70,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     if (moonDef == null) continue;
                     var position = new Vector3D(0, 0, 0);
                     long mId = MyRandom.Instance.NextLong();
-                    string storageNameMoon = moon.DefName + "_" + moon.Size + mId;
+                    string storageNameMoon = ("Moon " + moon.DisplayName + " - " + moonDef.Id.SubtypeId).Replace(" ", "_");
                     var threshold = 0;
                     do
                     {
@@ -97,7 +98,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return MyDefinitionManager.Static.GetDefinition<MyPlanetGeneratorDefinition>(MyStringHash.GetOrCompute(name));
         }
 
-        private bool ObstructedPlace(Vector3D position, List<Vector3D> other, int minDistance, MyPlanetRingItem ring)
+        private bool ObstructedPlace(Vector3D position, List<Vector3D> other, float minDistance, MyPlanetRingItem ring)
         {
 
             foreach (var obj in other)
@@ -115,81 +116,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
 
             return false;
-        }
-
-        private MyPlanet CreatePlanet(Vector3D? position, float? size, ref MyPlanetGeneratorDefinition generatorDef)
-        {
-            if (MyFakes.ENABLE_PLANETS == false)
-            {
-                MyLog.Default.Error("Planets Not Enabled, Enable them");
-                return null;
-            }
-
-            var random = MyRandom.Instance;
-            using (random.PushSeed(random.CreateRandomSeed()))
-            {
-                MyPlanetStorageProvider provider = new MyPlanetStorageProvider();
-                provider.Init(m_seed, generatorDef, size.Value / 2f);
-
-                IMyStorage storage = new MyOctreeStorage(provider, provider.StorageSize);
-                float minHillSize = provider.Radius * generatorDef.HillParams.Min;
-                float maxHillSize = provider.Radius * generatorDef.HillParams.Max;
-
-                float averagePlanetRadius = provider.Radius;
-
-                float outerRadius = averagePlanetRadius + maxHillSize;
-                float innerRadius = averagePlanetRadius + minHillSize;
-
-                float atmosphereRadius = generatorDef.AtmosphereSettings.HasValue && generatorDef.AtmosphereSettings.Value.Scale > 1f ? 1 + generatorDef.AtmosphereSettings.Value.Scale : 1.75f;
-                atmosphereRadius *= provider.Radius;
-
-                float redAtmosphereShift = random.NextFloat(generatorDef.HostileAtmosphereColorShift.R.Min, generatorDef.HostileAtmosphereColorShift.R.Max);
-                float greenAtmosphereShift = random.NextFloat(generatorDef.HostileAtmosphereColorShift.G.Min, generatorDef.HostileAtmosphereColorShift.G.Max);
-                float blueAtmosphereShift = random.NextFloat(generatorDef.HostileAtmosphereColorShift.B.Min, generatorDef.HostileAtmosphereColorShift.B.Max);
-
-                Vector3 atmosphereWavelengths = new Vector3(0.650f + redAtmosphereShift, 0.570f + greenAtmosphereShift, 0.475f + blueAtmosphereShift);
-
-                atmosphereWavelengths.X = MathHelper.Clamp(atmosphereWavelengths.X, 0.1f, 1.0f);
-                atmosphereWavelengths.Y = MathHelper.Clamp(atmosphereWavelengths.Y, 0.1f, 1.0f);
-                atmosphereWavelengths.Z = MathHelper.Clamp(atmosphereWavelengths.Z, 0.1f, 1.0f);
-
-                var planet = new MyPlanet();
-                planet.EntityId = random.NextLong();
-
-                MyPlanetInitArguments planetInitArguments = new MyPlanetInitArguments();
-                planetInitArguments.StorageName = generatorDef.Id.SubtypeId + "_" + size + "_" + planet.EntityId;
-                planetInitArguments.Storage = storage;
-                planetInitArguments.PositionMinCorner = position.Value;
-                planetInitArguments.Radius = provider.Radius;
-                planetInitArguments.AtmosphereRadius = atmosphereRadius;
-                planetInitArguments.MaxRadius = outerRadius;
-                planetInitArguments.MinRadius = innerRadius;
-                planetInitArguments.HasAtmosphere = generatorDef.HasAtmosphere;
-                planetInitArguments.AtmosphereWavelengths = atmosphereWavelengths;
-                planetInitArguments.GravityFalloff = generatorDef.GravityFalloffPower;
-                planetInitArguments.MarkAreaEmpty = true;
-                planetInitArguments.AtmosphereSettings = generatorDef.AtmosphereSettings.HasValue ? generatorDef.AtmosphereSettings.Value : MyAtmosphereSettings.Defaults();
-                planetInitArguments.SurfaceGravity = generatorDef.SurfaceGravity;
-                planetInitArguments.AddGps = false;
-                planetInitArguments.SpherizeWithDistance = true;
-                planetInitArguments.Generator = generatorDef;
-                planetInitArguments.UserCreated = false;
-                planetInitArguments.InitializeComponents = true;
-
-                planet.Init(planetInitArguments);
-
-                Vector3 pos = planet.PositionComp.GetPosition();
-
-                MyEntities.Add(planet);
-                MyEntities.RaiseEntityCreated(planet);
-                return planet;
-            }
-        }
-
-        private long GetPlanetEntityId(string storageName)
-        {
-            long hash = storageName.GetHashCode64();
-            return hash & 0x00FFFFFFFFFFFFFF | ((long)MyEntityIdentifier.ID_OBJECT_TYPE.ASTEROID << 56);
         }
     }
 }

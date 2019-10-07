@@ -47,7 +47,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public string DefName;
 
         [ProtoMember(4)]
-        public int Size;
+        public float Size;
 
         [ProtoMember(5)]
         public SerializableVector3D CenterPosition;
@@ -65,18 +65,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [DefaultValue(null)]
         [XmlArrayItem("MyPlanetMoon")]
         public MyPlanetMoonItem[] PlanetMoons;
-
-        public override string ToString()
-        {
-            return DefName + "\n Size = " + Size + "\n Generated = " + Generated;
-        }
     }
 
     [ProtoContract]
     public class MyPlanetMoonItem : MySystemItem
     {
         [ProtoMember(3)]
-        public int Size;
+        public float Size;
 
         [ProtoMember(4)]
         public float Distance;

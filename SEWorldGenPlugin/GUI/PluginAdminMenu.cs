@@ -1,4 +1,5 @@
-﻿using Sandbox.Engine.Multiplayer;
+﻿using Sandbox.Definitions;
+using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
@@ -6,6 +7,8 @@ using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using Sandbox.ModAPI;
+using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
@@ -40,6 +43,11 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlSlider m_ringAngleSlider;
         private MyGuiControlSlider m_ringRoidSizeSlider;
         private MyGuiControlSlider m_ringWidthSlider;
+
+        private MyGuiControlButton m_addRingButton;
+
+        private MyPlanetItem m_selectedPlanet;
+        private bool m_newPlanet;
 
         public PluginAdminMenu() : base()
         {
@@ -78,6 +86,7 @@ namespace SEWorldGenPlugin.GUI
                 else
                 {
                     m_attachedEntity = 0L;
+                    m_selectedPlanet = null;
                     modeCombo.SelectItemByKey(newCombo.GetSelectedKey());
                 }
             };
@@ -91,8 +100,6 @@ namespace SEWorldGenPlugin.GUI
         private void BuildPluginControls()
         {
             Vector2 controlPadding = new Vector2(0.02f, 0.02f);
-            float scale = 0.8f;
-            float separatorSize = 0.01f;
             float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
             float num2 = (SCREEN_SIZE.Y - 1f) / 2f;
 
@@ -152,7 +159,8 @@ namespace SEWorldGenPlugin.GUI
 
             m_ringDistanceSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 5000f, 1000000f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_DISTANCE);//Make dynamic
             m_ringDistanceSlider.Size = new Vector2(0.285f, 1f);
-            m_ringDistanceSlider.Value = 100000;
+            m_ringDistanceSlider.DefaultValue = 100000;
+            m_ringDistanceSlider.Value = m_ringDistanceSlider.DefaultValue.Value;
             m_ringDistanceSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringDistanceSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringDistanceSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
@@ -184,7 +192,8 @@ namespace SEWorldGenPlugin.GUI
             m_currentPosition.Y += 0.035f;
             m_ringWidthSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH);
             m_ringWidthSlider.Size = new Vector2(0.285f, 1f);
-            m_ringWidthSlider.Value = (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
+            m_ringWidthSlider.DefaultValue = (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
+            m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
             m_ringWidthSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringWidthSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringWidthSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
@@ -216,7 +225,8 @@ namespace SEWorldGenPlugin.GUI
             m_currentPosition.Y += 0.035f;
             m_ringAngleSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleSlider.Size = new Vector2(0.285f, 1f);
-            m_ringAngleSlider.Value = 0;
+            m_ringAngleSlider.DefaultValue = 0;
+            m_ringAngleSlider.Value = m_ringAngleSlider.DefaultValue.Value;
             m_ringAngleSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringAngleSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
@@ -248,7 +258,8 @@ namespace SEWorldGenPlugin.GUI
             m_currentPosition.Y += 0.035f;
             m_ringRoidSizeSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
             m_ringRoidSizeSlider.Size = new Vector2(0.285f, 1f);
-            m_ringRoidSizeSlider.Value = 500;
+            m_ringRoidSizeSlider.DefaultValue = 500;
+            m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
             m_ringRoidSizeSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringRoidSizeSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringRoidSizeSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
@@ -261,7 +272,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_currentPosition.Y += 0.045f + 0.035f;
 
-            MyGuiControlButton addRingButton = CreateDebugButton(0.284f, "Add ring to planet", OnAddRingToPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
+            m_addRingButton = CreateDebugButton(0.284f, "Add ring to planet", OnAddRingToPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
 
             Controls.Add(m_planetListBox);
 
@@ -270,7 +281,10 @@ namespace SEWorldGenPlugin.GUI
 
         private void OnAddRingToPlanetButton(MyGuiControlButton button)
         {
-
+            if (m_planetListBox.SelectedItems.Count > 0)
+            {
+                MyEntityList.MyEntityListInfoItem myEntityListInfoItem = (MyEntityList.MyEntityListInfoItem)m_planetListBox.SelectedItems[m_planetListBox.SelectedItems.Count - 1].UserData;
+            }
         }
 
         private void PlanetListItemClicked(MyGuiControlListbox box)
@@ -283,6 +297,68 @@ namespace SEWorldGenPlugin.GUI
                 {
                     MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator, null, myEntityListInfoItem.Position + Vector3.One * 50f);
                 }
+
+                MyPlanet planetEntity = (MyPlanet)MyEntities.GetEntityById(myEntityListInfoItem.EntityId);
+
+                SystemGenerator.Static.GetObject(myEntityListInfoItem.DisplayName.Replace("_", " ").Split('-')[0].Trim(), delegate (bool success, MySystemItem obj)
+                {
+                    MyLog.Default.WriteLine("SUCCESS GOT OBJECT FROM SERVER");
+                    if (success)
+                    {
+                        m_selectedPlanet = (MyPlanetItem)obj;
+                        m_newPlanet = false;
+                    }
+                    else
+                    {
+                        m_selectedPlanet = new MyPlanetItem()
+                        {
+                            DisplayName = myEntityListInfoItem.DisplayName.Replace("_", " "),
+                            CenterPosition = planetEntity.PositionComp.GetPosition(),
+                            DefName = ((MyObjectBuilder_Planet)planetEntity.GetObjectBuilder()).Name,
+                            Generated = true,
+                            OffsetPosition = planetEntity.PositionLeftBottomCorner,
+                            PlanetMoons = new MyPlanetMoonItem[0],
+                            PlanetRing = null,
+                            Size = planetEntity.AverageRadius * 2,
+                            Type = SystemObjectType.PLANET
+                        };
+                        m_newPlanet = true;
+                    }
+
+                    m_ringDistanceSlider.MinValue = planetEntity.AverageRadius * 2 * 0.75f - planetEntity.AverageRadius;
+                    m_ringDistanceSlider.MinValue -= m_ringDistanceSlider.MinValue % 1000;
+                    m_ringDistanceSlider.MaxValue = planetEntity.AverageRadius * 2 * 2 - planetEntity.AverageRadius;
+                    m_ringDistanceSlider.MaxValue -= m_ringDistanceSlider.MaxValue % 1000;
+                    m_ringDistanceSlider.Value = planetEntity.AverageRadius * 2 * 1.25f - planetEntity.AverageRadius;
+                    m_ringDistanceSlider.Value -= m_ringDistanceSlider.Value % 1000;
+
+                    bool hasRing = m_selectedPlanet.PlanetRing != null;
+
+                    m_ringAngleSlider.Enabled = !hasRing;
+                    m_ringDistanceSlider.Enabled = !hasRing;
+                    m_ringWidthSlider.Enabled = !hasRing;
+                    m_ringRoidSizeSlider.Enabled = !hasRing;
+                    m_addRingButton.Enabled = !hasRing;
+
+                    if (hasRing)
+                    {
+                        m_ringDistanceSlider.Value = m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
+                        m_ringWidthSlider.Value = m_selectedPlanet.PlanetRing.Width;
+                        m_ringAngleSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
+                        m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;
+                    }
+                    else
+                    {
+                        m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
+                        m_ringAngleSlider.Value = m_ringAngleSlider.DefaultValue.Value;
+                        m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
+                    }
+
+                    m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
+                    m_ringAngleValue.Text = String.Format("{0:0.00}", m_ringAngleSlider.Value);
+                    m_ringWidthValue.Text = m_ringWidthSlider.Value.ToString();
+                    m_ringDistanceValue.Text = m_ringDistanceSlider.Value.ToString();
+                });
             }
         }
 
@@ -291,7 +367,11 @@ namespace SEWorldGenPlugin.GUI
             List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
             foreach(var item in planets)
             {
-                m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(item.DisplayName), null, null, item));
+                string name = item.DisplayName.Replace("_", " ");
+
+                if (name.StartsWith("Moon ")) continue;
+
+                m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(item.DisplayName.Replace("_", " ")), null, null, item));
             }
         }
 

@@ -1,7 +1,6 @@
 ﻿using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
-using VRage.Utils;
 
 namespace SEWorldGenPlugin.Utilities
 {
@@ -70,7 +69,6 @@ namespace SEWorldGenPlugin.Utilities
 
         public static byte[] MsgToNetData(ulong senderId, string msg)
         {
-            MyLog.Default.WriteLine(senderId + "SENDER ID");
             char[] chars = msg.ToCharArray();
             byte[] bytes = new byte[8 + chars.Length * 2];
             for(int i = 0; i < bytes.Length; i++)

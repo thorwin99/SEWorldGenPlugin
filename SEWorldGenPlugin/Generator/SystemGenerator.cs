@@ -21,12 +21,11 @@ namespace SEWorldGenPlugin.Generator
 {
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
     [StaticEventOwner]
-    public class SystemGenerator : MySessionComponentBase
+    public partial class SystemGenerator : MySessionComponentBase
     {
         private string[] greek_letters = new string[] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "My", "Ny", "Xi", "Omikron", "Pi", "Rho", "Sigma", "Tau", "Ypsilon", "Phi", "Chi", "Psi", "Omega"};
 
         private const string STORAGE_FILE = "SystemData.xml";
-        private const ushort HANDLER_ID = 2839;
 
         public HashSet<MySystemItem> m_objects
         {
@@ -47,9 +46,7 @@ namespace SEWorldGenPlugin.Generator
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            MyMultiplayer.ReplicationLayer.RegisterFromAssembly(typeof(SystemGenerator).Assembly);
-
-            NetUtil.RegisterMessageHandler(HANDLER_ID, NetMessageHandler);
+            InitNet();
 
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
@@ -76,6 +73,8 @@ namespace SEWorldGenPlugin.Generator
         {
             Static = this;
 
+            LoadNet();
+
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             FilterDefinitions();
         }
@@ -89,43 +88,25 @@ namespace SEWorldGenPlugin.Generator
 
         protected override void UnloadData()
         {
-            NetUtil.UnregisterMessageHandlers(HANDLER_ID);
+            UnloadNet();
             m_objects?.Clear();
             m_planetDefinitions?.Clear();
             m_settings = null;
             Static = null;
         }
 
-        public void AddRingToPlanet(string name)
+        private bool TryGetObject(string name, out MySystemItem obj)
         {
-            if (Static == null) return;
-
-            NetUtil.SendPacketToServer(HANDLER_ID, "GENRINGSERV" + name);
-            MyLog.Default.WriteLine("Send data to server");
-        }
-
-        [Event]
-        [Reliable]
-        [Server]
-        static void SendAddRingToPlanet(string name)
-        {
-            if (!SettingsSession.Static.Settings.Enable) return;
-            MyPlanetRingItem ring = Static.GenerateRing(0, 0);
-            MyLog.Default.WriteLine("CREATE RING FOR PLANET " + name);
-        }
-
-        private void NetMessageHandler(ulong sender, string message)
-        {
-            MyLog.Default.WriteLine("Got message from " + sender + " with message " + message);
-            if (message.Contains("GENRINGSERV"))
+            foreach(var o in m_objects)
             {
-                NetUtil.SendPacket(HANDLER_ID, "GENRINGCLIENT" + message.Substring(("GENRINGSERV").Length), sender);
+                if (o.DisplayName.Equals(name))
+                {
+                    obj = o;
+                    return true;
+                }
             }
-            else if (message.Contains("GENRINGCLIENT"))
-            {
-                string name = message.Substring("GENRINGCLIENT".Length);
-                MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddRingToPlanet, name);
-            }
+            obj = null;
+            return false;
         }
 
         private void GenerateSystem()
@@ -237,7 +218,7 @@ namespace SEWorldGenPlugin.Generator
         private MyPlanetGeneratorDefinition GetPlanetDefinition(float maximumSize)
         {
             int tries = 0;
-            int size;
+            float size;
             MyPlanetGeneratorDefinition def = null;
 
             do
@@ -251,9 +232,9 @@ namespace SEWorldGenPlugin.Generator
             return def;
         }
 
-        private int SizeByGravity(float gravity)
+        private float SizeByGravity(float gravity)
         {
-           return (int)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * m_settings.PlanetSettings.SizeMultiplier * m_settings.PlanetSettings.SizeMultiplier), m_settings.PlanetSettings.PlanetSizeCap);
+           return (float)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * m_settings.PlanetSettings.SizeMultiplier * m_settings.PlanetSettings.SizeMultiplier), m_settings.PlanetSettings.PlanetSizeCap);
         }
 
         private int GetMaxMoonCount(float gravity)
