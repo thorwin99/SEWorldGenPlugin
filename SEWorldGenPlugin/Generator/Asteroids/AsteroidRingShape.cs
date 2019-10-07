@@ -48,6 +48,12 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return ContainmentType.Disjoint;
         }
 
+        public Vector3D LocationInRing(int angle)
+        {
+            double rad = radius + width / 2f;
+            return center + (new Vector3D(rotation.X * rad * Math.Cos(angle), rotation.Y * rad * Math.Cos(angle), Math.Sin(angle) * rad));
+        }
+
         private double GetHeightAtRad(double rad)
         {
             if (rad < radius || rad > radius + width) throw new ArgumentOutOfRangeException("The radius " + rad + " has to be less than " + (radius + width) + " and larger than " + radius);

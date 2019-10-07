@@ -1,4 +1,5 @@
 ﻿using Sandbox.ModAPI;
+using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
 
@@ -7,10 +8,14 @@ namespace SEWorldGenPlugin.Utilities
     public class NetUtil
     {
         private static Dictionary<ushort, Action> unregActions;
+        private const ushort PING_HANDLER = 2575;
+        private static int pingId;
 
         static NetUtil()
         {
             unregActions = new Dictionary<ushort, Action>();
+            RegisterMessageHandler(PING_HANDLER, ServerPingHandler);
+            pingId = 0;
         }
 
         public static void RegisterMessageHandler(ushort id, Action<ulong, string> handler)
@@ -65,6 +70,42 @@ namespace SEWorldGenPlugin.Utilities
             ulong id = MyAPIGateway.Multiplayer.MyId;
             byte[] data = MsgToNetData(id, message);
             MyAPIGateway.Multiplayer.SendMessageTo(handlerId, data, receiver, true);
+        }
+
+        public static void PingServer(Action successCallback)
+        {
+            int thisId = pingId++;
+            RegisterMessageHandler(PING_HANDLER, delegate(ulong id, string msg)
+            {
+                if (msg.Equals(GetPongMsg(thisId)))
+                {
+                    successCallback();
+                }
+            });
+            SendPacketToServer(PING_HANDLER, GetPingMsg(thisId));
+        }
+
+        private static void ServerPingHandler(ulong senderId, string msg)
+        {
+            if (!SettingsSession.Static.Settings.Enable) return;
+            if (!int.TryParse(msg.Replace(GetPingRawMsg(), " ").Trim(), out int id))return;
+            if (msg.Contains(GetPingRawMsg())){
+                SendPacket(PING_HANDLER, GetPongMsg(id), senderId);
+            }
+        }
+
+        private static string GetPingMsg(int id)
+        {
+            return "PING" + id;
+        }
+        private static string GetPongMsg(int id)
+        {
+            return "PONG" + id;
+        }
+
+        private static string GetPingRawMsg()
+        {
+            return "PING";
         }
 
         public static byte[] MsgToNetData(ulong senderId, string msg)

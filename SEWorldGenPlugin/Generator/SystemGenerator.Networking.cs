@@ -125,7 +125,6 @@ namespace SEWorldGenPlugin.Generator
             if(item == null)
             {
                 item = new MyPlanetItem();
-                item.Type = SystemObjectType.PLANET;
             }
             switch (item.Type)
             {

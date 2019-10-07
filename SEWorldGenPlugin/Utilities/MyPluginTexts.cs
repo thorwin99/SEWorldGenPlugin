@@ -32,6 +32,7 @@ namespace SEWorldGenPlugin.Utilities
         public readonly string ADMIN_RING_ANGLE = "The angle of the ring in degrees";
         public readonly string ADMIN_RING_ROID_SIZE = "The size of the asteroids in the ring in meters";
         public readonly string ADMIN_ADD_RING_BUTTON = "Adds the ring to the planet";
+        public readonly string ADMIN_TP_RING_BUTTON = "Teleports your player to the ring of the planet";
     }
 
 }

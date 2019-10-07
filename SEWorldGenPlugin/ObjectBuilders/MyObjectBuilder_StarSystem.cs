@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using VRage;
 using VRage.ObjectBuilders;
 using VRage.Serialization;
+using VRageMath;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
@@ -68,6 +69,18 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [XmlArrayItem("MyPlanetMoon")]
         [Serialize(MyObjectFlags.Nullable)]
         public MyPlanetMoonItem[] PlanetMoons;
+
+        public MyPlanetItem()
+        {
+            Type = SystemObjectType.PLANET;
+            DisplayName = "Planet";
+            DefName = "";
+            Size = 0;
+            CenterPosition = Vector3D.Zero;
+            OffsetPosition = Vector3D.Zero;
+            Generated = false;
+            PlanetMoons = new MyPlanetMoonItem[0];
+        }
     }
 
     [ProtoContract]
@@ -119,5 +132,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(6)]
         public int RoidSize;
+
+        public MySystemBeltItem()
+        {
+            Type = SystemObjectType.BELT;
+            DisplayName = "";
+            Radius = 0;
+            Width = 0;
+            Height = 0;
+            RoidSize = 0;
+        }
     }
 }

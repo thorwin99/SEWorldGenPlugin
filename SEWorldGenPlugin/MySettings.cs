@@ -1,4 +1,5 @@
-﻿using SEWorldGenPlugin.ObjectBuilders;
+﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
 using VRage.Utils;
@@ -58,6 +59,8 @@ namespace SEWorldGenPlugin
             else
             {
                 Settings = new MyObjectBuilder_PluginSettings();
+                if (Sync.IsDedicated)
+                    Settings.Enable = true;
             }
             Settings.Verify();
         }

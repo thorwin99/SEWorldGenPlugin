@@ -1,10 +1,12 @@
-﻿using Sandbox.Engine.Utils;
+﻿using Sandbox.Engine.Multiplayer;
+using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
@@ -22,6 +24,8 @@ namespace SEWorldGenPlugin.GUI
     [PreloadRequired]
     public class PluginAdminMenu : MyGuiScreenAdminMenu
     {
+        private const ushort ADMIN_PING_MESSAGEHANDLER = 2573;
+
         private static readonly Vector2 SCREEN_SIZE = new Vector2(0.4f, 1.2f);
         private static readonly float HIDDEN_PART_RIGHT = 0.04f;
 
@@ -40,13 +44,16 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlSlider m_ringWidthSlider;
 
         private MyGuiControlButton m_addRingButton;
+        private MyGuiControlButton m_teleportToRingButton;
 
         private MyPlanetItem m_selectedPlanet;
         private bool m_newPlanet;
+        private bool m_pluginInstalled;
 
         public PluginAdminMenu() : base()
         {
             m_currentKey = 0L;
+            m_pluginInstalled = false;
         }
 
         public override void RecreateControls(bool constructor)
@@ -88,8 +95,20 @@ namespace SEWorldGenPlugin.GUI
             if(newCombo.GetSelectedKey() == 8)
             {
                 ClearControls();
-                BuildPluginControls();
+                CheckBuildPluginControls();
             }
+        }
+
+        private void CheckBuildPluginControls()
+        {
+            if(!m_pluginInstalled)
+                NetUtil.PingServer(delegate
+                {
+                    m_pluginInstalled = true;
+                    RecreateControls(false);
+                });
+
+            BuildPluginControls();
         }
 
         private void BuildPluginControls()
@@ -101,6 +120,24 @@ namespace SEWorldGenPlugin.GUI
             m_currentPosition = -m_size.Value / 2f + controlPadding;
             m_currentPosition.Y += num2 + MyGuiConstants.SCREEN_CAPTION_DELTA_Y + controlPadding.Y - 0.012f + 0.095f;
             m_currentPosition.X += 0.018f;
+
+            if (!m_pluginInstalled)
+            {
+                MyGuiControlLabel errorLabel = new MyGuiControlLabel
+                {
+                    Position = new Vector2(0f, 0f),
+                    OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER,
+                    Text = "Plugin not installed or enabled on server",
+                    ColorMask = Color.Red.ToVector4(),
+                    TextScale = MyGuiConstants.DEFAULT_TEXT_SCALE
+                    
+                };
+
+
+                AddControl(errorLabel);
+
+                return;
+            }
 
             MyGuiControlLabel listBoxLabel = new MyGuiControlLabel
             {
@@ -122,13 +159,13 @@ namespace SEWorldGenPlugin.GUI
             m_planetListBox = new MyGuiControlListbox(Vector2.Zero, VRage.Game.MyGuiControlListboxStyleEnum.Blueprints);
             m_planetListBox.Size = new Vector2(num, 0f);
             m_planetListBox.Enabled = true;
-            m_planetListBox.VisibleRowsCount = 10;
+            m_planetListBox.VisibleRowsCount = 8;
             m_planetListBox.Position = m_planetListBox.Size / 2f + m_currentPosition;
             m_planetListBox.ItemClicked += PlanetListItemClicked;
             m_planetListBox.MultiSelect = false;
 
             MyGuiControlSeparatorList separator = new MyGuiControlSeparatorList();
-            separator.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.07f), m_size.Value.X * 0.73f);
+            separator.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.00f), m_size.Value.X * 0.73f);
             Controls.Add(separator);
 
             m_currentPosition = m_planetListBox.GetPositionAbsoluteBottomLeft();
@@ -150,7 +187,7 @@ namespace SEWorldGenPlugin.GUI
             };
             Controls.Add(m_ringDistanceValue);
 
-            m_currentPosition.Y += 0.035f;
+            m_currentPosition.Y += 0.025f;
 
             m_ringDistanceSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 5000f, 1000000f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_DISTANCE);//Make dynamic
             m_ringDistanceSlider.Size = new Vector2(0.285f, 1f);
@@ -166,7 +203,7 @@ namespace SEWorldGenPlugin.GUI
 
             Controls.Add(m_ringDistanceSlider);
 
-            m_currentPosition.Y += 0.045f;
+            m_currentPosition.Y += 0.055f;
 
             MyGuiControlLabel ringWidthLabel = new MyGuiControlLabel
             {
@@ -184,7 +221,7 @@ namespace SEWorldGenPlugin.GUI
             };
             Controls.Add(m_ringWidthValue);
 
-            m_currentPosition.Y += 0.035f;
+            m_currentPosition.Y += 0.025f;
             m_ringWidthSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH);
             m_ringWidthSlider.Size = new Vector2(0.285f, 1f);
             m_ringWidthSlider.DefaultValue = (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
@@ -199,7 +236,7 @@ namespace SEWorldGenPlugin.GUI
 
             Controls.Add(m_ringWidthSlider);
 
-            m_currentPosition.Y += 0.045f;
+            m_currentPosition.Y += 0.055f;
 
             MyGuiControlLabel ringAngleLabel = new MyGuiControlLabel
             {
@@ -217,7 +254,7 @@ namespace SEWorldGenPlugin.GUI
             };
             Controls.Add(m_ringAngleValue);
 
-            m_currentPosition.Y += 0.035f;
+            m_currentPosition.Y += 0.025f;
             m_ringAngleSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleSlider.DefaultValue = 0;
@@ -232,7 +269,7 @@ namespace SEWorldGenPlugin.GUI
 
             Controls.Add(m_ringAngleSlider);
 
-            m_currentPosition.Y += 0.045f;
+            m_currentPosition.Y += 0.055f;
 
             MyGuiControlLabel ringRoidSizeLabel = new MyGuiControlLabel
             {
@@ -250,7 +287,7 @@ namespace SEWorldGenPlugin.GUI
             };
             Controls.Add(m_ringRoidSizeValue);
 
-            m_currentPosition.Y += 0.035f;
+            m_currentPosition.Y += 0.025f;
             m_ringRoidSizeSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
             m_ringRoidSizeSlider.Size = new Vector2(0.285f, 1f);
             m_ringRoidSizeSlider.DefaultValue = 500;
@@ -265,13 +302,37 @@ namespace SEWorldGenPlugin.GUI
 
             Controls.Add(m_ringRoidSizeSlider);
 
-            m_currentPosition.Y += 0.045f + 0.035f;
+            m_currentPosition.Y += 0.055f + 0.035f;
 
             m_addRingButton = CreateDebugButton(0.284f, "Add ring to planet", OnAddRingToPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
+
+            m_currentPosition.Y += 0.003f;
+
+            m_teleportToRingButton = CreateDebugButton(0.284f, "Teleport to ring", OnTeleportToRingButton, true, MyPluginTexts.TOOLTIPS.ADMIN_TP_RING_BUTTON);
+            m_teleportToRingButton.Enabled = false;
 
             Controls.Add(m_planetListBox);
 
             FillList();
+        }
+
+        private void OnTeleportToRingButton(MyGuiControlButton button)
+        {
+            if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
+            {
+                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(m_selectedPlanet.PlanetRing);
+                MyLog.Default.WriteLine("Teleporting to " + shape.LocationInRing(0));
+                MyMultiplayer.TeleportControlledEntity(shape.LocationInRing(0));
+                m_attachedEntity = 0L;
+                m_selectedPlanet = null;
+                MyGuiScreenGamePlay.SetCameraController();
+                CloseScreen();
+            }
+        }
+
+        public override bool CloseScreen()
+        {
+            return base.CloseScreen();
         }
 
         private void OnAddRingToPlanetButton(MyGuiControlButton button)
@@ -368,6 +429,7 @@ namespace SEWorldGenPlugin.GUI
                     m_ringWidthSlider.Enabled = !hasRing;
                     m_ringRoidSizeSlider.Enabled = !hasRing;
                     m_addRingButton.Enabled = !hasRing;
+                    m_teleportToRingButton.Enabled = hasRing;
 
                     if (hasRing)
                     {
