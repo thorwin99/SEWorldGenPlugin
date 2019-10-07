@@ -87,7 +87,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     public class MyPlanetRingItem : MySystemItem
     {
         [ProtoMember(3)]
-        public long Radius;
+        public double Radius;
 
         [ProtoMember(4)]
         public int Width;
@@ -109,7 +109,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     public class MySystemBeltItem : MySystemItem
     {
         [ProtoMember(3)]
-        public long Radius;
+        public double Radius;
 
         [ProtoMember(4)]
         public int Width;

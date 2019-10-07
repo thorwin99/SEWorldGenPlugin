@@ -47,12 +47,10 @@ namespace SEWorldGenPlugin.GUI
 
         public PluginWorldSettings() : this(null, null)
         {
-            MyLog.Default.WriteLine("Create custom settings screen");
         }
 
         public PluginWorldSettings(MyObjectBuilder_Checkpoint checkpoint, string path) : base(checkpoint, path)
         {
-            MyLog.Default.WriteLine("Create custom settings screen");
             Static = this;
             m_isNewGame = (checkpoint == null);
             UseGlobal = false;
@@ -109,12 +107,10 @@ namespace SEWorldGenPlugin.GUI
                                 if (!UseGlobal)
                                 {
                                     MySettings.Static.SessionSettings = PlSettings;
-                                    MyLog.Default.WriteLine("Setting session settings");
                                 }
                                 else
                                 {
                                     MySettings.Static.SessionSettings = null;
-                                    MyLog.Default.WriteLine("Setting session settings global");
                                 }
                             };
                         }

@@ -343,7 +343,6 @@ namespace SEWorldGenPlugin.GUI
             scrollPane.ScrollbarVEnabled = true;
             scrollPane.Size = new Vector2(base.Size.Value.X - vector.X * 2f - 0.035f, 0.74f);
             scrollPane.Position = new Vector2(-0.27f, -0.394f);
-            MyLog.Default.WriteLine(scrollPane.Size.X + "SIZE");
 
             Controls.Add(m_okButton);
             Controls.Add(scrollPane);

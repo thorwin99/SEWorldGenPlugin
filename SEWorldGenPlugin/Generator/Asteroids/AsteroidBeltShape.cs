@@ -11,7 +11,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
     public struct AsteroidBeltShape
     {
         public Vector3D center;
-        public long radius;
+        public double radius;
         public int width;
         public int height;
 

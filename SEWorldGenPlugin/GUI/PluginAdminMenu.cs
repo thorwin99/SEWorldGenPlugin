@@ -283,8 +283,33 @@ namespace SEWorldGenPlugin.GUI
         {
             if (m_planetListBox.SelectedItems.Count > 0)
             {
-                MyEntityList.MyEntityListInfoItem myEntityListInfoItem = (MyEntityList.MyEntityListInfoItem)m_planetListBox.SelectedItems[m_planetListBox.SelectedItems.Count - 1].UserData;
+                var item = GenerateRingItem();
+                if (m_newPlanet)
+                {
+                    item.Center = m_selectedPlanet.CenterPosition;
+                    m_selectedPlanet.PlanetRing = item;
+                    SystemGenerator.Static.AddPlanet(m_selectedPlanet);
+                }
+                else
+                {
+                    SystemGenerator.Static.AddRingToPlanet(m_selectedPlanet.DisplayName, item);
+                }
+                PlanetListItemClicked(m_planetListBox);
             }
+        }
+
+        private MyPlanetRingItem GenerateRingItem()
+        {
+            MyPlanetRingItem item = new MyPlanetRingItem();
+            item.Type = SystemObjectType.RING;
+            item.DisplayName = "";
+            item.AngleDegrees = m_ringAngleSlider.Value;
+            item.Radius = m_ringDistanceSlider.Value + m_selectedPlanet.Size / 2f;
+            item.Width = (int)m_ringWidthSlider.Value;
+            item.Height = item.Width / 10;
+            item.RoidSize = (int)m_ringRoidSizeSlider.Value;
+
+            return item;
         }
 
         private void PlanetListItemClicked(MyGuiControlListbox box)
@@ -302,7 +327,6 @@ namespace SEWorldGenPlugin.GUI
 
                 SystemGenerator.Static.GetObject(myEntityListInfoItem.DisplayName.Replace("_", " ").Split('-')[0].Trim(), delegate (bool success, MySystemItem obj)
                 {
-                    MyLog.Default.WriteLine("SUCCESS GOT OBJECT FROM SERVER");
                     if (success)
                     {
                         m_selectedPlanet = (MyPlanetItem)obj;
@@ -342,7 +366,7 @@ namespace SEWorldGenPlugin.GUI
 
                     if (hasRing)
                     {
-                        m_ringDistanceSlider.Value = m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
+                        m_ringDistanceSlider.Value = (float)m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
                         m_ringWidthSlider.Value = m_selectedPlanet.PlanetRing.Width;
                         m_ringAngleSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
                         m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;

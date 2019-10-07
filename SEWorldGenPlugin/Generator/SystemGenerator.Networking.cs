@@ -52,14 +52,12 @@ namespace SEWorldGenPlugin.Generator
 
         public void GetObject(string name, Action<bool, MySystemItem> callback)
         {
-            MyLog.Default.WriteLine("Getting Object, requesting server");
             if (!m_handshakeDone)
             {
                 Action<ulong, string> handshake = delegate (ulong id, string msg)
                 {
                     if (msg.Equals("PONG"))
                     {
-                        MyLog.Default.WriteLine("Got Pong");
                         m_handshakeDone = true;
                         m_getCallacks.Add(++m_currentIndex, callback);
                         MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendGetServer, Sync.MyId, name, m_currentIndex);
@@ -67,7 +65,6 @@ namespace SEWorldGenPlugin.Generator
                 };
                 NetUtil.RegisterMessageHandler(GET_HANDLER_ID, handshake);
                 NetUtil.SendPacketToServer(GET_HANDLER_ID, "PING");
-                MyLog.Default.WriteLine("Sending Ping");
             }
             else
             {
@@ -80,13 +77,9 @@ namespace SEWorldGenPlugin.Generator
         {
             if (!m_handshakeDone)
             {
-                Action<ulong, string> handshake = delegate (ulong id, string msg)
+                Action<ulong, string> handshake = delegate (ulong id, string msg)//Handshake needed to check, if plugin is installed on the server, since it would crash the server to send data to it without it knowing what to do.
                 {
-                    if (msg.Equals("PING"))
-                    {
-                        NetUtil.SendPacket(PLANET_HANDLER_ID, "PONG", id);
-                    }
-                    else if (msg.Equals("PONG"))
+                    if (msg.Equals("PONG"))
                     {
                         m_handshakeDone = true;
                         MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddPlanet, planet);
@@ -101,12 +94,25 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
-        public void AddRingToPlanet(string name)
+        public void AddRingToPlanet(string name, MyPlanetRingItem ring)
         {
-            if (Static == null) return;
-
-            NetUtil.SendPacketToServer(RING_HANDLER_ID, "GENRINGSERV" + name);
-            MyLog.Default.WriteLine("Send data to server");
+            if (!m_handshakeDone)
+            {
+                Action<ulong, string> handshake = delegate (ulong id, string msg)//Handshake needed to check, if plugin is installed on the server, since it would crash the server to send data to it without it knowing what to do.
+                {
+                    if (msg.Equals("PONG"))
+                    {
+                        m_handshakeDone = true;
+                        MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddRingToPlanet, name, ring);
+                    }
+                };
+                NetUtil.RegisterMessageHandler(RING_HANDLER_ID, handshake);
+                NetUtil.SendPacketToServer(RING_HANDLER_ID, "PING");
+            }
+            else
+            {
+                MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddRingToPlanet, name, ring);
+            }
         }
 
         [Event]
@@ -114,7 +120,6 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         static void SendGetServer(ulong client, string name, ulong callback)
         {
-            MyLog.Default.WriteLine("Sending answer to client to get object");
             bool success = Static.TryGetObject(name, out MySystemItem item);
 
             switch (item.Type)
@@ -175,9 +180,20 @@ namespace SEWorldGenPlugin.Generator
         [Event]
         [Reliable]
         [Server]
-        static void SendAddRingToPlanet(string name)
+        static void SendAddRingToPlanet(string planetName, MyPlanetRingItem ringBase)
         {
-            if (!SettingsSession.Static.Settings.Enable) return;
+            if(Static.TryGetObject(planetName, out MySystemItem obj))
+            {
+                if (obj.Type == SystemObjectType.PLANET)
+                {
+                    MyPlanetItem planet = (MyPlanetItem)obj;
+                    if(planet.PlanetRing == null)
+                    {
+                        ringBase.Center = planet.CenterPosition;
+                        planet.PlanetRing = ringBase;
+                    }
+                }
+            }
         }
 
         [Event]
@@ -185,16 +201,32 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         static void SendAddPlanet(MyPlanetItem planet)
         {
-            if (!SettingsSession.Static.Settings.Enable) return;
+            if(planet != null)
+            {
+                if (Static.TryGetObject(planet.DisplayName, out MySystemItem obj))
+                {
+                    if(obj.Type == SystemObjectType.PLANET)
+                    {
+                        if (((MyPlanetItem)obj).Generated) return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    Static.m_objects.Remove(obj);
+                }
+                Static.m_objects.Add(planet);
+            }
         }
+
+
+        //Refactor into single method, that parses the handler id from message
 
         private void GetObjectPing(ulong sender, string message)
         {
             if (message.Equals("PING"))
             {
-                MyLog.Default.WriteLine("Got Ping");
                 NetUtil.SendPacket(GET_HANDLER_ID, "PONG", sender);
-                MyLog.Default.WriteLine("Sending Pong");
             }
         }
 
@@ -208,16 +240,9 @@ namespace SEWorldGenPlugin.Generator
 
         private void AddRingHandler(ulong sender, string message)
         {
-            MyLog.Default.WriteLine("Got message from " + sender + " with message " + message);
-            if (message.Contains("GENRINGSERV"))
+            if (message.Equals("PING"))
             {
-                NetUtil.SendPacket(RING_HANDLER_ID, "GENRINGCLIENT" + message.Substring(("GENRINGSERV").Length), sender);
-            }
-            else if (message.Contains("GENRINGCLIENT"))
-            {
-                string name = message.Substring("GENRINGCLIENT".Length);
-                m_handshakeDone = true;
-                MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddRingToPlanet, name);
+                NetUtil.SendPacket(RING_HANDLER_ID, "PONG", sender);
             }
         }
     }

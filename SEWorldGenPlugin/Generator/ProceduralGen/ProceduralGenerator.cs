@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
+using VRage.Trace;
 using VRage.Utils;
 
 /*
@@ -85,6 +86,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     var oldBounding = tracker.BoundingVolume;
                     tracker.UpdateLastPosition();
+
+                    planetModule.GeneratePlanets();
 
                     if (asteroidModule == null) continue;
 

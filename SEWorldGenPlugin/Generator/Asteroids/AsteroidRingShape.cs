@@ -8,7 +8,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
     public struct AsteroidRingShape
     {
         public Vector3D center;
-        public long radius;
+        public double radius;
         public int width;
         public int height;
         public Vector3D rotation;
