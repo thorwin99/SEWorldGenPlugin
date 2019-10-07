@@ -1,21 +1,16 @@
-﻿using Sandbox.Definitions;
-using Sandbox.Engine.Multiplayer;
-using Sandbox.Engine.Utils;
+﻿using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
-using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Game.SessionComponents;
@@ -325,7 +320,17 @@ namespace SEWorldGenPlugin.GUI
 
                 MyPlanet planetEntity = (MyPlanet)MyEntities.GetEntityById(myEntityListInfoItem.EntityId);
 
-                SystemGenerator.Static.GetObject(myEntityListInfoItem.DisplayName.Replace("_", " ").Split('-')[0].Trim(), delegate (bool success, MySystemItem obj)
+                string name = "";
+                if (myEntityListInfoItem.DisplayName.StartsWith("Planet"))
+                {
+                    name = myEntityListInfoItem.DisplayName.Replace("_", " ").Split('-')[0].Trim();
+                }
+                else
+                {
+                    name = myEntityListInfoItem.DisplayName.Replace("_", " ");
+                }
+
+                SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
                 {
                     if (success)
                     {

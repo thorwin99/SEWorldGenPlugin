@@ -60,7 +60,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 {
                     if (Enabled)
                         MySession.Static.Settings.ProceduralDensity = proceduralDensity;
-                    MyLog.Default.WriteLine("PROCDENS is " + MySession.Static.Settings.ProceduralDensity);
                 };
             }
             else

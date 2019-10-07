@@ -122,6 +122,11 @@ namespace SEWorldGenPlugin.Generator
         {
             bool success = Static.TryGetObject(name, out MySystemItem item);
 
+            if(item == null)
+            {
+                item = new MyPlanetItem();
+                item.Type = SystemObjectType.PLANET;
+            }
             switch (item.Type)
             {
                 case SystemObjectType.PLANET:
