@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
-using VRage.Trace;
 using VRage.Utils;
 
 /*
@@ -46,7 +45,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             planetModule = new ProceduralPlanetModule(m_seed);
 
-            if (!SettingsSession.Static.Settings.Enable) return;
+            if (!SettingsSession.Static.Settings.Enable || !Sync.IsServer) return;
 
             proceduralDensity = MySession.Static.Settings.ProceduralDensity + 1;
 
@@ -67,7 +66,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
-            foreach(var entity in m_toTrackedEntities)
+            if (SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
+            {
+                MySession.Static.Settings.ProceduralDensity = 0;
+            }
+
+            foreach (var entity in m_toTrackedEntities)
             {
                 if (m_trackedEntities.ContainsKey(entity.Key))
                 {
@@ -118,13 +122,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_trackedEntities?.Clear();
 
             Static = null;
-
-            MySession.Static.Settings.ProceduralDensity = proceduralDensity - 1;
         }
 
         public override void SaveData()
         {
             SaveConfig();
+
+            if(Enabled)
+                MySession.Static.Settings.ProceduralDensity = proceduralDensity - 1;
         }
 
         public void TrackEntity(MyEntity entity)
@@ -179,8 +184,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             Enabled = true;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
-
-            MySession.Static.Settings.ProceduralDensity = proceduralDensity - 1;
 
             planetModule.GeneratePlanets();
         }
