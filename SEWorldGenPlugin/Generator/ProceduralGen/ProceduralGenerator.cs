@@ -47,11 +47,32 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             if (!SettingsSession.Static.Settings.Enable || !Sync.IsServer) return;
 
-            proceduralDensity = MySession.Static.Settings.ProceduralDensity + 1;
+            MyObjectBuilder_AsteroidGenerator b = GetConfig();
+
+            m_existingObjectSeeds = b.ExistingObjectsSeeds;
+
+            proceduralDensity = b.ProceduralDensity == 0 ? MySession.Static.Settings.ProceduralDensity : b.ProceduralDensity;
 
             if(SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
             {
                 MySession.Static.Settings.ProceduralDensity = 0;
+                MySession.Static.OnSavingCheckpoint += delegate
+                {
+                    if (Enabled)
+                        MySession.Static.Settings.ProceduralDensity = proceduralDensity;
+                    MyLog.Default.WriteLine("PROCDENS is " + MySession.Static.Settings.ProceduralDensity);
+                };
+            }
+            else
+            {
+                if(MySession.Static.Settings.ProceduralDensity != 0 && MySession.Static.Settings.ProceduralDensity != proceduralDensity)
+                {
+                    proceduralDensity = MySession.Static.Settings.ProceduralDensity;
+                }
+                else
+                {
+                    MySession.Static.Settings.ProceduralDensity = proceduralDensity;
+                }
             }
 
             //if (MySession.Static.Settings.ProceduralDensity != 0) return;
@@ -127,9 +148,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         public override void SaveData()
         {
             SaveConfig();
-
-            if(Enabled)
-                MySession.Static.Settings.ProceduralDensity = proceduralDensity - 1;
         }
 
         public void TrackEntity(MyEntity entity)
@@ -176,10 +194,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
             base.Init(sessionComponent);
-
-            MyObjectBuilder_AsteroidGenerator b = GetConfig();
-
-            m_existingObjectSeeds = b.ExistingObjectsSeeds;
 
             Enabled = true;
 
@@ -229,6 +243,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             MyObjectBuilder_AsteroidGenerator conf = new MyObjectBuilder_AsteroidGenerator();
 
             conf.ExistingObjectsSeeds = m_existingObjectSeeds;
+            conf.ProceduralDensity = proceduralDensity;
 
             MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator));
 

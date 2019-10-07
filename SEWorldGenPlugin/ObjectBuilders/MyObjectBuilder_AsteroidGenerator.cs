@@ -14,5 +14,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
     {
         [ProtoMember(3005)]
         public HashSet<MyObjectSeedParams> ExistingObjectsSeeds;
+
+        [ProtoMember(3006)]
+        public float ProceduralDensity;
     }
 }
