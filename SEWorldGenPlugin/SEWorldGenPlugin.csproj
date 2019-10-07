@@ -175,6 +175,7 @@
     <Compile Include="Generator\ProceduralGen\ProceduralModule.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralPlanetModule.cs" />
     <Compile Include="Generator\SystemGenerator.cs" />
+    <Compile Include="GUI\PluginAdminMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
     <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
     <Compile Include="GUI\PluginMainMenu.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\FileUtils.cs" />
     <Compile Include="Utilities\MyPluginTexts.cs" />
+    <Compile Include="Utilities\NetUtil.cs" />
     <Compile Include="Utilities\Verifier.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,7 @@
-﻿using Sandbox.Game;
+﻿using Sandbox.Engine.Multiplayer;
+using Sandbox.Game;
+using Sandbox.Game.Gui;
+using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.Generator.ProceduralGen;
 using SEWorldGenPlugin.GUI;
 using VRage.Game.Entity;
@@ -26,6 +29,9 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.MainMenu = typeof(PluginMainMenu);
             MyPerGameSettings.GUI.CustomWorldScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
+            MyPerGameSettings.GUI.AdminMenuScreen = typeof(PluginAdminMenu);
+
+            //MyMultiplayer.ReplicationLayer.RegisterFromAssembly(typeof(SystemGenerator).Assembly);
         }
 
         public void Update()

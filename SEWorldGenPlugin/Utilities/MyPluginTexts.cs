@@ -26,6 +26,12 @@ namespace SEWorldGenPlugin.Utilities
         public readonly string MOON_GPS_CHECK = "If a GPS signal should be generated for each moon on world generation.";
         public readonly string BELT_GPS_CHECK = "If a GPS signal should be generated for each asteroid belt.";
         public readonly string ROID_GEN_COMBO = "Which asteroid generator should be used. If plugin, belts and rings will be generated, but nothing else. If vanilla, the default generation will be used, but no rings or belts are generated.";
+
+        public readonly string ADMIN_RING_DISTANCE = "The distance of the ring to the planet in meters";
+        public readonly string ADMIN_RING_WIDTH = "The width of the ring in meters";
+        public readonly string ADMIN_RING_ANGLE = "The angle of the ring in degrees";
+        public readonly string ADMIN_RING_ROID_SIZE = "The size of the asteroids in the ring in meters";
+        public readonly string ADMIN_ADD_RING_BUTTON = "Adds the ring to the planet";
     }
 
 }

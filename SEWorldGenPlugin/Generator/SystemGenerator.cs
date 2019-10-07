@@ -26,6 +26,7 @@ namespace SEWorldGenPlugin.Generator
         private string[] greek_letters = new string[] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "My", "Ny", "Xi", "Omikron", "Pi", "Rho", "Sigma", "Tau", "Ypsilon", "Phi", "Chi", "Psi", "Omega"};
 
         private const string STORAGE_FILE = "SystemData.xml";
+        private const ushort HANDLER_ID = 2839;
 
         public HashSet<MySystemItem> m_objects
         {
@@ -46,6 +47,10 @@ namespace SEWorldGenPlugin.Generator
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
+            MyMultiplayer.ReplicationLayer.RegisterFromAssembly(typeof(SystemGenerator).Assembly);
+
+            NetUtil.RegisterMessageHandler(HANDLER_ID, NetMessageHandler);
+
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
             MyObjectBuilder_StarSystem b = GetConfig();
@@ -69,7 +74,6 @@ namespace SEWorldGenPlugin.Generator
 
         public override void LoadData()
         {
-            if (!Sync.IsServer) return;
             Static = this;
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
@@ -85,6 +89,7 @@ namespace SEWorldGenPlugin.Generator
 
         protected override void UnloadData()
         {
+            NetUtil.UnregisterMessageHandlers(HANDLER_ID);
             m_objects?.Clear();
             m_planetDefinitions?.Clear();
             m_settings = null;
@@ -95,6 +100,8 @@ namespace SEWorldGenPlugin.Generator
         {
             if (Static == null) return;
 
+            NetUtil.SendPacketToServer(HANDLER_ID, "GENRINGSERV" + name);
+            MyLog.Default.WriteLine("Send data to server");
         }
 
         [Event]
@@ -102,8 +109,23 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         static void SendAddRingToPlanet(string name)
         {
+            if (!SettingsSession.Static.Settings.Enable) return;
             MyPlanetRingItem ring = Static.GenerateRing(0, 0);
+            MyLog.Default.WriteLine("CREATE RING FOR PLANET " + name);
+        }
 
+        private void NetMessageHandler(ulong sender, string message)
+        {
+            MyLog.Default.WriteLine("Got message from " + sender + " with message " + message);
+            if (message.Contains("GENRINGSERV"))
+            {
+                NetUtil.SendPacket(HANDLER_ID, "GENRINGCLIENT" + message.Substring(("GENRINGSERV").Length), sender);
+            }
+            else if (message.Contains("GENRINGCLIENT"))
+            {
+                string name = message.Substring("GENRINGCLIENT".Length);
+                MyMultiplayer.RaiseStaticEvent((IMyEventOwner s) => SendAddRingToPlanet, name);
+            }
         }
 
         private void GenerateSystem()

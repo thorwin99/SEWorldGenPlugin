@@ -55,6 +55,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 long id = MyRandom.Instance.NextLong();
                 MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(definition.Id.SubtypeId + "_" + planet.Size + id, planet.DisplayName, planet.DefName, planet.OffsetPosition, m_seed, planet.Size, true, id, false, false);
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
+                generatedPlanet.DisplayNameText = planet.DisplayName;
+                generatedPlanet.AsteroidName = planet.DisplayName;
+
                 if (planet.PlanetRing != null)
                     planet.PlanetRing.Center = planet.CenterPosition;
                 List<Vector3D> spawnedMoons = new List<Vector3D>();
