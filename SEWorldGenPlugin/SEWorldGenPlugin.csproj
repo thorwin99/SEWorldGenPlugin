@@ -160,15 +160,6 @@
   <ItemGroup>
     <Compile Include="Generator\Asteroids\AsteroidBeltShape.cs" />
     <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
-    <Compile Include="Generator\Asteroids\IMyPluginCompositionInfoProvider.cs" />
-    <Compile Include="Generator\Asteroids\MyPluginCompositeShapeGeneratorDelegate.cs" />
-    <Compile Include="Generator\Asteroids\MyPluginCompositeShapeOreDeposit.cs" />
-    <Compile Include="Generator\Asteroids\MyPluginCompositeShapeProvider.cs" />
-    <Compile Include="Generator\Asteroids\MyPluginCompositeShapes.cs" />
-    <Compile Include="Generator\Asteroids\MyCsgCapsule.cs" />
-    <Compile Include="Generator\Asteroids\MyCsgShapeBase.cs" />
-    <Compile Include="Generator\Asteroids\MyCsgSphere.cs" />
-    <Compile Include="Generator\Asteroids\MyCsgTorus.cs" />
     <Compile Include="Generator\ProceduralGen\EntityExtension.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralAsteroidsRingModule.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />
