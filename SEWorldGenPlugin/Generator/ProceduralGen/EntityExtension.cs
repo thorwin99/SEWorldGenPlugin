@@ -1,6 +1,5 @@
 ﻿using Sandbox.Game.Entities;
 using VRage.Game.Entity;
-using VRage.Utils;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {

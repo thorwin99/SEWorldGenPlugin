@@ -1,6 +1,5 @@
 ﻿using SEWorldGenPlugin.ObjectBuilders;
 using System;
-using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.Asteroids

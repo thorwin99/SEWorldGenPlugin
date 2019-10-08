@@ -1,7 +1,6 @@
 ﻿using ProtoBuf;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {

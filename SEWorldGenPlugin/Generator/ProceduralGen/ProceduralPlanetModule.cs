@@ -1,28 +1,15 @@
 ﻿using Sandbox.Definitions;
-using Sandbox.Engine.Multiplayer;
-using Sandbox.Engine.Utils;
-using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
 using Sandbox.Game.World;
-using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VRage;
-using VRage.Game;
 using VRage.Game.Entity;
-using VRage.Game.Voxels;
 using VRage.Library.Utils;
-using VRage.Network;
-using VRage.Profiler;
 using VRage.Utils;
 using VRageMath;
-using VRageRender.Messages;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {

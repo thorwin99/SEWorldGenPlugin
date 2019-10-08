@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using VRage.Game.Components;
-using VRage.Utils;
 
 namespace SEWorldGenPlugin.Networking
 {

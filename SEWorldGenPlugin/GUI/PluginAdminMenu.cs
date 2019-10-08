@@ -24,8 +24,6 @@ namespace SEWorldGenPlugin.GUI
     [PreloadRequired]
     public class PluginAdminMenu : MyGuiScreenAdminMenu
     {
-        private const ushort ADMIN_PING_MESSAGEHANDLER = 2573;
-
         private static readonly Vector2 SCREEN_SIZE = new Vector2(0.4f, 1.2f);
         private static readonly float HIDDEN_PART_RIGHT = 0.04f;
 

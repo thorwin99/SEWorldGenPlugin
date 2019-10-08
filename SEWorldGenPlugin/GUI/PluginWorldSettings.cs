@@ -1,7 +1,6 @@
 ﻿using Sandbox.Game.Localization;
 using Sandbox.Game.Screens;
 using Sandbox.Game.Screens.Helpers;
-using Sandbox.Graphics;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;

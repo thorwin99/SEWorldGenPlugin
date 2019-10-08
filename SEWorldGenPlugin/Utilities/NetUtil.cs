@@ -2,7 +2,6 @@
 using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SEWorldGenPlugin.Utilities
 {
