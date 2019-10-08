@@ -135,7 +135,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (!exists)
                     {
-                        var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(obj.Size), obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0, null);
+                        var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(obj.Size), obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0, 3);
                         Vector3D pos = obj.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2;
 
                         MyVoxelMap voxelMap;
