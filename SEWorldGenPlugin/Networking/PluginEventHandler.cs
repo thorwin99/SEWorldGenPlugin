@@ -97,10 +97,8 @@ namespace SEWorldGenPlugin.Networking
 
         private void SendData(MethodInfo method, byte[] data, ulong? receiver = null)
         {
-            MyLog.Default.WriteLine("Sending data to receiver");
             foreach(var attr in method.CustomAttributes)
             {
-                MyLog.Default.WriteLine(attr.AttributeType.ToString() + " Attribute type");
                 if(attr.AttributeType == typeof(ServerAttribute))
                 {
                     NetUtil.SendPacketToServer(HANDLER_ID, data);

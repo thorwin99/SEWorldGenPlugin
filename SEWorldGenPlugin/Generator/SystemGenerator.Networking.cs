@@ -40,10 +40,8 @@ namespace SEWorldGenPlugin.Generator
             {
                 NetUtil.PingServer(delegate
                 {
-                    MyLog.Default.WriteLine("Only called once " + m_handshakeDone);
                     m_handshakeDone = true;
                     m_getCallbacks.Add(++m_currentIndex, callback);
-                    MyLog.Default.WriteLine("Sending get to server, " + name);
                     PluginEventHandler.Static.RaiseStaticEvent(SendGetServer, Sync.MyId, name, m_currentIndex, null);
                 });
             }
@@ -77,7 +75,6 @@ namespace SEWorldGenPlugin.Generator
             {
                 NetUtil.PingServer(delegate //Handshake needed to check, if plugin is installed on the server, since it would crash the server to send data to it without it knowing what to do.
                 {
-                    MyLog.Default.WriteLine("Only called once " + m_handshakeDone);
                     m_handshakeDone = true;
                     PluginEventHandler.Static.RaiseStaticEvent(SendAddRingToPlanet, name, ring, null);
                 });
@@ -94,7 +91,6 @@ namespace SEWorldGenPlugin.Generator
         static void SendGetServer(ulong client, string name, ulong callback)
         {
             bool success = Static.TryGetObject(name, out MySystemItem item);
-            MyLog.Default.WriteLine("Getting object and sending to client. Item " + name + " exists: " + success);
             if (item == null)
             {
                 item = new MyPlanetItem();
@@ -123,7 +119,6 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         static void SendGetPlanetClient(bool success, MyPlanetItem item, ulong callback)
         {
-            MyLog.Default.WriteLine("Got object from server");
             Static.m_getCallbacks[callback](success, item);
             Static.m_getCallbacks.Remove(callback);
         }

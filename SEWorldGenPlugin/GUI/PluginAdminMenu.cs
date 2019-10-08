@@ -90,6 +90,7 @@ namespace SEWorldGenPlugin.GUI
                     m_attachedEntity = 0L;
                     m_selectedPlanet = null;
                     modeCombo.SelectItemByKey(newCombo.GetSelectedKey());
+                    RecreateControls(false);
                 }
             };
             if(newCombo.GetSelectedKey() == 8)
@@ -321,7 +322,6 @@ namespace SEWorldGenPlugin.GUI
             if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
             {
                 AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(m_selectedPlanet.PlanetRing);
-                MyLog.Default.WriteLine("Teleporting to " + shape.LocationInRing(0));
                 MyMultiplayer.TeleportControlledEntity(shape.LocationInRing(0));
                 m_attachedEntity = 0L;
                 m_selectedPlanet = null;

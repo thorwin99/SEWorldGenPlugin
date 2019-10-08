@@ -45,7 +45,6 @@ namespace SEWorldGenPlugin.Utilities
             }
 
             var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
-            MyLog.Default.WriteLine(paths);
             return File.Exists(paths);
         }
 
@@ -237,7 +236,6 @@ namespace SEWorldGenPlugin.Utilities
 
         public static T ReadXmlFileFromPath<T>(string path, string file, Type callingType)
         {
-            MyLog.Default.WriteLine(path + " PAth");
             if (FileExistsInPath(path, file, callingType))
             {
                 try
