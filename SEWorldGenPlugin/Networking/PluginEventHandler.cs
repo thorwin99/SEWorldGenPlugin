@@ -4,11 +4,9 @@ using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using VRage.Game.Components;
 using VRage.Utils;
 
@@ -18,7 +16,7 @@ namespace SEWorldGenPlugin.Networking
     public class PluginEventHandler : MySessionComponentBase
     {
         private const ushort HANDLER_ID = 2778;
-        private static DBNull e = DBNull.Value;
+        private static ProtoNull e = new ProtoNull();
 
         private MethodInfo m_unpackData = typeof(PluginEventHandler).GetMethod("UnpackData", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -135,7 +133,7 @@ namespace SEWorldGenPlugin.Networking
             {
                 var parameters = info.GetParameters();
                 if (parameters.Length > 3) return;
-                Type[] args = new Type[3] { typeof(DBNull), typeof(DBNull), typeof(DBNull) };
+                Type[] args = new Type[3] { typeof(ProtoNull), typeof(ProtoNull), typeof(ProtoNull) };
                 for(int i = 0; i < parameters.Length; i++)
                 {
                     args[i] = parameters[i].ParameterType;
@@ -146,7 +144,7 @@ namespace SEWorldGenPlugin.Networking
                 List<object> objs = new List<object>();
                 for(int i = 0; i < args.Length; i++)
                 {
-                    if (args[i] == typeof(DBNull)) continue;
+                    if (args[i] == typeof(ProtoNull)) continue;
                     objs.Add(paras[i + 2]);
                 }
 
@@ -184,6 +182,11 @@ namespace SEWorldGenPlugin.Networking
                 arg3 = Serializer.DeserializeWithLengthPrefix<T3>(ms, PrefixStyle.Base128);
                 return;
             }
+        }
+
+        [ProtoContract]
+        public class ProtoNull
+        {
         }
     }
 }
