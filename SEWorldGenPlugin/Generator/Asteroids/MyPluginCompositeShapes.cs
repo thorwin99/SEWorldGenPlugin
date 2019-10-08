@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using VRage;
 using VRage.Collections;
 using VRage.FileSystem;
@@ -32,9 +31,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
 
         public static readonly MyCompositeShapeGeneratorDelegate[] AsteroidGenerators;
 
-        private List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> m_primarySelections;
+        private List<MyTuple<MyVoxelMapStorageDefinition, Sandbox.Engine.Voxels.MyOctreeStorage>> m_primarySelections;
 
-        private List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> m_secondarySelections;
+        private List<MyTuple<MyVoxelMapStorageDefinition, Sandbox.Engine.Voxels.MyOctreeStorage>> m_secondarySelections;
 
         static MyPluginCompositeShapes()
         {
@@ -120,7 +119,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             data.FilledShapes = new MyCsgShapeBase[num];
             IMyCompositeShape[] array = new IMyCompositeShape[6];
             FillSpan(instance, size, new Span<IMyCompositeShape>(array, 0, 1), MyDefinitionManager.Static.GetVoxelMapStorageDefinitionsForProceduralPrimaryAdditions(), prefferOnlyBestFittingSize: true);
-            size = ((MyOctreeStorage)array[0]).Size.AbsMax();
+            size = ((Sandbox.Engine.Voxels.MyOctreeStorage)array[0]).Size.AbsMax();
             float idealSize = size / 2f;
             float idealSize2 = size / 2f;
             int num2 = 5 / ((size > 200f) ? 1 : 2);
@@ -188,7 +187,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                         int num2 = int.MaxValue;
                         foreach (MyVoxelMapStorageDefinition item in voxelMaps)
                         {
-                            MyOctreeStorage myOctreeStorage = CreateAsteroidStorage(item);
+                            Sandbox.Engine.Voxels.MyOctreeStorage myOctreeStorage = CreateAsteroidStorage(item);
                             int num3 = myOctreeStorage.Size.AbsMax();
                             if ((float)num3 > idealSize)
                             {
@@ -219,14 +218,14 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                                 m_primarySelections.Add(MyTuple.Create(item, myOctreeStorage));
                             }
                         }
-                        List<MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage>> list = (m_primarySelections.Count > 0) ? m_primarySelections : m_secondarySelections;
-                        float num4 = list.Sum((MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> x) => x.Item1.SpawnProbability);
+                        List<MyTuple<MyVoxelMapStorageDefinition, Sandbox.Engine.Voxels.MyOctreeStorage>> list = (m_primarySelections.Count > 0) ? m_primarySelections : m_secondarySelections;
+                        float num4 = list.Sum((MyTuple<MyVoxelMapStorageDefinition, Sandbox.Engine.Voxels.MyOctreeStorage> x) => x.Item1.SpawnProbability);
                         for (int j = 0; j < shapes.Length; j++)
                         {
                             if (shapes[j] == null)
                             {
                                 float num5 = num4 * random.NextFloat();
-                                foreach (MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> item2 in list)
+                                foreach (MyTuple<MyVoxelMapStorageDefinition, Sandbox.Engine.Voxels.MyOctreeStorage> item2 in list)
                                 {
                                     float spawnProbability = item2.Item1.SpawnProbability;
                                     if (!(num5 < spawnProbability))
@@ -237,7 +236,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
                                     shapes[j] = item2.Item2;
                                     goto IL_0221;
                                 }
-                                shapes[j] = list.MaxBy((MyTuple<MyVoxelMapStorageDefinition, MyOctreeStorage> x) => x.Item1.SpawnProbability).Item2;
+                                shapes[j] = list.MaxBy((MyTuple<MyVoxelMapStorageDefinition, Sandbox.Engine.Voxels.MyOctreeStorage> x) => x.Item1.SpawnProbability).Item2;
                             }
                             IL_0221:;
                         }
@@ -246,9 +245,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             }
         }
 
-        public static MyOctreeStorage CreateAsteroidStorage(MyVoxelMapStorageDefinition definition)
+        public static Sandbox.Engine.Voxels.MyOctreeStorage CreateAsteroidStorage(MyVoxelMapStorageDefinition definition)
         {
-            return (MyOctreeStorage)MyStorageBase.LoadFromFile(Path.Combine(definition.Context.IsBaseGame ? MyFileSystem.ContentPath : definition.Context.ModPath, definition.StorageFile));
+            return (Sandbox.Engine.Voxels.MyOctreeStorage)MyStorageBase.LoadFromFile(Path.Combine(definition.Context.IsBaseGame ? MyFileSystem.ContentPath : definition.Context.ModPath, definition.StorageFile));
         }
 
         private IMyPluginCompositionInfoProvider ProceduralGenerator(int version, int seed, float size)

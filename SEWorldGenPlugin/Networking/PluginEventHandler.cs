@@ -75,13 +75,10 @@ namespace SEWorldGenPlugin.Networking
 
         public void Register(Type type)
         {
-            MyLog.Default.WriteLine("Registering " + type.ToString());
             if (type.CustomAttributes.Where(data => data.AttributeType.Equals(typeof(EventOwnerAttribute))).Count() > 0)
             {
-                MyLog.Default.WriteLine("HasEventOwner Attribute");
                 foreach (var m in type.GetRuntimeMethods())
                 {
-                    MyLog.Default.WriteLine("Checking method " + m.Name);
                     if (m.CustomAttributes.Any(data => data.AttributeType == typeof(EventAttribute)))
                     {
                         m_registeredMethods.Add(m.GetCustomAttribute<EventAttribute>().Id, m);
@@ -180,6 +177,7 @@ namespace SEWorldGenPlugin.Networking
                 arg1 = Serializer.DeserializeWithLengthPrefix<T1>(ms, PrefixStyle.Base128);
                 arg2 = Serializer.DeserializeWithLengthPrefix<T2>(ms, PrefixStyle.Base128);
                 arg3 = Serializer.DeserializeWithLengthPrefix<T3>(ms, PrefixStyle.Base128);
+
                 return;
             }
         }

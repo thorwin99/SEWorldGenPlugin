@@ -7,14 +7,17 @@ using Sandbox.Game.Entities;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
+using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using VRage;
 using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Library.Utils;
+using VRage.Plugins;
 using VRage.Profiler;
 using VRage.Utils;
 using VRage.Voxels;
@@ -36,6 +39,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private HashSet<MyVoxelBase> m_NotSavedMaps;
         private bool m_saving;
         private MyAsteroidGeneratorDefinition m_data;
+        private MethodInfo m_createRoid;
+        private Type m_providerType;
 
         public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
         {
@@ -49,6 +54,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 m_saving = true;
             };
             m_data = GetData();
+            m_providerType = typeof(MyProceduralWorldGenerator).Assembly.GetType("Sandbox.Game.World.Generator.MyCompositeShapeProvider");
+            m_createRoid = m_providerType.GetMethod("CreateAsteroidShape");
         }
 
         public override MyProceduralCell GenerateCell(ref Vector3I id)
@@ -128,9 +135,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (!exists)
                     {
-                        var provider = MyPluginCompositeShapeProvider.CreateAsteroidShape(obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0);
-                        var storage = new MyOctreeStorage(provider, GetAsteroidVoxelSize(obj.Size));
-
+                        var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(obj.Size), obj.Params.Seed, obj.Size, m_data.UseGeneratorSeed ? obj.Params.GeneratorSeed : 0, null);
                         Vector3D pos = obj.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(obj.Size) / 2;
 
                         MyVoxelMap voxelMap;
@@ -234,6 +239,17 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_saving = false;
         }
 
+        private MyOctreeStorage CreateAsteroidStorage(Vector3I storageSize, int seed, float size, int generatorSeed = 0, int? generator = default(int?))
+        {
+            object[] args = new object[] { seed, size, generatorSeed, generator };
+
+            object prov = m_createRoid.Invoke(null, args);
+
+            ConstructorInfo ctor = typeof(MyOctreeStorage).GetConstructor(new Type[] { m_providerType, typeof(Vector3I) });
+            MyOctreeStorage instance = (MyOctreeStorage)ctor.Invoke(new object[] { prov, storageSize });
+            return instance;
+        }
+
         private static MyAsteroidGeneratorDefinition GetData()
         {
             MyAsteroidGeneratorDefinition myAsteroidGeneratorDefinition = null;
@@ -262,6 +278,5 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
             return myAsteroidGeneratorDefinition;
         }
-
     }
 }
