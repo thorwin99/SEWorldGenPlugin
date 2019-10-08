@@ -2,6 +2,7 @@
 using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SEWorldGenPlugin.Utilities
 {
@@ -24,6 +25,30 @@ namespace SEWorldGenPlugin.Utilities
             {
                 ulong sender = NetDataToMsg(data, out string msg);
                 handler(sender, msg);
+            };
+            MyAPIGateway.Multiplayer.RegisterMessageHandler(id, newHandler);
+            if (unregActions.TryGetValue(id, out Action value))
+            {
+                unregActions[id] += delegate
+                {
+                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(id, newHandler);
+                };
+            }
+            else
+            {
+                unregActions[id] = delegate
+                {
+                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(id, newHandler);
+                };
+            }
+        }
+
+        public static void RegisterMessageHandler(ushort id, Action<ulong, byte[]> handler)
+        {
+            Action<byte[]> newHandler = delegate (byte[] data)
+            {
+                ulong sender = ReadSenderId(data, out byte[] rawData);
+                handler(sender, rawData);
             };
             MyAPIGateway.Multiplayer.RegisterMessageHandler(id, newHandler);
             if (unregActions.TryGetValue(id, out Action value))
@@ -70,6 +95,24 @@ namespace SEWorldGenPlugin.Utilities
             ulong id = MyAPIGateway.Multiplayer.MyId;
             byte[] data = MsgToNetData(id, message);
             MyAPIGateway.Multiplayer.SendMessageTo(handlerId, data, receiver, true);
+        }
+
+        public static void SendPacketToServer(ushort handlerId, byte[] data)
+        {
+            ulong id = MyAPIGateway.Multiplayer.MyId;
+            MyAPIGateway.Multiplayer.SendMessageToServer(handlerId, PrefixDataWithId(id, data), true);
+        }
+
+        public static void SendPacketToClients(ushort handlerId, byte[] data)
+        {
+            ulong id = MyAPIGateway.Multiplayer.MyId;
+            MyAPIGateway.Multiplayer.SendMessageToOthers(handlerId, PrefixDataWithId(id, data), true);
+        }
+
+        public static void SendPacket(ushort handlerId, byte[] data, ulong receiver)
+        {
+            ulong id = MyAPIGateway.Multiplayer.MyId;
+            MyAPIGateway.Multiplayer.SendMessageTo(handlerId, PrefixDataWithId(id, data), receiver, true);
         }
 
         public static void PingServer(Action successCallback)
@@ -145,6 +188,42 @@ namespace SEWorldGenPlugin.Utilities
                 }
             }
             return id;
+        }
+
+        private static ulong ReadSenderId(byte[] data, out byte[] rawData)
+        {
+            rawData = new byte[data.Length - 8];
+            ulong id = 0;
+            for (int i = 0; i < data.Length; i++)
+            {
+                if(i < 8)
+                {
+                    id = id | (ulong)((long)data[i] << ((7 - i) * 8));
+                }
+                else
+                {
+                    rawData[i - 8] = data[i];
+                }
+            }
+
+            return id;
+        }
+
+        private static byte[] PrefixDataWithId(ulong id, byte[] data)
+        {
+            byte[] newData = new byte[data.Length + 8];
+            for(int i = 0; i < newData.Length; i++)
+            {
+                if(i < 8)
+                {
+                    newData[i] = (byte)((id & (ulong)0xFF00000000000000 >> i * 8) >> 56 - i * 8);
+                }
+                else
+                {
+                    newData[i] = data[i - 8];
+                }
+            }
+            return newData;
         }
     }
 }

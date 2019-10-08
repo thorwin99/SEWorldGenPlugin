@@ -30,8 +30,6 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.CustomWorldScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(PluginAdminMenu);
-
-            //MyMultiplayer.ReplicationLayer.RegisterFromAssembly(typeof(SystemGenerator).Assembly);
         }
 
         public void Update()

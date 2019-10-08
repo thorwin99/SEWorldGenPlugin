@@ -1,15 +1,16 @@
 ﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using VRage;
-using VRage.ObjectBuilders;
 using VRage.Serialization;
 using VRageMath;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
     [ProtoContract]
+    [Serializable]
     public class MyObjectBuilder_StarSystem
     {
         [ProtoMember(3010)]
@@ -25,6 +26,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [XmlInclude(typeof(MySystemBeltItem))]
     [XmlInclude(typeof(MyPlanetMoonItem))]
     [XmlInclude(typeof(MyPlanetRingItem))]
+    [Serializable]
     public class MySystemItem
     {
         [ProtoMember(1)]
@@ -43,6 +45,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     [ProtoContract]
+    [Serializable]
     public class MyPlanetItem : MySystemItem
     {
         [ProtoMember(3)]
@@ -84,6 +87,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     [ProtoContract]
+    [Serializable]
     public class MyPlanetMoonItem : MySystemItem
     {
         [ProtoMember(3)]
@@ -97,6 +101,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     [ProtoContract]
+    [Serializable]
     public class MyPlanetRingItem : MySystemItem
     {
         [ProtoMember(3)]
@@ -119,6 +124,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     [ProtoContract]
+    [Serializable]
     public class MySystemBeltItem : MySystemItem
     {
         [ProtoMember(3)]

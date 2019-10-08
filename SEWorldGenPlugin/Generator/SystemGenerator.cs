@@ -1,26 +1,23 @@
 ﻿using Sandbox.Definitions;
-using Sandbox.Engine.Multiplayer;
 using Sandbox.Game.Multiplayer;
-using Sandbox.Game.Screens.Helpers;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
+using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
-using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Library.Utils;
-using VRage.Network;
 using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
 {
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
-    [StaticEventOwner]
+    [EventOwner]
     public partial class SystemGenerator : MySessionComponentBase
     {
         private string[] greek_letters = new string[] {"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "My", "Ny", "Xi", "Omikron", "Pi", "Rho", "Sigma", "Tau", "Ypsilon", "Phi", "Chi", "Psi", "Omega"};
