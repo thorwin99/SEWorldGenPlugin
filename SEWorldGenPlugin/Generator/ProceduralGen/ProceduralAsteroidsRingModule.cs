@@ -134,6 +134,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                         MyVoxelMap voxelMap;
 
                         voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
+                        if (voxelMap == null) continue;
                         voxelMap.Save = true;
 
                         m_NotSavedMaps.Add(voxelMap);
