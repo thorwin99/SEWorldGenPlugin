@@ -91,7 +91,7 @@ namespace SEWorldGenPlugin.GUI
                     RecreateControls(false);
                 }
             };
-            if(newCombo.GetSelectedKey() == 8)
+            if(newCombo.GetSelectedKey() > 7)
             {
                 ClearControls();
                 CheckBuildPluginControls();
@@ -100,14 +100,18 @@ namespace SEWorldGenPlugin.GUI
 
         private void CheckBuildPluginControls()
         {
-            if(!m_pluginInstalled)
+            if (!m_pluginInstalled)
+            {
                 NetUtil.PingServer(delegate
                 {
                     m_pluginInstalled = true;
                     RecreateControls(false);
                 });
-
-            BuildPluginControls();
+            }
+            else
+            {
+                BuildPluginControls();
+            }
         }
 
         private void BuildPluginControls()
