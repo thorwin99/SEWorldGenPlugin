@@ -1,4 +1,5 @@
-﻿using SEWorldGenPlugin.ObjectBuilders;
+﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using VRage.Game;
 using VRage.Game.Components;
@@ -44,7 +45,8 @@ namespace SEWorldGenPlugin.Session
 
         public override void SaveData()
         {
-            FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(SettingsSession));
+            if(Sync.IsServer)
+                FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(SettingsSession));
         }
 
         protected override void UnloadData()
