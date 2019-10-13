@@ -16,6 +16,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_moonGpsLabel;
         private MyGuiControlLabel m_beltGpsLabel;
         private MyGuiControlLabel m_asteroidGeneratorLabel;
+        private MyGuiControlLabel m_asteroidDensityLabel;
         private MyGuiControlLabel m_objAmountLabel;
         private MyGuiControlLabel m_orbDistanceLabel;
         private MyGuiControlLabel m_sizeMultiplierLabel;
@@ -27,6 +28,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_beltProbLabel;
 
         private MyGuiControlLabel m_objAmountValue;
+        private MyGuiControlLabel m_asteroidDensityValue;
         private MyGuiControlLabel m_orbDistanceValue;
         private MyGuiControlLabel m_sizeMultiplierValue;
         private MyGuiControlLabel m_sizeCapValue;
@@ -41,6 +43,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlCheckbox m_moonGpsCheck;
         private MyGuiControlCheckbox m_beltGpsCheck;
         private MyGuiControlCombobox m_asteroidGeneratorCombo;
+        private MyGuiControlSlider m_asteroidDensitySlider;
         private MyGuiControlSlider m_objAmountSlider;
         private MyGuiControlSlider m_orbDistanceSlider;
         private MyGuiControlSlider m_sizeMultiplierSlider;
@@ -80,10 +83,10 @@ namespace SEWorldGenPlugin.GUI
             int mod = m_isNewGame ? 2 : 0;
             AddCaption("SEWorldGenPlugin Settings", null, new Vector2(0f, 0.003f));
 
-            MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (12 + mod)));
+            MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (13 + mod)));
             if (!m_isNewGame)
             {
-                parent.Size = new Vector2(parent.Size.X, 0.052f * (11 + mod));
+                parent.Size = new Vector2(parent.Size.X, 0.052f * (13 + mod));
             }
             parent.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
 
@@ -99,6 +102,7 @@ namespace SEWorldGenPlugin.GUI
             m_moonGpsLabel = MakeLabel("Create GPS for Moons");
             m_beltGpsLabel = MakeLabel("Create GPS for Belts");
             m_asteroidGeneratorLabel = MakeLabel("Asteroid generator");
+            m_asteroidDensityLabel = MakeLabel("Asteroid density");
             m_objAmountLabel = MakeLabel("Objects in System");
             m_orbDistanceLabel = MakeLabel("Average Orbit distance");
             m_sizeMultiplierLabel = MakeLabel("Planet size multiplier");
@@ -115,6 +119,7 @@ namespace SEWorldGenPlugin.GUI
             m_beltGpsCheck = new MyGuiControlCheckbox();
             m_asteroidGeneratorCombo = new MyGuiControlCombobox(null, new Vector2(x2, 0.04f));
             x2 += 0.05f;
+            m_asteroidDensitySlider = new MyGuiControlSlider(Vector2.Zero, 0.1f, 1f, x2, 0.6f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ROID_DENS_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
             m_objAmountSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 100f, x2, 15f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SYS_OBJ_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_orbDistanceSlider = new MyGuiControlSlider(Vector2.Zero, 500f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_sizeMultiplierSlider = new MyGuiControlSlider(Vector2.Zero, 1f, 10f, x2, 2f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_MUL_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
@@ -125,6 +130,8 @@ namespace SEWorldGenPlugin.GUI
             m_beltHeightSlider = new MyGuiControlSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_beltProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
 
+            m_asteroidDensityValue = MakeLabel(String.Format("{0:0.00}", m_asteroidDensitySlider.Value));
+            m_asteroidDensityValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
             m_objAmountValue = MakeLabel(m_objAmountSlider.Value.ToString());
             m_objAmountValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
             m_orbDistanceValue = MakeLabel(m_orbDistanceSlider.Value.ToString());
@@ -171,6 +178,10 @@ namespace SEWorldGenPlugin.GUI
                 m_beltProbSlider.Enabled = !val;
             };
 
+            m_asteroidDensitySlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_asteroidDensitySlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                m_asteroidDensityValue.Text = String.Format("{0:0.00}", s.Value);
+            });
             m_objAmountSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_objAmountSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
                 m_objAmountValue.Text = s.Value.ToString();
@@ -205,7 +216,7 @@ namespace SEWorldGenPlugin.GUI
             });
             m_beltProbSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_beltProbSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
-                m_beltProbValue.Text = String.Format("{0:0.000}", s.Value); ;
+                m_beltProbValue.Text = String.Format("{0:0.000}", s.Value);
             });
             m_useGlobalCheck.IsCheckedChanged = (Action<MyGuiControlCheckbox>)Delegate.Combine(m_useGlobalCheck.IsCheckedChanged, (Action<MyGuiControlCheckbox>)delegate (MyGuiControlCheckbox s)
             {
@@ -240,6 +251,10 @@ namespace SEWorldGenPlugin.GUI
 
             parent.Controls.Add(m_asteroidGeneratorLabel);
             parent.Controls.Add(m_asteroidGeneratorCombo);
+
+            parent.Controls.Add(m_asteroidDensityLabel);
+            parent.Controls.Add(m_asteroidDensitySlider);
+            parent.Controls.Add(m_asteroidDensityValue);
 
             parent.Controls.Add(m_objAmountLabel);
             parent.Controls.Add(m_objAmountSlider);
@@ -277,7 +292,7 @@ namespace SEWorldGenPlugin.GUI
             parent.Controls.Add(m_beltProbSlider);
             parent.Controls.Add(m_beltProbValue);
 
-            Vector2 start = (new Vector2(0f, 0.052f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
+            Vector2 start = (new Vector2(0f, (!m_isNewGame) ? 0.052f : 0.026f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
             Vector2 offset = new Vector2(0f, 0.050f);//0.028f
             Vector2 offset2 = new Vector2(m_orbDistanceLabel.Size.X * 1.5f, 0f);
             Vector2 offset3 = new Vector2(0.4973214f, 0f);
@@ -297,39 +312,43 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidGeneratorLabel.Position = start + offset * (2 + mod);
             m_asteroidGeneratorCombo.Position = m_asteroidGeneratorLabel.Position + offset2;
 
-            m_objAmountLabel.Position = start + offset * (3 + mod);
+            m_asteroidDensityLabel.Position = start + offset * (3 + mod);
+            m_asteroidDensitySlider.Position = m_asteroidDensityLabel.Position + offset2;
+            m_asteroidDensityValue.Position = m_asteroidDensityLabel.Position + offset3;
+
+            m_objAmountLabel.Position = start + offset * (4 + mod);
             m_objAmountSlider.Position = m_objAmountLabel.Position + offset2;
             m_objAmountValue.Position = m_objAmountLabel.Position + offset3;
 
-            m_orbDistanceLabel.Position = start + offset * (4 + mod);
+            m_orbDistanceLabel.Position = start + offset * (5 + mod);
             m_orbDistanceSlider.Position = m_orbDistanceLabel.Position + offset2;
             m_orbDistanceValue.Position = m_orbDistanceLabel.Position + offset3;
 
-            m_sizeMultiplierLabel.Position = start + offset * (5 + mod);
+            m_sizeMultiplierLabel.Position = start + offset * (6 + mod);
             m_sizeMultiplierSlider.Position = m_sizeMultiplierLabel.Position + offset2;
             m_sizeMultiplierValue.Position = m_sizeMultiplierLabel.Position + offset3;
 
-            m_sizeCapLabel.Position = start + offset * (6 + mod);
+            m_sizeCapLabel.Position = start + offset * (7 + mod);
             m_sizeCapSlider.Position = m_sizeCapLabel.Position + offset2;
             m_sizeCapValue.Position = m_sizeCapLabel.Position + offset3;
 
-            m_moonProbLabel.Position = start + offset * (7 + mod);
+            m_moonProbLabel.Position = start + offset * (8 + mod);
             m_moonProbSlider.Position = m_moonProbLabel.Position + offset2;
             m_moonProbValue.Position = m_moonProbLabel.Position + offset3;
 
-            m_ringWidthLabel.Position = start + offset * (8 + mod);
+            m_ringWidthLabel.Position = start + offset * (9 + mod);
             m_ringWidthSlider.Position = m_ringWidthLabel.Position + offset2;
             m_ringWidthValue.Position = m_ringWidthLabel.Position + offset3;
 
-            m_ringProbLabel.Position = start + offset * (9 + mod);
+            m_ringProbLabel.Position = start + offset * (10 + mod);
             m_ringProbSlider.Position = m_ringProbLabel.Position + offset2;
             m_ringProbValue.Position = m_ringProbLabel.Position + offset3;
 
-            m_beltHeightLabel.Position = start + offset * (10 + mod);
+            m_beltHeightLabel.Position = start + offset * (11 + mod);
             m_beltHeightSlider.Position = m_beltHeightLabel.Position + offset2;
             m_beltHeightValue.Position = m_beltHeightLabel.Position + offset3;
 
-            m_beltProbLabel.Position = start + offset * (11 + mod);
+            m_beltProbLabel.Position = start + offset * (12 + mod);
             m_beltProbSlider.Position = m_beltProbLabel.Position + offset2;
             m_beltProbValue.Position = m_beltProbLabel.Position + offset3;
 
@@ -362,6 +381,8 @@ namespace SEWorldGenPlugin.GUI
 
             m_asteroidGeneratorCombo.SelectItemByKey((int)settings.GeneratorSettings.AsteroidGenerator);
 
+            m_asteroidDensitySlider.Value = settings.GeneratorSettings.AsteroidDensity;
+
             m_objAmountSlider.Value = (settings.GeneratorSettings.MinObjectsInSystem + settings.GeneratorSettings.MaxObjectsInSystem) / 2;
 
             m_orbDistanceSlider.Value = (settings.GeneratorSettings.MinOrbitDistance / 1000 + settings.GeneratorSettings.MaxOrbitDistance / 1000) / 2;
@@ -391,6 +412,7 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.MaxOrbitDistance = (int)(m_orbDistanceSlider.Value * 1000 * 2 - settings.GeneratorSettings.MinOrbitDistance);
 
             settings.GeneratorSettings.AsteroidGenerator = (AsteroidGenerator)m_asteroidGeneratorCombo.GetSelectedKey();
+            settings.GeneratorSettings.AsteroidDensity = m_asteroidDensitySlider.Value;
 
             settings.GeneratorSettings.PlanetSettings.SizeMultiplier = (int)m_sizeMultiplierSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_sizeCapSlider.Value * 1000;
