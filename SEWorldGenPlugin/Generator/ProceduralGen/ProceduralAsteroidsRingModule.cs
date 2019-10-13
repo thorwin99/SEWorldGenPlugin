@@ -5,6 +5,7 @@ using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -26,16 +27,16 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     {
         private const int OBJECT_SIZE_MIN = 128;
         private const int OBJECT_SIZE_MAX = 512;
-        private const int SUBCELL_SIZE = OBJECT_SIZE_MAX * 3;
-        private const int SUBCELLS = 6;
+        private const int CELL_SIZE = OBJECT_SIZE_MAX * 20;
 
         private HashSet<MyVoxelBase> m_NotSavedMaps;
         private bool m_saving;
         private MyAsteroidGeneratorDefinition m_data;
         private MethodInfo m_createRoid;
         private Type m_providerType;
+        private float m_density;
 
-        public ProceduralAsteroidsRingModule(int seed) : base(seed, SUBCELLS * SUBCELL_SIZE)
+        public ProceduralAsteroidsRingModule(int seed) : base(seed, CELL_SIZE)
         {
             m_NotSavedMaps = new HashSet<MyVoxelBase>();
             MySession.Static.OnSavingCheckpoint += delegate
@@ -49,6 +50,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_data = GetData();
             m_providerType = typeof(MyProceduralWorldGenerator).Assembly.GetType("Sandbox.Game.World.Generator.MyCompositeShapeProvider");
             m_createRoid = m_providerType.GetMethod("CreateAsteroidShape");
+            m_density = SettingsSession.Static.Settings.GeneratorSettings.AsteroidDensity;
         }
 
         public override MyProceduralCell GenerateCell(ref Vector3I id)
@@ -60,14 +62,17 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             {
                 int index = 0;
 
+                int subCellSize = (int)(OBJECT_SIZE_MAX * 2 / m_density);
+                int subcells = CELL_SIZE / subCellSize;
+
                 Vector3I subcellId = Vector3I.Zero;
-                Vector3I max = new Vector3I(SUBCELLS - 1);
+                Vector3I max = new Vector3I(subcells - 1);
 
                 for(var it = new Vector3I_RangeIterator(ref Vector3I.Zero, ref max); it.IsValid(); it.GetNext(out subcellId))
                 {
                     Vector3D position = new Vector3D(MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble());
                     position += (Vector3D)subcellId;
-                    position *= SUBCELL_SIZE;
+                    position *= subCellSize;
                     position += id * CELL_SIZE;
 
                     if (!MyEntities.IsInsideWorld(position)) continue;

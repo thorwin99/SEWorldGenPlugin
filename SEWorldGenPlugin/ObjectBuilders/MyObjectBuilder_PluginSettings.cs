@@ -36,6 +36,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MinOrbitDistance = 4000000;
             MaxOrbitDistance = 10000000;
             AsteroidGenerator = AsteroidGenerator.PLUGIN;
+            AsteroidDensity = 0.6f;
             PlanetSettings = new PlanetSettings();
             BeltSettings = new BeltSettings();
         }
