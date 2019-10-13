@@ -176,6 +176,7 @@ namespace SEWorldGenPlugin.GUI
                 m_ringWidthSlider.Enabled = !val;
                 m_beltHeightSlider.Enabled = !val;
                 m_beltProbSlider.Enabled = !val;
+                m_asteroidDensitySlider.Enabled = !val;
             };
 
             m_asteroidDensitySlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_asteroidDensitySlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
