@@ -56,9 +56,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public AsteroidGenerator AsteroidGenerator;
 
         [ProtoMember(6)]
-        public PlanetSettings PlanetSettings;
+        public float AsteroidDensity;
 
         [ProtoMember(7)]
+        public PlanetSettings PlanetSettings;
+
+        [ProtoMember(8)]
         public BeltSettings BeltSettings;
 
         public void Verify()
@@ -67,6 +70,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             Verifier.VerifyInt(MinObjectsInSystem, int.MaxValue, 25, "MaxObjectsInSystem", ref MaxObjectsInSystem);
             Verifier.VerifyInt(0, MinOrbitDistance, 4000000, "MinOrbitDistance", ref MinOrbitDistance);
             Verifier.VerifyInt(MinOrbitDistance, int.MaxValue, 10000000, "MaxOrbitDistance", ref MaxOrbitDistance);
+            Verifier.VerifyFloat(0f, 1f, 0.5f, "AsteroidDensity", ref AsteroidDensity);
 
             PlanetSettings.Verify();
             BeltSettings.Verify();
