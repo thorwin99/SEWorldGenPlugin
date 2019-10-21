@@ -29,7 +29,7 @@ namespace SEWorldGenPlugin.Session
                 ShowOnHud = true,
                 GPSColor = color,
                 AlwaysVisible = true,
-                DiscardAt = TimeSpan.FromDays(100)
+                DiscardAt = null
             };
             g.UpdateHash();
             ToAddGpss.Add(g);
