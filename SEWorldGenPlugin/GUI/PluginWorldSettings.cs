@@ -44,11 +44,11 @@ namespace SEWorldGenPlugin.GUI
             private set;
         }
 
-        public PluginWorldSettings() : this(null, null)
+        public PluginWorldSettings(bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true) : this(null, null, displayTabScenario, displayTabWorkshop, displayTabCustom)
         {
         }
 
-        public PluginWorldSettings(MyObjectBuilder_Checkpoint checkpoint, string path) : base(checkpoint, path)
+        public PluginWorldSettings(MyObjectBuilder_Checkpoint checkpoint, string path, bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true) : base(checkpoint, path, displayTabScenario, displayTabWorkshop, displayTabCustom)
         {
             Static = this;
             m_isNewGame = (checkpoint == null);
