@@ -14,6 +14,11 @@ namespace SEWorldGenPlugin.GUI
 
         }
 
+        public PluginGuiScreenNewGame(bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true) : base(displayTabScenario, displayTabWorkshop, displayTabCustom)
+        {
+
+        }
+
 
         public override void RecreateControls(bool constructor)
         {
