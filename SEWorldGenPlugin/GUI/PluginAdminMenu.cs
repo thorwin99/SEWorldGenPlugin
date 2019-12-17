@@ -1,8 +1,10 @@
-﻿using Sandbox.Engine.Multiplayer;
+﻿using Sandbox.Definitions;
+using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
+using Sandbox.Game.SessionComponents.Clipboard;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
@@ -30,6 +32,7 @@ namespace SEWorldGenPlugin.GUI
         private long m_currentKey;
         private long m_attachedEntity;
 
+        //Elements for Ring Menu
         private MyGuiControlListbox m_planetListBox;
         private MyGuiControlLabel m_ringDistanceValue;
         private MyGuiControlLabel m_ringAngleValue;
@@ -46,6 +49,15 @@ namespace SEWorldGenPlugin.GUI
 
         private MyPlanetItem m_selectedPlanet;
         private bool m_newPlanet;
+
+        //Elements for Planet Menu
+        private MyGuiControlListbox m_planetDefListBox;
+        private MyGuiControlLabel m_planetSizeValue;
+        private MyGuiControlSlider m_planetSizeSlider;
+        private MyGuiControlButton m_spawnPlanetButton;
+
+        private MyPlanetGeneratorDefinition m_selectedDefinition;
+
         private bool m_pluginInstalled;
 
         public PluginAdminMenu() : base()
@@ -61,7 +73,10 @@ namespace SEWorldGenPlugin.GUI
             MyGuiControlCombobox modeCombo = GetCombo();
 
             if (MySession.Static.IsUserSpaceMaster(Sync.MyId) && MySession.Static.IsUserAdmin(Sync.MyId))
-                modeCombo.AddItem(8L, "SEWorldGenPlugin");
+            {
+                modeCombo.AddItem(8L, "SEWorldGenPlugin - Rings");
+                modeCombo.AddItem(9L, "SEWorldGenPlugin - Planets");
+            }
 
             MyGuiControlCombobox newCombo = AddCombo();
 
@@ -91,14 +106,19 @@ namespace SEWorldGenPlugin.GUI
                     RecreateControls(false);
                 }
             };
-            if(newCombo.GetSelectedKey() > 7)
+            if(newCombo.GetSelectedKey() == 8)
             {
                 ClearControls();
-                CheckBuildPluginControls();
+                CheckBuildPluginControls(BuildRingMenu);
+            }
+            else if(newCombo.GetSelectedKey() == 9)
+            {
+                ClearControls();
+                CheckBuildPluginControls(BuildPlanetMenu);
             }
         }
 
-        private void CheckBuildPluginControls()
+        private void CheckBuildPluginControls(Action creator)
         {
             if (!m_pluginInstalled)
             {
@@ -108,16 +128,12 @@ namespace SEWorldGenPlugin.GUI
                     RecreateControls(false);
                 });
             }
-            else
-            {
-                BuildPluginControls();
-            }
+            creator?.Invoke();
         }
 
-        private void BuildPluginControls()
+        private void BuildPluginMenuHeader()
         {
             Vector2 controlPadding = new Vector2(0.02f, 0.02f);
-            float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
             float num2 = (SCREEN_SIZE.Y - 1f) / 2f;
 
             m_currentPosition = -m_size.Value / 2f + controlPadding;
@@ -133,14 +149,102 @@ namespace SEWorldGenPlugin.GUI
                     Text = "Plugin not installed or enabled on server",
                     ColorMask = Color.Red.ToVector4(),
                     TextScale = MyGuiConstants.DEFAULT_TEXT_SCALE
-                    
-                };
 
+                };
 
                 AddControl(errorLabel);
 
                 return;
             }
+        }
+
+        private void BuildPlanetMenu()
+        {
+            Vector2 controlPadding = new Vector2(0.02f, 0.02f);
+            float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
+            float num2 = (SCREEN_SIZE.Y - 1f) / 2f;
+
+            BuildPluginMenuHeader();
+
+            MyGuiControlLabel listBoxLabel = new MyGuiControlLabel
+            {
+                Position = new Vector2(-0.153f, -0.334f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Text = "List of Planet definitions"
+            };
+
+            MyGuiControlPanel listBoxLabelBg = new MyGuiControlPanel(new Vector2(listBoxLabel.PositionX - 0.0085f, listBoxLabel.Position.Y - 0.005f), new Vector2(0.2865f, 0.035f), null, null, null, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP)
+            {
+                BackgroundTexture = MyGuiConstants.TEXTURE_RECTANGLE_DARK_BORDER
+            };
+
+            Controls.Add(listBoxLabelBg);
+            Controls.Add(listBoxLabel);
+
+            m_currentPosition.Y += 0.020f;
+
+            m_planetDefListBox = new MyGuiControlListbox(Vector2.Zero, VRage.Game.MyGuiControlListboxStyleEnum.Blueprints);
+            m_planetDefListBox.Size = new Vector2(num, 0f);
+            m_planetDefListBox.Enabled = true;
+            m_planetDefListBox.VisibleRowsCount = 8;
+            m_planetDefListBox.Position = m_planetDefListBox.Size / 2f + m_currentPosition;
+            m_planetDefListBox.ItemClicked += PlanetDefListItemClicked;
+            m_planetDefListBox.MultiSelect = false;
+
+            MyGuiControlSeparatorList separator = new MyGuiControlSeparatorList();
+            separator.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.00f), m_size.Value.X * 0.73f);
+            Controls.Add(separator);
+
+            m_currentPosition = m_planetDefListBox.GetPositionAbsoluteBottomLeft();
+            m_currentPosition.Y += 0.045f;
+
+            MyGuiControlLabel planetSizeLabel = new MyGuiControlLabel
+            {
+                Position = m_currentPosition + new Vector2(0.001f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Text = "PlanetSize"
+            };
+            Controls.Add(planetSizeLabel);
+
+            m_planetSizeValue = new MyGuiControlLabel
+            {
+                Position = m_currentPosition + new Vector2(0.285f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
+                Text = "0"
+            };
+            Controls.Add(m_planetSizeValue);
+
+            m_currentPosition.Y += 0.025f;
+
+            m_planetSizeSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, 2400f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
+            m_planetSizeSlider.Size = new Vector2(0.285f, 1f);
+            m_planetSizeSlider.DefaultValue = 1200f;
+            m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue.Value;
+            m_planetSizeSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+            m_planetSizeSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_planetSizeSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                m_planetSizeValue.Text = s.Value.ToString();
+            });
+
+            m_planetSizeValue.Text = m_planetSizeSlider.Value.ToString();
+
+            Controls.Add(m_planetSizeSlider);
+
+            m_currentPosition.Y += 0.055f + 0.035f;
+
+            m_spawnPlanetButton = CreateDebugButton(0.284f, "Spawn planet", OnSpawnPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
+
+            Controls.Add(m_planetDefListBox);
+
+            LoadPlanetDefinitions();
+        }
+
+        private void BuildRingMenu()
+        {
+            Vector2 controlPadding = new Vector2(0.02f, 0.02f);
+            float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
+
+            BuildPluginMenuHeader();
 
             MyGuiControlLabel listBoxLabel = new MyGuiControlLabel
             {
@@ -316,7 +420,7 @@ namespace SEWorldGenPlugin.GUI
 
             Controls.Add(m_planetListBox);
 
-            FillList();
+            LoadPlanetsInWorld();
         }
 
         private void OnTeleportToRingButton(MyGuiControlButton button)
@@ -455,7 +559,7 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
-        private void FillList()
+        private void LoadPlanetsInWorld()
         {
             List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
             foreach(var item in planets)
@@ -464,7 +568,37 @@ namespace SEWorldGenPlugin.GUI
 
                 if (name.StartsWith("Moon ")) continue;
 
-                m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(item.DisplayName.Replace("_", " ")), null, null, item));
+                m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, item));
+            }
+        }
+
+        private void LoadPlanetDefinitions()
+        {
+            var definitions = SystemGenerator.Static.m_planetDefinitions;
+            foreach (var item in definitions)
+            {
+                string name = item.Id.SubtypeName.ToString();
+
+                m_planetDefListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, item));
+            }
+        }
+
+        private void PlanetDefListItemClicked(MyGuiControlListbox box)
+        {
+            if (box.SelectedItems.Count > 0)
+            {
+                m_selectedDefinition = (MyPlanetGeneratorDefinition)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
+            }
+        }
+
+        private void OnSpawnPlanetButton(MyGuiControlButton button)
+        {
+            if (m_planetListBox.SelectedItems.Count > 0)
+            {
+                
+
+                MyClipboardComponent.Static.ActivateVoxelClipboard(voxelMap, myStorageBase, MySector.MainCamera.ForwardVector, (myStorageBase.Size * 0.5f).Length());
+                CloseScreenNow();
             }
         }
 
