@@ -9,6 +9,11 @@ namespace SEWorldGenPlugin.GUI
 {
     public class PluginGuiScreenWorkshopGame : MyGuiScreenNewWorkshopGame
     {
+        public PluginGuiScreenWorkshopGame(bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true) : base(displayTabScenario, displayTabWorkshop, displayTabCustom)
+        {
+
+        }
+
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);

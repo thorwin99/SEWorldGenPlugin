@@ -19,7 +19,6 @@ namespace SEWorldGenPlugin.GUI
 
         }
 
-
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
