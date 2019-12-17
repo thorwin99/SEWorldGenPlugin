@@ -5,6 +5,7 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
+using VRage.Utils;
 
 namespace SEWorldGenPlugin.Generator
 {
@@ -186,6 +187,7 @@ namespace SEWorldGenPlugin.Generator
                     }
                     Static.m_objects.Remove(obj);
                 }
+                MyLog.Default.WriteLine("Adding Planet");
                 Static.m_objects.Add(planet);
             }
         }

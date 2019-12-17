@@ -36,12 +36,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 MyPlanetItem planet = (MyPlanetItem)obj;
 
                 if (planet.Generated) continue;
-
                 MyPlanetGeneratorDefinition definition = GetDefinition(planet.DefName);
                 if (definition == null) continue;
                 long id = MyRandom.Instance.NextLong();
                 string name = (planet.DisplayName + " - " + definition.Id.SubtypeId).Replace(" ", "_");
-                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, planet.OffsetPosition, m_seed, planet.Size, true, id, false, false);
+                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, Vector3D.Subtract(planet.OffsetPosition, new Vector3D(planet.Size)), m_seed, planet.Size, true, id, false, true);
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
                 generatedPlanet.DisplayNameText = planet.DisplayName;
                 generatedPlanet.AsteroidName = planet.DisplayName;

@@ -18,6 +18,7 @@ using System.Text;
 using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Game.SessionComponents;
+using VRage.Library.Utils;
 using VRage.Utils;
 using VRageMath;
 
@@ -160,6 +161,7 @@ namespace SEWorldGenPlugin.GUI
 
         private void BuildPlanetMenu()
         {
+            ClearControls();
             Vector2 controlPadding = new Vector2(0.02f, 0.02f);
             float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
             float num2 = (SCREEN_SIZE.Y - 1f) / 2f;
@@ -233,6 +235,7 @@ namespace SEWorldGenPlugin.GUI
             m_currentPosition.Y += 0.055f + 0.035f;
 
             m_spawnPlanetButton = CreateDebugButton(0.284f, "Spawn planet", OnSpawnPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
+            m_spawnPlanetButton.Enabled = false;
 
             Controls.Add(m_planetDefListBox);
 
@@ -586,18 +589,35 @@ namespace SEWorldGenPlugin.GUI
         private void PlanetDefListItemClicked(MyGuiControlListbox box)
         {
             if (box.SelectedItems.Count > 0)
-            {
+            {                
                 m_selectedDefinition = (MyPlanetGeneratorDefinition)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
+                m_spawnPlanetButton.Enabled = true;
             }
         }
 
         private void OnSpawnPlanetButton(MyGuiControlButton button)
         {
-            if (m_planetListBox.SelectedItems.Count > 0)
+            if (m_planetDefListBox.SelectedItems.Count > 0)
             {
-                
+                Vector3 camForward = MySector.MainCamera.ForwardVector;
+                float planetSize = m_planetSizeSlider.Value * 1000;
 
-                MyClipboardComponent.Static.ActivateVoxelClipboard(voxelMap, myStorageBase, MySector.MainCamera.ForwardVector, (myStorageBase.Size * 0.5f).Length());
+                Vector3 pos = Vector3.Add(Vector3.Multiply(camForward, planetSize), MySector.MainCamera.Position);
+                MyPlanetItem planet = new MyPlanetItem()
+                {
+                    OffsetPosition = new Vector3D(pos.X, pos.Y, pos.Z),
+                    DefName = m_selectedDefinition.Id.SubtypeId.ToString(),
+                    DisplayName = m_selectedDefinition.Id.SubtypeId.ToString() + "_" + planetSize + "_" + MyRandom.Instance.Next(),
+                    Generated = false,
+                    PlanetMoons = new MyPlanetMoonItem[0],
+                    PlanetRing = null,
+                    Size = planetSize,
+                    Type = SystemObjectType.PLANET,
+                    CenterPosition = Vector3D.Zero
+                };
+
+                SystemGenerator.Static.AddPlanet(planet);
+
                 CloseScreenNow();
             }
         }

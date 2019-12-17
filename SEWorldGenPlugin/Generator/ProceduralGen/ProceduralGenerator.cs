@@ -91,6 +91,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 MySession.Static.Settings.ProceduralDensity = 0;
             }
 
+            planetModule.GeneratePlanets();
+
             foreach (var entity in m_toTrackedEntities)
             {
                 if (m_trackedEntities.ContainsKey(entity.Key))
@@ -110,8 +112,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     var oldBounding = tracker.BoundingVolume;
                     tracker.UpdateLastPosition();
-
-                    planetModule.GeneratePlanets();
 
                     if (asteroidModule == null) continue;
 
