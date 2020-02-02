@@ -36,6 +36,18 @@ namespace SEWorldGenPlugin.Generator
             private set;
         }
 
+        public List<MyPlanetGeneratorDefinition> m_moonDefinitions
+        {
+            get;
+            private set;
+        }
+
+        public List<MyPlanetGeneratorDefinition> m_mandatoryPlanets
+        {
+            get;
+            private set;
+        }
+
         private int m_seed;
         private GeneratorSettings m_settings;
 
@@ -73,6 +85,8 @@ namespace SEWorldGenPlugin.Generator
             LoadNet();
 
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
+            m_mandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
+            m_moonDefinitions = new List<MyPlanetGeneratorDefinition>();
             FilterDefinitions();
         }
 
@@ -112,13 +126,14 @@ namespace SEWorldGenPlugin.Generator
 
             using (MyRandom.Instance.PushSeed(m_seed))
             {
-                int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem);
+                int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem) + m_mandatoryPlanets.Count;
                 long tmp_distance = 0;
                 int totalBelts = 0;
                 int totalPlanets = 0;
 
                 for (int i = 0; i < numberPlanets; i++)
                 {
+
                     int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
                     tmp_distance += distToPrev;
 
@@ -128,6 +143,17 @@ namespace SEWorldGenPlugin.Generator
                     else
                     {
                         GenerateBelt(tmp_distance, ref totalBelts);
+                    }
+                }
+
+                if(totalPlanets < m_mandatoryPlanets.Count)
+                {
+                    for(int i = totalPlanets; i < m_mandatoryPlanets.Count; i++)
+                    {
+                        int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
+                        tmp_distance += distToPrev;
+
+                        GeneratePlanet(i, tmp_distance, numberPlanets, ref totalPlanets);
                     }
                 }
             }
@@ -180,7 +206,7 @@ namespace SEWorldGenPlugin.Generator
             for(int i = 0; i < numMoons; i++)
             {
                 var dist = planetSize * (i + 1) + planetSize / 2 * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
-                var def = GetPlanetDefinition(planetSize * 0.8f);
+                var def = GetPlanetMoonDefinition(planetSize * 0.8f);
 
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
                 item.Type = SystemObjectType.MOON;
@@ -216,11 +242,40 @@ namespace SEWorldGenPlugin.Generator
         {
             int tries = 0;
             float size;
-            MyPlanetGeneratorDefinition def = null;
+            MyPlanetGeneratorDefinition def;
+
+            if(m_mandatoryPlanets.Count != 0)
+            {
+                def = m_mandatoryPlanets[0];
+                m_mandatoryPlanets.RemoveAt(0);
+                return def;
+            }
 
             do
             {
                 def = m_planetDefinitions[MyRandom.Instance.Next(0, m_planetDefinitions.Count - 1)];
+                size = SizeByGravity(def.SurfaceGravity);
+                tries++;
+
+            } while (size >= maximumSize && tries < 10000);
+
+            return def;
+        }
+
+        private MyPlanetGeneratorDefinition GetPlanetMoonDefinition(float maximumSize)
+        {
+            int tries = 0;
+            float size;
+            MyPlanetGeneratorDefinition def;
+
+            if (m_moonDefinitions.Count == 0) return GetPlanetDefinition(maximumSize);
+
+            do
+            {
+                def = m_moonDefinitions[MyRandom.Instance.Next(0, m_moonDefinitions.Count - 1)];
+
+                MyLog.Default.WriteLine("moon " + def.Id.SubtypeId.String + " " + m_moonDefinitions.Count);
+
                 size = SizeByGravity(def.SurfaceGravity);
                 tries++;
 
@@ -241,20 +296,28 @@ namespace SEWorldGenPlugin.Generator
 
         private void FilterDefinitions()
         {
-            List<MyPlanetGeneratorDefinition> toRemove = new List<MyPlanetGeneratorDefinition>();
+            List<MyPlanetGeneratorDefinition> toRemovePlanets = new List<MyPlanetGeneratorDefinition>();
             foreach (var p in m_planetDefinitions)
             {
                 if (p.Id.SubtypeId.String.Contains("Tutorial") || p.Id.SubtypeId.String.Contains("TestMap") || p.Id.SubtypeId.String.Contains("ModExample"))
                 {
-                    toRemove.Add(p);
+                    toRemovePlanets.Add(p);
                 }
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets.Contains(p.Id.SubtypeId.String))
                 {
-                    toRemove.Add(p);
+                    toRemovePlanets.Add(p);
+                }
+                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.Moons.Contains(p.Id.SubtypeId.String))
+                {
+                    toRemovePlanets.Add(p);
+                    m_moonDefinitions.Add(p);
+                }
+                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String)){
+                    m_mandatoryPlanets.Add(p);
                 }
             }
 
-            foreach(var r in toRemove)
+            foreach(var r in toRemovePlanets)
             {
                 m_planetDefinitions.Remove(r);
             }

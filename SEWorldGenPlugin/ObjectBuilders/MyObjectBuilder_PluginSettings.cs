@@ -91,6 +91,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
             ShowMoonGPS = false;
             BlacklistedPlanets = new HashSet<string>();
             BlacklistedPlanets.Add("MoonTutorial");
+
+            MandatoryPlanets = new HashSet<string>();
+
+            Moons = new HashSet<string>();
+            Moons.Add("Moon");
+            Moons.Add("Titan");
         }
 
         [ProtoMember(1)]
@@ -113,6 +119,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(7)]
         public HashSet<string> BlacklistedPlanets;
+
+        [ProtoMember(8)]
+        public HashSet<string> MandatoryPlanets;
+
+        [ProtoMember(9)]
+        public HashSet<string> Moons;
 
         public void Verify()
         {

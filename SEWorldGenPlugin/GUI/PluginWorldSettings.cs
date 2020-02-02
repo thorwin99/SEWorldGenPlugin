@@ -130,6 +130,8 @@ namespace SEWorldGenPlugin.GUI
             {
                 PlSettings = new MyObjectBuilder_PluginSettings();
                 PlSettings.GeneratorSettings.PlanetSettings.BlacklistedPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets;
+                PlSettings.GeneratorSettings.PlanetSettings.Moons = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.Moons;
+                PlSettings.GeneratorSettings.PlanetSettings.MandatoryPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets;
             }
             else
             {
