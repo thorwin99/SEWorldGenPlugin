@@ -22,11 +22,10 @@ namespace SEWorldGenPlugin
             private set;
         }
 
-        private MyObjectBuilder_PluginSettings m_sessonSettings;
         public MyObjectBuilder_PluginSettings SessionSettings
         {
-            get { return m_sessonSettings == null ? Settings : m_sessonSettings; }
-            set { m_sessonSettings = value; }
+            get;
+            set;
         }
 
         public MySettings()
@@ -59,6 +58,9 @@ namespace SEWorldGenPlugin
             else
             {
                 Settings = new MyObjectBuilder_PluginSettings();
+                Settings.GeneratorSettings.PlanetSettings.Moons.Add("Moon");
+                Settings.GeneratorSettings.PlanetSettings.Moons.Add("Titan");
+
                 if (Sync.IsDedicated)
                     Settings.Enable = true;
             }

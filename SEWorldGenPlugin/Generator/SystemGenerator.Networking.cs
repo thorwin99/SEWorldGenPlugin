@@ -187,7 +187,6 @@ namespace SEWorldGenPlugin.Generator
                     }
                     Static.m_objects.Remove(obj);
                 }
-                MyLog.Default.WriteLine("Adding Planet");
                 Static.m_objects.Add(planet);
             }
         }

@@ -3,6 +3,7 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using VRage.Game;
 using VRage.Game.Components;
+using VRage.Utils;
 
 namespace SEWorldGenPlugin.Session
 {

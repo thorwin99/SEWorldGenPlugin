@@ -126,7 +126,7 @@ namespace SEWorldGenPlugin.Generator
 
             using (MyRandom.Instance.PushSeed(m_seed))
             {
-                int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem) + m_mandatoryPlanets.Count;
+                int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem);
                 long tmp_distance = 0;
                 int totalBelts = 0;
                 int totalPlanets = 0;
@@ -272,9 +272,7 @@ namespace SEWorldGenPlugin.Generator
 
             do
             {
-                def = m_moonDefinitions[MyRandom.Instance.Next(0, m_moonDefinitions.Count - 1)];
-
-                MyLog.Default.WriteLine("moon " + def.Id.SubtypeId.String + " " + m_moonDefinitions.Count);
+                def = m_moonDefinitions[MyRandom.Instance.Next(0, (m_moonDefinitions.Count - 1) * 2) % m_moonDefinitions.Count];
 
                 size = SizeByGravity(def.SurfaceGravity);
                 tries++;

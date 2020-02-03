@@ -109,7 +109,7 @@ namespace SEWorldGenPlugin.GUI
                                 }
                                 else
                                 {
-                                    MySettings.Static.SessionSettings = null;
+                                    MySettings.Static.SessionSettings = MySettings.Static.Settings;
                                 }
                             };
                         }

@@ -95,8 +95,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MandatoryPlanets = new HashSet<string>();
 
             Moons = new HashSet<string>();
-            Moons.Add("Moon");
-            Moons.Add("Titan");
         }
 
         [ProtoMember(1)]
