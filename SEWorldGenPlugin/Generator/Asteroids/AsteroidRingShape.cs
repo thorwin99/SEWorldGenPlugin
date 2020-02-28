@@ -21,9 +21,21 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             shape.height = ring.Height;
             shape.rotation = new Vector3D(1, 0, 0);
 
-            double angle = 2 * Math.PI / 360 * (ring.AngleDegrees);
-            shape.rotation.X = Math.Cos(angle);
-            shape.rotation.Y = Math.Sin(angle);
+            double angleZ = 2 * Math.PI / 360 * (ring.AngleDegrees);
+            double angleY = 2 * Math.PI / 360 * (ring.AngleDegreesY);
+            double angleX = 2 * Math.PI / 360 * (ring.AngleDegreesX);
+
+            //shape.rotation.X = Math.Cos(angleZ);
+            //shape.rotation.Y = Math.Sin(angleZ);
+            MatrixD mx = MatrixD.CreateRotationX(angleX);
+            MatrixD my = MatrixD.CreateRotationY(angleY);
+            MatrixD mz = MatrixD.CreateRotationZ(angleZ);
+
+            MatrixD.Multiply(ref mx, ref my, out MatrixD mxy);
+            MatrixD.Multiply(ref mxy, ref mz, out MatrixD mxyz);
+
+            Vector3D.Rotate(ref shape.rotation, ref mxyz, out Vector3D newRotation);
+            shape.rotation = Vector3D.Normalize(newRotation);
 
             return shape;
         }

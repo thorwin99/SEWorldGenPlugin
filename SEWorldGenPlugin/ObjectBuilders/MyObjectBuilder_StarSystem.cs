@@ -120,7 +120,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public float AngleDegreesY;
 
         [ProtoMember(8)]
-        public float AngleDegreesZ;
+        public float AngleDegreesX;
 
         [ProtoMember(9)]
         public int RoidSize;
