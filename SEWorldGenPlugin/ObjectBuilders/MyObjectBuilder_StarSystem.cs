@@ -117,9 +117,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public float AngleDegrees;
 
         [ProtoMember(7)]
-        public int RoidSize;
+        public float AngleDegreesY;
 
         [ProtoMember(8)]
+        public float AngleDegreesZ;
+
+        [ProtoMember(9)]
+        public int RoidSize;
+
+        [ProtoMember(10)]
         public SerializableVector3D Center;
     }
 
