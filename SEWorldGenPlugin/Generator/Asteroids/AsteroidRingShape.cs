@@ -11,6 +11,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public int width;
         public int height;
         public Vector3D rotation;
+        public Vector3D normal;
 
         public static AsteroidRingShape CreateFromRingItem(MyPlanetRingItem ring)
         {
@@ -20,6 +21,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             shape.width = ring.Width;
             shape.height = ring.Height;
             shape.rotation = new Vector3D(1, 0, 0);
+            shape.normal = new Vector3D(0, 0, 1);
 
             double angleZ = 2 * Math.PI / 360 * (ring.AngleDegrees);
             double angleY = 2 * Math.PI / 360 * (ring.AngleDegreesY);
@@ -35,7 +37,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             MatrixD.Multiply(ref mxy, ref mz, out MatrixD mxyz);
 
             Vector3D.Rotate(ref shape.rotation, ref mxyz, out Vector3D newRotation);
+            Vector3D.Rotate(ref shape.normal, ref mxyz, out Vector3D newNormal);
             shape.rotation = Vector3D.Normalize(newRotation);
+            shape.normal = Vector3D.Normalize(newNormal);
 
             return shape;
         }
@@ -43,7 +47,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public ContainmentType Contains(Vector3D point)
         {
             Vector3D relPosition = Vector3D.Subtract(point, center);
-            Vector3D planeNormal = new Vector3D(-rotation.Y, rotation.X, 0);
+            Vector3D planeNormal = normal;
             Vector3D horVector = Vector3D.ProjectOnPlane(ref relPosition, ref planeNormal);
             Vector3D vertVector = Vector3D.Subtract(relPosition, horVector);
 
