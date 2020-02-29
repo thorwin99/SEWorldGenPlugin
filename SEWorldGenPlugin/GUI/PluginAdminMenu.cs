@@ -9,6 +9,7 @@ using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
+using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
@@ -42,12 +43,12 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_ringRoidSizeValue;
         private MyGuiControlLabel m_ringWidthValue;
 
-        private MyGuiControlSlider m_ringDistanceSlider;
-        private MyGuiControlSlider m_ringAngleXSlider;
-        private MyGuiControlSlider m_ringAngleYSlider;
-        private MyGuiControlSlider m_ringAngleZSlider;
-        private MyGuiControlSlider m_ringRoidSizeSlider;
-        private MyGuiControlSlider m_ringWidthSlider;
+        private MyGuiControlClickableSlider m_ringDistanceSlider;
+        private MyGuiControlClickableSlider m_ringAngleXSlider;
+        private MyGuiControlClickableSlider m_ringAngleYSlider;
+        private MyGuiControlClickableSlider m_ringAngleZSlider;
+        private MyGuiControlClickableSlider m_ringRoidSizeSlider;
+        private MyGuiControlClickableSlider m_ringWidthSlider;
 
         private MyGuiControlButton m_addRingButton;
         private MyGuiControlButton m_removeRingButton;
@@ -59,7 +60,7 @@ namespace SEWorldGenPlugin.GUI
         //Elements for Planet Menu
         private MyGuiControlListbox m_planetDefListBox;
         private MyGuiControlLabel m_planetSizeValue;
-        private MyGuiControlSlider m_planetSizeSlider;
+        private MyGuiControlClickableSlider m_planetSizeSlider;
         private MyGuiControlButton m_spawnPlanetButton;
 
         private MyPlanetGeneratorDefinition m_selectedDefinition;
@@ -223,7 +224,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_currentPosition.Y += 0.025f;
 
-            m_planetSizeSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, 2400f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
+            m_planetSizeSlider = new MyGuiControlClickableSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, 2400f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
             m_planetSizeSlider.Size = new Vector2(0.285f, 1f);
             m_planetSizeSlider.DefaultValue = 1200f;
             m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue.Value;
@@ -325,7 +326,7 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringDistanceSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), 5000f, 1000000f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_DISTANCE, showLabel: false);//Make dynamic
+            m_ringDistanceSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), 5000f, 1000000f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_DISTANCE, showLabel: false);//Make dynamic
             m_ringDistanceSlider.Size = new Vector2(0.285f, 1f);
             m_ringDistanceSlider.DefaultValue = 100000;
             m_ringDistanceSlider.Value = m_ringDistanceSlider.DefaultValue.Value;
@@ -359,7 +360,7 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringWidthSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
+            m_ringWidthSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
             m_ringWidthSlider.Size = new Vector2(0.285f, 1f);
             m_ringWidthSlider.DefaultValue = (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
             m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
@@ -393,7 +394,7 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringAngleXSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleXSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleXSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleXSlider.DefaultValue = 0;
             m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
@@ -427,7 +428,7 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringAngleYSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleYSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleYSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleYSlider.DefaultValue = 0;
             m_ringAngleYSlider.Value = m_ringAngleYSlider.DefaultValue.Value;
@@ -461,7 +462,7 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringAngleZSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleZSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleZSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleZSlider.DefaultValue = 0;
             m_ringAngleZSlider.Value = m_ringAngleZSlider.DefaultValue.Value;
@@ -495,7 +496,7 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringRoidSizeSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
+            m_ringRoidSizeSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
             m_ringRoidSizeSlider.Size = new Vector2(0.285f, 1f);
             m_ringRoidSizeSlider.DefaultValue = 500;
             m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
@@ -529,6 +530,16 @@ namespace SEWorldGenPlugin.GUI
             m_teleportToRingButton.Enabled = false;
 
             Controls.Add(m_planetListBox);
+
+            m_ringAngleXSlider.Enabled = false;
+            m_ringAngleYSlider.Enabled = false;
+            m_ringAngleZSlider.Enabled = false;
+            m_ringDistanceSlider.Enabled = false;
+            m_ringWidthSlider.Enabled = false;
+            m_ringRoidSizeSlider.Enabled = false;
+            m_addRingButton.Enabled = false;
+            m_removeRingButton.Enabled = false;
+            m_teleportToRingButton.Enabled = false;
 
             LoadPlanetsInWorld();
         }

@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using Sandbox.Game.Localization;
 using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
@@ -43,16 +44,16 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlCheckbox m_moonGpsCheck;
         private MyGuiControlCheckbox m_beltGpsCheck;
         private MyGuiControlCombobox m_asteroidGeneratorCombo;
-        private MyGuiControlSlider m_asteroidDensitySlider;
-        private MyGuiControlSlider m_objAmountSlider;
-        private MyGuiControlSlider m_orbDistanceSlider;
-        private MyGuiControlSlider m_sizeMultiplierSlider;
-        private MyGuiControlSlider m_sizeCapSlider;
-        private MyGuiControlSlider m_moonProbSlider;
-        private MyGuiControlSlider m_ringWidthSlider;
-        private MyGuiControlSlider m_ringProbSlider;
-        private MyGuiControlSlider m_beltHeightSlider;
-        private MyGuiControlSlider m_beltProbSlider;
+        private MyGuiControlClickableSlider m_asteroidDensitySlider;
+        private MyGuiControlClickableSlider m_objAmountSlider;
+        private MyGuiControlClickableSlider m_orbDistanceSlider;
+        private MyGuiControlClickableSlider m_sizeMultiplierSlider;
+        private MyGuiControlClickableSlider m_sizeCapSlider;
+        private MyGuiControlClickableSlider m_moonProbSlider;
+        private MyGuiControlClickableSlider m_ringWidthSlider;
+        private MyGuiControlClickableSlider m_ringProbSlider;
+        private MyGuiControlClickableSlider m_beltHeightSlider;
+        private MyGuiControlClickableSlider m_beltProbSlider;
 
         private MyGuiControlButton m_okButton;
 
@@ -119,16 +120,16 @@ namespace SEWorldGenPlugin.GUI
             m_beltGpsCheck = new MyGuiControlCheckbox();
             m_asteroidGeneratorCombo = new MyGuiControlCombobox(null, new Vector2(x2, 0.04f));
             x2 += 0.05f;
-            m_asteroidDensitySlider = new MyGuiControlSlider(Vector2.Zero, 0.1f, 1f, x2, 0.6f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ROID_DENS_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
-            m_objAmountSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 100f, x2, 15f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SYS_OBJ_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_orbDistanceSlider = new MyGuiControlSlider(Vector2.Zero, 500f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_sizeMultiplierSlider = new MyGuiControlSlider(Vector2.Zero, 1f, 10f, x2, 2f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_MUL_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_sizeCapSlider = new MyGuiControlSlider(Vector2.Zero, 120f, 2400f, x2, 1200f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_CAP_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_moonProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.MOON_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
-            m_ringWidthSlider = new MyGuiControlSlider(Vector2.Zero, 10000f, 100000f, x2, 15000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_WIDTH_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_ringProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
-            m_beltHeightSlider = new MyGuiControlSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
-            m_beltProbSlider = new MyGuiControlSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_asteroidDensitySlider = new MyGuiControlClickableSlider(Vector2.Zero, 0.1f, 1f, x2, 0.6f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ROID_DENS_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_objAmountSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 100f, x2, 15f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SYS_OBJ_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_orbDistanceSlider = new MyGuiControlClickableSlider(Vector2.Zero, 500f, 100000f, x2, 50500f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.ORB_DIST_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_sizeMultiplierSlider = new MyGuiControlClickableSlider(Vector2.Zero, 1f, 10f, x2, 2f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_MUL_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_sizeCapSlider = new MyGuiControlClickableSlider(Vector2.Zero, 120f, 2400f, x2, 1200f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.SIZE_CAP_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_moonProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.MOON_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_ringWidthSlider = new MyGuiControlClickableSlider(Vector2.Zero, 10000f, 100000f, x2, 15000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_WIDTH_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_ringProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_beltHeightSlider = new MyGuiControlClickableSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_beltProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
 
             m_asteroidDensityValue = MakeLabel(String.Format("{0:0.00}", m_asteroidDensitySlider.Value));
             m_asteroidDensityValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;

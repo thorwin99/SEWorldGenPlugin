@@ -197,6 +197,7 @@
     <Compile Include="Generator\ProceduralGen\ProceduralPlanetModule.cs" />
     <Compile Include="Generator\SystemGenerator.cs" />
     <Compile Include="Generator\SystemGenerator.Networking.cs" />
+    <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
     <Compile Include="GUI\PluginAdminMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
     <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
