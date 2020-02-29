@@ -57,7 +57,7 @@ namespace SEWorldGenPlugin.Generator
         {
             InitNet();
 
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm != 0) return;
 
             MyObjectBuilder_StarSystem b = GetConfig();
             m_objects = b.SystemObjects;

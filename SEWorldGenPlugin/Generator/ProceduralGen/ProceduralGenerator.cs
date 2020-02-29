@@ -45,7 +45,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             planetModule = new ProceduralPlanetModule(m_seed);
 
-            if (!SettingsSession.Static.Settings.Enable || !Sync.IsServer) return;
+            if (!SettingsSession.Static.Settings.Enable || !Sync.IsServer || MySession.Static.Settings.WorldSizeKm != 0) return;
 
             MyObjectBuilder_AsteroidGenerator b = GetConfig();
 
@@ -84,7 +84,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Enabled)
                 return;
 
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm != 0) return;
 
             if (SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
             {
@@ -190,7 +190,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm != 0) return;
 
             base.Init(sessionComponent);
 
