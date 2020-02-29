@@ -558,11 +558,6 @@ namespace SEWorldGenPlugin.GUI
             PluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
         }
 
-        private void UpdatePlanetVisual()
-        {
-
-        }
-
         private void OnTeleportToRingButton(MyGuiControlButton button)
         {
             if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
@@ -777,7 +772,7 @@ namespace SEWorldGenPlugin.GUI
         {
             if (m_planetDefListBox.SelectedItems.Count > 0)
             {
-                Vector3 camForward = MySector.MainCamera.ForwardVector;
+                /*Vector3 camForward = MySector.MainCamera.ForwardVector;
                 float planetSize = m_planetSizeSlider.Value * 1000;
 
                 Vector3 pos = Vector3.Add(Vector3.Multiply(camForward, planetSize), MySector.MainCamera.Position);
@@ -794,9 +789,36 @@ namespace SEWorldGenPlugin.GUI
                     CenterPosition = Vector3D.Zero
                 };
 
-                SystemGenerator.Static.AddPlanet(planet);
+                SystemGenerator.Static.AddPlanet(planet);*/
+
+                float size = m_planetSizeSlider.Value * 1000;
+                MyPlanetItem planet = new MyPlanetItem()
+                {
+                    OffsetPosition = Vector3D.Zero,
+                    DefName = m_selectedDefinition.Id.SubtypeId.ToString(),
+                    DisplayName = m_selectedDefinition.Id.SubtypeId.ToString() + "_" + size + "_" + MyRandom.Instance.Next(),
+                    Generated = false,
+                    PlanetMoons = new MyPlanetMoonItem[0],
+                    PlanetRing = null,
+                    Size = size,
+                    Type = SystemObjectType.PLANET,
+                    CenterPosition = Vector3D.Zero
+                };
+
+                PluginItemsClipboard.Static.Activate(planet, SpawnPlanet, size);
 
                 CloseScreenNow();
+            }
+        }
+
+        private void SpawnPlanet(MySystemItem planet, Vector3D position)
+        {
+            if(planet.Type == SystemObjectType.PLANET)
+            {
+                MyPlanetItem p = (MyPlanetItem)planet;
+                p.OffsetPosition = position;
+
+                SystemGenerator.Static.AddPlanet(p);
             }
         }
 
