@@ -68,8 +68,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
 
         public Vector3D LocationInRing(int angle)
         {
-            double rad = radius + width / 2f;
-            return center + (new Vector3D(rotation.X * rad * Math.Cos(angle), rotation.Y * rad * Math.Cos(angle), Math.Sin(angle) * rad));
+            Vector3D pos = Vector3D.Zero;
+            pos.X = (float)((radius + width / 2) * Math.Cos(MathHelper.ToRadians(angle)));
+            pos.Y = 0;
+            pos.Z = (float)((radius + width / 2) * Math.Sin(MathHelper.ToRadians(angle)));
+            return Vector3D.Transform(pos, worldMatrix);
         }
 
         private double GetHeightAtRad(double rad)

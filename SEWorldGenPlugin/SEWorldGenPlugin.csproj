@@ -191,6 +191,7 @@
     <Compile Include="Draw\RenderCylinder.cs" />
     <Compile Include="Draw\IRenderObject.cs" />
     <Compile Include="Draw\RenderHollowCylinder.cs" />
+    <Compile Include="Draw\RenderSphere.cs" />
     <Compile Include="Generator\Asteroids\AsteroidBeltShape.cs" />
     <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
     <Compile Include="Generator\ProceduralGen\EntityExtension.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Session\GlobalGpsManager.cs" />
     <Compile Include="Session\PlayerTracker.cs" />
     <Compile Include="Session\PluginDrawSession.cs" />
+    <Compile Include="Session\PluginItemsClipboard.cs" />
     <Compile Include="Session\SettingsSession.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

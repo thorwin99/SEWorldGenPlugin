@@ -6,7 +6,7 @@ using VRage.Utils;
 
 namespace SEWorldGenPlugin.Session
 {
-    [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
     public class PluginDrawSession : MySessionComponentBase
     {
         public static PluginDrawSession Static;

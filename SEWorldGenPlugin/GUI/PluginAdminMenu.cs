@@ -558,22 +558,30 @@ namespace SEWorldGenPlugin.GUI
             PluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
         }
 
+        private void UpdatePlanetVisual()
+        {
+
+        }
+
         private void OnTeleportToRingButton(MyGuiControlButton button)
         {
             if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
             {
+                CloseScreen();
                 AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(m_selectedPlanet.PlanetRing);
+
                 MyMultiplayer.TeleportControlledEntity(shape.LocationInRing(0));
                 m_attachedEntity = 0L;
                 m_selectedPlanet = null;
                 MyGuiScreenGamePlay.SetCameraController();
-                CloseScreen();
+                
             }
         }
 
         public override bool CloseScreen()
         {
-            PluginDrawSession.Static.RemoveRenderObject(0);
+            if(m_selectedPlanet != null)
+                PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
             return base.CloseScreen();
         }
 
