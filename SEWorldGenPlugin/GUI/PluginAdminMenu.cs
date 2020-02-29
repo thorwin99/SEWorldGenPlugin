@@ -6,6 +6,7 @@ using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.GUI.Controls;
@@ -332,6 +333,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringDistanceSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringDistanceSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringDistanceSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
+                UpdateRingVisual();
                 m_ringDistanceValue.Text = s.Value.ToString();
             });
 
@@ -366,6 +368,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringWidthSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringWidthSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringWidthSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
+                UpdateRingVisual();
                 m_ringWidthValue.Text = s.Value.ToString();
             });
 
@@ -393,13 +396,14 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringAngleXSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleXSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -90, 90, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleXSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleXSlider.DefaultValue = 0;
             m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
             m_ringAngleXSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringAngleXSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleXSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
+                UpdateRingVisual();
                 m_ringAngleXValue.Text = String.Format("{0:0.00}", s.Value);
             });
 
@@ -427,13 +431,14 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringAngleYSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleYSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -90, 90, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleYSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleYSlider.DefaultValue = 0;
             m_ringAngleYSlider.Value = m_ringAngleYSlider.DefaultValue.Value;
             m_ringAngleYSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringAngleYSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleYSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
+                UpdateRingVisual();
                 m_ringAngleYValue.Text = String.Format("{0:0.00}", s.Value);
             });
 
@@ -461,13 +466,14 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringAngleZSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleZSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), -90, 90, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
             m_ringAngleZSlider.Size = new Vector2(0.285f, 1f);
             m_ringAngleZSlider.DefaultValue = 0;
             m_ringAngleZSlider.Value = m_ringAngleZSlider.DefaultValue.Value;
             m_ringAngleZSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringAngleZSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleZSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
+                UpdateRingVisual();
                 m_ringAngleZValue.Text = String.Format("{0:0.00}", s.Value);
             });
 
@@ -543,6 +549,15 @@ namespace SEWorldGenPlugin.GUI
             LoadPlanetsInWorld();
         }
 
+        private void UpdateRingVisual()
+        {
+            PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
+
+            AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(GenerateRingItem());
+
+            PluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
+        }
+
         private void OnTeleportToRingButton(MyGuiControlButton button)
         {
             if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
@@ -558,6 +573,7 @@ namespace SEWorldGenPlugin.GUI
 
         public override bool CloseScreen()
         {
+            PluginDrawSession.Static.RemoveRenderObject(0);
             return base.CloseScreen();
         }
 
@@ -599,6 +615,7 @@ namespace SEWorldGenPlugin.GUI
 
         private MyPlanetRingItem GenerateRingItem()
         {
+            if (m_selectedPlanet.PlanetRing != null) return m_selectedPlanet.PlanetRing;
             MyPlanetRingItem item = new MyPlanetRingItem();
             item.Type = SystemObjectType.RING;
             item.DisplayName = "";
@@ -609,6 +626,7 @@ namespace SEWorldGenPlugin.GUI
             item.Width = (int)m_ringWidthSlider.Value;
             item.Height = item.Width / 10;
             item.RoidSize = (int)m_ringRoidSizeSlider.Value;
+            item.Center = m_selectedPlanet.CenterPosition;
 
             return item;
         }
@@ -634,6 +652,11 @@ namespace SEWorldGenPlugin.GUI
                 else
                 {
                     name = myEntityListInfoItem.DisplayName.Replace("_", " ");
+                }
+
+                if(m_selectedPlanet != null)
+                {
+                    PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
                 }
 
                 SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
@@ -703,6 +726,8 @@ namespace SEWorldGenPlugin.GUI
                     m_ringAngleZValue.Text = String.Format("{0:0.00}", m_ringAngleZSlider.Value);
                     m_ringWidthValue.Text = m_ringWidthSlider.Value.ToString();
                     m_ringDistanceValue.Text = m_ringDistanceSlider.Value.ToString();
+
+                    UpdateRingVisual();
                 });
             }
         }

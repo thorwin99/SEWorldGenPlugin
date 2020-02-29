@@ -12,6 +12,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public int height;
         public Vector3D rotation;
         public Vector3D normal;
+        public MatrixD worldMatrix;
 
         public static AsteroidRingShape CreateFromRingItem(MyPlanetRingItem ring)
         {
@@ -40,6 +41,8 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             Vector3D.Rotate(ref shape.normal, ref mxyz, out Vector3D newNormal);
             shape.rotation = Vector3D.Normalize(newRotation);
             shape.normal = Vector3D.Normalize(newNormal);
+
+            shape.worldMatrix = MatrixD.CreateWorld(shape.center, shape.rotation, shape.normal);
 
             return shape;
         }
