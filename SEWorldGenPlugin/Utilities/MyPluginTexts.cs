@@ -33,6 +33,7 @@ namespace SEWorldGenPlugin.Utilities
         public readonly string ADMIN_RING_ANGLE = "The angle of the ring in degrees";
         public readonly string ADMIN_RING_ROID_SIZE = "The size of the asteroids in the ring in meters";
         public readonly string ADMIN_ADD_RING_BUTTON = "Adds the ring to the planet";
+        public readonly string ADMIN_REMOVE_RING_BUTTON = "Removes the ring from the planet. All previously generated Asteroids will stay.";
         public readonly string ADMIN_TP_RING_BUTTON = "Teleports your player to the ring of the planet";
         public readonly string ADMIN_PLANET_SIZE = "The size of the planet in kilometers";
         public readonly string ADMIN_SPAWN_PLANET = "Spawns the planet with given size";

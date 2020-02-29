@@ -84,6 +84,22 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        public void RemoveRingFromPlanet(string name)
+        {
+            if (!m_handshakeDone)
+            {
+                NetUtil.PingServer(delegate //Handshake needed to check, if plugin is installed on the server, since it would crash the server to send data to it without it knowing what to do.
+                {
+                    m_handshakeDone = true;
+                    PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, null);
+                });
+            }
+            else
+            {
+                PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, null);
+            }
+        }
+
         [Event(100)]
         [Reliable]
         [Server]
@@ -188,6 +204,24 @@ namespace SEWorldGenPlugin.Generator
                     Static.m_objects.Remove(obj);
                 }
                 Static.m_objects.Add(planet);
+            }
+        }
+
+        [Event(107)]
+        [Reliable]
+        [Server]
+        static void SendRemoveRingFromPlanet(string planetName)
+        {
+            if (Static.TryGetObject(planetName, out MySystemItem obj))
+            {
+                if (obj.Type == SystemObjectType.PLANET)
+                {
+                    MyPlanetItem planet = (MyPlanetItem)obj;
+                    if (planet.PlanetRing != null)
+                    {
+                        planet.PlanetRing = null;
+                    }
+                }
             }
         }
     }

@@ -36,16 +36,21 @@ namespace SEWorldGenPlugin.GUI
         //Elements for Ring Menu
         private MyGuiControlListbox m_planetListBox;
         private MyGuiControlLabel m_ringDistanceValue;
-        private MyGuiControlLabel m_ringAngleValue;
+        private MyGuiControlLabel m_ringAngleXValue;
+        private MyGuiControlLabel m_ringAngleYValue;
+        private MyGuiControlLabel m_ringAngleZValue;
         private MyGuiControlLabel m_ringRoidSizeValue;
         private MyGuiControlLabel m_ringWidthValue;
 
         private MyGuiControlSlider m_ringDistanceSlider;
-        private MyGuiControlSlider m_ringAngleSlider;
+        private MyGuiControlSlider m_ringAngleXSlider;
+        private MyGuiControlSlider m_ringAngleYSlider;
+        private MyGuiControlSlider m_ringAngleZSlider;
         private MyGuiControlSlider m_ringRoidSizeSlider;
         private MyGuiControlSlider m_ringWidthSlider;
 
         private MyGuiControlButton m_addRingButton;
+        private MyGuiControlButton m_removeRingButton;
         private MyGuiControlButton m_teleportToRingButton;
 
         private MyPlanetItem m_selectedPlanet;
@@ -283,25 +288,44 @@ namespace SEWorldGenPlugin.GUI
             m_currentPosition = m_planetListBox.GetPositionAbsoluteBottomLeft();
             m_currentPosition.Y += 0.045f;
 
+            MyGuiControlParent myGuiControlParent = new MyGuiControlParent
+            {
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Position = Vector2.Zero,
+                Size = new Vector2(0.32f, 0.48f)
+            };
+
+            MyGuiControlScrollablePanel m_optionsGroup = new MyGuiControlScrollablePanel(myGuiControlParent)
+            {
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Position = m_currentPosition,
+                Size = new Vector2(0.32f, 0.32f)
+            };
+            m_optionsGroup.ScrollbarVEnabled = true;
+            m_optionsGroup.ScrollBarOffset = new Vector2(-0.01f, 0f);
+            Controls.Add(m_optionsGroup);
+
+            Vector2 vector = -myGuiControlParent.Size * 0.5f;
+
             MyGuiControlLabel ringDistLabel = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.001f, 0f),
+                Position = vector + new Vector2(0.001f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
                 Text = "Ring distance"
             };
-            Controls.Add(ringDistLabel);
+            myGuiControlParent.Controls.Add(ringDistLabel);
 
             m_ringDistanceValue = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.285f, 0f),
+                Position = vector + new Vector2(0.285f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
                 Text = "0"
             };
-            Controls.Add(m_ringDistanceValue);
+            myGuiControlParent.Controls.Add(m_ringDistanceValue);
 
-            m_currentPosition.Y += 0.025f;
+            vector.Y += 0.025f;
 
-            m_ringDistanceSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 5000f, 1000000f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_DISTANCE, showLabel: false);//Make dynamic
+            m_ringDistanceSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), 5000f, 1000000f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_DISTANCE, showLabel: false);//Make dynamic
             m_ringDistanceSlider.Size = new Vector2(0.285f, 1f);
             m_ringDistanceSlider.DefaultValue = 100000;
             m_ringDistanceSlider.Value = m_ringDistanceSlider.DefaultValue.Value;
@@ -313,28 +337,29 @@ namespace SEWorldGenPlugin.GUI
 
             m_ringDistanceValue.Text = m_ringDistanceSlider.Value.ToString();
 
-            Controls.Add(m_ringDistanceSlider);
+            myGuiControlParent.Controls.Add(m_ringDistanceSlider);
 
-            m_currentPosition.Y += 0.055f;
+            vector.Y += 0.055f;
 
             MyGuiControlLabel ringWidthLabel = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.001f, 0f),
+                Position = vector + new Vector2(0.001f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
                 Text = "Ring width"
             };
-            Controls.Add(ringWidthLabel);
+            myGuiControlParent.Controls.Add(ringWidthLabel);
 
             m_ringWidthValue = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.285f, 0f),
+                Position = vector + new Vector2(0.285f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
                 Text = "0"
             };
-            Controls.Add(m_ringWidthValue);
+            myGuiControlParent.Controls.Add(m_ringWidthValue);
 
-            m_currentPosition.Y += 0.025f;
-            m_ringWidthSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
+            vector.Y += 0.025f;
+
+            m_ringWidthSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
             m_ringWidthSlider.Size = new Vector2(0.285f, 1f);
             m_ringWidthSlider.DefaultValue = (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
             m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
@@ -346,61 +371,131 @@ namespace SEWorldGenPlugin.GUI
 
             m_ringWidthValue.Text = m_ringWidthSlider.Value.ToString();
 
-            Controls.Add(m_ringWidthSlider);
+            myGuiControlParent.Controls.Add(m_ringWidthSlider);
 
-            m_currentPosition.Y += 0.055f;
+            vector.Y += 0.055f;
 
-            MyGuiControlLabel ringAngleLabel = new MyGuiControlLabel
+            MyGuiControlLabel ringAngleXLabel = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.001f, 0f),
+                Position = vector + new Vector2(0.001f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
-                Text = "Ring angle"
+                Text = "Ring angle X"
             };
-            Controls.Add(ringAngleLabel);
+            myGuiControlParent.Controls.Add(ringAngleXLabel);
 
-            m_ringAngleValue = new MyGuiControlLabel
+            m_ringAngleXValue = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.285f, 0f),
+                Position = vector + new Vector2(0.285f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
                 Text = "0.00"
             };
-            Controls.Add(m_ringAngleValue);
+            myGuiControlParent.Controls.Add(m_ringAngleXValue);
 
-            m_currentPosition.Y += 0.025f;
-            m_ringAngleSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
-            m_ringAngleSlider.Size = new Vector2(0.285f, 1f);
-            m_ringAngleSlider.DefaultValue = 0;
-            m_ringAngleSlider.Value = m_ringAngleSlider.DefaultValue.Value;
-            m_ringAngleSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
-            m_ringAngleSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            vector.Y += 0.025f;
+
+            m_ringAngleXSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleXSlider.Size = new Vector2(0.285f, 1f);
+            m_ringAngleXSlider.DefaultValue = 0;
+            m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+            m_ringAngleXSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+            m_ringAngleXSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleXSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
-                m_ringAngleValue.Text = String.Format("{0:0.00}", s.Value);
+                m_ringAngleXValue.Text = String.Format("{0:0.00}", s.Value);
             });
 
-            m_ringAngleValue.Text = String.Format("{0:0.00}", m_ringAngleSlider.Value);
+            m_ringAngleXValue.Text = String.Format("{0:0.00}", m_ringAngleXSlider.Value);
 
-            Controls.Add(m_ringAngleSlider);
+            myGuiControlParent.Controls.Add(m_ringAngleXSlider);
 
-            m_currentPosition.Y += 0.055f;
+            vector.Y += 0.055f;
+
+            MyGuiControlLabel ringAngleYLabel = new MyGuiControlLabel
+            {
+                Position = vector + new Vector2(0.001f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Text = "Ring angle Y"
+            };
+            myGuiControlParent.Controls.Add(ringAngleYLabel);
+
+            m_ringAngleYValue = new MyGuiControlLabel
+            {
+                Position = vector + new Vector2(0.285f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
+                Text = "0.00"
+            };
+            myGuiControlParent.Controls.Add(m_ringAngleYValue);
+
+            vector.Y += 0.025f;
+
+            m_ringAngleYSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleYSlider.Size = new Vector2(0.285f, 1f);
+            m_ringAngleYSlider.DefaultValue = 0;
+            m_ringAngleYSlider.Value = m_ringAngleYSlider.DefaultValue.Value;
+            m_ringAngleYSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+            m_ringAngleYSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleYSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                m_ringAngleYValue.Text = String.Format("{0:0.00}", s.Value);
+            });
+
+            m_ringAngleYValue.Text = String.Format("{0:0.00}", m_ringAngleYSlider.Value);
+
+            myGuiControlParent.Controls.Add(m_ringAngleYSlider);
+
+            vector.Y += 0.055f;
+
+            MyGuiControlLabel ringAngleZLabel = new MyGuiControlLabel
+            {
+                Position = vector + new Vector2(0.001f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Text = "Ring angle Z"
+            };
+            myGuiControlParent.Controls.Add(ringAngleZLabel);
+
+            m_ringAngleZValue = new MyGuiControlLabel
+            {
+                Position = vector + new Vector2(0.285f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
+                Text = "0.00"
+            };
+            myGuiControlParent.Controls.Add(m_ringAngleZValue);
+
+            vector.Y += 0.025f;
+
+            m_ringAngleZSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), -45, 45, intValue: false, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ANGLE);
+            m_ringAngleZSlider.Size = new Vector2(0.285f, 1f);
+            m_ringAngleZSlider.DefaultValue = 0;
+            m_ringAngleZSlider.Value = m_ringAngleZSlider.DefaultValue.Value;
+            m_ringAngleZSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+            m_ringAngleZSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringAngleZSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                m_ringAngleZValue.Text = String.Format("{0:0.00}", s.Value);
+            });
+
+            m_ringAngleZValue.Text = String.Format("{0:0.00}", m_ringAngleZSlider.Value);
+
+            myGuiControlParent.Controls.Add(m_ringAngleZSlider);
+
+            vector.Y += 0.055f;
 
             MyGuiControlLabel ringRoidSizeLabel = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.001f, 0f),
+                Position = vector + new Vector2(0.001f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
                 Text = "Asteroid size"
             };
-            Controls.Add(ringRoidSizeLabel);
+            myGuiControlParent.Controls.Add(ringRoidSizeLabel);
 
             m_ringRoidSizeValue = new MyGuiControlLabel
             {
-                Position = m_currentPosition + new Vector2(0.285f, 0f),
+                Position = vector + new Vector2(0.285f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
                 Text = "0"
             };
-            Controls.Add(m_ringRoidSizeValue);
+            myGuiControlParent.Controls.Add(m_ringRoidSizeValue);
 
-            m_currentPosition.Y += 0.025f;
-            m_ringRoidSizeSlider = new MyGuiControlSlider(m_currentPosition + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
+            vector.Y += 0.025f;
+
+            m_ringRoidSizeSlider = new MyGuiControlSlider(vector + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
             m_ringRoidSizeSlider.Size = new Vector2(0.285f, 1f);
             m_ringRoidSizeSlider.DefaultValue = 500;
             m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
@@ -412,11 +507,21 @@ namespace SEWorldGenPlugin.GUI
 
             m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
 
-            Controls.Add(m_ringRoidSizeSlider);
+            myGuiControlParent.Controls.Add(m_ringRoidSizeSlider);
 
-            m_currentPosition.Y += 0.055f + 0.035f;
+            m_optionsGroup.RefreshInternals();
+
+            m_currentPosition.Y += m_optionsGroup.Size.Y;
+
+            MyGuiControlSeparatorList separator2 = new MyGuiControlSeparatorList();
+            separator2.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.00f), m_size.Value.X * 0.73f);
+            Controls.Add(separator2);
 
             m_addRingButton = CreateDebugButton(0.284f, "Add ring to planet", OnAddRingToPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
+
+            m_currentPosition.Y += 0.003f;
+
+            m_removeRingButton = CreateDebugButton(0.284f, "Remove ring from planet", OnRemoveRingFromPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_REMOVE_RING_BUTTON);
 
             m_currentPosition.Y += 0.003f;
 
@@ -464,13 +569,32 @@ namespace SEWorldGenPlugin.GUI
                 PlanetListItemClicked(m_planetListBox);
             }
         }
+        
+        private void OnRemoveRingFromPlanetButton(MyGuiControlButton button)
+        {
+            if (m_planetListBox.SelectedItems.Count > 0)
+            {
+                if (m_newPlanet)
+                {
+                    m_selectedPlanet.PlanetRing = null;
+                    SystemGenerator.Static.AddPlanet(m_selectedPlanet);
+                }
+                else
+                {
+                    SystemGenerator.Static.RemoveRingFromPlanet(m_selectedPlanet.DisplayName);
+                }
+                PlanetListItemClicked(m_planetListBox);
+            }
+        }
 
         private MyPlanetRingItem GenerateRingItem()
         {
             MyPlanetRingItem item = new MyPlanetRingItem();
             item.Type = SystemObjectType.RING;
             item.DisplayName = "";
-            item.AngleDegrees = m_ringAngleSlider.Value;
+            item.AngleDegrees = m_ringAngleZSlider.Value;
+            item.AngleDegreesX = m_ringAngleXSlider.Value;
+            item.AngleDegreesY = m_ringAngleYSlider.Value;
             item.Radius = m_ringDistanceSlider.Value + m_selectedPlanet.Size / 2f;
             item.Width = (int)m_ringWidthSlider.Value;
             item.Height = item.Width / 10;
@@ -535,29 +659,38 @@ namespace SEWorldGenPlugin.GUI
 
                     bool hasRing = m_selectedPlanet.PlanetRing != null;
 
-                    m_ringAngleSlider.Enabled = !hasRing;
+                    m_ringAngleXSlider.Enabled = !hasRing;
+                    m_ringAngleYSlider.Enabled = !hasRing;
+                    m_ringAngleZSlider.Enabled = !hasRing;
                     m_ringDistanceSlider.Enabled = !hasRing;
                     m_ringWidthSlider.Enabled = !hasRing;
                     m_ringRoidSizeSlider.Enabled = !hasRing;
                     m_addRingButton.Enabled = !hasRing;
+                    m_removeRingButton.Enabled = hasRing;
                     m_teleportToRingButton.Enabled = hasRing;
 
                     if (hasRing)
                     {
                         m_ringDistanceSlider.Value = (float)m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
                         m_ringWidthSlider.Value = m_selectedPlanet.PlanetRing.Width;
-                        m_ringAngleSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
+                        m_ringAngleZSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
+                        m_ringAngleYSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesY;
+                        m_ringAngleXSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesX;
                         m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;
                     }
                     else
                     {
                         m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
-                        m_ringAngleSlider.Value = m_ringAngleSlider.DefaultValue.Value;
+                        m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+                        m_ringAngleYSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+                        m_ringAngleZSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
                         m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
                     }
 
                     m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
-                    m_ringAngleValue.Text = String.Format("{0:0.00}", m_ringAngleSlider.Value);
+                    m_ringAngleXValue.Text = String.Format("{0:0.00}", m_ringAngleXSlider.Value);
+                    m_ringAngleYValue.Text = String.Format("{0:0.00}", m_ringAngleYSlider.Value);
+                    m_ringAngleZValue.Text = String.Format("{0:0.00}", m_ringAngleZSlider.Value);
                     m_ringWidthValue.Text = m_ringWidthSlider.Value.ToString();
                     m_ringDistanceValue.Text = m_ringDistanceSlider.Value.ToString();
                 });
