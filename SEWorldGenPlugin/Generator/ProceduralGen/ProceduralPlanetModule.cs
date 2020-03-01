@@ -1,4 +1,5 @@
 ﻿using Sandbox.Definitions;
+using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.Asteroids;
@@ -7,6 +8,7 @@ using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
 using VRage.Game.Entity;
+using VRage.Game.Voxels;
 using VRage.Library.Utils;
 using VRage.Utils;
 using VRageMath;
@@ -40,7 +42,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 if (definition == null) continue;
                 long id = MyRandom.Instance.NextLong();
                 string name = (planet.DisplayName + " - " + definition.Id.SubtypeId).Replace(" ", "_");
-                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, Vector3D.Subtract(planet.OffsetPosition, new Vector3D(planet.Size)), m_seed, planet.Size, true, id, false, true);
+                if (planet.CenterPosition.Equals(Vector3D.Zero))
+                {
+                    planet.CenterPosition = planet.OffsetPosition;
+                }
+                MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, planet.CenterPosition - GetPlanetOffset(definition, planet.Size), m_seed, planet.Size, true, id, false, true);
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
                 generatedPlanet.DisplayNameText = planet.DisplayName;
                 generatedPlanet.AsteroidName = planet.DisplayName;
@@ -77,6 +83,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS)
                     GlobalGpsManager.Static.AddGps(planet.DisplayName, Color.Aqua, generatedPlanet.PositionComp.GetPosition());
             }
+        }
+
+        private Vector3D GetPlanetOffset(MyPlanetGeneratorDefinition definition, float size)
+        {
+            MyPlanetStorageProvider myPlanetStorageProvider = new MyPlanetStorageProvider();
+            myPlanetStorageProvider.Init(0, definition, size / 2f);
+            IMyStorage myStorage = new MyOctreeStorage(myPlanetStorageProvider, myPlanetStorageProvider.StorageSize);
+
+            return myStorage.Size / 2.0f;
         }
 
         private MyPlanetGeneratorDefinition GetDefinition(string name)

@@ -189,7 +189,7 @@ namespace SEWorldGenPlugin.Generator
             planet.Size = SizeByGravity(def.SurfaceGravity);
             planet.PlanetRing = GenerateRing(def.SurfaceGravity, planet.Size);
             planet.OffsetPosition = pos;
-            planet.CenterPosition = Vector3D.Zero;
+            planet.CenterPosition = pos;
             planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity, planet.DisplayName);
             planet.Generated = false;
 

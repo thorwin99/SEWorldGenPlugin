@@ -72,6 +72,7 @@ namespace SEWorldGenPlugin.Session
             if (m_isActive)
             {
                 PluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
+
                 MatrixD wm = GetPasteMatrix();
 
                 Vector3D posGlobal = wm.Forward * m_distanceToCam;

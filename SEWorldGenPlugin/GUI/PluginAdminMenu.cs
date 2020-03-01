@@ -1,6 +1,7 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
+using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
@@ -19,6 +20,7 @@ using System.Text;
 using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Game.SessionComponents;
+using VRage.Game.Voxels;
 using VRage.Library.Utils;
 using VRage.Utils;
 using VRageMath;
@@ -772,25 +774,6 @@ namespace SEWorldGenPlugin.GUI
         {
             if (m_planetDefListBox.SelectedItems.Count > 0)
             {
-                /*Vector3 camForward = MySector.MainCamera.ForwardVector;
-                float planetSize = m_planetSizeSlider.Value * 1000;
-
-                Vector3 pos = Vector3.Add(Vector3.Multiply(camForward, planetSize), MySector.MainCamera.Position);
-                MyPlanetItem planet = new MyPlanetItem()
-                {
-                    OffsetPosition = new Vector3D(pos.X, pos.Y, pos.Z),
-                    DefName = m_selectedDefinition.Id.SubtypeId.ToString(),
-                    DisplayName = m_selectedDefinition.Id.SubtypeId.ToString() + "_" + planetSize + "_" + MyRandom.Instance.Next(),
-                    Generated = false,
-                    PlanetMoons = new MyPlanetMoonItem[0],
-                    PlanetRing = null,
-                    Size = planetSize,
-                    Type = SystemObjectType.PLANET,
-                    CenterPosition = Vector3D.Zero
-                };
-
-                SystemGenerator.Static.AddPlanet(planet);*/
-
                 float size = m_planetSizeSlider.Value * 1000;
                 MyPlanetItem planet = new MyPlanetItem()
                 {
@@ -816,7 +799,7 @@ namespace SEWorldGenPlugin.GUI
             if(planet.Type == SystemObjectType.PLANET)
             {
                 MyPlanetItem p = (MyPlanetItem)planet;
-                p.OffsetPosition = position;
+                p.CenterPosition = position;
 
                 SystemGenerator.Static.AddPlanet(p);
             }
