@@ -27,7 +27,6 @@ namespace SEWorldGenPlugin
             MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
 
             MyPerGameSettings.GUI.MainMenu = typeof(PluginMainMenu);
-            MyPerGameSettings.GUI.CustomWorldScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(PluginAdminMenu);
         }
