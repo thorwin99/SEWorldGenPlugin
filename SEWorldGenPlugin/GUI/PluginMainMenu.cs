@@ -6,6 +6,8 @@ using Sandbox.Game.Screens.Helpers;
 using Sandbox.Game.World;
 using Sandbox.Graphics;
 using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.http;
+using SEWorldGenPlugin.Utilities;
 using SpaceEngineers.Game.GUI;
 using System;
 using System.IO;
@@ -62,6 +64,19 @@ namespace SEWorldGenPlugin.GUI
                 newGameButton.Name = button.Name;
                 Controls[index] = newGameButton;
                 newGameButton.SetToolTip(button.Tooltips);
+            }
+
+            if (!VersionCheck.Static.IsNewest())
+            {
+                MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_BOX), new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_TITLE), null, null, null, null, OnUpdateNotifiactionMessageClose));
+            }
+        }
+
+        private void OnUpdateNotifiactionMessageClose(MyGuiScreenMessageBox.ResultEnum r)
+        {
+            if(r == MyGuiScreenMessageBox.ResultEnum.YES)
+            {
+                MyGuiSandbox.OpenUrl(VersionCheck.Static.GetLatestVersionPage(), UrlOpenMode.SteamOrExternalWithConfirm);
             }
         }
 

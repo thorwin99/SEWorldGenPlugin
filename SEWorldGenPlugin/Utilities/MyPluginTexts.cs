@@ -3,6 +3,7 @@
     public class MyPluginTexts
     {
         public static ToolTips TOOLTIPS = new ToolTips();
+        public static Messages MESSAGES = new Messages();
     }
     public class ToolTips
     {
@@ -31,6 +32,12 @@
         public readonly string ADMIN_TP_RING_BUTTON = "Teleports your player to the ring of the planet";
         public readonly string ADMIN_PLANET_SIZE = "The size of the planet in kilometers";
         public readonly string ADMIN_SPAWN_PLANET = "Spawns the planet with given size";
+    }
+
+    public class Messages
+    {
+        public readonly string UPDATE_AVAILABLE_TITLE = "SEWorldGenPlugin Update available";
+        public readonly string UPDATE_AVAILABLE_BOX = "A new version of the SEWorldGenPlugin is a available. Do you want to visit the download page now?";
     }
 
 }

@@ -101,6 +101,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\System.Memory.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -208,6 +209,8 @@
     <Compile Include="GUI\PluginMainMenu.cs" />
     <Compile Include="GUI\PluginSettingsGui.cs" />
     <Compile Include="GUI\PluginWorldSettings.cs" />
+    <Compile Include="http\Responses\GitHubVersionResponse.cs" />
+    <Compile Include="http\VersionCheck.cs" />
     <Compile Include="MySettings.cs" />
     <Compile Include="Networking\Attributes\BroadcastAttribute.cs" />
     <Compile Include="Networking\Attributes\ClientAttribute.cs" />
