@@ -42,7 +42,7 @@ namespace SEWorldGenPlugin.GUI
             base.RecreateControls(constructor);
             if (m_pauseGame) return;
             m_elemtents = new MyGuiControlElementGroup();
-            //m_elemtents.HighlightChanged += OnHighlightChange;
+            m_elemtents.HighlightChanged += OnHighlightChange;
             MyGuiControlButton button = null;
             foreach (var c in Controls)
             {
@@ -65,18 +65,17 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
-        /*private void OnHighlightChange(MyGuiControlElementGroup obj)
+        private void OnHighlightChange(MyGuiControlElementGroup obj)
         {
-            int i = 0;
             foreach (var c in m_elemtents)
             {
-                if (c.HasFocus && i != obj.SelectedIndex)
+                if (c.HasFocus && m_elemtents.SelectedIndex != obj.SelectedIndex)
                 {
-                    FocusedControl = obj.SelectedElement;
+                    FocusedControl = c;
                     break;
                 }
             }
-        }*/
+        }
 
         private void OnNewGameClick(object sender)
         {
