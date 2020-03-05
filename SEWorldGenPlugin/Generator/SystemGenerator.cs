@@ -65,6 +65,7 @@ namespace SEWorldGenPlugin.Generator
             m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
 
             m_settings = SettingsSession.Static.Settings.GeneratorSettings;
+            //FilterDefinitions();
 
             if (b == null || m_objects == null || m_objects.Count == 0)
             {

@@ -60,9 +60,6 @@ namespace SEWorldGenPlugin
                 Settings = new MyObjectBuilder_PluginSettings();
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Moon");
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Titan");
-
-                if (Sync.IsDedicated)
-                    Settings.Enable = true;
             }
             Settings.Verify();
         }

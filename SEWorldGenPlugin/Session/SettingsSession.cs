@@ -39,7 +39,15 @@ namespace SEWorldGenPlugin.Session
                     var s = new MySettings();
                     s.LoadSettings();
                 }
-                Settings = MySettings.Static.SessionSettings;
+                if(MySettings.Static.SessionSettings != null)
+                {
+                    Settings = MySettings.Static.SessionSettings;
+                }
+                else
+                {
+                    Settings = MySettings.Static.Settings;
+                }
+                
                 MySettings.Static.SessionSettings = null;
             }
         }
