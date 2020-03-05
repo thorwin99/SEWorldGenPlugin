@@ -18,6 +18,8 @@ namespace SEWorldGenPlugin.GUI
 {
     public class PluginWorldSettings : MyGuiScreenWorldSettings
     {
+
+        public static MyGuiScreenWorldSettings Static;
         public MyObjectBuilder_PluginSettings PluginSettings;
 
         private MyGuiControlCheckbox m_enablePlugin;
@@ -47,7 +49,7 @@ namespace SEWorldGenPlugin.GUI
         {
         }
 
-        public PluginWorldSettings(MyObjectBuilder_Checkpoint checkpoint, string path, bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true) : base(checkpoint, path, displayTabScenario, displayTabWorkshop, displayTabCustom)
+        public PluginWorldSettings(MyObjectBuilder_Checkpoint checkpoint, string path, bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true, bool isCloudPath = false) : base(checkpoint, path, displayTabScenario, displayTabWorkshop, displayTabCustom, isCloudPath)
         {
             Static = this;
             m_isNewGame = (checkpoint == null);
