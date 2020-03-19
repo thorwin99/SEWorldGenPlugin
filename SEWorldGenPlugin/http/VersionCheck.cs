@@ -55,7 +55,8 @@ namespace SEWorldGenPlugin.http
 
             for(int i = 0; i < Math.Min(vc.Length, vl.Length); i++)
             {
-                if (int.Parse(vl[i]) > int.Parse(vc[i])) return false;
+                if (int.Parse(vc[i]) > int.Parse(vl[i])) return true;
+                if (int.Parse(vc[i]) < int.Parse(vl[i])) return false;
             }
 
             return true;
