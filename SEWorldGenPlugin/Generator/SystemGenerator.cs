@@ -301,6 +301,7 @@ namespace SEWorldGenPlugin.Generator
                 if (p.Id.SubtypeId.String.Contains("Tutorial") || p.Id.SubtypeId.String.Contains("TestMap") || p.Id.SubtypeId.String.Contains("ModExample"))
                 {
                     toRemovePlanets.Add(p);
+                    continue;
                 }
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets.Contains(p.Id.SubtypeId.String))
                 {
@@ -311,7 +312,8 @@ namespace SEWorldGenPlugin.Generator
                     toRemovePlanets.Add(p);
                     m_moonDefinitions.Add(p);
                 }
-                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String)){
+                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String) || SettingsSession.Static.Settings.GeneratorSettings.SemiRandomizedGeneration)
+                {
                     m_mandatoryPlanets.Add(p);
                 }
             }

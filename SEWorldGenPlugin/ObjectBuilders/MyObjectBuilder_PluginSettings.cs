@@ -39,6 +39,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             AsteroidDensity = 0.6f;
             PlanetSettings = new PlanetSettings();
             BeltSettings = new BeltSettings();
+            SemiRandomizedGeneration = false;
         }
 
         [ProtoMember(1)]
@@ -64,6 +65,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(8)]
         public BeltSettings BeltSettings;
+
+        [ProtoMember(9)]
+        public bool SemiRandomizedGeneration;
 
         public void Verify()
         {
