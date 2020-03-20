@@ -104,6 +104,11 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [Serializable]
     public class MyPlanetRingItem : MySystemItem
     {
+        public MyPlanetRingItem()
+        {
+            RoidSizeMax = 512;
+        }
+
         [ProtoMember(3)]
         public double Radius;
 
@@ -127,6 +132,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(10)]
         public SerializableVector3D Center;
+
+        [ProtoMember(11)]
+        public int RoidSizeMax;
     }
 
     [ProtoContract]

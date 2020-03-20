@@ -81,14 +81,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     if (obj == null) continue;
                     int minSize = OBJECT_SIZE_MIN;
+                    int maxSize = OBJECT_SIZE_MAX;
 
                     if (obj.Type == SystemObjectType.BELT)
                         minSize = ((MySystemBeltItem)obj).RoidSize;
 
                     if (obj.Type == SystemObjectType.RING)
+                    {
                         minSize = ((MyPlanetRingItem)obj).RoidSize;
+                        maxSize = ((MyPlanetRingItem)obj).RoidSizeMax;
+                    }
 
-                    var cellObject = new MyObjectSeed(cell, position, MyRandom.Instance.Next(Math.Min(OBJECT_SIZE_MAX, minSize), OBJECT_SIZE_MAX));
+                    var cellObject = new MyObjectSeed(cell, position, MyRandom.Instance.Next(Math.Min(maxSize, minSize), Math.Max(maxSize, minSize)));
                     cellObject.Params.Type = MyObjectSeedType.Asteroid;
                     cellObject.Params.Seed = MyRandom.Instance.Next();
                     cellObject.Params.Index = index++;

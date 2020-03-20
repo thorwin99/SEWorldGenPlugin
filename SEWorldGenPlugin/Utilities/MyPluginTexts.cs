@@ -26,7 +26,8 @@
         public readonly string ADMIN_RING_DISTANCE = "The distance of the ring to the planet in meters";
         public readonly string ADMIN_RING_WIDTH = "The width of the ring in meters";
         public readonly string ADMIN_RING_ANGLE = "The angle of the ring around the wanted axis in degrees";
-        public readonly string ADMIN_RING_ROID_SIZE = "The size of the asteroids in the ring in meters";
+        public readonly string ADMIN_RING_ROID_SIZE = "The minimum size of the asteroids in the ring in meters";
+        public readonly string ADMIN_RING_ROID_SIZE_MAX = "The maximum size of the asteroids in the ring in meters.";
         public readonly string ADMIN_ADD_RING_BUTTON = "Adds the ring to the planet";
         public readonly string ADMIN_REMOVE_RING_BUTTON = "Removes the ring from the planet. All previously generated Asteroids will stay.";
         public readonly string ADMIN_TP_RING_BUTTON = "Teleports your player to the ring of the planet";

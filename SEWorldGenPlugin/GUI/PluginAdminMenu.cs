@@ -43,6 +43,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_ringAngleYValue;
         private MyGuiControlLabel m_ringAngleZValue;
         private MyGuiControlLabel m_ringRoidSizeValue;
+        private MyGuiControlLabel m_ringRoidSizeMaxValue;
         private MyGuiControlLabel m_ringWidthValue;
 
         private MyGuiControlClickableSlider m_ringDistanceSlider;
@@ -50,6 +51,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlClickableSlider m_ringAngleYSlider;
         private MyGuiControlClickableSlider m_ringAngleZSlider;
         private MyGuiControlClickableSlider m_ringRoidSizeSlider;
+        private MyGuiControlClickableSlider m_ringRoidSizeMaxSlider;
         private MyGuiControlClickableSlider m_ringWidthSlider;
 
         private MyGuiControlButton m_addRingButton;
@@ -295,7 +297,7 @@ namespace SEWorldGenPlugin.GUI
             {
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
                 Position = Vector2.Zero,
-                Size = new Vector2(0.32f, 0.48f)
+                Size = new Vector2(0.32f, 0.56f)
             };
 
             MyGuiControlScrollablePanel m_optionsGroup = new MyGuiControlScrollablePanel(myGuiControlParent)
@@ -489,7 +491,7 @@ namespace SEWorldGenPlugin.GUI
             {
                 Position = vector + new Vector2(0.001f, 0f),
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
-                Text = "Asteroid size"
+                Text = "Asteroid min size"
             };
             myGuiControlParent.Controls.Add(ringRoidSizeLabel);
 
@@ -503,19 +505,61 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringRoidSizeSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), 128, 1028, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
+            m_ringRoidSizeSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), 128, 1024, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE);
             m_ringRoidSizeSlider.Size = new Vector2(0.285f, 1f);
-            m_ringRoidSizeSlider.DefaultValue = 500;
+            m_ringRoidSizeSlider.DefaultValue = 128;
             m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
             m_ringRoidSizeSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringRoidSizeSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringRoidSizeSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
                 m_ringRoidSizeValue.Text = s.Value.ToString();
+                if(s.Value > m_ringRoidSizeMaxSlider.Value)
+                {
+                    m_ringRoidSizeSlider.Value = m_ringRoidSizeMaxSlider.Value;
+                }
             });
 
             m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
 
             myGuiControlParent.Controls.Add(m_ringRoidSizeSlider);
+
+            vector.Y += 0.055f;
+
+            MyGuiControlLabel ringRoidSizeMaxLabel = new MyGuiControlLabel
+            {
+                Position = vector + new Vector2(0.001f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP,
+                Text = "Asteroid max size"
+            };
+            myGuiControlParent.Controls.Add(ringRoidSizeMaxLabel);
+
+            m_ringRoidSizeMaxValue = new MyGuiControlLabel
+            {
+                Position = vector + new Vector2(0.285f, 0f),
+                OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_TOP,
+                Text = "0"
+            };
+            myGuiControlParent.Controls.Add(m_ringRoidSizeMaxValue);
+
+            vector.Y += 0.025f;
+
+            m_ringRoidSizeMaxSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), 128, 1024, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_ROID_SIZE_MAX);
+            m_ringRoidSizeMaxSlider.Size = new Vector2(0.285f, 1f);
+            m_ringRoidSizeMaxSlider.DefaultValue = 1028;
+            m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
+            m_ringRoidSizeMaxSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+            m_ringRoidSizeMaxSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringRoidSizeMaxSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                m_ringRoidSizeMaxValue.Text = s.Value.ToString();
+                if(s.Value < m_ringRoidSizeSlider.Value)
+                {
+                    m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeSlider.Value;
+                }
+            });
+
+            m_ringRoidSizeMaxValue.Text = m_ringRoidSizeMaxSlider.Value.ToString();
+
+            myGuiControlParent.Controls.Add(m_ringRoidSizeMaxSlider);
 
             m_optionsGroup.RefreshInternals();
 
@@ -631,6 +675,7 @@ namespace SEWorldGenPlugin.GUI
             item.Width = (int)m_ringWidthSlider.Value;
             item.Height = item.Width / 10;
             item.RoidSize = (int)m_ringRoidSizeSlider.Value;
+            item.RoidSizeMax = (int)m_ringRoidSizeMaxSlider.Value;
             item.Center = m_selectedPlanet.CenterPosition;
 
             return item;
@@ -703,6 +748,7 @@ namespace SEWorldGenPlugin.GUI
                     m_ringDistanceSlider.Enabled = !hasRing;
                     m_ringWidthSlider.Enabled = !hasRing;
                     m_ringRoidSizeSlider.Enabled = !hasRing;
+                    m_ringRoidSizeMaxSlider.Enabled = !hasRing;
                     m_addRingButton.Enabled = !hasRing;
                     m_removeRingButton.Enabled = hasRing;
                     m_teleportToRingButton.Enabled = hasRing;
@@ -715,6 +761,7 @@ namespace SEWorldGenPlugin.GUI
                         m_ringAngleYSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesY;
                         m_ringAngleXSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesX;
                         m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;
+                        m_ringRoidSizeMaxSlider.Value = m_selectedPlanet.PlanetRing.RoidSizeMax;
                     }
                     else
                     {
@@ -722,7 +769,10 @@ namespace SEWorldGenPlugin.GUI
                         m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
                         m_ringAngleYSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
                         m_ringAngleZSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+                        m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.MinValue;
+                        m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeMaxSlider.MaxValue;
                         m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
+                        m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeMaxSlider.DefaultValue.Value;
                     }
 
                     m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
