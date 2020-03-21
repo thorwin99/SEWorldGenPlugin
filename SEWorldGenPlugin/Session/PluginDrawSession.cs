@@ -36,11 +36,6 @@ namespace SEWorldGenPlugin.Session
         {
             foreach(IRenderObject obj in m_toRender.Values)
             {
-                MyLog.Default.WriteLine("Drawing item");
-                if(obj is RenderCylinder)
-                {
-                    MyLog.Default.WriteLine("Drawing cylinder at " + ((RenderCylinder)obj).ToString());
-                }
                 obj.Draw();
             }
             base.Draw();
