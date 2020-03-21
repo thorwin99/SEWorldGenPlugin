@@ -147,9 +147,10 @@ namespace SEWorldGenPlugin.Generator
                     }
                 }
 
-                if(totalPlanets < m_mandatoryPlanets.Count)
+                if(m_mandatoryPlanets.Count != 0)
                 {
-                    for(int i = totalPlanets; i < m_mandatoryPlanets.Count; i++)
+                    int length = m_mandatoryPlanets.Count;
+                    for (int i = totalPlanets; i < length; i++)
                     {
                         int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
                         tmp_distance += distToPrev;
@@ -293,6 +294,19 @@ namespace SEWorldGenPlugin.Generator
             return (int)Math.Floor(gravity * 5 * MyRandom.Instance.NextFloat());
         }
 
+        private void ShuffleMandatoryPlanets()
+        {
+            int n = m_mandatoryPlanets.Count;
+            while(n > 1)
+            {
+                n--;
+                int index = MyRandom.Instance.Next(n - 1);
+                var value = m_mandatoryPlanets[index];
+                m_mandatoryPlanets[index] = m_mandatoryPlanets[n];
+                m_mandatoryPlanets[n] = value;
+            }
+        }
+
         private void FilterDefinitions()
         {
             List<MyPlanetGeneratorDefinition> toRemovePlanets = new List<MyPlanetGeneratorDefinition>();
@@ -322,6 +336,8 @@ namespace SEWorldGenPlugin.Generator
             {
                 m_planetDefinitions.Remove(r);
             }
+
+            ShuffleMandatoryPlanets();
         }
 
         private MyObjectBuilder_StarSystem GetConfig()
