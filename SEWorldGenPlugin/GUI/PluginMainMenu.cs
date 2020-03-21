@@ -23,7 +23,7 @@ namespace SEWorldGenPlugin.GUI
 {
     public class PluginMainMenu : MyGuiScreenMainMenu
     {
-        private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin is loaded and by default ");
+        private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin version {0} is loaded and by default ");
         private static readonly StringBuilder PLUGIN_ENABLED = new StringBuilder("ENABLED");
         private static readonly StringBuilder PLUGIN_DISABLED = new StringBuilder("DISABLED");
 
@@ -146,9 +146,12 @@ namespace SEWorldGenPlugin.GUI
             Vector2 textLeftBottomPosition = MyGuiManager.ComputeFullscreenGuiCoordinate(MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM, 8, 8);
             textLeftBottomPosition.Y -= 0 * TEXT_LINE_HEIGHT;
 
-            size = MyGuiManager.MeasureString(MyFontEnum.BuildInfo, PLUGIN_LOADED, 1);
+            StringBuilder pluginWithVersion = new StringBuilder();
+            pluginWithVersion.AppendFormat(PLUGIN_LOADED.ToString(), VersionCheck.Static.GetVersion());
 
-            MyGuiManager.DrawString(MyFontEnum.BuildInfo, PLUGIN_LOADED, textLeftBottomPosition, 1, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
+            MyGuiManager.DrawString(MyFontEnum.BuildInfo, pluginWithVersion, textLeftBottomPosition, 1, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
+
+            size = MyGuiManager.MeasureString(MyFontEnum.BuildInfo, pluginWithVersion, 1);
 
             textLeftBottomPosition.X += size.X;
 
