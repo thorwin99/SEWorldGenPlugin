@@ -134,6 +134,7 @@ namespace SEWorldGenPlugin.Generator
 
                 for (int i = 0; i < numberPlanets; i++)
                 {
+                    if (tmp_distance > m_settings.WorldSize && m_settings.WorldSize != -1) return;
 
                     int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
                     tmp_distance += distToPrev;

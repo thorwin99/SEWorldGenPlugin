@@ -14,6 +14,16 @@ namespace SEWorldGenPlugin.Utilities
             }
         }
 
+        public static void VerifyLong(long min, long max, long def, string name, ref long value)
+        {
+            if (value < min || value > max)
+            {
+                value = def;
+
+                MyLog.Default.Error("Value " + name + " of SEWorldGenPlugin config was invalid and will be set to default.");
+            }
+        }
+
         public static void VerifyFloat(float min, float max, float def, string name, ref float value)
         {
             if (value < min || value > max)
