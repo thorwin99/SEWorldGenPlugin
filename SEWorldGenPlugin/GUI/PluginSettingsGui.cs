@@ -28,6 +28,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_ringProbLabel;
         private MyGuiControlLabel m_beltHeightLabel;
         private MyGuiControlLabel m_beltProbLabel;
+        private MyGuiControlLabel m_worldSizeLabel;
 
         private MyGuiControlLabel m_objAmountValue;
         private MyGuiControlLabel m_asteroidDensityValue;
@@ -39,6 +40,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlLabel m_ringProbValue;
         private MyGuiControlLabel m_beltHeightValue;
         private MyGuiControlLabel m_beltProbValue;
+        private MyGuiControlLabel m_worldSizeValue;
 
         private MyGuiControlCheckbox m_useGlobalCheck;
         private MyGuiControlCheckbox m_useSemiRandomGenerationCheck;
@@ -56,6 +58,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlClickableSlider m_ringProbSlider;
         private MyGuiControlClickableSlider m_beltHeightSlider;
         private MyGuiControlClickableSlider m_beltProbSlider;
+        private MyGuiControlClickableSlider m_worldSizeSlider;
 
         private MyGuiControlButton m_okButton;
 
@@ -89,7 +92,7 @@ namespace SEWorldGenPlugin.GUI
             MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (13 + mod)));
             if (!m_isNewGame)
             {
-                parent.Size = new Vector2(parent.Size.X, 0.052f * (13 + mod));
+                parent.Size = new Vector2(parent.Size.X, 0.052f * (14 + mod));
             }
             parent.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
 
@@ -116,6 +119,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringProbLabel = MakeLabel("Ring spawn probability");
             m_beltHeightLabel = MakeLabel("Average belt height");
             m_beltProbLabel = MakeLabel("Belt spawn probability");
+            m_worldSizeLabel = MakeLabel("World Size");
 
             m_useGlobalCheck = new MyGuiControlCheckbox();
             m_useSemiRandomGenerationCheck = new MyGuiControlCheckbox();
@@ -134,6 +138,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
             m_beltHeightSlider = new MyGuiControlClickableSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_beltProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
+            m_worldSizeSlider = new MyGuiControlClickableSlider(Vector2.Zero, -2f, 1000000 - 1, x2, -1, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
 
             m_asteroidDensityValue = MakeLabel(String.Format("{0:0.00}", m_asteroidDensitySlider.Value));
             m_asteroidDensityValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
@@ -168,6 +173,8 @@ namespace SEWorldGenPlugin.GUI
             m_beltGpsCheck.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             m_asteroidGeneratorCombo.SetToolTip(MyPluginTexts.TOOLTIPS.ROID_GEN_COMBO);
             m_asteroidGeneratorCombo.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+            m_worldSizeValue = MakeLabel(m_worldSizeSlider.Value.ToString());
+            m_worldSizeValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
 
             m_asteroidGeneratorCombo.AddItem(0L, "Plugin");
             m_asteroidGeneratorCombo.AddItem(1L, "Vanilla");
@@ -226,9 +233,23 @@ namespace SEWorldGenPlugin.GUI
             {
                 m_beltProbValue.Text = String.Format("{0:0.000}", s.Value);
             });
+            m_worldSizeSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_worldSizeSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
+            {
+                if(s.Value <= 0)
+                {
+                    m_worldSizeValue.Text = "Infinite";
+                }
+                else
+                {
+                    m_worldSizeValue.Text = s.Value.ToString();
+                }
+            });
             m_useGlobalCheck.IsCheckedChanged = (Action<MyGuiControlCheckbox>)Delegate.Combine(m_useGlobalCheck.IsCheckedChanged, (Action<MyGuiControlCheckbox>)delegate (MyGuiControlCheckbox s)
             {
+                m_useSemiRandomGenerationCheck.Enabled = !s.IsChecked;
                 m_objAmountSlider.Enabled = !s.IsChecked;
+                m_asteroidDensitySlider.Enabled = !s.IsChecked;
+                m_asteroidGeneratorCombo.Enabled = !s.IsChecked;
                 m_orbDistanceSlider.Enabled = !s.IsChecked;
                 m_sizeMultiplierSlider.Enabled = !s.IsChecked;
                 m_sizeCapSlider.Enabled = !s.IsChecked;
@@ -240,6 +261,7 @@ namespace SEWorldGenPlugin.GUI
                 m_planetGpsCheck.Enabled = !s.IsChecked;
                 m_moonGpsCheck.Enabled = !s.IsChecked;
                 m_beltGpsCheck.Enabled = !s.IsChecked;
+                m_worldSizeSlider.Enabled = !s.IsChecked && m_isNewGame;
             });
 
             parent.Controls.Add(m_useGlobalSettignsLabel);
@@ -302,6 +324,10 @@ namespace SEWorldGenPlugin.GUI
             parent.Controls.Add(m_beltProbLabel);
             parent.Controls.Add(m_beltProbSlider);
             parent.Controls.Add(m_beltProbValue);
+
+            parent.Controls.Add(m_worldSizeLabel);
+            parent.Controls.Add(m_worldSizeSlider);
+            parent.Controls.Add(m_worldSizeValue);
 
             Vector2 start = (new Vector2(0f, (!m_isNewGame) ? 0.052f : 0.026f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
             Vector2 offset = new Vector2(0f, 0.050f);//0.028f
@@ -366,6 +392,10 @@ namespace SEWorldGenPlugin.GUI
             m_beltProbSlider.Position = m_beltProbLabel.Position + offset2;
             m_beltProbValue.Position = m_beltProbLabel.Position + offset3;
 
+            m_worldSizeLabel.Position = start + offset * (13 + mod);
+            m_worldSizeSlider.Position = m_worldSizeLabel.Position + offset2;
+            m_worldSizeValue.Position = m_worldSizeLabel.Position + offset3;
+
             m_okButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Default, null, null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, VRage.MyTexts.Get(MyCommonTexts.Ok), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_ACTIVE, OkButtonClicked);
             m_okButton.SetToolTip(VRage.MyTexts.GetString(MySpaceTexts.ToolTipOptionsSpace_Ok));
             m_okButton.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_BOTTOM;
@@ -376,6 +406,11 @@ namespace SEWorldGenPlugin.GUI
             scrollPane.ScrollbarVEnabled = true;
             scrollPane.Size = new Vector2(base.Size.Value.X - vector.X * 2f - 0.035f, 0.74f);
             scrollPane.Position = new Vector2(-0.27f, -0.394f);
+
+            if (m_isNewGame)
+            {
+                m_worldSizeSlider.Enabled = false;
+            }
 
             Controls.Add(m_okButton);
             Controls.Add(scrollPane);
@@ -414,6 +449,8 @@ namespace SEWorldGenPlugin.GUI
             m_ringProbSlider.Value = settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability;
 
             m_beltHeightSlider.Value = (settings.GeneratorSettings.BeltSettings.MinBeltHeight + settings.GeneratorSettings.BeltSettings.MaxBeltHeight) / 2;
+        
+            m_worldSizeSlider.Value = settings.GeneratorSettings.WorldSize / 1000;
         }
 
         public bool GetSettings(ref MyObjectBuilder_PluginSettings settings)
@@ -446,6 +483,8 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.BeltSettings.MaxBeltHeight = (int)m_beltHeightSlider.Value * 2 - settings.GeneratorSettings.BeltSettings.MinBeltHeight;
             settings.GeneratorSettings.BeltSettings.BeltProbability = m_beltProbSlider.Value;
             settings.GeneratorSettings.BeltSettings.ShowBeltGPS = m_beltGpsCheck.IsChecked;
+
+            settings.GeneratorSettings.WorldSize = (long)m_worldSizeSlider.Value * 1000;
 
             return m_useGlobalCheck.IsChecked;
         }

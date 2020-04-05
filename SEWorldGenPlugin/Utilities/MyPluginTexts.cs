@@ -23,6 +23,7 @@
         public readonly string BELT_GPS_CHECK = "If a GPS signal should be generated for each asteroid belt.";
         public readonly string ROID_GEN_COMBO = "Which asteroid generator should be used. If plugin, belts and rings will be generated, but nothing else. If vanilla, the default generation will be used, but no rings or belts are generated.";
         public readonly string ROID_DENS_SLIDER = "The density of the asteroids, where 1 is the most dense.";
+        public readonly string WORLD_SIZE_SLIDER = "The max size of the wolrd in kilometers. Beyond this limit, the plugin wont be generating objects.";
 
         public readonly string ADMIN_RING_DISTANCE = "The distance of the ring to the planet in meters";
         public readonly string ADMIN_RING_WIDTH = "The width of the ring in meters";
