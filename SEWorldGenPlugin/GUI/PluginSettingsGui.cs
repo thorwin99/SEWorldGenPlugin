@@ -134,7 +134,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
             m_beltHeightSlider = new MyGuiControlClickableSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_beltProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
-            m_worldSizeSlider = new MyGuiControlClickableSlider(Vector2.Zero, -2f, 1000000 - 1, x2, -1, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_worldSizeSlider = new MyGuiControlClickableSlider(Vector2.Zero, -1f, 1000000 - 1, x2, -1, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
 
             m_asteroidDensityValue = MakeLabel(String.Format("{0:0.00}", m_asteroidDensitySlider.Value));
             m_asteroidDensityValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
@@ -326,7 +326,7 @@ namespace SEWorldGenPlugin.GUI
             parent.Controls.Add(m_worldSizeValue);
 
             //Vector2 start = (new Vector2(0f, (!m_isNewGame) ? 0.052f : 0.026f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
-            Vector2 start = Vector2.Zero - new Vector2(parent.Size.X * 0.835f / 2f, parent.Size.Y / 2f - 0.075f);
+            Vector2 start = Vector2.Zero - new Vector2(parent.Size.X / 2f, parent.Size.Y / 2f - 0.056f);
             Vector2 offset = new Vector2(0f, 0.050f);//0.028f
             Vector2 offset2 = new Vector2(m_orbDistanceLabel.Size.X * 1.5f, 0f);
             Vector2 offset3 = new Vector2(0.4973214f, 0f);
@@ -404,7 +404,7 @@ namespace SEWorldGenPlugin.GUI
             scrollPane.Size = new Vector2(base.Size.Value.X - vector.X * 2f - 0.035f, 0.74f);
             scrollPane.Position = new Vector2(-0.27f, -0.394f);
 
-            if (m_isNewGame)
+            if (!m_isNewGame)
             {
                 m_worldSizeSlider.Enabled = false;
             }

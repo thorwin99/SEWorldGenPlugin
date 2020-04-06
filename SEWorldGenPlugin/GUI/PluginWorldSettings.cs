@@ -80,6 +80,8 @@ namespace SEWorldGenPlugin.GUI
                 }
             });
 
+            m_enablePlugin.IsChecked = MySettings.Static.Settings.Enable;
+
             m_pluginSettingsButton = new MyGuiControlButton(null, MyGuiControlButtonStyleEnum.Small, null, null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Plugin settings"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_ACTIVE, OnSettingsClick);
             Controls.Add(m_enablePluginLabel);
             Controls.Add(m_enablePlugin);
