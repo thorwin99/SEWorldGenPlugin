@@ -68,6 +68,8 @@ artifacts/
 # StyleCop
 StyleCopReport.xml
 
+[Dd]ependencies/
+
 # Files built by Visual Studio
 *_i.c
 *_p.c
