@@ -241,13 +241,13 @@ namespace SEWorldGenPlugin.Generator
             return ring;
         }
 
-        private MyPlanetGeneratorDefinition GetPlanetDefinition(float maximumSize)
+        private MyPlanetGeneratorDefinition GetPlanetDefinition(float maximumSize, bool ignoreMandatory = false)
         {
             int tries = 0;
             float size;
             MyPlanetGeneratorDefinition def;
 
-            if(m_mandatoryPlanets.Count != 0)
+            if(m_mandatoryPlanets.Count != 0 && !ignoreMandatory)
             {
                 def = m_mandatoryPlanets[0];
                 m_mandatoryPlanets.RemoveAt(0);
@@ -271,7 +271,7 @@ namespace SEWorldGenPlugin.Generator
             float size;
             MyPlanetGeneratorDefinition def;
 
-            if (m_moonDefinitions.Count == 0) return GetPlanetDefinition(maximumSize);
+            if (m_moonDefinitions.Count == 0) return GetPlanetDefinition(maximumSize, true);
 
             do
             {
