@@ -136,8 +136,12 @@ namespace SEWorldGenPlugin.Generator
                 {
                     if (tmp_distance >= m_settings.WorldSize && m_settings.WorldSize > 0) return;
 
-                    int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
-                    tmp_distance += distToPrev;
+                    if (i != 0 || !m_settings.FirstPlanetCenter)
+                    {
+                        int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
+                        tmp_distance += distToPrev;
+                    }
+
 
                     if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability && m_planetDefinitions.Count != 0){
                         GeneratePlanet(i, tmp_distance, numberPlanets, ref totalPlanets);
@@ -153,6 +157,8 @@ namespace SEWorldGenPlugin.Generator
                     int length = m_mandatoryPlanets.Count;
                     for (int i = totalPlanets; i < length; i++)
                     {
+                        if (tmp_distance > m_settings.WorldSize && m_settings.WorldSize != -1) return;
+
                         int distToPrev = MyRandom.Instance.Next(m_settings.MinOrbitDistance, m_settings.MaxOrbitDistance);
                         tmp_distance += distToPrev;
 
@@ -180,7 +186,11 @@ namespace SEWorldGenPlugin.Generator
         {
             MyPlanetItem planet = new MyPlanetItem();
 
-            var def = GetPlanetDefinition((int)(m_settings.PlanetSettings.PlanetSizeCap * Math.Sin(index * Math.PI / totalObjects)));
+            double mod = distance == 0 && m_settings.FirstPlanetCenter ? 1 : Math.Sin(index * Math.PI / totalObjects);
+
+            var def = GetPlanetDefinition((int)(m_settings.PlanetSettings.PlanetSizeCap * mod));
+
+            var size = SizeByGravity(def.SurfaceGravity);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
@@ -189,7 +199,7 @@ namespace SEWorldGenPlugin.Generator
             planet.DisplayName = "Planet " + (++planetIndex);
             planet.Type = SystemObjectType.PLANET;
             planet.DefName = def.Id.SubtypeId.String;
-            planet.Size = SizeByGravity(def.SurfaceGravity);
+            planet.Size = size;
             planet.PlanetRing = GenerateRing(def.SurfaceGravity, planet.Size);
             planet.OffsetPosition = pos;
             planet.CenterPosition = pos;
@@ -260,7 +270,7 @@ namespace SEWorldGenPlugin.Generator
                 size = SizeByGravity(def.SurfaceGravity);
                 tries++;
 
-            } while (size >= maximumSize && tries < 10000);
+            } while (size > maximumSize && tries < 10000);
 
             return def;
         }
@@ -300,7 +310,6 @@ namespace SEWorldGenPlugin.Generator
             int n = m_mandatoryPlanets.Count;
             while(n > 1)
             {
-                n--;
                 int index = MyRandom.Instance.Next(n - 1);
                 var value = m_mandatoryPlanets[index];
                 m_mandatoryPlanets[index] = m_mandatoryPlanets[n];

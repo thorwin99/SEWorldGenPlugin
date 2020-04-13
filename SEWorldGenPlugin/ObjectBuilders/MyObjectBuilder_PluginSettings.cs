@@ -41,6 +41,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             BeltSettings = new BeltSettings();
             SemiRandomizedGeneration = false;
             WorldSize = -1;
+            FirstPlanetCenter = false;
         }
 
         [ProtoMember(1)]
@@ -72,6 +73,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(10)]
         public long WorldSize;
+
+        [ProtoMember(10)]
+        public bool FirstPlanetCenter;
 
         public void Verify()
         {

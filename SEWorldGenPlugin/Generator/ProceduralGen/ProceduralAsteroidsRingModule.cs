@@ -27,7 +27,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     {
         private const int OBJECT_SIZE_MIN = 128;
         private const int OBJECT_SIZE_MAX = 512;
-        private const int CELL_SIZE = OBJECT_SIZE_MAX * 20;
+        private const int CELL_SIZE_ = OBJECT_SIZE_MAX * 20;
 
         private HashSet<MyVoxelBase> m_NotSavedMaps;
         private bool m_saving;
@@ -36,7 +36,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private Type m_providerType;
         private float m_density;
 
-        public ProceduralAsteroidsRingModule(int seed) : base(seed, CELL_SIZE)
+        public ProceduralAsteroidsRingModule(int seed) : base(seed, CELL_SIZE_)
         {
             m_NotSavedMaps = new HashSet<MyVoxelBase>();
             MySession.Static.OnSavingCheckpoint += delegate
@@ -55,7 +55,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override MyProceduralCell GenerateCell(ref Vector3I id)
         {
-            MyProceduralCell cell = new MyProceduralCell(id, CELL_SIZE);
+            MyProceduralCell cell = new MyProceduralCell(id, CELL_SIZE_);
             int cellSeed = GetCellSeed(ref id);
 
             using (MyRandom.Instance.PushSeed(cellSeed))
@@ -63,7 +63,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 int index = 0;
 
                 int subCellSize = (int)(OBJECT_SIZE_MAX * 2 / m_density);
-                int subcells = CELL_SIZE / subCellSize;
+                int subcells = CELL_SIZE_ / subCellSize;
 
                 Vector3I subcellId = Vector3I.Zero;
                 Vector3I max = new Vector3I(subcells - 1);
@@ -73,7 +73,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     Vector3D position = new Vector3D(MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble());
                     position += (Vector3D)subcellId;
                     position *= subCellSize;
-                    position += id * CELL_SIZE;
+                    position += id * CELL_SIZE_;
 
                     if (!MyEntities.IsInsideWorld(position)) continue;
 
