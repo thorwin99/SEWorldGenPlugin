@@ -131,7 +131,8 @@ namespace SEWorldGenPlugin.GUI
 
             if (m_isNewGame)
             {
-                PlSettings = MySettings.Static.Settings;
+                PlSettings = new MyObjectBuilder_PluginSettings();
+                PlSettings.GeneratorSettings.FirstPlanetCenter = MySettings.Static.Settings.GeneratorSettings.FirstPlanetCenter;
                 PlSettings.GeneratorSettings.PlanetSettings.BlacklistedPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets;
                 PlSettings.GeneratorSettings.PlanetSettings.Moons = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.Moons;
                 PlSettings.GeneratorSettings.PlanetSettings.MandatoryPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets;
