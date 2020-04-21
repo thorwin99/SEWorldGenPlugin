@@ -27,6 +27,8 @@ namespace SEWorldGenPlugin.GUI
         private static readonly StringBuilder PLUGIN_ENABLED = new StringBuilder("ENABLED");
         private static readonly StringBuilder PLUGIN_DISABLED = new StringBuilder("DISABLED");
 
+        private static bool OPENED_VERSION_NOTIFICATION = false;
+
         private MyGuiControlElementGroup m_elemtents;
 
         public PluginMainMenu() : this(false)
@@ -66,8 +68,9 @@ namespace SEWorldGenPlugin.GUI
                 newGameButton.SetToolTip(button.Tooltips);
             }
 
-            if (!VersionCheck.Static.IsNewest())
+            if (!VersionCheck.Static.IsNewest() && !OPENED_VERSION_NOTIFICATION)
             {
+                OPENED_VERSION_NOTIFICATION = true;
                 MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_BOX), new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_TITLE), null, null, null, null, OnUpdateNotifiactionMessageClose));
             }
         }
