@@ -203,13 +203,13 @@ namespace SEWorldGenPlugin.Generator
             planet.PlanetRing = GenerateRing(def.SurfaceGravity, planet.Size);
             planet.OffsetPosition = pos;
             planet.CenterPosition = pos;
-            planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity, planet.DisplayName);
+            planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity, planet.DisplayName, distance);
             planet.Generated = false;
 
             m_objects.Add(planet);
         }
 
-        private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity, string planetName)
+        private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity, string planetName, long distance)
         {
             if (MyRandom.Instance.NextFloat() > m_settings.PlanetSettings.MoonProbability) return new MyPlanetMoonItem[0];
 
@@ -220,6 +220,8 @@ namespace SEWorldGenPlugin.Generator
             {
                 var dist = planetSize * (i + 1) + planetSize / 2 * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
                 var def = GetPlanetMoonDefinition(planetSize * 0.8f);
+
+                if (dist + distance > m_settings.WorldSize) return moons;
 
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
                 item.Type = SystemObjectType.MOON;
