@@ -307,14 +307,15 @@ namespace SEWorldGenPlugin.Generator
 
         private void ShuffleMandatoryPlanets()
         {
-            int n = m_mandatoryPlanets.Count;
-            if (n == 0) return;
+            int n = m_mandatoryPlanets.Count - 1;
+            if (n <= 0) return;
             while(n > 1)
             {
                 int index = MyRandom.Instance.Next(n - 1);
                 var value = m_mandatoryPlanets[index];
                 m_mandatoryPlanets[index] = m_mandatoryPlanets[n];
                 m_mandatoryPlanets[n] = value;
+                n--;
             }
         }
 
