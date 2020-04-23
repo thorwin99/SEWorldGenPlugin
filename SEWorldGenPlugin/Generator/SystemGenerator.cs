@@ -308,6 +308,7 @@ namespace SEWorldGenPlugin.Generator
         private void ShuffleMandatoryPlanets()
         {
             int n = m_mandatoryPlanets.Count;
+            if (n == 0) return;
             while(n > 1)
             {
                 int index = MyRandom.Instance.Next(n - 1);
