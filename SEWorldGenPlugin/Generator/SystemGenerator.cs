@@ -311,7 +311,7 @@ namespace SEWorldGenPlugin.Generator
             if (n <= 0) return;
             while(n > 1)
             {
-                int index = MyRandom.Instance.Next(n - 1);
+                int index = MyRandom.Instance.Next(1, n - 1);
                 var value = m_mandatoryPlanets[index];
                 m_mandatoryPlanets[index] = m_mandatoryPlanets[n];
                 m_mandatoryPlanets[n] = value;
