@@ -7,6 +7,7 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using VRage.Game.Entity;
 using VRage.Game.Voxels;
 using VRage.Library.Utils;
@@ -33,6 +34,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             foreach(var obj in SystemGenerator.Static.m_objects)
             {
+                if (obj == null) continue;
                 if (obj.Type != SystemObjectType.PLANET) continue;
 
                 MyPlanetItem planet = (MyPlanetItem)obj;
@@ -47,6 +49,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     planet.CenterPosition = planet.OffsetPosition;
                 }
                 MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, planet.CenterPosition - GetPlanetOffset(definition, planet.Size), m_seed, planet.Size, true, id, false, true);
+                
+                if(generatedPlanet == null)
+                {
+                    continue;
+                }
+
                 planet.CenterPosition = generatedPlanet.PositionComp.GetPosition();
                 generatedPlanet.DisplayNameText = planet.DisplayName;
                 generatedPlanet.AsteroidName = planet.DisplayName;
@@ -55,9 +63,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     planet.PlanetRing.Center = planet.CenterPosition;
                 List<Vector3D> spawnedMoons = new List<Vector3D>();
 
-                for(int i = 0; i < planet.PlanetMoons.Length; i++)
+                for (int i = 0; i < planet.PlanetMoons.Length; i++)
                 {
                     MyPlanetMoonItem moon = planet.PlanetMoons[i];
+                    if(moon == null)
+                    {
+                        continue;
+                    }
                     MyPlanetGeneratorDefinition moonDef = GetDefinition(moon.DefName);
                     if (moonDef == null) continue;
                     var position = new Vector3D(0, 0, 0);
@@ -76,9 +88,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     MyPlanet spawnedMoon = MyWorldGenerator.AddPlanet(storageNameMoon, moon.DisplayName, moon.DefName, position, m_seed, moon.Size, true, mId, false, true);
                     spawnedMoons.Add(spawnedMoon.PositionComp.GetPosition());
 
-                    if(SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.ShowMoonGPS)
+                    if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.ShowMoonGPS)
                         GlobalGpsManager.Static.AddGps(moon.DisplayName, Color.Aqua, spawnedMoon.PositionComp.GetPosition());
                 }
+                
                 planet.Generated = true;
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS)
                     GlobalGpsManager.Static.AddGps(planet.DisplayName, Color.Aqua, generatedPlanet.PositionComp.GetPosition());

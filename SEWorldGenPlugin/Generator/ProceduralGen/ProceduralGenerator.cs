@@ -39,6 +39,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void LoadData()
         {
+            MyLog.Default.WriteLine("PData");
             Static = this;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
@@ -84,7 +85,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Enabled)
                 return;
 
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm != 0) return;
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
 
             if (SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
             {
@@ -190,15 +191,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm != 0) return;
+            MyLog.Default.WriteLine("PInit");
 
+            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
             base.Init(sessionComponent);
 
             Enabled = true;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
-
-            planetModule.GeneratePlanets();
         }
 
         override public bool UpdatedBeforeInit()
