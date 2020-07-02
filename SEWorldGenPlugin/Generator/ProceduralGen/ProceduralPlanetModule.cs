@@ -7,7 +7,6 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using VRage.Game.Entity;
 using VRage.Game.Voxels;
 using VRage.Library.Utils;

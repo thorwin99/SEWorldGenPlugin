@@ -109,6 +109,7 @@ namespace SEWorldGenPlugin.GUI
                                 if (!UseGlobal)
                                 {
                                     MySettings.Static.SessionSettings = PlSettings;
+                                    MyLog.Default.WriteLine("settings: " + PlSettings.ToString());
                                 }
                                 else
                                 {
