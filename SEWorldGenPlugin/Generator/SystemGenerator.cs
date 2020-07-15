@@ -213,15 +213,16 @@ namespace SEWorldGenPlugin.Generator
         {
             if (MyRandom.Instance.NextFloat() > m_settings.PlanetSettings.MoonProbability) return new MyPlanetMoonItem[0];
 
-            int numMoons = MyRandom.Instance.Next(0, GetMaxMoonCount(surfaceGravity));
+            int maxMoons = GetMaxMoonCount(surfaceGravity);
+            int numMoons = MyRandom.Instance.Next(maxMoons > 0 ? 1 : 0, maxMoons);
             MyPlanetMoonItem[] moons = new MyPlanetMoonItem[numMoons];
 
             for(int i = 0; i < numMoons; i++)
             {
-                var dist = planetSize * (i + 1) + planetSize / 2 * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
+                var dist = planetSize * (i + 1) + planetSize * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
                 var def = GetPlanetMoonDefinition(planetSize * 0.8f);
 
-                if (dist + distance > m_settings.WorldSize) return moons;
+                if (dist + distance > m_settings.WorldSize && m_settings.WorldSize > 0) return moons;
 
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
                 item.Type = SystemObjectType.MOON;
