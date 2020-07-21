@@ -2,10 +2,8 @@
 using Sandbox.Game.World;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
-using System;
 using System.Collections.Generic;
 using VRage.Game.Components;
-using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Session
@@ -163,7 +161,6 @@ namespace SEWorldGenPlugin.Session
             DynamicGpsId id = new DynamicGpsId(playerId, gpsName);
             if (DynamicGpss.ContainsKey(id))
             {
-                MyLog.Default.WriteLine("GPS Exists");
                 MySession.Static.Gpss.SendDelete(playerId, DynamicGpss[id]);
                 DynamicGpss.Remove(id);
             }

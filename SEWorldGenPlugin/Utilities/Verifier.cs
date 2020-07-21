@@ -1,6 +1,4 @@
-﻿using VRage.Utils;
-
-namespace SEWorldGenPlugin.Utilities
+﻿namespace SEWorldGenPlugin.Utilities
 {
     public class Verifier
     {
@@ -10,7 +8,7 @@ namespace SEWorldGenPlugin.Utilities
             {
                 value = def;
 
-                MyLog.Default.Error("Value " + name + " of SEWorldGenPlugin config was invalid and will be set to default.");
+                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
 
@@ -20,7 +18,7 @@ namespace SEWorldGenPlugin.Utilities
             {
                 value = def;
 
-                MyLog.Default.Error("Value " + name + " of SEWorldGenPlugin config was invalid and will be set to default.");
+                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
 
@@ -30,7 +28,7 @@ namespace SEWorldGenPlugin.Utilities
             {
                 value = def;
 
-                MyLog.Default.Error("Value " + name + " of SEWorldGenPlugin config was invalid and will be set to default.");
+                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
 
@@ -40,7 +38,7 @@ namespace SEWorldGenPlugin.Utilities
             {
                 value = def;
 
-                MyLog.Default.Error("Value " + name + " of SEWorldGenPlugin config was invalid and will be set to default.");
+                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
     }

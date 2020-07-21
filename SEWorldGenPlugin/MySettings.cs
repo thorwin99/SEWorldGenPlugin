@@ -1,8 +1,6 @@
-﻿using Sandbox.Game.Multiplayer;
-using SEWorldGenPlugin.ObjectBuilders;
+﻿using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
-using VRage.Utils;
 
 namespace SEWorldGenPlugin
 {
@@ -36,6 +34,7 @@ namespace SEWorldGenPlugin
 
         public void LoadSettings()
         {
+            PluginLog.Log("Loading the global config file");
             if (FileUtils.FileExistsInGlobalStorage(FILENAME))
             {
                 try
@@ -49,19 +48,21 @@ namespace SEWorldGenPlugin
                 }
                 catch (Exception e)
                 {
-                    MyLog.Default.Error("Couldnt load Plugin config file.");
-                    MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                    PluginLog.Log("Couldnt load Plugin config file.", LogLevel.ERROR);
+                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
                     FileUtils.DeleteFileInGlobalStorage(FILENAME);
                     Settings = new MyObjectBuilder_PluginSettings();
                 }
             }
             else
             {
+                PluginLog.Log("Config does not exist, creating default one");
                 Settings = new MyObjectBuilder_PluginSettings();
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Moon");
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Titan");
             }
             Settings.Verify();
+            PluginLog.Log("Config loaded");
         }
 
         public void SaveSettings()
@@ -70,7 +71,7 @@ namespace SEWorldGenPlugin
 
             string xml = FileUtils.SerializeToXml(Settings);
 
-            MyLog.Default.WriteLine("Saving SEWorldGenPlugin config file: " + xml);
+            PluginLog.Log("Saving global SEWorldGenPlugin config file: " + xml);
 
             using (var writer = FileUtils.WriteFileInGlobalStorage(FILENAME))
             {

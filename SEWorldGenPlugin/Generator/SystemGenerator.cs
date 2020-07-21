@@ -5,13 +5,13 @@ using Sandbox.ModAPI;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Library.Utils;
-using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
@@ -55,6 +55,8 @@ namespace SEWorldGenPlugin.Generator
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
+            PluginLog.Log("Initializing system generator");
+
             InitNet();
 
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
@@ -81,6 +83,8 @@ namespace SEWorldGenPlugin.Generator
 
         public override void LoadData()
         {
+            PluginLog.Log("Loading definitions and network data");
+
             Static = this;
 
             LoadNet();
@@ -95,11 +99,15 @@ namespace SEWorldGenPlugin.Generator
         {
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
 
+            PluginLog.Log("Saving system data");
+
             SaveConfig();
         }
 
         protected override void UnloadData()
         {
+            PluginLog.Log("Unloading system generator data");
+
             UnloadNet();
             m_objects?.Clear();
             m_planetDefinitions?.Clear();
@@ -123,6 +131,8 @@ namespace SEWorldGenPlugin.Generator
 
         private void GenerateSystem()
         {
+            PluginLog.Log("Generating new solar system");
+
             m_objects = new HashSet<MySystemItem>();
 
             using (MyRandom.Instance.PushSeed(m_seed))
@@ -369,8 +379,9 @@ namespace SEWorldGenPlugin.Generator
                 }
                 catch (Exception e)
                 {
-                    MyLog.Default.Error("Couldnt load Starsystem save file.");
-                    MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                    PluginLog.Log("Couldnt load Starsystem save file.", LogLevel.ERROR);
+                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
+
                     MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator));
                     return null;
                 }

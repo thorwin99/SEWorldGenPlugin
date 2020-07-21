@@ -6,12 +6,12 @@ using Sandbox.Game.World.Generator;
 using Sandbox.ModAPI;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
-using VRage.Utils;
 
 /*
  * Code is primarily taken from the Space Engineers GitHub repository. 
@@ -39,7 +39,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void LoadData()
         {
-            MyLog.Default.WriteLine("PData");
+            PluginLog.Log("Loading procedural generator data");
             Static = this;
 
             m_seed = MySession.Static.Settings.ProceduralSeed;
@@ -136,6 +136,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         protected override void UnloadData()
         {
+            PluginLog.Log("unloading procedural generator data");
             Enabled = false;
 
             asteroidModule = null;
@@ -196,7 +197,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            MyLog.Default.WriteLine("PInit");
+            PluginLog.Log("Initializing procedural generator");
 
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
             base.Init(sessionComponent);
@@ -230,8 +231,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
                 catch (Exception e)
                 {
-                    MyLog.Default.Error("Couldnt load Starsystem save file.");
-                    MyLog.Default.Error(e.Message + "\n" + e.StackTrace);
+                    PluginLog.Log("Couldnt load Starsystem save file.", LogLevel.ERROR);
+                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
+
                     MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator));
                     return null;
                 }
@@ -244,6 +246,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         private void SaveConfig()
         {
+            PluginLog.Log("Saving procedural generator files");
             MyObjectBuilder_AsteroidGenerator conf = new MyObjectBuilder_AsteroidGenerator();
 
             conf.ExistingObjectsSeeds = m_existingObjectSeeds;

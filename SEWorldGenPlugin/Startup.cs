@@ -2,9 +2,9 @@
 using SEWorldGenPlugin.Generator.ProceduralGen;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.http;
+using SEWorldGenPlugin.Utilities;
 using VRage.Game.Entity;
 using VRage.Plugins;
-using VRage.Utils;
 
 namespace SEWorldGenPlugin
 {
@@ -20,13 +20,15 @@ namespace SEWorldGenPlugin
 
         public void Init(object gameInstance)
         {
+            PluginLog.Log("Begin init");
+
             settings = new MySettings();
             settings.LoadSettings();
             settings.SaveSettings();
 
             updater = new VersionCheck();
-            MyLog.Default.WriteLine("SEWorldGenPlugin - Version is " + updater.GetVersion());
-            MyLog.Default.WriteLine("SEWorldGenPlugin - Latest Version is " + updater.GetNewestVersion());
+            PluginLog.Log("Version is " + updater.GetVersion());
+            PluginLog.Log("Latest Version is " + updater.GetNewestVersion());
 
             MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
             MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
@@ -34,6 +36,8 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.MainMenu = typeof(PluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(PluginAdminMenu);
+
+            PluginLog.Log("Init completed");
         }
 
         public void Update()

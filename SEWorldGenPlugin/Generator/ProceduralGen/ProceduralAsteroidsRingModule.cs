@@ -7,6 +7,7 @@ using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,7 +15,6 @@ using VRage;
 using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Library.Utils;
-using VRage.Utils;
 using VRage.Voxels;
 using VRageMath;
 
@@ -172,12 +172,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 if (p.Type != SystemObjectType.PLANET || ((MyPlanetItem)p).PlanetRing == null) continue;
 
                 MyPlanetRingItem ring = ((MyPlanetItem)p).PlanetRing;
-                MyLog.Default.WriteLine(((MyPlanetItem)p).DisplayName + " Ring");
                 Vector3D entityPos = tracker.Entity.PositionComp.GetPosition();
 
                 if (Vector3D.Subtract(ring.Center, entityPos).Length() > 5000000)
                 {
-                    MyLog.Default.WriteLine(    "Is Out of distance " + entityPos + " at distance " + Vector3D.Subtract(ring.Center, entityPos).Length());
                     GlobalGpsManager.Static.RemoveDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
                     continue;
                 }
@@ -186,14 +184,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 if (shape.Contains(tracker.LastPosition) == ContainmentType.Contains)
                 {
-                    MyLog.Default.WriteLine(    "Is Inside Ring " + entityPos);
                     GlobalGpsManager.Static.RemoveDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
                     continue;
                 }
 
                 Vector3D pos = shape.ClosestPointAtRingCenter(entityPos);
-
-                MyLog.Default.WriteLine(    "Closest position is " + pos);
                 GlobalGpsManager.Static.AddOrUpdateDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId(), pos, Color.Gold);
             }
         }
@@ -301,7 +296,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
             if (myAsteroidGeneratorDefinition == null)
             {
-                MyLog.Default.WriteLine("Generator of version " + voxelGeneratorVersion + "not found!");
+                PluginLog.Log("Generator of version " + voxelGeneratorVersion + "not found!");
                 {
                     foreach (MyAsteroidGeneratorDefinition value2 in MyDefinitionManager.Static.GetAsteroidGeneratorDefinitions().Values)
                     {
