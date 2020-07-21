@@ -66,6 +66,20 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return ContainmentType.Disjoint;
         }
 
+        public Vector3D ClosestPointAtRingCenter(Vector3D position)
+        {
+            if (Contains(position) == ContainmentType.Contains) return position;
+            Vector3D relPosition = Vector3D.Subtract(position, center);
+            Vector3D planeNormal = normal;
+            Vector3D horVector = Vector3D.ProjectOnPlane(ref relPosition, ref planeNormal);
+            double length = horVector.Length();
+
+            if (length < radius + width && length > radius) return Vector3D.Add(horVector, center);
+            Vector3D horVectorNorm = Vector3D.Normalize(horVector);
+
+            return Vector3D.Add(Vector3D.Multiply(horVectorNorm, radius + width / 2), center);
+        }
+
         public Vector3D LocationInRing(int angle)
         {
             Vector3D pos = Vector3D.Zero;

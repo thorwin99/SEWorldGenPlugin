@@ -14,6 +14,5 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 ProceduralGenerator.Static.TrackEntity(thisEntity);
             }
         }
-
     }
 }

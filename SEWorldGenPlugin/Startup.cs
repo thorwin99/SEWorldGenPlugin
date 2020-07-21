@@ -29,6 +29,7 @@ namespace SEWorldGenPlugin
             MyLog.Default.WriteLine("SEWorldGenPlugin - Latest Version is " + updater.GetNewestVersion());
 
             MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
+            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
 
             MyPerGameSettings.GUI.MainMenu = typeof(PluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);

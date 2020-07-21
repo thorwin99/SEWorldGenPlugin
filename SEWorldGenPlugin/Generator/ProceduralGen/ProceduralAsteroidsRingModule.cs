@@ -1,6 +1,7 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
+using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.Asteroids;
@@ -161,6 +162,39 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     }
                     tmp_voxelMaps.Clear();
                 }
+            }
+        }
+
+        public void UpdateGps(MyEntityTracker tracker)
+        {
+            foreach(MySystemItem p in SystemGenerator.Static.m_objects)
+            {
+                if (p.Type != SystemObjectType.PLANET || ((MyPlanetItem)p).PlanetRing == null) continue;
+
+                MyPlanetRingItem ring = ((MyPlanetItem)p).PlanetRing;
+                MyLog.Default.WriteLine(((MyPlanetItem)p).DisplayName + " Ring");
+                Vector3D entityPos = tracker.Entity.PositionComp.GetPosition();
+
+                if (Vector3D.Subtract(ring.Center, entityPos).Length() > 5000000)
+                {
+                    MyLog.Default.WriteLine(    "Is Out of distance " + entityPos + " at distance " + Vector3D.Subtract(ring.Center, entityPos).Length());
+                    GlobalGpsManager.Static.RemoveDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
+                    continue;
+                }
+
+                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(ring);
+
+                if (shape.Contains(tracker.LastPosition) == ContainmentType.Contains)
+                {
+                    MyLog.Default.WriteLine(    "Is Inside Ring " + entityPos);
+                    GlobalGpsManager.Static.RemoveDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
+                    continue;
+                }
+
+                Vector3D pos = shape.ClosestPointAtRingCenter(entityPos);
+
+                MyLog.Default.WriteLine(    "Closest position is " + pos);
+                GlobalGpsManager.Static.AddOrUpdateDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId(), pos, Color.Gold);
             }
         }
 

@@ -120,6 +120,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     asteroidModule.GenerateObjects(cellObjects, m_existingObjectSeeds);
 
                     asteroidModule.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
+
+                    if(tracker.Entity is MyCharacter)
+                    {
+                        asteroidModule.UpdateGps(tracker);
+                    }
                 }
             }
             if (asteroidModule == null) return;
