@@ -21,6 +21,7 @@
         public readonly string PLANET_GPSL_CHECK = "If a GPS signal should be generated for each planet on world generation.";
         public readonly string MOON_GPS_CHECK = "If a GPS signal should be generated for each moon on world generation.";
         public readonly string BELT_GPS_CHECK = "If a GPS signal should be generated for each asteroid belt.";
+        public readonly string RING_GPS_CHECK = "If a dynamic gps should be generated, that shows the player where a planetary asteroid ring is located in 5000km proximity to the player";
         public readonly string ROID_GEN_COMBO = "Which asteroid generator should be used. If plugin, belts and rings will be generated, but nothing else. If vanilla, the default generation will be used, but no rings or belts are generated.";
         public readonly string ROID_DENS_SLIDER = "The density of the asteroids, where 1 is the most dense.";
         public readonly string WORLD_SIZE_SLIDER = "The max size of the wolrd in kilometers. Beyond this limit, the plugin wont be generating objects.";
