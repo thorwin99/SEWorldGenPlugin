@@ -42,7 +42,7 @@ namespace SEWorldGenPlugin.Session
                 Coords = pos,
                 ShowOnHud = true,
                 GPSColor = color,
-                AlwaysVisible = true,
+                AlwaysVisible = false,
                 DiscardAt = null
             };
             g.UpdateHash();
@@ -131,7 +131,7 @@ namespace SEWorldGenPlugin.Session
                     Coords = position,
                     ShowOnHud = true,
                     GPSColor = color,
-                    AlwaysVisible = true,
+                    AlwaysVisible = false,
                     DiscardAt = null
                 };
                 gps.CalculateHash();
@@ -147,7 +147,7 @@ namespace SEWorldGenPlugin.Session
                     Coords = position,
                     ShowOnHud = true,
                     GPSColor = color,
-                    AlwaysVisible = true,
+                    AlwaysVisible = false,
                     DiscardAt = null
                 };
                 gps.CalculateHash();
