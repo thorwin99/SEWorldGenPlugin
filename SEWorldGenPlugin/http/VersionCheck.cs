@@ -30,13 +30,21 @@ namespace SEWorldGenPlugin.http
             HttpWebRequest request = WebRequest.Create("https://api.github.com/repos/thorwin99/SEWorldGenPlugin/releases/latest") as HttpWebRequest;
             request.Method = "GET";
             request.UserAgent = "SEWorldGenPlugin";
-            WebResponse response = request.GetResponse();
+            try
+            {
+                WebResponse response = request.GetResponse();
 
-            JsonRelease latest = GitHubVersionResponse.Deserialize(response.GetResponseStream());
+                JsonRelease latest = GitHubVersionResponse.Deserialize(response.GetResponseStream());
 
-            m_latestBuild = latest.tag_name.Trim().Substring(1) + ".0";
-            m_latestPage = latest.html_url;
-            return m_latestBuild;
+                m_latestBuild = latest.tag_name.Trim().Substring(1) + ".0";
+                m_latestPage = latest.html_url;
+                return m_latestBuild;
+            }catch(Exception e)
+            {
+                m_latestBuild = m_version;
+                return m_version;
+            }
+            
         }
 
         public string GetLatestVersionPage()

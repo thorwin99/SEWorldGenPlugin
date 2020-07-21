@@ -13,8 +13,8 @@ namespace SEWorldGenPlugin.Session
     {
         struct DynamicGpsId
         {
-            long playerId;
-            string gpsName;
+            public long playerId;
+            public string gpsName;
 
             public DynamicGpsId(long playerId, string gpsName)
             {
@@ -168,6 +168,8 @@ namespace SEWorldGenPlugin.Session
 
         protected override void UnloadData()
         {
+            DynamicGpss.Clear();
+
             Gpss.Clear();
             ToAddGpss.Clear();
             Static = null;

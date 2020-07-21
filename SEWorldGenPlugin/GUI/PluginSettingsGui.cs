@@ -336,7 +336,7 @@ namespace SEWorldGenPlugin.GUI
             parent.Controls.Add(m_worldSizeValue);
 
             //Vector2 start = (new Vector2(0f, (!m_isNewGame) ? 0.052f : 0.026f) - new Vector2(m_size.Value.X * 0.835f / 2f, m_size.Value.Y / 2f - 0.075f)) + (new Vector2(0f, m_useGlobalSettignsLabel.Size.Y));
-            Vector2 start = Vector2.Zero - new Vector2(parent.Size.X / 2f, parent.Size.Y / 2f - 0.056f);
+            Vector2 start = Vector2.Zero - new Vector2(parent.Size.X / 2f, parent.Size.Y / 2f - 0.028f);
             Vector2 offset = new Vector2(0f, 0.050f);//0.028f
             Vector2 offset2 = new Vector2(m_orbDistanceLabel.Size.X * 1.5f, 0f);
             Vector2 offset3 = new Vector2(0.4973214f, 0f);
