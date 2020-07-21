@@ -121,7 +121,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     asteroidModule.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
 
-                    if(tracker.Entity is MyCharacter)
+                    if(tracker.Entity is MyCharacter && SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS)
                     {
                         asteroidModule.UpdateGps(tracker);
                     }

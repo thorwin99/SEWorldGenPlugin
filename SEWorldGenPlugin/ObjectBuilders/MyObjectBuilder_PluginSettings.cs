@@ -155,6 +155,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MinPlanetRingWidth = 10000;
             MaxPlanetRingWidth = 100000;
             PlanetRingProbability = 0.5f;
+            ShowRingGPS = true;
         }
 
         [ProtoMember(1)]
@@ -162,8 +163,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(2)]
         public int MaxPlanetRingWidth;
-        [ProtoMember(2)]
+
+        [ProtoMember(3)]
         public float PlanetRingProbability;
+
+        [ProtoMember(4)]
+        public bool ShowRingGPS;
 
 
         public void Verify()
