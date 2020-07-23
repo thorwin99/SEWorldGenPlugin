@@ -11,9 +11,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(1)]
         public HashSet<GpsData> Gpss;
 
+        [ProtoMember(2)]
+        public HashSet<DynamicGpsData> DynamicGpss;
+
         public MyObjectBuilder_GpsManager()
         {
             Gpss = new HashSet<GpsData>();
+            DynamicGpss = new HashSet<DynamicGpsData>();
         }
     }
 
@@ -33,6 +37,25 @@ namespace SEWorldGenPlugin.ObjectBuilders
             name = "Gps";
             color = Vector3.Zero;
             position = Vector3D.Zero;
+        }
+    }
+
+    public class DynamicGpsData
+    {
+        [ProtoMember(1)]
+        public long playerId;
+
+        [ProtoMember(2)]
+        public int gpsHash;
+
+        [ProtoMember(3)]
+        public string gpsName;
+
+        public DynamicGpsData()
+        {
+            playerId = 0;
+            gpsHash = 0;
+            gpsName = "";
         }
     }
 }

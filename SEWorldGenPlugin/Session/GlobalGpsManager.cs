@@ -68,6 +68,11 @@ namespace SEWorldGenPlugin.Session
                 AddGps(gps.name, new Color(gps.color), gps.position);
             }
 
+            foreach(var gps in builder.DynamicGpss)
+            {
+                DynamicGpss.Add(new DynamicGpsId(gps.playerId, gps.gpsName), gps.gpsHash);
+            }
+
             Static = this;
         }
 
@@ -82,6 +87,16 @@ namespace SEWorldGenPlugin.Session
                 data.position = gps.Coords;
 
                 builder.Gpss.Add(data);
+            }
+
+            foreach(var gps in DynamicGpss)
+            {
+                DynamicGpsData data = new DynamicGpsData();
+                data.playerId = gps.Key.playerId;
+                data.gpsName = gps.Key.gpsName;
+                data.gpsHash = gps.Value;
+
+                builder.DynamicGpss.Add(data);
             }
 
             FileUtils.WriteXmlFileToWorld(builder, FILENAME, typeof(GlobalGpsManager));
