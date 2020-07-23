@@ -155,7 +155,14 @@ namespace SEWorldGenPlugin.Session
             }
             else
             {
-                gps = MySession.Static.Gpss[playerId][DynamicGpss[id]];
+                MySession.Static.Gpss[playerId].TryGetValue(DynamicGpss[id], out gps);
+                if(gps == null)
+                {
+                    DynamicGpss.Remove(id);
+                    AddOrUpdateDynamicGps(gpsName, playerId, position, color);
+                    return;
+                }
+
                 gps.Coords = position;
                 MySession.Static.Gpss.SendModifyGps(playerId, gps);
                 gps.UpdateHash();
