@@ -4,6 +4,7 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
 using VRage.Game.Components;
+using VRage.Game.ModAPI;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Session
@@ -154,19 +155,10 @@ namespace SEWorldGenPlugin.Session
             }
             else
             {
-                gps = new MyGps()
-                {
-                    Name = gpsName,
-                    Coords = position,
-                    ShowOnHud = true,
-                    GPSColor = color,
-                    AlwaysVisible = false,
-                    DiscardAt = null
-                };
-                gps.CalculateHash();
+                gps = MySession.Static.Gpss[playerId][DynamicGpss[id]];
+                gps.Coords = position;
+                MySession.Static.Gpss.SendModifyGps(playerId, gps);
                 gps.UpdateHash();
-                MySession.Static.Gpss.SendDelete(playerId, DynamicGpss[id]);
-                MySession.Static.Gpss.SendAddGps(playerId, ref gps, playSoundOnCreation: false);
                 DynamicGpss[id] = gps.Hash;
             }   
         }
