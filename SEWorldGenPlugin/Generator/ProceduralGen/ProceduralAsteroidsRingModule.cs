@@ -11,6 +11,7 @@ using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using VRage;
 using VRage.Game;
 using VRage.Game.Entity;
@@ -174,9 +175,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 MyPlanetRingItem ring = ((MyPlanetItem)p).PlanetRing;
                 Vector3D entityPos = tracker.Entity.PositionComp.GetPosition();
 
+                string pre = ((MyPlanetItem)p).DisplayName;
+                Regex.Replace(pre, "-\\d+", string.Empty);
+
+                string name = pre + " Ring";
+
                 if (Vector3D.Subtract(ring.Center, entityPos).Length() > 5000000)
                 {
-                    GlobalGpsManager.Static.RemoveDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
+                    GlobalGpsManager.Static.RemoveDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
                     continue;
                 }
 
@@ -184,12 +190,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 if (shape.Contains(tracker.LastPosition) == ContainmentType.Contains)
                 {
-                    GlobalGpsManager.Static.RemoveDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
+                    GlobalGpsManager.Static.RemoveDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
                     continue;
                 }
 
                 Vector3D pos = shape.ClosestPointAtRingCenter(entityPos);
-                GlobalGpsManager.Static.AddOrUpdateDynamicGps(((MyPlanetItem)p).DisplayName + " Ring", ((MyCharacter)tracker.Entity).GetPlayerIdentityId(), pos, Color.Gold);
+                GlobalGpsManager.Static.AddOrUpdateDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId(), pos, Color.Gold);
             }
         }
 
