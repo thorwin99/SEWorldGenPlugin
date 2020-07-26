@@ -176,7 +176,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 Vector3D entityPos = tracker.Entity.PositionComp.GetPosition();
 
                 string pre = ((MyPlanetItem)p).DisplayName;
-                Regex.Replace(pre, "-\\d+", string.Empty);
+                pre = Regex.Replace(pre, "-\\d+", string.Empty);
 
                 string name = pre + " Ring";
 
