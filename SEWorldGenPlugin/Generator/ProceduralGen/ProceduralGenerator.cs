@@ -107,7 +107,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
             foreach(MyEntityTracker tracker in m_trackedEntities.Values)
             {
-                if (tracker.ShouldGenerate())
+                if (tracker.ShouldGenerate(true))
                 {
                     List<MyObjectSeed> cellObjects = new List<MyObjectSeed>();
 
