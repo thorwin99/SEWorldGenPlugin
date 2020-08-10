@@ -137,6 +137,7 @@ namespace SEWorldGenPlugin.GUI
                 PlSettings.GeneratorSettings.PlanetSettings.BlacklistedPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets;
                 PlSettings.GeneratorSettings.PlanetSettings.Moons = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.Moons;
                 PlSettings.GeneratorSettings.PlanetSettings.MandatoryPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets;
+                PlSettings.GeneratorSettings.PlanetSettings.GasGiants = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants;
             }
             else
             {

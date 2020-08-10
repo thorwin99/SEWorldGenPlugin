@@ -98,6 +98,7 @@ namespace SEWorldGenPlugin.Generator
             m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
             m_mandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
             m_moonDefinitions = new List<MyPlanetGeneratorDefinition>();
+            m_gasGiants = new List<MyPlanetGeneratorDefinition>();
             FilterDefinitions();
         }
 
@@ -117,6 +118,9 @@ namespace SEWorldGenPlugin.Generator
             UnloadNet();
             m_objects?.Clear();
             m_planetDefinitions?.Clear();
+            m_moonDefinitions?.Clear();
+            m_mandatoryPlanets?.Clear();
+            m_gasGiants?.Clear();
             m_settings = null;
             Static = null;
         }
@@ -317,7 +321,7 @@ namespace SEWorldGenPlugin.Generator
 
         private float SizeByGravity(float gravity, bool isGasGiant = false)
         {
-            float multiplier = isGasGiant ? m_settings.PlanetSettings.SizeMultiplier : m_settings.PlanetSettings.SizeMultiplier * 2.0f;
+            float multiplier = isGasGiant ? m_settings.PlanetSettings.SizeMultiplier * 2.0f : m_settings.PlanetSettings.SizeMultiplier;
 
            return (float)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * multiplier * multiplier), m_settings.PlanetSettings.PlanetSizeCap);
         }
