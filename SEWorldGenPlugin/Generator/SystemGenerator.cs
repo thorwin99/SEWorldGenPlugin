@@ -48,6 +48,12 @@ namespace SEWorldGenPlugin.Generator
             private set;
         }
 
+        public List<MyPlanetGeneratorDefinition> m_gasGiants
+        {
+            get;
+            private set;
+        }
+
         private int m_seed;
         private GeneratorSettings m_settings;
 
@@ -199,8 +205,8 @@ namespace SEWorldGenPlugin.Generator
             double mod = distance == 0 && m_settings.FirstPlanetCenter ? 1 : Math.Sin(index * Math.PI / totalObjects);
 
             var def = GetPlanetDefinition((int)(m_settings.PlanetSettings.PlanetSizeCap * mod));
-
-            var size = SizeByGravity(def.SurfaceGravity);
+            bool isGasGiant = m_gasGiants.Contains(def);
+            var size = SizeByGravity(def.SurfaceGravity, isGasGiant);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
@@ -231,6 +237,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 var dist = planetSize * (i + 1) + planetSize * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
                 var def = GetPlanetMoonDefinition(planetSize * 0.8f);
+                bool isGasGiant = m_gasGiants.Contains(def);
 
                 if (dist + distance > m_settings.WorldSize && m_settings.WorldSize > 0) return moons;
 
@@ -238,7 +245,7 @@ namespace SEWorldGenPlugin.Generator
                 item.Type = SystemObjectType.MOON;
                 item.DefName = def.Id.SubtypeName.ToString();
                 item.Distance = dist;
-                item.Size = SizeByGravity(def.SurfaceGravity);
+                item.Size = SizeByGravity(def.SurfaceGravity, isGasGiant);
                 item.DisplayName = planetName + " " + (char)('A' + i);
 
                 moons[i] = item;
@@ -308,14 +315,18 @@ namespace SEWorldGenPlugin.Generator
             return def;
         }
 
-        private float SizeByGravity(float gravity)
+        private float SizeByGravity(float gravity, bool isGasGiant = false)
         {
-           return (float)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * m_settings.PlanetSettings.SizeMultiplier * m_settings.PlanetSettings.SizeMultiplier), m_settings.PlanetSettings.PlanetSizeCap);
+            float multiplier = isGasGiant ? m_settings.PlanetSettings.SizeMultiplier : m_settings.PlanetSettings.SizeMultiplier * 2.0f;
+
+           return (float)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * multiplier * multiplier), m_settings.PlanetSettings.PlanetSizeCap);
         }
 
-        private int GetMaxMoonCount(float gravity)
+        private int GetMaxMoonCount(float gravity, bool isGasGiant = false)
         {
-            return (int)Math.Floor(gravity * 5 * MyRandom.Instance.NextFloat());
+            float m = isGasGiant ? 2 : 1;
+            float o = isGasGiant ? 0.3f : 0;
+            return (int)Math.Floor(gravity * m * 5 * (MyRandom.Instance.NextFloat() + o));
         }
 
         private void ShuffleMandatoryPlanets()
@@ -354,6 +365,10 @@ namespace SEWorldGenPlugin.Generator
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String) || SettingsSession.Static.Settings.GeneratorSettings.SemiRandomizedGeneration)
                 {
                     m_mandatoryPlanets.Add(p);
+                }
+                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants.Contains(p.Id.SubtypeId.String))
+                {
+                    m_gasGiants.Add(p);
                 }
             }
 

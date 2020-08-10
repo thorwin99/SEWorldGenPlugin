@@ -108,6 +108,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MandatoryPlanets = new HashSet<string>();
 
             Moons = new HashSet<string>();
+
+            GasGiants = new HashSet<string>();
         }
 
         [ProtoMember(1)]
@@ -136,6 +138,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(9)]
         public HashSet<string> Moons;
+
+        [ProtoMember(10)]
+        public HashSet<string> GasGiants;
 
         public void Verify()
         {
