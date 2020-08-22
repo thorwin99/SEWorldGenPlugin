@@ -24,6 +24,8 @@ namespace SEWorldGenPlugin.Generator
 
         private const string STORAGE_FILE = "SystemData.xml";
 
+        private List<string> vanilla_planets = new List<string> { "EarthLike", "Mars", "Triton", "Alien", "Europa", "Titan", "Moon" };
+
         public HashSet<MySystemItem> m_objects
         {
             get;
@@ -353,6 +355,11 @@ namespace SEWorldGenPlugin.Generator
             foreach (var p in m_planetDefinitions)
             {
                 if (p.Id.SubtypeId.String.Contains("Tutorial") || p.Id.SubtypeId.String.Contains("TestMap") || p.Id.SubtypeId.String.Contains("ModExample"))
+                {
+                    toRemovePlanets.Add(p);
+                    continue;
+                }
+                if (!SettingsSession.Static.Settings.GeneratorSettings.UseVanillaPlanets && vanilla_planets.Contains(p.Id.SubtypeId.String))
                 {
                     toRemovePlanets.Add(p);
                     continue;

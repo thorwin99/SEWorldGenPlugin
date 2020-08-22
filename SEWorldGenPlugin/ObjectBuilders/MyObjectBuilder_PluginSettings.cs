@@ -42,6 +42,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             SemiRandomizedGeneration = false;
             WorldSize = -1;
             FirstPlanetCenter = false;
+            UseVanillaPlanets = true;
         }
 
         [ProtoMember(1)]
@@ -76,6 +77,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(10)]
         public bool FirstPlanetCenter;
+
+        [ProtoMember(11)]
+        public bool UseVanillaPlanets;
 
         public void Verify()
         {
