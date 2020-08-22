@@ -14,6 +14,7 @@ namespace SEWorldGenPlugin.GUI
     {
         private MyGuiControlLabel m_useGlobalSettignsLabel;
         private MyGuiControlLabel m_useSemiRandomGenerationLabel;
+        private MyGuiControlLabel m_useVanillaPlanetsLabel;
         private MyGuiControlLabel m_planetGpsLabel;
         private MyGuiControlLabel m_moonGpsLabel;
         private MyGuiControlLabel m_beltGpsLabel;
@@ -45,6 +46,7 @@ namespace SEWorldGenPlugin.GUI
 
         private MyGuiControlCheckbox m_useGlobalCheck;
         private MyGuiControlCheckbox m_useSemiRandomGenerationCheck;
+        private MyGuiControlCheckbox m_useVanillaPlanetsCheck;
         private MyGuiControlCheckbox m_planetGpsCheck;
         private MyGuiControlCheckbox m_moonGpsCheck;
         private MyGuiControlCheckbox m_beltGpsCheck;
@@ -88,7 +90,7 @@ namespace SEWorldGenPlugin.GUI
         {
             Vector2 vector = new Vector2(50f) / MyGuiConstants.GUI_OPTIMAL_SIZE;
             float x2 = 0.209375018f;
-            int mod = m_isNewGame ? 3 : 0;
+            int mod = m_isNewGame ? 4 : 0;
             AddCaption("SEWorldGenPlugin Settings", null, new Vector2(0f, 0.003f));
 
             MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (15 + mod)));
@@ -103,6 +105,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_useGlobalSettignsLabel = MakeLabel("Use global Config");
             m_useSemiRandomGenerationLabel = MakeLabel("Use all planets");
+            m_useVanillaPlanetsLabel = MakeLabel("Use vanilla planets");
             m_planetGpsLabel = MakeLabel("Create GPS for Planets");
             m_moonGpsLabel = MakeLabel("Create GPS for Moons");
             m_beltGpsLabel = MakeLabel("Create GPS for Belts");
@@ -122,6 +125,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_useGlobalCheck = new MyGuiControlCheckbox();
             m_useSemiRandomGenerationCheck = new MyGuiControlCheckbox();
+            m_useVanillaPlanetsCheck = new MyGuiControlCheckbox();
             m_planetGpsCheck = new MyGuiControlCheckbox();
             m_moonGpsCheck = new MyGuiControlCheckbox();
             m_beltGpsCheck = new MyGuiControlCheckbox();
@@ -165,6 +169,8 @@ namespace SEWorldGenPlugin.GUI
             m_useGlobalCheck.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             m_useSemiRandomGenerationCheck.SetToolTip(MyPluginTexts.TOOLTIPS.USE_SEMI_RAND_GEN_CHECK);
             m_useSemiRandomGenerationCheck.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+            m_useVanillaPlanetsCheck.SetToolTip(MyPluginTexts.TOOLTIPS.USE_VANILLA_PLANETS);
+            m_useVanillaPlanetsCheck.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             m_planetGpsCheck.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_GPSL_CHECK);
             m_planetGpsCheck.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             m_moonGpsCheck.SetToolTip(MyPluginTexts.TOOLTIPS.MOON_GPS_CHECK);
@@ -249,6 +255,7 @@ namespace SEWorldGenPlugin.GUI
             m_useGlobalCheck.IsCheckedChanged = (Action<MyGuiControlCheckbox>)Delegate.Combine(m_useGlobalCheck.IsCheckedChanged, (Action<MyGuiControlCheckbox>)delegate (MyGuiControlCheckbox s)
             {
                 m_useSemiRandomGenerationCheck.Enabled = !s.IsChecked;
+                m_useVanillaPlanetsCheck.Enabled = !s.IsChecked;
                 m_objAmountSlider.Enabled = !s.IsChecked;
                 m_asteroidDensitySlider.Enabled = !s.IsChecked;
                 m_asteroidGeneratorCombo.Enabled = !s.IsChecked;
@@ -274,6 +281,9 @@ namespace SEWorldGenPlugin.GUI
             {
                 parent.Controls.Add(m_useSemiRandomGenerationLabel);
                 parent.Controls.Add(m_useSemiRandomGenerationCheck);
+
+                parent.Controls.Add(m_useVanillaPlanetsLabel);
+                parent.Controls.Add(m_useVanillaPlanetsCheck);
 
                 parent.Controls.Add(m_planetGpsLabel);
                 parent.Controls.Add(m_planetGpsCheck);
@@ -349,6 +359,9 @@ namespace SEWorldGenPlugin.GUI
             {
                 m_useSemiRandomGenerationLabel.Position = start + offset * m++;
                 m_useSemiRandomGenerationCheck.Position = m_useSemiRandomGenerationLabel.Position + offset2;
+
+                m_useVanillaPlanetsLabel.Position = start + offset * m++;
+                m_useVanillaPlanetsCheck.Position = m_useVanillaPlanetsLabel.Position + offset2;
 
                 m_planetGpsLabel.Position = start + offset * m++;
                 m_planetGpsCheck.Position = m_planetGpsLabel.Position + offset2;
@@ -438,6 +451,8 @@ namespace SEWorldGenPlugin.GUI
 
             m_useSemiRandomGenerationCheck.IsChecked = settings.GeneratorSettings.SemiRandomizedGeneration;
 
+            m_useVanillaPlanetsCheck.IsChecked = settings.GeneratorSettings.UseVanillaPlanets;
+
             m_planetGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS;
 
             m_moonGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.ShowMoonGPS;
@@ -475,6 +490,7 @@ namespace SEWorldGenPlugin.GUI
                 settings = new MyObjectBuilder_PluginSettings();
 
             settings.GeneratorSettings.SemiRandomizedGeneration = m_useSemiRandomGenerationCheck.IsChecked;
+            settings.GeneratorSettings.UseVanillaPlanets = m_useVanillaPlanetsCheck.IsChecked;
 
             settings.GeneratorSettings.MinObjectsInSystem = (int)m_objAmountSlider.Value;
             settings.GeneratorSettings.MaxObjectsInSystem = (int)m_objAmountSlider.Value;

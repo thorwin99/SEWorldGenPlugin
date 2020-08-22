@@ -165,7 +165,7 @@ namespace SEWorldGenPlugin.Generator
                     }
 
 
-                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability && m_planetDefinitions.Count != 0){
+                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability && m_planetDefinitions.Count > 0){
                         GeneratePlanet(i, tmp_distance, numberPlanets, ref totalPlanets);
                     }
                     else
