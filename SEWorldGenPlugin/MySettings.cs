@@ -60,6 +60,8 @@ namespace SEWorldGenPlugin
                 Settings = new MyObjectBuilder_PluginSettings();
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Moon");
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Titan");
+                Settings.GeneratorSettings.PlanetSettings.Moons.Add("Europa");
+                Settings.GeneratorSettings.PlanetSettings.Moons.Add("Triton");
             }
             Settings.Verify();
             PluginLog.Log("Config loaded");
