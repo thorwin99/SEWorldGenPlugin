@@ -19,6 +19,8 @@
         public readonly string USE_GLOBAL_CHECK = "If the settings for this world are based on the global configuration file.";
         public readonly string USE_SEMI_RAND_GEN_CHECK = "If every possible planet has to be generated at least once. The amount of spawned objects can exceed max system objects when using this obtion.";
         public readonly string USE_VANILLA_PLANETS = "If the plugin should consider vanilla planets for world generation.";
+        public readonly string PLANETS_ONLY_ONCE = "Generates Planets only once, until none are left. Then duplicates can appear.";
+        public readonly string MOONS_ONLY_ONCE = "Generates Moons only once, until none are left. Then duplicates can appear";
         public readonly string PLANET_GPSL_CHECK = "If a GPS signal should be generated for each planet on world generation.";
         public readonly string MOON_GPS_CHECK = "If a GPS signal should be generated for each moon on world generation.";
         public readonly string BELT_GPS_CHECK = "If a GPS signal should be generated for each asteroid belt.";

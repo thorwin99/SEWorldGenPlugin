@@ -43,6 +43,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             WorldSize = -1;
             FirstPlanetCenter = false;
             UseVanillaPlanets = true;
+            PlanetsOnlyOnce = false;
+            MoonsOnlyOnce = false;
         }
 
         [ProtoMember(1)]
@@ -80,6 +82,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(11)]
         public bool UseVanillaPlanets;
+
+        [ProtoMember(12)]
+        public bool PlanetsOnlyOnce;
+
+        [ProtoMember(13)]
+        public bool MoonsOnlyOnce;
 
         public void Verify()
         {
