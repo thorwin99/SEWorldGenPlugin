@@ -97,7 +97,7 @@ namespace SEWorldGenPlugin.GUI
             int mod = m_isNewGame ? 6 : 0;
             AddCaption("SEWorldGenPlugin Settings", null, new Vector2(0f, 0.003f));
 
-            MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (17 + mod)));
+            MyGuiControlParent parent = new MyGuiControlParent(null, new Vector2(base.Size.Value.X - vector.X * 2f, 0.052f * (15 + mod)));
             parent.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
 
             MyGuiControlSeparatorList myGuiControlSeparatorList = new MyGuiControlSeparatorList();
