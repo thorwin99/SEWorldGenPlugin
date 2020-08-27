@@ -140,6 +140,9 @@ namespace SEWorldGenPlugin.GUI
                 PlSettings.GeneratorSettings.PlanetSettings.Moons = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.Moons;
                 PlSettings.GeneratorSettings.PlanetSettings.MandatoryPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets;
                 PlSettings.GeneratorSettings.PlanetSettings.GasGiants = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants;
+                //PlSettings.GeneratorSettings.PlanetSettings.PlanetNameFormat = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat;
+                //PlSettings.GeneratorSettings.PlanetSettings.MoonNameFormat = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat;
+                //PlSettings.GeneratorSettings.BeltSettings.BeltNameFormat = MySettings.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat;
             }
             else
             {

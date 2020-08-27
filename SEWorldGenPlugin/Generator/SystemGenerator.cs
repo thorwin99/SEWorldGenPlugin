@@ -235,7 +235,12 @@ namespace SEWorldGenPlugin.Generator
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
             Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Sin(height));
 
-            planet.DisplayName = "Planet " + (++planetIndex);
+            string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
+                .SetProperty("ObjectNumber", ++planetIndex)
+                .SetProperty("ObjectNumberGreek", greek_letters[planetIndex])
+                .SetProperty("ObjectId", def.Id.SubtypeId.String);
+
+            planet.DisplayName = name;
             planet.Type = SystemObjectType.PLANET;
             planet.DefName = def.Id.SubtypeId.String;
             planet.Size = size;
@@ -264,12 +269,17 @@ namespace SEWorldGenPlugin.Generator
 
                 if (dist + distance > m_settings.WorldSize && m_settings.WorldSize > 0) return moons;
 
+                string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
+                .SetProperty("ObjectNumber", i)
+                .SetProperty("ObjectNumberGreek", greek_letters[i])
+                .SetProperty("ObjectId", def.Id.SubtypeId.String);
+
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
                 item.Type = SystemObjectType.MOON;
                 item.DefName = def.Id.SubtypeName.ToString();
                 item.Distance = dist;
                 item.Size = SizeByGravity(def.SurfaceGravity, isGasGiant);
-                item.DisplayName = planetName + " " + (char)('A' + i);
+                item.DisplayName = name;
 
                 moons[i] = item;
             }

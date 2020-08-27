@@ -10,7 +10,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public MyObjectBuilder_PluginSettings()
         {
             Enable = false;
-            GeneratorSettings = new GeneratorSettings();
+            if(MySettings.Static != null)
+                if(MySettings.Static.Settings != null)
+                {
+                    GeneratorSettings = MySettings.Static.Settings.GeneratorSettings.copy();
+                }
+                else
+                {
+                    GeneratorSettings = new GeneratorSettings();
+                }
         }
 
         [ProtoMember(1)]
@@ -18,6 +26,14 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(2)]
         public GeneratorSettings GeneratorSettings;
+
+        public MyObjectBuilder_PluginSettings copy()
+        {
+            MyObjectBuilder_PluginSettings s = new MyObjectBuilder_PluginSettings();
+            s.Enable = Enable;
+            s.GeneratorSettings = GeneratorSettings.copy();
+            return s;
+        }
 
         public void Verify()
         {
@@ -89,6 +105,27 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(13)]
         public bool MoonsOnlyOnce;
 
+        public GeneratorSettings copy()
+        {
+            GeneratorSettings g = new GeneratorSettings();
+            g.MinObjectsInSystem = MinObjectsInSystem;
+            g.MaxObjectsInSystem = MaxObjectsInSystem;
+            g.MinOrbitDistance = MinOrbitDistance;
+            g.MaxOrbitDistance = MaxOrbitDistance;
+            g.AsteroidGenerator = AsteroidGenerator;
+            g.AsteroidDensity = AsteroidDensity;
+            g.PlanetSettings = PlanetSettings.copy();
+            g.BeltSettings = BeltSettings.copy();
+            g.SemiRandomizedGeneration = SemiRandomizedGeneration;
+            g.WorldSize = WorldSize;
+            g.FirstPlanetCenter = FirstPlanetCenter;
+            g.UseVanillaPlanets = UseVanillaPlanets;
+            g.PlanetsOnlyOnce = PlanetsOnlyOnce;
+            g.MoonsOnlyOnce = MoonsOnlyOnce;
+
+            return g;
+        }
+
         public void Verify()
         {
             Verifier.VerifyInt(0, MaxObjectsInSystem, 5, "MinObjectsInSystem", ref MinObjectsInSystem);
@@ -116,6 +153,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             ShowMoonGPS = false;
             BlacklistedPlanets = new HashSet<string>();
             BlacklistedPlanets.Add("MoonTutorial");
+            PlanetNameFormat = "Planet [ObjectNumber]";
+            MoonNameFormat = "Moon [ObjectNumber]";
 
             MandatoryPlanets = new HashSet<string>();
 
@@ -143,16 +182,41 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public bool ShowMoonGPS;
 
         [ProtoMember(7)]
-        public HashSet<string> BlacklistedPlanets;
+        public string PlanetNameFormat;
 
         [ProtoMember(8)]
-        public HashSet<string> MandatoryPlanets;
+        public string MoonNameFormat;
 
         [ProtoMember(9)]
-        public HashSet<string> Moons;
+        public HashSet<string> BlacklistedPlanets;
 
         [ProtoMember(10)]
+        public HashSet<string> MandatoryPlanets;
+
+        [ProtoMember(11)]
+        public HashSet<string> Moons;
+
+        [ProtoMember(12)]
         public HashSet<string> GasGiants;
+
+        public PlanetSettings copy()
+        {
+            PlanetSettings p = new PlanetSettings();
+            p.SizeMultiplier = SizeMultiplier;
+            p.PlanetSizeCap = PlanetSizeCap;
+            p.MoonProbability = MoonProbability;
+            p.RingSettings = RingSettings.copy();
+            p.ShowPlanetGPS = ShowPlanetGPS;
+            p.ShowMoonGPS = ShowMoonGPS;
+            p.PlanetNameFormat = PlanetNameFormat;
+            p.MoonNameFormat = MoonNameFormat;
+            p.BlacklistedPlanets = BlacklistedPlanets;
+            p.MandatoryPlanets = MandatoryPlanets;
+            p.Moons = Moons;
+            p.GasGiants = GasGiants;
+
+            return p;
+        }
 
         public void Verify()
         {
@@ -187,6 +251,16 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(4)]
         public bool ShowRingGPS;
 
+        public PlanetRingSettings copy()
+        {
+            PlanetRingSettings r = new PlanetRingSettings();
+            r.MinPlanetRingWidth = MinPlanetRingWidth;
+            r.MaxPlanetRingWidth = MaxPlanetRingWidth;
+            r.PlanetRingProbability = PlanetRingProbability;
+            r.ShowRingGPS = ShowRingGPS;
+
+            return r;
+        }
 
         public void Verify()
         {
@@ -205,6 +279,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MaxBeltHeight = 40000;
             BeltProbability = 0.2f;
             ShowBeltGPS = true;
+            BeltNameFormat = "Belt [ObjectNumberGreek]";
         }
 
         [ProtoMember(1)]
@@ -218,6 +293,20 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         [ProtoMember(4)]
         public bool ShowBeltGPS;
+
+        [ProtoMember(5)]
+        public string BeltNameFormat;
+
+        public BeltSettings copy()
+        {
+            BeltSettings b = new BeltSettings();
+            b.MinBeltHeight = MinBeltHeight;
+            b.MaxBeltHeight = MaxBeltHeight;
+            b.BeltProbability = BeltProbability;
+            b.ShowBeltGPS = ShowBeltGPS;
+            b.BeltNameFormat = BeltNameFormat;
+            return b;
+        }
 
         public void Verify()
         {

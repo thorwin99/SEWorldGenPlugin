@@ -210,6 +210,7 @@
     <Compile Include="Utilities\MyPluginTexts.cs" />
     <Compile Include="Utilities\NetUtil.cs" />
     <Compile Include="Utilities\PluginLog.cs" />
+    <Compile Include="Utilities\StringExtension.cs" />
     <Compile Include="Utilities\Verifier.cs" />
   </ItemGroup>
   <ItemGroup>
