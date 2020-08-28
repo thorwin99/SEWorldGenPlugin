@@ -214,6 +214,7 @@ namespace SEWorldGenPlugin.Generator
             string name = SettingsSession.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat
                 .SetProperty("ObjectNumber", beltIndex + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[beltIndex])
+                .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(beltIndex + 1))
                 .SetProperty("ObjectLetterLower", (char)('a' + (beltIndex % 26)))
                 .SetProperty("ObjectLetterUpper", (char)('A' + (beltIndex % 26)));
 
@@ -246,6 +247,7 @@ namespace SEWorldGenPlugin.Generator
             string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
                 .SetProperty("ObjectNumber", planetIndex + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[planetIndex])
+                .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(planetIndex + 1))
                 .SetProperty("ObjectLetterLower", (char)('a' + (planetIndex % 26)))
                 .SetProperty("ObjectLetterUpper", (char)('A' + (planetIndex % 26)))
                 .SetProperty("ObjectId", def.Id.SubtypeId.String);
@@ -284,6 +286,7 @@ namespace SEWorldGenPlugin.Generator
                 string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat
                 .SetProperty("ObjectNumber", i + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[i])
+                .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(i + 1))
                 .SetProperty("ObjectLetterLower", (char)('a' + (i % 26)))
                 .SetProperty("ObjectLetterUpper", (char)('A' + (i % 26)))
                 .SetProperty("ObjectId", def.Id.SubtypeId.String)
@@ -518,6 +521,24 @@ namespace SEWorldGenPlugin.Generator
 
                 GlobalGpsManager.Static.AddGps(obj.DisplayName, Color.Aqua, pos);
             }
+        }
+
+        private string ConvertNumberToRoman(int number)
+        {
+            if (number >= 1000) return "M" + ConvertNumberToRoman(number - 1000);
+            if (number >= 900) return "CM" + ConvertNumberToRoman(number - 900);
+            if (number >= 500) return "D" + ConvertNumberToRoman(number - 500);
+            if (number >= 400) return "CD" + ConvertNumberToRoman(number - 400);
+            if (number >= 100) return "C" + ConvertNumberToRoman(number - 100);
+            if (number >= 90) return "XC" + ConvertNumberToRoman(number - 90);
+            if (number >= 50) return "L" + ConvertNumberToRoman(number - 50);
+            if (number >= 40) return "XL" + ConvertNumberToRoman(number - 40);
+            if (number >= 10) return "X" + ConvertNumberToRoman(number - 10);
+            if (number >= 9) return "IX" + ConvertNumberToRoman(number - 9);
+            if (number >= 5) return "V" + ConvertNumberToRoman(number - 5);
+            if (number >= 4) return "IV" + ConvertNumberToRoman(number - 4);
+            if (number >= 1) return "I" + ConvertNumberToRoman(number - 1);
+            return "";
         }
     }
 }
