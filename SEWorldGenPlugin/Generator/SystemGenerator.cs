@@ -211,7 +211,11 @@ namespace SEWorldGenPlugin.Generator
         {
             MySystemBeltItem belt = new MySystemBeltItem();
 
-            belt.DisplayName = "Belt " + greek_letters[beltIndex++ % greek_letters.Length];
+            string name = SettingsSession.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat
+                .SetProperty("ObjectNumber", beltIndex + 1)
+                .SetProperty("ObjectNumberGreek", greek_letters[beltIndex++]);
+
+            belt.DisplayName = name;
             belt.Type = SystemObjectType.BELT;
             belt.Height = MyRandom.Instance.Next(m_settings.BeltSettings.MinBeltHeight, m_settings.BeltSettings.MaxBeltHeight);
             belt.Radius = distance;
@@ -269,10 +273,12 @@ namespace SEWorldGenPlugin.Generator
 
                 if (dist + distance > m_settings.WorldSize && m_settings.WorldSize > 0) return moons;
 
-                string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
-                .SetProperty("ObjectNumber", i)
+                string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat
+                .SetProperty("ObjectNumber", i + 1)
+                .SetProperty("ObjectNumber", i + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[i])
-                .SetProperty("ObjectId", def.Id.SubtypeId.String);
+                .SetProperty("ObjectId", def.Id.SubtypeId.String)
+                .SetProperty("PlanetName", planetName);
 
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
                 item.Type = SystemObjectType.MOON;
