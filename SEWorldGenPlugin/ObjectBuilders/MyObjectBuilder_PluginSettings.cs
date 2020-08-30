@@ -11,7 +11,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             Enable = false;
             if(MySettings.Static != null)
-                if(MySettings.Static.Settings != null)
+            {
+                if (MySettings.Static.Settings != null)
                 {
                     GeneratorSettings = MySettings.Static.Settings.GeneratorSettings.copy();
                 }
@@ -19,6 +20,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
                 {
                     GeneratorSettings = new GeneratorSettings();
                 }
+            }
+            else
+            {
+                GeneratorSettings = new GeneratorSettings();
+            }
+
         }
 
         [ProtoMember(1)]

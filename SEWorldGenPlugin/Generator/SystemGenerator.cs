@@ -246,7 +246,7 @@ namespace SEWorldGenPlugin.Generator
 
             string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
                 .SetProperty("ObjectNumber", planetIndex + 1)
-                .SetProperty("ObjectNumberGreek", greek_letters[planetIndex])
+                .SetProperty("ObjectNumberGreek", greek_letters[planetIndex % greek_letters.Length])
                 .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(planetIndex + 1))
                 .SetProperty("ObjectLetterLower", (char)('a' + (planetIndex % 26)))
                 .SetProperty("ObjectLetterUpper", (char)('A' + (planetIndex % 26)))
@@ -330,7 +330,7 @@ namespace SEWorldGenPlugin.Generator
             float size;
             MyPlanetGeneratorDefinition def;
 
-            if(m_mandatoryPlanets.Count != 0 && !ignoreMandatory)
+            if(m_mandatoryPlanets.Count > 0 && !ignoreMandatory)
             {
                 def = m_mandatoryPlanets[0];
                 m_mandatoryPlanets.RemoveAt(0);
