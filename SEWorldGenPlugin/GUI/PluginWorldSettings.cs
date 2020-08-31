@@ -134,7 +134,9 @@ namespace SEWorldGenPlugin.GUI
 
             if (m_isNewGame)
             {
+                PluginLog.Log(MySettings.Static.Settings.ToString());
                 PlSettings = MySettings.Static.Settings.copy();
+                PluginLog.Log(PlSettings.ToString());
                 //PlSettings.GeneratorSettings.FirstPlanetCenter = MySettings.Static.Settings.GeneratorSettings.FirstPlanetCenter;
                 //PlSettings.GeneratorSettings.PlanetSettings.BlacklistedPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets;
                 //PlSettings.GeneratorSettings.PlanetSettings.Moons = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.Moons;

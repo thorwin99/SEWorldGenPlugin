@@ -134,6 +134,10 @@ namespace SEWorldGenPlugin.Utilities
             {
                 throw new FileNotFoundException();
             }
+            if (!MySession.Static.CurrentPath.ToLower().Contains(MyFileSystem.UserDataPath.ToLower()))
+            {
+                return null;
+            }
 
             var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
             var stream = MyFileSystem.OpenWrite(path);
@@ -229,6 +233,7 @@ namespace SEWorldGenPlugin.Utilities
             string xml = SerializeToXml<T>(saveFile);
             using (var writer = WriteFileInWorldStorage(file, callingType))
             {
+                if (writer == null) return;
                 writer.Write(xml);
                 writer.Close();
             }
