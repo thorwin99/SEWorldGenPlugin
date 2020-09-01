@@ -213,7 +213,7 @@ namespace SEWorldGenPlugin.Generator
 
             string name = SettingsSession.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat
                 .SetProperty("ObjectNumber", beltIndex + 1)
-                .SetProperty("ObjectNumberGreek", greek_letters[beltIndex])
+                .SetProperty("ObjectNumberGreek", greek_letters[beltIndex % greek_letters.Length])
                 .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(beltIndex + 1))
                 .SetProperty("ObjectLetterLower", (char)('a' + (beltIndex % 26)))
                 .SetProperty("ObjectLetterUpper", (char)('A' + (beltIndex % 26)));
@@ -285,7 +285,7 @@ namespace SEWorldGenPlugin.Generator
 
                 string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat
                 .SetProperty("ObjectNumber", i + 1)
-                .SetProperty("ObjectNumberGreek", greek_letters[i])
+                .SetProperty("ObjectNumberGreek", greek_letters[i % greek_letters.Length])
                 .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(i + 1))
                 .SetProperty("ObjectLetterLower", (char)('a' + (i % 26)))
                 .SetProperty("ObjectLetterUpper", (char)('A' + (i % 26)))
