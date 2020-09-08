@@ -22,7 +22,6 @@ namespace SEWorldGenPlugin.Draw
         {
             MatrixD wm = MatrixD.CreateWorld(m_position);
             MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_radius, ref m_color, MySimpleObjectRasterizer.SolidAndWireframe, 100, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: 1000);
-            //MyRenderProxy.DebugDrawSphere(m_position, m_radius * 1.1f, m_color.ToVector3(), 1.0f, true, true);
         }
     }
 }
