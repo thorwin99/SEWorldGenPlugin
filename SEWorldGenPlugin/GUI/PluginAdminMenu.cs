@@ -590,6 +590,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringDistanceSlider.Enabled = false;
             m_ringWidthSlider.Enabled = false;
             m_ringRoidSizeSlider.Enabled = false;
+            m_ringRoidSizeMaxSlider.Enabled = false;
             m_addRingButton.Enabled = false;
             m_removeRingButton.Enabled = false;
             m_teleportToRingButton.Enabled = false;
