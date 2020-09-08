@@ -115,6 +115,7 @@ namespace SEWorldGenPlugin.GUI
                                 {
                                     MySettings.Static.SessionSettings = new MyObjectBuilder_PluginSettings();
                                     MySettings.Static.SessionSettings.Enable = m_enablePlugin.IsChecked;
+                                    MySettings.Static.SessionSettings.GeneratorSettings = MySettings.Static.Settings.GeneratorSettings;
                                 }
                             };
                         }
