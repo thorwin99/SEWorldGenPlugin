@@ -33,6 +33,8 @@ namespace SEWorldGenPlugin.GUI
         private static readonly Vector2 SCREEN_SIZE = new Vector2(0.4f, 1.2f);
         private static readonly float HIDDEN_PART_RIGHT = 0.04f;
 
+        private static bool SNAP_CAMERA_TO_PLANET = true;
+
         private long m_currentKey;
         private long m_attachedEntity;
 
@@ -283,17 +285,36 @@ namespace SEWorldGenPlugin.GUI
             m_planetListBox = new MyGuiControlListbox(Vector2.Zero, VRage.Game.MyGuiControlListboxStyleEnum.Blueprints);
             m_planetListBox.Size = new Vector2(num, 0f);
             m_planetListBox.Enabled = true;
-            m_planetListBox.VisibleRowsCount = 8;
+            m_planetListBox.VisibleRowsCount = 7;
             m_planetListBox.Position = m_planetListBox.Size / 2f + m_currentPosition;
             m_planetListBox.ItemClicked += PlanetListItemClicked;
             m_planetListBox.MultiSelect = false;
 
-            MyGuiControlSeparatorList separator = new MyGuiControlSeparatorList();
-            separator.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.00f), m_size.Value.X * 0.73f);
-            Controls.Add(separator);
-
             m_currentPosition = m_planetListBox.GetPositionAbsoluteBottomLeft();
+            m_currentPosition.Y += 0.025f;
+
+            MyGuiControlLabel snapLabel = new MyGuiControlLabel(null, null, "Snap camera to planet");
+            snapLabel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+            snapLabel.Position = m_currentPosition;
+
+            Controls.Add(snapLabel);
+
+            MyGuiControlCheckbox snapCamera = new MyGuiControlCheckbox();
+            snapCamera.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+            snapCamera.IsCheckedChanged = snapCamera.IsCheckedChanged = (Action<MyGuiControlCheckbox>)Delegate.Combine(snapCamera.IsCheckedChanged, (Action<MyGuiControlCheckbox>)delegate (MyGuiControlCheckbox s)
+            {
+                SNAP_CAMERA_TO_PLANET = snapCamera.IsChecked;
+            });
+
+            snapCamera.IsChecked = SNAP_CAMERA_TO_PLANET;
+            snapCamera.Position = snapLabel.Position + new Vector2(snapLabel.Size.X, 0f);
+            Controls.Add(snapCamera);
+
             m_currentPosition.Y += 0.045f;
+
+            MyGuiControlSeparatorList separator = new MyGuiControlSeparatorList();
+            separator.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.09f), m_size.Value.X * 0.73f);
+            Controls.Add(separator);
 
             MyGuiControlParent myGuiControlParent = new MyGuiControlParent
             {
@@ -567,9 +588,9 @@ namespace SEWorldGenPlugin.GUI
 
             m_currentPosition.Y += m_optionsGroup.Size.Y;
 
-            MyGuiControlSeparatorList separator2 = new MyGuiControlSeparatorList();
+            /*MyGuiControlSeparatorList separator2 = new MyGuiControlSeparatorList();
             separator2.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.00f), m_size.Value.X * 0.73f);
-            Controls.Add(separator2);
+            Controls.Add(separator2);*/
 
             m_addRingButton = CreateDebugButton(0.284f, "Add ring to planet", OnAddRingToPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
 
@@ -690,7 +711,7 @@ namespace SEWorldGenPlugin.GUI
             {
                 MyEntityList.MyEntityListInfoItem myEntityListInfoItem = (MyEntityList.MyEntityListInfoItem)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
                 m_attachedEntity = myEntityListInfoItem.EntityId;
-                if (!TryAttachCamera(myEntityListInfoItem.EntityId))
+                if (SNAP_CAMERA_TO_PLANET && !TryAttachCamera(myEntityListInfoItem.EntityId))
                 {
                     MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator, null, myEntityListInfoItem.Position + Vector3.One * 50f);
                 }
