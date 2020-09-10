@@ -216,7 +216,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 else if(p.Type == SystemObjectType.BELT)
                 {
                     MySystemBeltItem belt = (MySystemBeltItem)p;
-                    AsteroidBeltShape shape = AsteroidBeltShape.CreateFromRingItem(belt);
+                    AsteroidBeltShape shape = AsteroidBeltShape.CreateFromBeltItem(belt);
                     if (shape.Contains(position) == ContainmentType.Contains) return belt;
                 }
 
