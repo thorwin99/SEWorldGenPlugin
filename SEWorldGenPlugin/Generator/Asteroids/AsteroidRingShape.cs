@@ -4,6 +4,10 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.Asteroids
 {
+    /// <summary>
+    /// A struct that represents the shape of an asteroid ring,
+    /// and contains a method to check relations of points to the ring.
+    /// </summary>
     public struct AsteroidRingShape
     {
         public Vector3D center;
@@ -14,6 +18,12 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public Vector3D normal;
         public MatrixD worldMatrix;
 
+        /// <summary>
+        /// Creates a bew asteroid ring shape from a MyPlanetRingItem.
+        /// A ring has a radius, a rotation and a width.
+        /// </summary>
+        /// <param name="ring">The ring to create a shape representation for.</param>
+        /// <returns>An AsteroidRingShape representing the given ring in worldspace</returns>
         public static AsteroidRingShape CreateFromRingItem(MyPlanetRingItem ring)
         {
             AsteroidRingShape shape = new AsteroidRingShape();
@@ -29,7 +39,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             double angleX = 2 * Math.PI / 360 * (ring.AngleDegreesX);
 
             //shape.rotation.X = Math.Cos(angleZ);
-            //shape.rotation.Y = Math.Sin(angleZ);
+            //shape.rotation.Y = Math.Sin(angleZ); 
             MatrixD mx = MatrixD.CreateRotationX(angleX);
             MatrixD my = MatrixD.CreateRotationY(angleY);
             MatrixD mz = MatrixD.CreateRotationZ(angleZ);
@@ -47,6 +57,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return shape;
         }
 
+        /// <summary>
+        /// Checks whether a given point is inside the asteroid rings shape or outside.
+        /// </summary>
+        /// <param name="point">The point to check</param>
+        /// <returns>An ContainmentType enum</returns>
         public ContainmentType Contains(Vector3D point)
         {
             Vector3D relPosition = Vector3D.Subtract(point, center);
@@ -66,6 +81,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Gets the Closest point at the center of the rings torus to the given position.
+        /// </summary>
+        /// <param name="position">The position to get the closest point to</param>
+        /// <returns>The closest position to position inside the ring</returns>
         public Vector3D ClosestPointAtRingCenter(Vector3D position)
         {
             if (Contains(position) == ContainmentType.Contains) return position;
@@ -80,6 +100,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return Vector3D.Add(Vector3D.Multiply(horVectorNorm, radius + width / 2), center);
         }
 
+        /// <summary>
+        /// Will get a location in the ring at the given angle of the ring
+        /// </summary>
+        /// <param name="angle">The angle</param>
+        /// <returns>A location in the ring at the given angle</returns>
         public Vector3D LocationInRing(int angle)
         {
             Vector3D pos = Vector3D.Zero;
@@ -89,6 +114,11 @@ namespace SEWorldGenPlugin.Generator.Asteroids
             return Vector3D.Transform(pos, worldMatrix);
         }
 
+        /// <summary>
+        /// Gets the height of the ring at the given radius
+        /// </summary>
+        /// <param name="rad">The radius</param>
+        /// <returns>The height</returns>
         private double GetHeightAtRad(double rad)
         {
             if (rad < radius || rad > radius + width) throw new ArgumentOutOfRangeException("The radius " + rad + " has to be less than " + (radius + width) + " and larger than " + radius);
