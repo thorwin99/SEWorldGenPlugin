@@ -37,7 +37,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         /// </summary>
         public void GeneratePlanets()
         {
-            foreach(var obj in SystemGenerator.Static.m_objects)
+            foreach(var obj in SystemGenerator.Static.Objects)
             {
                 if (obj == null) continue;
                 if (obj.Type != SystemObjectType.PLANET) continue;

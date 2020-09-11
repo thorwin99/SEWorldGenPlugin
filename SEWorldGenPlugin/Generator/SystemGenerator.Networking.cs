@@ -5,27 +5,38 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
-using VRage.Utils;
 
 namespace SEWorldGenPlugin.Generator
 {
+    /// <summary>
+    /// Networking part of the SystemGenerator class
+    /// </summary>
     public partial class SystemGenerator
     {
         private Dictionary<ulong, Action<bool, MySystemItem>> m_getCallbacks;
         private bool m_handshakeDone;
         private ulong m_currentIndex;
 
+        /// <summary>
+        /// Initializes a list for callbacks, for networking actions.
+        /// </summary>
         private void InitNet()
         {
             m_getCallbacks = new Dictionary<ulong, Action<bool, MySystemItem>>();
         }
 
+        /// <summary>
+        /// Initializes internal variables
+        /// </summary>
         private void LoadNet()
         {
             m_handshakeDone = false;
             m_currentIndex = 0;
         }
 
+        /// <summary>
+        /// Unloads all internal variables
+        /// </summary>
         private void UnloadNet()
         {
             m_handshakeDone = false;
@@ -33,6 +44,11 @@ namespace SEWorldGenPlugin.Generator
             m_getCallbacks = null;
         }
 
+        /// <summary>
+        /// Gets an object of the system with given name  from the server and calls callback on it.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="callback"></param>
         public void GetObject(string name, Action<bool, MySystemItem> callback)
         {
             if (!m_handshakeDone)
@@ -51,6 +67,10 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Adds a planet to the system on the server.
+        /// </summary>
+        /// <param name="planet">Planet to add</param>
         public void AddPlanet(MyPlanetItem planet)
         {
             if (!m_handshakeDone)
@@ -68,6 +88,11 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Adds a ring to a planet on the server.
+        /// </summary>
+        /// <param name="name">Name of the planet to add the ring to</param>
+        /// <param name="ring">Ring data to add</param>
         public void AddRingToPlanet(string name, MyPlanetRingItem ring)
         {
             if (!m_handshakeDone)
@@ -84,6 +109,10 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Removes the asteroid ring from a planet on the server
+        /// </summary>
+        /// <param name="name">Name of the ring</param>
         public void RemoveRingFromPlanet(string name)
         {
             if (!m_handshakeDone)
@@ -100,6 +129,12 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Server Event: Gets an object from the system, and sends it to the client, and passes the callback id through
+        /// </summary>
+        /// <param name="client">Client that requested the object</param>
+        /// <param name="name">Name of the object</param>
+        /// <param name="callback">Callback id of the callback to call on the client</param>
         [Event(100)]
         [Reliable]
         [Server]
@@ -129,6 +164,12 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Client Event: Sends a Planet item to the client
+        /// </summary>
+        /// <param name="success">Whether or not the planet is valid</param>
+        /// <param name="item">The planet item</param>
+        /// <param name="callback">Callback id of the callback to call</param>
         [Event(101)]
         [Reliable]
         [Client]
@@ -138,6 +179,12 @@ namespace SEWorldGenPlugin.Generator
             Static.m_getCallbacks.Remove(callback);
         }
 
+        /// <summary>
+        /// Client Event: Sends a Moon item to the client
+        /// </summary>
+        /// <param name="success">Whether or not the moon is valid</param>
+        /// <param name="item">The moon item</param>
+        /// <param name="callback">Callback id of the callback to call</param>
         [Event(102)]
         [Reliable]
         [Client]
@@ -147,6 +194,12 @@ namespace SEWorldGenPlugin.Generator
             Static.m_getCallbacks.Remove(callback);
         }
 
+        /// <summary>
+        /// Client Event: Sends a Belt item to the client
+        /// </summary>
+        /// <param name="success">Whether or not the belt is valid</param>
+        /// <param name="item">The belt item</param>
+        /// <param name="callback">Callback id of the callback to call</param>
         [Event(103)]
         [Reliable]
         [Client]
@@ -156,6 +209,12 @@ namespace SEWorldGenPlugin.Generator
             Static.m_getCallbacks.Remove(callback);
         }
 
+        /// <summary>
+        /// Client Event: Sends a ring item to the client
+        /// </summary>
+        /// <param name="success">Whether or not the ring is valid</param>
+        /// <param name="item">The ring item</param>
+        /// <param name="callback">Callback id of the callback to call</param>
         [Event(104)]
         [Reliable]
         [Client]
@@ -165,6 +224,11 @@ namespace SEWorldGenPlugin.Generator
             Static.m_getCallbacks.Remove(callback);
         }
 
+        /// <summary>
+        /// Server Event: Adds a ring to a planet on the server
+        /// </summary>
+        /// <param name="planetName">Name of the planet</param>
+        /// <param name="ringBase">Ring item to add to the planet</param>
         [Event(105)]
         [Reliable]
         [Server]
@@ -184,6 +248,10 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Server Event: Adds a planet to the solar system on the server
+        /// </summary>
+        /// <param name="planet">Planet item to add</param>
         [Event(106)]
         [Reliable]
         [Server]
@@ -201,12 +269,17 @@ namespace SEWorldGenPlugin.Generator
                     {
                         return;
                     }
-                    Static.m_objects.Remove(obj);
+                    Static.Objects.Remove(obj);
                 }
-                Static.m_objects.Add(planet);
+                Static.Objects.Add(planet);
             }
         }
 
+        /// <summary>
+        /// Server Event: Removes a planet with given name from the solar system on the server
+        /// </summary>
+        /// <param name="planetName">Name of the planet</param>
+        /// <param name="planetName">Name of the planet</param>
         [Event(107)]
         [Reliable]
         [Server]

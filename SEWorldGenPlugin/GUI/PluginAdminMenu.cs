@@ -826,7 +826,7 @@ namespace SEWorldGenPlugin.GUI
 
         private void LoadPlanetDefinitions()
         {
-            var definitions = SystemGenerator.Static.m_planetDefinitions;
+            var definitions = SystemGenerator.Static.PlanetDefinitions;
             foreach (var item in definitions)
             {
                 string name = item.Id.SubtypeName.ToString();

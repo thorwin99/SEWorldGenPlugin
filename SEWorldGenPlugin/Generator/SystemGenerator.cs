@@ -16,6 +16,10 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
 {
+    /// <summary>
+    /// Session component that generates the solar system data for the solar system of
+    /// the current game session / world. Is a singleton class
+    /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
     [EventOwner]
     public partial class SystemGenerator : MySessionComponentBase
@@ -26,44 +30,65 @@ namespace SEWorldGenPlugin.Generator
 
         private List<string> vanilla_planets = new List<string> { "EarthLike", "Mars", "Triton", "Alien", "Europa", "Titan", "Moon" };
 
-        public HashSet<MySystemItem> m_objects
+        /// <summary>
+        /// All celestial bodies present in the solar system
+        /// </summary>
+        public HashSet<MySystemItem> Objects
         {
             get;
             private set;
         }
 
-        public List<MyPlanetGeneratorDefinition> m_planetDefinitions
+        /// <summary>
+        /// All planetary defintions that are loaded to be used as planets
+        /// </summary>
+        public List<MyPlanetGeneratorDefinition> PlanetDefinitions
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// All planetary defintions that are loaded to be used as moons
+        /// </summary>
         public List<MyPlanetGeneratorDefinition> m_moonDefinitions
         {
             get;
             private set;
         }
 
-        public List<MyPlanetGeneratorDefinition> m_mandatoryPlanets
+        /// <summary>
+        /// All planetary defintions that are mandatory to be generated as planets
+        /// </summary>
+        public List<MyPlanetGeneratorDefinition> MandatoryPlanets
         {
             get;
             private set;
         }
 
-        public List<MyPlanetGeneratorDefinition> m_gasGiants
+        /// <summary>
+        /// All planetary defintions that are defined as gas Giants and therefore double the size
+        /// </summary>
+        public List<MyPlanetGeneratorDefinition> GasGiants
         {
             get;
             private set;
         }
 
-        public List<MyPlanetGeneratorDefinition> m_availablePlanets
+        /// <summary>
+        /// All planetary definitions that available for generation as planets
+        /// </summary>
+        public List<MyPlanetGeneratorDefinition> AvailablePlanets
         {
             get;
             private set;
         }
 
 
-        public List<MyPlanetGeneratorDefinition> m_availableMoons
+        /// <summary>
+        /// All planetary definitions that are available for generation as moons
+        /// </summary>
+        public List<MyPlanetGeneratorDefinition> AvailableMoons
         {
             get;
             private set;
@@ -72,8 +97,16 @@ namespace SEWorldGenPlugin.Generator
         private int m_seed;
         private GeneratorSettings m_settings;
 
+        /// <summary>
+        /// Singleton instance of the SystemGenerator
+        /// </summary>
         public static SystemGenerator Static;
 
+        /// <summary>
+        /// Executed after loading and initializes the generator.
+        /// It generates the system, if it should.
+        /// </summary>
+        /// <param name="sessionComponent"></param>
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             PluginLog.Log("Initializing system generator");
@@ -83,14 +116,13 @@ namespace SEWorldGenPlugin.Generator
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
 
             MyObjectBuilder_StarSystem b = GetConfig();
-            m_objects = b.SystemObjects;
+            Objects = b.SystemObjects;
 
             m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
 
             m_settings = SettingsSession.Static.Settings.GeneratorSettings;
-            //FilterDefinitions();
 
-            if (b == null || m_objects == null || m_objects.Count == 0)
+            if (b == null || Objects == null || Objects.Count == 0)
             {
                 GenerateSystem();
             }
@@ -102,6 +134,9 @@ namespace SEWorldGenPlugin.Generator
             };
         } 
 
+        /// <summary>
+        /// Loads required Planetary definitions and filters them, also initializes networking.
+        /// </summary>
         public override void LoadData()
         {
             PluginLog.Log("Loading definitions and network data");
@@ -110,15 +145,18 @@ namespace SEWorldGenPlugin.Generator
 
             LoadNet();
 
-            m_planetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
-            m_mandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
+            PlanetDefinitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions().ToList();
+            MandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
             m_moonDefinitions = new List<MyPlanetGeneratorDefinition>();
-            m_gasGiants = new List<MyPlanetGeneratorDefinition>();
-            m_availableMoons = new List<MyPlanetGeneratorDefinition>();
-            m_availablePlanets = new List<MyPlanetGeneratorDefinition>();
+            GasGiants = new List<MyPlanetGeneratorDefinition>();
+            AvailableMoons = new List<MyPlanetGeneratorDefinition>();
+            AvailablePlanets = new List<MyPlanetGeneratorDefinition>();
             FilterDefinitions();
         }
 
+        /// <summary>
+        /// Saves the systemdata configuration file, if plugin is enabled.
+        /// </summary>
         public override void SaveData()
         {
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
@@ -128,23 +166,32 @@ namespace SEWorldGenPlugin.Generator
             SaveConfig();
         }
 
+        /// <summary>
+        /// Unloads all data used by this session component
+        /// </summary>
         protected override void UnloadData()
         {
             PluginLog.Log("Unloading system generator data");
 
             UnloadNet();
-            m_objects?.Clear();
-            m_planetDefinitions?.Clear();
+            Objects?.Clear();
+            PlanetDefinitions?.Clear();
             m_moonDefinitions?.Clear();
-            m_mandatoryPlanets?.Clear();
-            m_gasGiants?.Clear();
+            MandatoryPlanets?.Clear();
+            GasGiants?.Clear();
             m_settings = null;
             Static = null;
         }
 
+        /// <summary>
+        /// Tries to get the system object with the given name
+        /// </summary>
+        /// <param name="name">Name of the object</param>
+        /// <param name="obj">Output value if return is true</param>
+        /// <returns>True if object exists in the system</returns>
         private bool TryGetObject(string name, out MySystemItem obj)
         {
-            foreach(var o in m_objects)
+            foreach(var o in Objects)
             {
                 if (o.DisplayName.Equals(name))
                 {
@@ -156,11 +203,16 @@ namespace SEWorldGenPlugin.Generator
             return false;
         }
 
+        /// <summary>
+        /// Generates the solar system by randomly generating planets or asteroid belts,
+        /// probabilities and settings are defined in the MyObjectBuilder_PluginSettings loaded with the world and set in
+        /// OnInit().
+        /// </summary>
         private void GenerateSystem()
         {
             PluginLog.Log("Generating new solar system");
 
-            m_objects = new HashSet<MySystemItem>();
+            Objects = new HashSet<MySystemItem>();
 
             using (MyRandom.Instance.PushSeed(m_seed))
             {
@@ -180,7 +232,7 @@ namespace SEWorldGenPlugin.Generator
                     }
 
 
-                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability && m_planetDefinitions.Count > 0){
+                    if(MyRandom.Instance.NextDouble()/* * ((i % 6) * (i % 6) / 12.5)*/ < 1 - m_settings.BeltSettings.BeltProbability && PlanetDefinitions.Count > 0){
                         GeneratePlanet(i, tmp_distance, numberPlanets, ref totalPlanets);
                     }
                     else
@@ -191,9 +243,9 @@ namespace SEWorldGenPlugin.Generator
 
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetsOnlyOnce) return;
 
-                if(m_mandatoryPlanets.Count != 0)
+                if(MandatoryPlanets.Count != 0)
                 {
-                    int length = m_mandatoryPlanets.Count;
+                    int length = MandatoryPlanets.Count;
                     for (int i = totalPlanets; i < length; i++)
                     {
                         if (tmp_distance > m_settings.WorldSize && m_settings.WorldSize != -1) return;
@@ -207,6 +259,11 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Generates a asteroid belts data at distance from the center of the map. It is the beltIndex+1 -th belt
+        /// </summary>
+        /// <param name="distance">Distance of the belt to the center of the map</param>
+        /// <param name="beltIndex">The index of the belt</param>
         private void GenerateBelt(long distance, ref int beltIndex)
         {
             MySystemBeltItem belt = new MySystemBeltItem();
@@ -227,9 +284,16 @@ namespace SEWorldGenPlugin.Generator
             belt.Width = MyRandom.Instance.Next(belt.Height * 10, belt.Height * 100);
             belt.RoidSize = MyRandom.Instance.Next(256, 512);
 
-            m_objects.Add(belt);
+            Objects.Add(belt);
         }
 
+        /// <summary>
+        /// Generates a planets data and possible moons or an asteroid ring for the planet
+        /// </summary>
+        /// <param name="index">Index of the planet in the system</param>
+        /// <param name="distance">Distance from the world center</param>
+        /// <param name="totalObjects">Total number of objects in the system</param>
+        /// <param name="planetIndex">Index of the planet of the planets (n-th planet)</param>
         private void GeneratePlanet(int index, long distance, int totalObjects, ref int planetIndex)
         {
             MyPlanetItem planet = new MyPlanetItem();
@@ -237,7 +301,7 @@ namespace SEWorldGenPlugin.Generator
             double mod = distance == 0 && m_settings.FirstPlanetCenter ? 1 : Math.Sin(index * Math.PI / totalObjects);
 
             var def = GetPlanetDefinition((int)(m_settings.PlanetSettings.PlanetSizeCap * mod));
-            bool isGasGiant = m_gasGiants.Contains(def);
+            bool isGasGiant = GasGiants.Contains(def);
             var size = SizeByGravity(def.SurfaceGravity, isGasGiant);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
@@ -264,9 +328,18 @@ namespace SEWorldGenPlugin.Generator
             planet.PlanetMoons = GenerateMoons(planet.Size, def.SurfaceGravity, planet.DisplayName, distance);
             planet.Generated = false;
 
-            m_objects.Add(planet);
+            Objects.Add(planet);
         }
 
+        /// <summary>
+        /// Generates moon datas for a planet of the given size, gravity, name and distance from the world center.
+        /// The moon has to have a size smaller than the planet
+        /// </summary>
+        /// <param name="planetSize">Size of the parent planet</param>
+        /// <param name="surfaceGravity">Surface gravity of the parent planet</param>
+        /// <param name="planetName">Name of the planet, used for naming the moon</param>
+        /// <param name="distance">Distance</param>
+        /// <returns>An array of all generated moons</returns>
         private MyPlanetMoonItem[] GenerateMoons(float planetSize, float surfaceGravity, string planetName, long distance)
         {
             if (MyRandom.Instance.NextFloat() > m_settings.PlanetSettings.MoonProbability) return new MyPlanetMoonItem[0];
@@ -279,7 +352,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 var dist = planetSize * (i + 1) + planetSize * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
                 var def = GetPlanetMoonDefinition(planetSize * 0.8f);
-                bool isGasGiant = m_gasGiants.Contains(def);
+                bool isGasGiant = GasGiants.Contains(def);
 
                 if (dist + distance > m_settings.WorldSize && m_settings.WorldSize > 0) return moons;
 
@@ -305,6 +378,12 @@ namespace SEWorldGenPlugin.Generator
             return moons;
         }
 
+        /// <summary>
+        /// Generates an asteroid rings data for a planet with given size and surface gravity
+        /// </summary>
+        /// <param name="surfaceGravity">Surface gravity of the parent planet</param>
+        /// <param name="planetSize">Size of the parent planet</param>
+        /// <returns>The generated asteroid ring, if generated</returns>
         private MyPlanetRingItem GenerateRing(float surfaceGravity, float planetSize)
         {
             if (MyRandom.Instance.NextFloat() > m_settings.PlanetSettings.RingSettings.PlanetRingProbability * surfaceGravity) return null;
@@ -324,22 +403,29 @@ namespace SEWorldGenPlugin.Generator
 
         bool m_usedAllPlanets = false;
 
+        /// <summary>
+        /// Gets a fit planetary definition which should be smaller than maximum size, if all mandatory planets have been used.
+        /// Mandatory planet will always fit. If no definition could be found after 10000 tries, it will disregard the restrictions
+        /// </summary>
+        /// <param name="maximumSize">Maximum size of the planet</param>
+        /// <param name="ignoreMandatory">Whether to ignore mandatory planets</param>
+        /// <returns>The MyPlanetGeneratorDefinition of the planet</returns>
         private MyPlanetGeneratorDefinition GetPlanetDefinition(float maximumSize, bool ignoreMandatory = false)
         {
             int tries = 0;
             float size;
             MyPlanetGeneratorDefinition def;
 
-            if(m_mandatoryPlanets.Count > 0 && !ignoreMandatory)
+            if(MandatoryPlanets.Count > 0 && !ignoreMandatory)
             {
-                def = m_mandatoryPlanets[0];
-                m_mandatoryPlanets.RemoveAt(0);
+                def = MandatoryPlanets[0];
+                MandatoryPlanets.RemoveAt(0);
             }
             else
             {
                 do
                 {
-                    def = m_availablePlanets[MyRandom.Instance.Next(0, m_availablePlanets.Count - 1)];
+                    def = AvailablePlanets[MyRandom.Instance.Next(0, AvailablePlanets.Count - 1)];
                     size = SizeByGravity(def.SurfaceGravity);
                     tries++;
 
@@ -349,10 +435,10 @@ namespace SEWorldGenPlugin.Generator
 
             if (SettingsSession.Static.Settings.GeneratorSettings.PlanetsOnlyOnce && !m_usedAllPlanets)
             {
-                m_availablePlanets.Remove(def);
-                if(m_availablePlanets.Count <= 0)
+                AvailablePlanets.Remove(def);
+                if(AvailablePlanets.Count <= 0)
                 {
-                    m_availablePlanets = m_planetDefinitions;
+                    AvailablePlanets = PlanetDefinitions;
                     m_usedAllPlanets = true;
                 }
             }
@@ -362,6 +448,12 @@ namespace SEWorldGenPlugin.Generator
 
         bool m_usedAllMoons = false;
 
+        /// <summary>
+        /// Gets a fit planetary definition which should be smaller than maximum size.
+        /// If no definition could be found after 10000 tries, it will disregard the restrictions
+        /// </summary>
+        /// <param name="maximumSize">Maximum size of the planet</param>
+        /// <returns>The MyPlanetGeneratorDefinition of the moon</returns>
         private MyPlanetGeneratorDefinition GetPlanetMoonDefinition(float maximumSize)
         {
             int tries = 0;
@@ -372,7 +464,7 @@ namespace SEWorldGenPlugin.Generator
 
             do
             {
-                def = m_availableMoons[MyRandom.Instance.Next(0, (m_availableMoons.Count - 1) * 2) % m_availableMoons.Count];
+                def = AvailableMoons[MyRandom.Instance.Next(0, (AvailableMoons.Count - 1) * 2) % AvailableMoons.Count];
 
                 size = SizeByGravity(def.SurfaceGravity);
                 tries++;
@@ -381,10 +473,10 @@ namespace SEWorldGenPlugin.Generator
 
             if (SettingsSession.Static.Settings.GeneratorSettings.MoonsOnlyOnce && !m_usedAllMoons)
             {
-                m_availableMoons.Remove(def);
-                if (m_availableMoons.Count <= 0)
+                AvailableMoons.Remove(def);
+                if (AvailableMoons.Count <= 0)
                 {
-                    m_availableMoons = m_moonDefinitions;
+                    AvailableMoons = m_moonDefinitions;
                     m_usedAllMoons = true;
                 }
             }
@@ -392,6 +484,12 @@ namespace SEWorldGenPlugin.Generator
             return def;
         }
 
+        /// <summary>
+        /// Gets a diameter for a planet with given gravity.
+        /// </summary>
+        /// <param name="gravity">Gravity of the planet</param>
+        /// <param name="isGasGiant">Whether or not it is a gas giant and should use double the size</param>
+        /// <returns>The diameter of the planet</returns>
         private float SizeByGravity(float gravity, bool isGasGiant = false)
         {
             float multiplier = isGasGiant ? m_settings.PlanetSettings.SizeMultiplier * 2.0f : m_settings.PlanetSettings.SizeMultiplier;
@@ -399,6 +497,12 @@ namespace SEWorldGenPlugin.Generator
            return (float)Math.Min(Math.Sqrt(gravity * 120000 * 120000 * multiplier * multiplier), m_settings.PlanetSettings.PlanetSizeCap);
         }
 
+        /// <summary>
+        /// Gets the maximum amount of moons a planet with given gravity can have. Gas giants can have more.
+        /// </summary>
+        /// <param name="gravity">Gravity of the planet</param>
+        /// <param name="isGasGiant">Whether or not it is a gas giant</param>
+        /// <returns></returns>
         private int GetMaxMoonCount(float gravity, bool isGasGiant = false)
         {
             float m = isGasGiant ? 2 : 1;
@@ -406,24 +510,30 @@ namespace SEWorldGenPlugin.Generator
             return (int)Math.Floor(gravity * m * 5 * (MyRandom.Instance.NextFloat() + o));
         }
 
+        /// <summary>
+        /// Shuffles the list of mandatory planets
+        /// </summary>
         private void ShuffleMandatoryPlanets()
         {
-            int n = m_mandatoryPlanets.Count - 1;
+            int n = MandatoryPlanets.Count - 1;
             if (n <= 0) return;
             while(n > 1)
             {
                 int index = MyRandom.Instance.Next(1, n - 1);
-                var value = m_mandatoryPlanets[index];
-                m_mandatoryPlanets[index] = m_mandatoryPlanets[n];
-                m_mandatoryPlanets[n] = value;
+                var value = MandatoryPlanets[index];
+                MandatoryPlanets[index] = MandatoryPlanets[n];
+                MandatoryPlanets[n] = value;
                 n--;
             }
         }
 
+        /// <summary>
+        /// Filters all planetary definitions based on settings set in the Plugin settings file and puts them in their respective lists.
+        /// </summary>
         private void FilterDefinitions()
         {
             List<MyPlanetGeneratorDefinition> toRemovePlanets = new List<MyPlanetGeneratorDefinition>();
-            foreach (var p in m_planetDefinitions)
+            foreach (var p in PlanetDefinitions)
             {
                 if (p.Id.SubtypeId.String.Contains("Tutorial") || p.Id.SubtypeId.String.Contains("TestMap") || p.Id.SubtypeId.String.Contains("ModExample"))
                 {
@@ -443,31 +553,35 @@ namespace SEWorldGenPlugin.Generator
                 {
                     toRemovePlanets.Add(p);
                     m_moonDefinitions.Add(p);
-                    m_availableMoons.Add(p);
+                    AvailableMoons.Add(p);
                 }
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String) || SettingsSession.Static.Settings.GeneratorSettings.SemiRandomizedGeneration)
                 {
-                    m_mandatoryPlanets.Add(p);
+                    MandatoryPlanets.Add(p);
                 }
                 if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants.Contains(p.Id.SubtypeId.String))
                 {
-                    m_gasGiants.Add(p);
+                    GasGiants.Add(p);
                 }
             }
 
             foreach(var r in toRemovePlanets)
             {
-                m_planetDefinitions.Remove(r);
+                PlanetDefinitions.Remove(r);
             }
 
-            foreach(var p in m_planetDefinitions)
+            foreach(var p in PlanetDefinitions)
             {
-                m_availablePlanets.Add(p);
+                AvailablePlanets.Add(p);
             }
 
             ShuffleMandatoryPlanets();
         }
 
+        /// <summary>
+        /// Loads the systemData.xml of the world, if it exist
+        /// </summary>
+        /// <returns>MyObjectBuilder_StarSystem system data</returns>
         private MyObjectBuilder_StarSystem GetConfig()
         {
             if (MyAPIGateway.Utilities.FileExistsInWorldStorage(STORAGE_FILE, typeof(SystemGenerator)))
@@ -495,11 +609,14 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Saves the system objects data to systemData.xml
+        /// </summary>
         private void SaveConfig()
         {
             MyObjectBuilder_StarSystem conf = new MyObjectBuilder_StarSystem();
 
-            conf.SystemObjects = m_objects;
+            conf.SystemObjects = Objects;
 
             MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator));
 
@@ -511,9 +628,12 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Adds an asteroid belt gps to the world
+        /// </summary>
         private void AddBeltsGpss()
         {
-            foreach (var obj in m_objects)
+            foreach (var obj in Objects)
             {
                 if (obj.Type != SystemObjectType.BELT) continue;
 
@@ -523,8 +643,14 @@ namespace SEWorldGenPlugin.Generator
             }
         }
 
+        /// <summary>
+        /// Converts an integer to roman numerals
+        /// </summary>
+        /// <param name="number">Number to convert</param>
+        /// <returns>The converted number in roman numerals.</returns>
         private string ConvertNumberToRoman(int number)
         {
+            if (number < 0) return "";
             if (number >= 1000) return "M" + ConvertNumberToRoman(number - 1000);
             if (number >= 900) return "CM" + ConvertNumberToRoman(number - 900);
             if (number >= 500) return "D" + ConvertNumberToRoman(number - 500);

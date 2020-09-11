@@ -181,7 +181,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         /// <param name="tracker"></param>
         public void UpdateGps(MyEntityTracker tracker)
         {
-            foreach(MySystemItem p in SystemGenerator.Static.m_objects)
+            foreach(MySystemItem p in SystemGenerator.Static.Objects)
             {
                 if (p.Type != SystemObjectType.PLANET || ((MyPlanetItem)p).PlanetRing == null) continue;
 
@@ -222,7 +222,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         /// <returns>Returns the ring or belt the position is inside</returns>
         private MySystemItem GetContainingRingOrBelt(Vector3D position)
         {
-            foreach(MySystemItem p in SystemGenerator.Static.m_objects)
+            foreach(MySystemItem p in SystemGenerator.Static.Objects)
             {
                 if(p.Type == SystemObjectType.PLANET)
                 {
