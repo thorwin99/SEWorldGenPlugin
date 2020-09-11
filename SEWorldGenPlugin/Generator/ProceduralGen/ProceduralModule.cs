@@ -6,12 +6,18 @@ using VRage.Game;
 using VRage.Game.Entity;
 using VRageMath;
 
-
-/*
- * Code is primarily taken from the Space Engineers GitHub repository. 
+/**
+ * Code was partly taken from the KSH Github page of Space Engineers (https://github.com/KeenSoftwareHouse/SpaceEngineers)
+ * Because it already had an implemention for a Procedural module for its own asteroid generator, which only needed slight modifications
+ * and simplifications for use with the plugin.
  */
+
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
+    /// <summary>
+    /// Abstract class ProceduralModule which provides basic methods and abstract methods
+    /// for Procudedural Generator modules. The Procedural Generator uses these modules.
+    /// </summary>
     public abstract class ProceduralModule
     {
         protected int m_seed;
@@ -21,6 +27,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         public readonly double CELL_SIZE;
 
+        /// <summary>
+        /// Creates a new Procedural module with given seed and cell size.
+        /// If the Cellsize is larger than 25000, it wont be used and 25000 will be used instead
+        /// </summary>
+        /// <param name="seed">Seed of the module</param>
+        /// <param name="cellSize">Size of the indevidual cells</param>
         protected ProceduralModule(int seed, double cellSize)
         {
             m_seed = seed;
@@ -28,6 +40,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_toUnloadCells = new CachingHashSet<MyProceduralCell>();
         }
 
+        /// <summary>
+        /// Marks all cells inside of the toUnload bounding sphere to be unloaded, except all Objects inside toExclude.
+        /// </summary>
+        /// <param name="toUnload">Unload sphere</param>
+        /// <param name="toExclude">Exclude sphere</param>
         public void MarkToUnloadCells(BoundingSphereD toUnload, BoundingSphereD? toExclude = null)
         {
             Vector3I cellId = Vector3I.Floor((toUnload.Center - toUnload.Radius) / CELL_SIZE);
@@ -44,6 +61,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        /// <summary>
+        /// Unloads all cells that have been marked to be unloaded. It will remove all objects inside the sphere from
+        /// the world. It will not unload cells that are still in the tracking volume of a tracked entity.
+        /// </summary>
+        /// <param name="trackedEntities">List of tracked entities</param>
         public void UnloadCells(Dictionary<MyEntity, MyEntityTracker> trackedEntities)
         {
             m_toUnloadCells.ApplyAdditions();
@@ -85,17 +107,50 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_toUnloadCells.Clear();
         }
 
+        /// <summary>
+        /// Closes the specified object. This should remove it from the world and memory.
+        /// </summary>
+        /// <param name="seed">The MyObjectSeed of the object that should be removed.</param>
         public abstract void CloseObject(MyObjectSeed seed);
 
+        /// <summary>
+        /// Gets all objects that are inside the given Bounding sphere and puts them into the
+        /// outObjects list.
+        /// </summary>
+        /// <param name="sphere"></param>
+        /// <param name="outObjects"></param>
         public void GetObjectsInSphere(BoundingSphereD sphere, List<MyObjectSeed> outObjects)
         {
             GenerateObjectsData(ref sphere);
-            GetAllObjectsInSphere(ref sphere, outObjects);
+
+            List<MyProceduralCell> cells = new List<MyProceduralCell>();
+
+            m_cellsTree.OverlapAllBoundingSphere(ref sphere, cells);
+
+            foreach (var cell in cells)
+            {
+                cell.OverlapAllBoundingSphere(ref sphere, outObjects);
+            }
+            cells.Clear();
         }
 
+        /// <summary>
+        /// Generates the given objects if they don't exist and puts them into
+        /// the existingObjectSeeds list.
+        /// </summary>
+        /// <param name="objects">Objects to generate</param>
+        /// <param name="existingObjectSeeds">Existing objects</param>
         public abstract void GenerateObjects(List<MyObjectSeed> objects, HashSet<MyObjectSeedParams> existingObjectSeeds);
+
+        /// <summary>
+        /// Updates all Objects.
+        /// </summary>
         public abstract void UpdateObjects();
 
+        /// <summary>
+        /// Generates all Cells data that are within sphere, if they have not been generated.
+        /// </summary>
+        /// <param name="sphere">Bounding Sphere of the cells to generate</param>
         protected void GenerateObjectsData(ref BoundingSphereD sphere)
         {
             BoundingBoxD box = BoundingBoxD.CreateFromSphere(sphere);
@@ -120,26 +175,23 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        /// <summary>
+        /// Generates a single cell with its object seeds, at the given Cell coordinate
+        /// </summary>
+        /// <param name="id">The cell coordinate which is its id</param>
+        /// <returns>The generated procedural cell</returns>
         public abstract MyProceduralCell GenerateCell(ref Vector3I id);
-
-        protected void GetAllObjectsInSphere(ref BoundingSphereD sphere, List<MyObjectSeed> outList)
-        {
-            List<MyProceduralCell> cells = new List<MyProceduralCell>();
-
-            m_cellsTree.OverlapAllBoundingSphere(ref sphere, cells);
-
-            foreach(var cell in cells)
-            {
-                cell.OverlapAllBoundingSphere(ref sphere, outList);
-            }
-            cells.Clear();
-        }
 
         protected Vector3I_RangeIterator GetCellsIterator(BoundingSphereD sphere)
         {
             return GetCellsIterator(BoundingBoxD.CreateFromSphere(sphere));
         }
 
+        /// <summary>
+        /// Gets an iterator for all Vector3I within the bounding box bbox
+        /// </summary>
+        /// <param name="bbox">Bounding box</param>
+        /// <returns>Vector3I Iterator for all vectors inside bbox</returns>
         protected Vector3I_RangeIterator GetCellsIterator(BoundingBoxD bbox)
         {
             Vector3I min = Vector3I.Floor(bbox.Min / CELL_SIZE);
@@ -148,6 +200,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return new Vector3I_RangeIterator(ref min, ref max);
         }
 
+        /// <summary>
+        /// Gets the seed for the given cell
+        /// </summary>
+        /// <param name="cellId">The cell id for the cell to get the seed for</param>
+        /// <returns>The cell seed</returns>
         protected int GetCellSeed(ref Vector3I cellId)
         {
             unchecked
@@ -156,6 +213,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        /// <summary>
+        /// Gets the seed of the object based on the objects hashcode.
+        /// </summary>
+        /// <param name="obj">The MyObjectSeed for the object</param>
+        /// <returns>The seed of the object</returns>
         protected int GetObjectIdSeed(MyObjectSeed obj)
         {
             int hash = obj.CellId.GetHashCode();
@@ -164,6 +226,5 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             hash = (hash * 397) ^ obj.Params.Seed;
             return hash;
         }
-
     }
 }
