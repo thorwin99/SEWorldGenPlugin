@@ -13,12 +13,20 @@ using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
 
-/*
- * Code is primarily taken from the Space Engineers GitHub repository. 
+/**
+ * Code was partly taken from the KSH Github page of Space Engineers (https://github.com/KeenSoftwareHouse/SpaceEngineers)
+ * because it already had an implemention for a Procedural generator for its own world generator, which only needed slight modifications,
+ * simplifications and adaptations for use with the plugin.
  */
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
 {
+    /// <summary>
+    /// The Procedural Generator session component which handles asteroid and
+    /// planet generation of the plugin using both modules. It tracks all entities that
+    /// should be considered when generating objects. It is a singleton class
+    /// and only one should exist at a time.
+    /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 590)]
     public class ProceduralGenerator : MySessionComponentBase
     {
@@ -37,6 +45,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         private float proceduralDensity = 0;
         private bool Enabled = false;
 
+        /// <summary>
+        /// Loads data for the asteroid generator. Prepares all modules and
+        /// initializes them.
+        /// </summary>
         public override void LoadData()
         {
             PluginLog.Log("Loading procedural generator data");
@@ -75,11 +87,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
             }
 
-            //if (MySession.Static.Settings.ProceduralDensity != 0) return;
-
             asteroidModule = new ProceduralAsteroidsRingModule(m_seed);
         }
 
+        /// <summary>
+        /// Updates the generators and generates all objects that needs to be generated, aswell as unloading
+        /// all Cells that need to be unloaded.
+        /// </summary>
         public override void UpdateBeforeSimulation()
         {
             if (!Enabled)
@@ -134,6 +148,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             asteroidModule.UpdateObjects();
         }
 
+        /// <summary>
+        /// Unloads all Data used by this Session component
+        /// </summary>
         protected override void UnloadData()
         {
             PluginLog.Log("unloading procedural generator data");
@@ -151,11 +168,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             Static = null;
         }
 
+        /// <summary>
+        /// Saves the data used by this Session component
+        /// </summary>
         public override void SaveData()
         {
             SaveConfig();
         }
 
+        /// <summary>
+        /// Tracks a new entity within the Procedural generator, if it is enabled
+        /// </summary>
+        /// <param name="entity">The to track entity</param>
         public void TrackEntity(MyEntity entity)
         {
             if (!Enabled)
@@ -174,6 +198,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        /// <summary>
+        /// Tracks an entity with given track range. The range determines,
+        /// how far the entity affects generation
+        /// </summary>
+        /// <param name="entity">MyEntity to track</param>
+        /// <param name="range">Tracking range</param>
         public void TrackEntityRanged(MyEntity entity, double range)
         {
             MyEntityTracker tracker;
@@ -195,6 +225,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        /// <summary>
+        /// Enables the Procedural generator, if it should.
+        /// </summary>
+        /// <param name="sessionComponent">Session component that is initialized</param>
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             PluginLog.Log("Initializing procedural generator");
@@ -212,11 +246,19 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             return true;
         }
 
+        /// <summary>
+        /// Gets the session components object builder
+        /// </summary>
+        /// <returns>MyObjectBuilder_SessionComponent object builder of this component</returns>
         public override MyObjectBuilder_SessionComponent GetObjectBuilder()
         {
             return base.GetObjectBuilder();
         }
 
+        /// <summary>
+        /// Gets the storage file of the asteroid generator.
+        /// </summary>
+        /// <returns>Asteroid generator storage file</returns>
         private MyObjectBuilder_AsteroidGenerator GetConfig()
         {
             if (MyAPIGateway.Utilities.FileExistsInWorldStorage(STORAGE_FILE, typeof(ProceduralGenerator)))
@@ -244,6 +286,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
         }
 
+        /// <summary>
+        /// Saves the asteroid generator storage file.
+        /// </summary>
         private void SaveConfig()
         {
             PluginLog.Log("Saving procedural generator files");
