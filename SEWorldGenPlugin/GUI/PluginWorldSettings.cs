@@ -16,6 +16,11 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.GUI
 {
+    /// <summary>
+    /// Replacement for the new game screen to add plugin specific elements.
+    /// singleton class to allow for easy communication with submenus for settings
+    /// Adds plugin settings gui elements to the screen
+    /// </summary>
     public class PluginWorldSettings : MyGuiScreenWorldSettings
     {
 
@@ -39,6 +44,10 @@ namespace SEWorldGenPlugin.GUI
         internal PluginSettingsGui SettingsGui;
 
         public MyObjectBuilder_PluginSettings PlSettings;
+
+        /// <summary>
+        /// If the world should use the global configuration file
+        /// </summary>
         public bool UseGlobal
         {
             get;
@@ -56,6 +65,13 @@ namespace SEWorldGenPlugin.GUI
             UseGlobal = false;
         }
 
+        /// <summary>
+        /// Builds the controls for the gui screen by first building the base
+        /// controls and then adding the checkbox to enable the plugin and a button to edit
+        /// its settings for the world, also initializes an instance of plugin settings to edit.
+        /// Adds a new delegate to the create world button, to transfere the set plugin settings
+        /// to the plugins settings session component.
+        /// </summary>
         protected override void BuildControls()
         {
             base.BuildControls();
@@ -134,14 +150,6 @@ namespace SEWorldGenPlugin.GUI
             if (m_isNewGame)
             {
                 PlSettings = MySettings.Static.Settings.copy();
-                //PlSettings.GeneratorSettings.FirstPlanetCenter = MySettings.Static.Settings.GeneratorSettings.FirstPlanetCenter;
-                //PlSettings.GeneratorSettings.PlanetSettings.BlacklistedPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets;
-                //PlSettings.GeneratorSettings.PlanetSettings.Moons = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.Moons;
-                //PlSettings.GeneratorSettings.PlanetSettings.MandatoryPlanets = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets;
-                //PlSettings.GeneratorSettings.PlanetSettings.GasGiants = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants;
-                //PlSettings.GeneratorSettings.PlanetSettings.PlanetNameFormat = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat;
-                //PlSettings.GeneratorSettings.PlanetSettings.MoonNameFormat = MySettings.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat;
-                //PlSettings.GeneratorSettings.BeltSettings.BeltNameFormat = MySettings.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat;
             }
             else
             {
@@ -149,6 +157,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Gets the position of the first checkbox found in the gui control list.
+        /// </summary>
+        /// <returns>The position</returns>
         private Vector2 GetControlPosition()
         {
             foreach(var c in Controls)
@@ -159,6 +171,9 @@ namespace SEWorldGenPlugin.GUI
             return Vector2.Zero;
         }
 
+        /// <summary>
+        /// Loads values from the folder of the world, which is currently edited. Used for editing world settings.
+        /// </summary>
         private void LoadValues()
         {
             var path = Path.Combine(MyFileSystem.SavesPath, Checkpoint.SessionName.Replace(":", "-"));
@@ -173,6 +188,11 @@ namespace SEWorldGenPlugin.GUI
             m_enablePlugin.IsChecked = PlSettings.Enable;
         }
 
+        /// <summary>
+        /// Button callback for the plugin settigns button. Opens the plugin settings window
+        /// and provides it the current plugin settings set.
+        /// </summary>
+        /// <param name="sender"></param>
         private void OnSettingsClick(object sender)
         {
             SettingsGui = new PluginSettingsGui(this);
@@ -181,11 +201,20 @@ namespace SEWorldGenPlugin.GUI
             MyGuiSandbox.AddScreen(SettingsGui);
         }
 
+        /// <summary>
+        /// Callback for the confirm button in the plugin settings menu,
+        /// to get the new settings back.
+        /// </summary>
         private void Settings_OnOkButtonClick()
         {
             UseGlobal = SettingsGui.GetSettings(ref PlSettings);
         }
 
+        /// <summary>
+        /// Builds the gui and replaces the top buttons to change the type of world (custom, workshop, newgame)
+        /// to open the plugins own new game screen, workshop game screen and campaign screen
+        /// </summary>
+        /// <param name="constructor">Whether or not it was called from constructor</param>
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
@@ -240,6 +269,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Button callback for the custom world button, to open the custom world screen
+        /// </summary>
+        /// <param name="myGuiControlButton">Clicked button</param>
         private void OnCustomWorldButtonClick(MyGuiControlButton myGuiControlButton)
         {
             MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
@@ -249,6 +282,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Button callback for the campaing button, to change to the campaign screen
+        /// </summary>
+        /// <param name="myGuiControlButton">Clicked button</param>
         private void OnCampaignButtonClick(MyGuiControlButton myGuiControlButton)
         {
             MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
@@ -258,6 +295,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Button callback for the workshop world button, to open the workshop world screen
+        /// </summary>
+        /// <param name="myGuiControlButton">Clicked button</param>
         private void OnWorkshopButtonClick(MyGuiControlButton myGuiControlButton)
         {
             MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
@@ -267,6 +308,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Seamlessly changes between two screens
+        /// </summary>
+        /// <param name="focusedScreen">Currently focused screen</param>
+        /// <param name="exchangedFor">New screen</param>
         private static void SeamlesslyChangeScreen(MyGuiScreenBase focusedScreen, MyGuiScreenBase exchangedFor)
         {
             focusedScreen.SkipTransition = true;
