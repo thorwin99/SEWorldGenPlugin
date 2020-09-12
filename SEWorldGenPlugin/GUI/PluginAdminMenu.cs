@@ -20,13 +20,15 @@ using System.Text;
 using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Game.SessionComponents;
-using VRage.Game.Voxels;
 using VRage.Library.Utils;
 using VRage.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.GUI
 {
+    /// <summary>
+    /// Replaces the vanilla admin menu to add plugin specific menus to it
+    /// </summary>
     [PreloadRequired]
     public class PluginAdminMenu : MyGuiScreenAdminMenu
     {
@@ -73,12 +75,21 @@ namespace SEWorldGenPlugin.GUI
 
         private bool m_pluginInstalled;
 
+        /// <summary>
+        /// Initializes a new instance for the plugi nadmin menu
+        /// </summary>
         public PluginAdminMenu() : base()
         {
             m_currentKey = 0L;
             m_pluginInstalled = false;
         }
 
+        /// <summary>
+        /// Rebuilds the UI of the menu, by replacing the combo box at the top, with
+        /// a new one with new selectable options, and checks, if a plugin menu should be shown and when yes,
+        /// which one, otherwise shows the corresponding vanilla menu
+        /// </summary>
+        /// <param name="constructor">Whether this is run from constructor</param>
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
@@ -133,6 +144,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Checks if the plugin is installed on the server and calls the
+        /// creator callback, to build the gui.
+        /// </summary>
+        /// <param name="creator">GUI creator callback</param>
         private void CheckBuildPluginControls(Action creator)
         {
             if (!m_pluginInstalled)
@@ -146,6 +162,10 @@ namespace SEWorldGenPlugin.GUI
             creator?.Invoke();
         }
 
+        /// <summary>
+        /// Builds the header for plugin specific menus,
+        /// which essentially only shows, if the plugin is disabled on the server.
+        /// </summary>
         private void BuildPluginMenuHeader()
         {
             Vector2 controlPadding = new Vector2(0.02f, 0.02f);
@@ -173,6 +193,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Builds the menu for adding plugin planets. It creates a
+        /// list of all available planets to place and sliders to configure it.
+        /// </summary>
         private void BuildPlanetMenu()
         {
             ClearControls();
@@ -256,6 +280,11 @@ namespace SEWorldGenPlugin.GUI
             LoadPlanetDefinitions();
         }
 
+        /// <summary>
+        /// Builds the menu to add asteroid rings to planets. It contains a list of all planets
+        /// and shows the properties of the ring on a planet, and if none is present, you can edit these
+        /// properties with sliders and add it to the planet.
+        /// </summary>
         private void BuildRingMenu()
         {
             ClearControls();
@@ -588,10 +617,6 @@ namespace SEWorldGenPlugin.GUI
 
             m_currentPosition.Y += m_optionsGroup.Size.Y;
 
-            /*MyGuiControlSeparatorList separator2 = new MyGuiControlSeparatorList();
-            separator2.AddHorizontal(new Vector2(0f, 0f) - new Vector2(m_size.Value.X * 0.83f / 2f, -0.00f), m_size.Value.X * 0.73f);
-            Controls.Add(separator2);*/
-
             m_addRingButton = CreateDebugButton(0.284f, "Add ring to planet", OnAddRingToPlanetButton, true, MyPluginTexts.TOOLTIPS.ADMIN_ADD_RING_BUTTON);
 
             m_currentPosition.Y += 0.003f;
@@ -619,6 +644,10 @@ namespace SEWorldGenPlugin.GUI
             LoadPlanetsInWorld();
         }
 
+        /// <summary>
+        /// Updates the visible representation of the asteroid ring on the screen, which is currently viewed or edited
+        /// using the ring menu
+        /// </summary>
         private void UpdateRingVisual()
         {
             PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
@@ -628,6 +657,10 @@ namespace SEWorldGenPlugin.GUI
             PluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
         }
 
+        /// <summary>
+        /// Callback for button, to teleport the player to the currently selected planets ring
+        /// </summary>
+        /// <param name="button">Button that got pressed</param>
         private void OnTeleportToRingButton(MyGuiControlButton button)
         {
             if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
@@ -643,6 +676,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Closes the screen and unloads data
+        /// </summary>
+        /// <returns>If the screen was closed</returns>
         public override bool CloseScreen()
         {
             if(m_selectedPlanet != null)
@@ -650,6 +687,10 @@ namespace SEWorldGenPlugin.GUI
             return base.CloseScreen();
         }
 
+        /// <summary>
+        /// Callback for button, to add a ring to the current selected planet
+        /// </summary>
+        /// <param name="button">Button that got clicked</param>
         private void OnAddRingToPlanetButton(MyGuiControlButton button)
         {
             if (m_planetListBox.SelectedItems.Count > 0)
@@ -668,7 +709,11 @@ namespace SEWorldGenPlugin.GUI
                 PlanetListItemClicked(m_planetListBox);
             }
         }
-        
+
+        /// <summary>
+        /// Callback for button, to remove an asteroid ring from a planet
+        /// </summary>
+        /// <param name="button">Button that got clicked</param>
         private void OnRemoveRingFromPlanetButton(MyGuiControlButton button)
         {
             if (m_planetListBox.SelectedItems.Count > 0)
@@ -686,6 +731,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Generates an MyPlanetRingItem with the current slider values in the ring menu
+        /// </summary>
+        /// <returns>The generated MyPlanetRingItem</returns>
         private MyPlanetRingItem GenerateRingItem()
         {
             if (m_selectedPlanet.PlanetRing != null) return m_selectedPlanet.PlanetRing;
@@ -705,6 +754,12 @@ namespace SEWorldGenPlugin.GUI
             return item;
         }
 
+        /// <summary>
+        /// Callback, for when a planet in the planet list is clicked
+        /// Loads all slider values, if a ring is present, if not it initializes them
+        /// with respective limits to the planet
+        /// </summary>
+        /// <param name="box">Listbox that got clicked</param>
         private void PlanetListItemClicked(MyGuiControlListbox box)
         {
             if (box.SelectedItems.Count > 0)
@@ -811,6 +866,9 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Loads all planets that are in the world
+        /// </summary>
         private void LoadPlanetsInWorld()
         {
             List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
@@ -818,12 +876,15 @@ namespace SEWorldGenPlugin.GUI
             {
                 string name = item.DisplayName.Replace("_", " ");
 
-                if (name.StartsWith("Moon ")) continue;
+                if (name.StartsWith("Moon ")) continue; //Needs rework, since this does not always work with the new naming scheme
 
                 m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, item));
             }
         }
 
+        /// <summary>
+        /// Loads all available planetary definitions
+        /// </summary>
         private void LoadPlanetDefinitions()
         {
             var definitions = SystemGenerator.Static.PlanetDefinitions;
@@ -835,6 +896,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Callback for click in the Planet definition list.
+        /// Selects the respective definition
+        /// </summary>
+        /// <param name="box">Clicked box</param>
         private void PlanetDefListItemClicked(MyGuiControlListbox box)
         {
             if (box.SelectedItems.Count > 0)
@@ -844,6 +910,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Callback for spawn planet button. Spawns a planet of the current selected definition
+        /// and the entered parameters in the planet menu. Closes the menu and switches to planet placement
+        /// </summary>
+        /// <param name="button">Clicked button</param>
         private void OnSpawnPlanetButton(MyGuiControlButton button)
         {
             if (m_planetDefListBox.SelectedItems.Count > 0)
@@ -868,6 +939,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Spawns a planet in the system
+        /// </summary>
+        /// <param name="planet">Planet to spawn</param>
+        /// <param name="position">Position to spawn at</param>
         private void SpawnPlanet(MySystemItem planet, Vector3D position)
         {
             if(planet.Type == SystemObjectType.PLANET)
@@ -879,6 +955,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Clears all controls, except those before the combo box to select the current menu from.
+        /// Used to rebuild the whole admin menu
+        /// </summary>
         private void ClearControls()
         {
             List<MyGuiControlBase> keep = new List<MyGuiControlBase>();
@@ -895,6 +975,10 @@ namespace SEWorldGenPlugin.GUI
             
         }
 
+        /// <summary>
+        /// Gets the admin menu combo box from the list of controls
+        /// </summary>
+        /// <returns>The combo box or null if it does not exist</returns>
         private MyGuiControlCombobox GetCombo()
         {
             foreach(var c in Controls)
@@ -907,6 +991,17 @@ namespace SEWorldGenPlugin.GUI
             return null;
         }
 
+        /// <summary>
+        /// Creates a smaller button called a debug button
+        /// </summary>
+        /// <param name="usableWidth">Usable width of the button</param>
+        /// <param name="text">Text of the button</param>
+        /// <param name="onClick">OnClick callback</param>
+        /// <param name="enabled">Whether it is enabled</param>
+        /// <param name="tooltip">Tooltip of the button</param>
+        /// <param name="increaseSpacing">Increased spacing or not</param>
+        /// <param name="addToControls"><Whether it should be added to controls/param>
+        /// <returns></returns>
         private MyGuiControlButton CreateDebugButton(float usableWidth, string text, Action<MyGuiControlButton> onClick, bool enabled = true, string tooltip = null, bool increaseSpacing = true, bool addToControls = true)
         {
             MyGuiControlButton myGuiControlButton = AddButton(new StringBuilder(text), onClick, null, null, null, increaseSpacing, addToControls);
@@ -922,6 +1017,12 @@ namespace SEWorldGenPlugin.GUI
             return myGuiControlButton;
         }
 
+        /// <summary>
+        /// Tries to attach the spectator camera to the entity with the given id, so the camera
+        /// will look at it.
+        /// </summary>
+        /// <param name="entityId">Id of the entity</param>
+        /// <returns>If it was sucessful or not</returns>
         private static bool TryAttachCamera(long entityId)
         {
             if (MyEntities.TryGetEntityById(entityId, out MyEntity entity))
@@ -936,6 +1037,11 @@ namespace SEWorldGenPlugin.GUI
             return false;
         }
 
+        /// <summary>
+        /// OnUpdate call for the gui.
+        /// </summary>
+        /// <param name="hasFocus">If the window has focus</param>
+        /// <returns></returns>
         public override bool Update(bool hasFocus)
         {
             if(m_currentKey == 8)
