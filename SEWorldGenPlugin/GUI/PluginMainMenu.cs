@@ -21,6 +21,10 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.GUI
 {
+    /// <summary>
+    /// Replacement for the main menu, to add plugin specific information, such as the version of the plugin and if it is enabled.
+    /// Also replaces the new game button to insert its own new game menu.
+    /// </summary>
     public class PluginMainMenu : MyGuiScreenMainMenu
     {
         private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin version {0} is loaded and by default ");
@@ -41,6 +45,11 @@ namespace SEWorldGenPlugin.GUI
             m_pauseGame = pauseGame;
         }
 
+        /// <summary>
+        /// Recreates the gui controls and replaces the new game button to insert its own new game menu.
+        /// Also shows a message, if a new version of the plugin is available
+        /// </summary>
+        /// <param name="constructor"></param>
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
@@ -75,6 +84,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Callback when the message box, which notifies the user of a new plugin version, gets closed.
+        /// Opens the plugins github page, if the message box was confirmed with yes
+        /// </summary>
+        /// <param name="r">Message box result</param>
         private void OnUpdateNotifiactionMessageClose(MyGuiScreenMessageBox.ResultEnum r)
         {
             if(r == MyGuiScreenMessageBox.ResultEnum.YES)
@@ -83,6 +97,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Callback for when the highlight of an gui element gets changed. Updates the highlights of the elements.
+        /// </summary>
+        /// <param name="obj"></param>
         private void OnHighlightChange(MyGuiControlElementGroup obj)
         {
             foreach (var c in m_elemtents)
@@ -95,6 +113,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Callback for the new game button to open the plugins new game menu
+        /// </summary>
+        /// <param name="sender"></param>
         private void OnNewGameClick(object sender)
         {
             if (!MyFakes.LIMITED_MAIN_MENU || MyInput.Static.ENABLE_DEVELOPER_KEYS)
@@ -110,6 +132,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Starts a scenario with given name
+        /// </summary>
+        /// <param name="scenarioName">Scenario name</param>
         private void QuickstartScenario(string scenarioName)
         {
             string path = "CustomWorlds";
@@ -125,6 +151,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Shows tutorial and runs afterTutorial if necessary, if not just runs afterTurorial.
+        /// </summary>
+        /// <param name="afterTutorial">Action to run after doing the tutorial</param>
         private void RunWithTutorialCheck(Action afterTutorial)
         {
             if (MySandboxGame.Config.FirstTimeTutorials)
@@ -137,12 +167,19 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// OnDraw to draw on the screen
+        /// </summary>
+        /// <returns></returns>
         public override bool Draw()
         {
             DrawPluginLoaded();
             return base.Draw();
         }
 
+        /// <summary>
+        /// Draws the plugins version and loaded message on the screen
+        /// </summary>
         private void DrawPluginLoaded()
         {
             Vector2 size;
