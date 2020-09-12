@@ -10,6 +10,9 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.GUI
 {
+    /// <summary>
+    /// Gui class to set settings regarding the plugin for a world
+    /// </summary>
     public class PluginSettingsGui : MyGuiScreenBase
     {
         private MyGuiControlLabel m_useGlobalSettignsLabel;
@@ -76,6 +79,10 @@ namespace SEWorldGenPlugin.GUI
 
         public event Action OnOkButtonClicked;
 
+        /// <summary>
+        /// Creates this screen
+        /// </summary>
+        /// <param name="parent"></param>
         public PluginSettingsGui(PluginWorldSettings parent) : base(new Vector2(0.5f, 0.5f), MyGuiConstants.SCREEN_BACKGROUND_COLOR, CalcSize(), isTopMostScreen: false, null, MySandboxGame.Config.UIBkOpacity, MySandboxGame.Config.UIOpacity)
         {
             m_parent = parent;
@@ -84,12 +91,19 @@ namespace SEWorldGenPlugin.GUI
             RecreateControls(true);
         }
 
+        /// <summary>
+        /// Recreates the controls and builds them to show on screen
+        /// </summary>
+        /// <param name="constructor">If run from constructor</param>
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
             BuildControls();
         }
 
+        /// <summary>
+        /// Builds the plugin settings controls from top to bottom.
+        /// </summary>
         public void BuildControls()
         {
             Vector2 vector = new Vector2(50f) / MyGuiConstants.GUI_OPTIMAL_SIZE;
@@ -514,6 +528,12 @@ namespace SEWorldGenPlugin.GUI
             m_worldSizeSlider.Value = settings.GeneratorSettings.WorldSize / 1000;
         }
 
+        /// <summary>
+        /// Gets the current set settings from the gui elements and sets them in
+        /// settings
+        /// </summary>
+        /// <param name="settings">The plugin settings to set</param>
+        /// <returns>If global config should be used</returns>
         public bool GetSettings(ref MyObjectBuilder_PluginSettings settings)
         {
             if (settings == null)
@@ -559,16 +579,30 @@ namespace SEWorldGenPlugin.GUI
             return "PluginSettingsGui";
         }
 
+        /// <summary>
+        /// Size of the gui screen
+        /// </summary>
+        /// <returns>Size of this screen</returns>
         public static Vector2 CalcSize()
         {
             return new Vector2(183f / 280f, 0.9398855f);
         }
 
+        /// <summary>
+        /// Creates a new gui control label with given text
+        /// </summary>
+        /// <param name="text">Text for label</param>
+        /// <returns>The created label</returns>
         private MyGuiControlLabel MakeLabel(string text)
         {
             return new MyGuiControlLabel(null, null, text);
         }
 
+        /// <summary>
+        /// Callback for the ok button, calls the callback set from the world settings screen
+        /// and closes this screen.
+        /// </summary>
+        /// <param name="sender"></param>
         private void OkButtonClicked(object sender)
         {
             this.OnOkButtonClicked?.Invoke();
