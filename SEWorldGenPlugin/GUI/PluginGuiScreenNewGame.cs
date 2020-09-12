@@ -7,6 +7,9 @@ using VRage;
 
 namespace SEWorldGenPlugin.GUI
 {
+    /// <summary>
+    /// Replacement for the new game screen to add plugin specific elements
+    /// </summary>
     public class PluginGuiScreenNewGame : MyGuiScreenNewGame
     {
         public PluginGuiScreenNewGame() : base()
@@ -19,6 +22,11 @@ namespace SEWorldGenPlugin.GUI
 
         }
 
+        /// <summary>
+        /// Builds the gui and replaces the top buttons to change the type of world (custom, workshop, newgame)
+        /// to open the plugins own new game screen, workshop game screen and campaign screen
+        /// </summary>
+        /// <param name="constructor">Whether or not it was called from constructor</param>
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
@@ -73,6 +81,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Button callback for the custom world button, to open the custom world screen
+        /// </summary>
+        /// <param name="myGuiControlButton">Clicked button</param>
         private void OnCustomWorldButtonClick(MyGuiControlButton myGuiControlButton)
         {
             MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
@@ -82,6 +94,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Button callback for the campaing button, to change to the campaign screen
+        /// </summary>
+        /// <param name="myGuiControlButton">Clicked button</param>
         private void OnCampaignButtonClick(MyGuiControlButton myGuiControlButton)
         {
             MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
@@ -91,6 +107,10 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Button callback for the workshop world button, to open the workshop world screen
+        /// </summary>
+        /// <param name="myGuiControlButton">Clicked button</param>
         private void OnWorkshopButtonClick(MyGuiControlButton myGuiControlButton)
         {
             MyGuiScreenBase screenWithFocus = MyScreenManager.GetScreenWithFocus();
@@ -100,6 +120,11 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Seamlessly changes between two screens
+        /// </summary>
+        /// <param name="focusedScreen">Currently focused screen</param>
+        /// <param name="exchangedFor">New screen</param>
         private static void SeamlesslyChangeScreen(MyGuiScreenBase focusedScreen, MyGuiScreenBase exchangedFor)
         {
             focusedScreen.SkipTransition = true;
