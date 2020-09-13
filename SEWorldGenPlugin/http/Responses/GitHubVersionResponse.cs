@@ -5,6 +5,9 @@ using System.Runtime.Serialization.Json;
 
 namespace SEWorldGenPlugin.http.Responses
 {
+    /// <summary>
+    /// Class to deserialize the json response that comes from githubs latest release http request
+    /// </summary>
     public class GitHubVersionResponse
     {
         public static JsonRelease Deserialize(Stream json)
@@ -15,6 +18,9 @@ namespace SEWorldGenPlugin.http.Responses
         }
     }
 
+    /// <summary>
+    /// Representation of the latest release json response from github
+    /// </summary>
     [DataContract]
     public class JsonRelease
     {
@@ -64,6 +70,9 @@ namespace SEWorldGenPlugin.http.Responses
         public IList<JsonAsset> assets { get; set; }
     }
 
+    /// <summary>
+    /// Representation of the json user object of the json github response
+    /// </summary>
     [DataContract]
     public class JsonUser
     {
@@ -122,6 +131,9 @@ namespace SEWorldGenPlugin.http.Responses
         public bool site_admin { get; set; }
     }
 
+    /// <summary>
+    /// Representation of the json asset object in the github latest release json response
+    /// </summary>
     [DataContract]
     public class JsonAsset
     {
