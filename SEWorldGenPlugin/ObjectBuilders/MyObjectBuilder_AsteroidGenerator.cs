@@ -4,6 +4,9 @@ using VRage.Game;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
+    /// <summary>
+    /// Serializable ObjectBuilder for the Asteroid generators savedata, containing existing object seeds and the procedural density.
+    /// </summary>
     [ProtoContract]
     public class MyObjectBuilder_AsteroidGenerator
     {
