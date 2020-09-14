@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
+    /// <summary>
+    /// Serializable ObjectBuilder used for the plugins save data. Contains 
+    /// wheter it is enabled or not, and the Generator settings.
+    /// </summary>
     [ProtoContract]
     public class MyObjectBuilder_PluginSettings
     {
@@ -48,6 +52,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Serializable class representing the GeneratorSettings for the plugin
+    /// </summary>
     [ProtoContract]
     public class GeneratorSettings
     {
@@ -147,6 +154,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Serializable class representing the PlanetSettings for the plugin
+    /// </summary>
     [ProtoContract]
     public class PlanetSettings
     {
@@ -235,6 +245,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Serializable class representing the PlanetRingSettings for the plugin
+    /// </summary>
     [ProtoContract]
     public class PlanetRingSettings
     {
@@ -277,6 +290,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Serializable class representing the BeltSettings for the plugin
+    /// </summary>
     [ProtoContract]
     public class BeltSettings
     {
@@ -323,6 +339,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Enum to set which asteroid generator the plugin uses.
+    /// </summary>
     public enum AsteroidGenerator
     {
         PLUGIN,
