@@ -5,6 +5,10 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
+    /// <summary>
+    /// The serializable ObjectBuilder for the GpsManagers savedata.
+    /// Contains saved gpss and dynamic gpss.
+    /// </summary>
     [ProtoContract]
     public class MyObjectBuilder_GpsManager
     {
@@ -21,6 +25,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Serializable class which contains gps data such as the name, color and position of the gps.
+    /// </summary>
     public class GpsData
     {
         [ProtoMember(1)]
@@ -40,6 +47,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Serializable class for dynamic gpss. It contains the player id of the player that gets shown this
+    /// gps, the hash of the gps and the name of the gps.
+    /// </summary>
     public class DynamicGpsData
     {
         [ProtoMember(1)]
