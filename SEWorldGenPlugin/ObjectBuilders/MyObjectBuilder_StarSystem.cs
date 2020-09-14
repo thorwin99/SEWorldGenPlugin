@@ -9,6 +9,9 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
+    /// <summary>
+    /// Serializable ObjectBuilder used to save the solar systems data and contains all system objects.
+    /// </summary>
     [ProtoContract]
     [Serializable]
     public class MyObjectBuilder_StarSystem
@@ -17,6 +20,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public HashSet<MySystemItem> SystemObjects = new HashSet<MySystemItem>();
     }
 
+    /// <summary>
+    /// Baseclass for all system objects containing a type and display name
+    /// </summary>
     [ProtoContract]
     [ProtoInclude(1501, typeof(MyPlanetItem))]
     [ProtoInclude(1502, typeof(MySystemBeltItem))]
@@ -36,6 +42,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public string DisplayName;
     }
 
+    /// <summary>
+    /// Enum for the body type of an object in the solar system.
+    /// </summary>
     public enum SystemObjectType
     {
         PLANET,
@@ -44,6 +53,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         BELT
     }
 
+    /// <summary>
+    /// Class representing a planets data in the solar system
+    /// </summary>
     [ProtoContract]
     [Serializable]
     public class MyPlanetItem : MySystemItem
@@ -86,6 +98,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
     }
 
+    /// <summary>
+    /// Class representing a moons data in the solar system
+    /// </summary>
     [ProtoContract]
     [Serializable]
     public class MyPlanetMoonItem : MySystemItem
@@ -100,6 +115,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public string DefName;
     }
 
+    /// <summary>
+    /// Class representing a rings data in the solar system
+    /// </summary>
     [ProtoContract]
     [Serializable]
     public class MyPlanetRingItem : MySystemItem
@@ -137,6 +155,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public int RoidSizeMax;
     }
 
+    /// <summary>
+    /// Class representing a belts data in the solar system
+    /// </summary>
     [ProtoContract]
     [Serializable]
     public class MySystemBeltItem : MySystemItem
