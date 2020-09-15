@@ -1,10 +1,16 @@
 ﻿namespace SEWorldGenPlugin.Utilities
 {
+    /// <summary>
+    /// Simple class to have a list of all static texts for the plugin.
+    /// </summary>
     public class MyPluginTexts
     {
         public static ToolTips TOOLTIPS = new ToolTips();
         public static Messages MESSAGES = new Messages();
     }
+    /// <summary>
+    /// Class, that contains all tooltips
+    /// </summary>
     public class ToolTips
     {
         public readonly string SYS_OBJ_SLIDER = "Objects that should be generated in the system";
@@ -41,6 +47,9 @@
         public readonly string ADMIN_SPAWN_PLANET = "Spawns the planet with given size";
     }
 
+    /// <summary>
+    /// Class that contains all messages
+    /// </summary>
     public class Messages
     {
         public readonly string UPDATE_AVAILABLE_TITLE = "SEWorldGenPlugin Update available";
