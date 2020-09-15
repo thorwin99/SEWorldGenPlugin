@@ -4,9 +4,16 @@ using VRage.Game.Components;
 
 namespace SEWorldGenPlugin.Session
 {
+    /// <summary>
+    /// Sessioncomponent that manages the tracking of players for the procedural generator
+    /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501)]
     public class PlayerTracker : MySessionComponentBase
     {
+        /// <summary>
+        /// Runs before simulation update. If the plugin is enabled, will
+        /// track every player that is currently online for the procedural generator.
+        /// </summary>
         public override void UpdateBeforeSimulation()
         {
             if (!MySettings.Static.Settings.Enable) return;
