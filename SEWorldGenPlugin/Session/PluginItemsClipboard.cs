@@ -2,10 +2,6 @@
 using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Input;
@@ -13,23 +9,59 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Session
 {
+    /// <summary>
+    /// Session component that is used to hold and paste a MySystemItem
+    /// into the world. It will update a visual for the item, which currently only works with planets.
+    /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
     public class PluginItemsClipboard : MySessionComponentBase
     {
+        /// <summary>
+        /// Singleton instance of this session component
+        /// </summary>
         public static PluginItemsClipboard Static;
 
+        /// <summary>
+        /// Currently copied item
+        /// </summary>
         private MySystemItem m_copiedItem = null;
+
+        /// <summary>
+        /// Callpack for the paste event of the currently copied item
+        /// </summary>
         private Action<MySystemItem, Vector3D> m_callback;
+
+        /// <summary>
+        /// If the clipboard is currently active
+        /// </summary>
         private bool m_isActive = false;
+
+        /// <summary>
+        /// Distance of the to paste object to the camera
+        /// </summary>
         private float m_distanceToCam;
+
+        /// <summary>
+        /// Current position of the to be pasted item
+        /// </summary>
         private Vector3D m_currentPos;
 
+        /// <summary>
+        /// Initializes this session component and its singleton instance
+        /// </summary>
+        /// <param name="sessionComponent"></param>
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             base.Init(sessionComponent);
             Static = this;
         }
 
+        /// <summary>
+        /// Activates this clipboard with the given MySystemItem and sets the callback for the paste event
+        /// </summary>
+        /// <param name="item">Item to copy and paste</param>
+        /// <param name="callback">Callback to call, when the item gets pasted</param>
+        /// <param name="distanceToCam">The distance the object has to the camera</param>
         public void Activate(MySystemItem item, Action<MySystemItem, Vector3D> callback, float distanceToCam)
         {
             m_copiedItem = item;
@@ -38,6 +70,10 @@ namespace SEWorldGenPlugin.Session
             m_distanceToCam = distanceToCam;
         }
 
+        /// <summary>
+        /// Handles player input. When the escape key is pressed, the copy and paste is cancelled
+        /// and all cleared. When you press the left mouse button, the item is pasted and the callback is called, if the clipboard is active.
+        /// </summary>
         public override void HandleInput()
         {
             base.HandleInput();
@@ -67,6 +103,10 @@ namespace SEWorldGenPlugin.Session
             }
         }
 
+        /// <summary>
+        /// Runs before simulation update. If the clipboard is active,
+        /// draws the copied item, incase of a planet, into the world as a sphere and updates its position.
+        /// </summary>
         public override void UpdateBeforeSimulation()
         {
             if (m_isActive)
@@ -79,10 +119,15 @@ namespace SEWorldGenPlugin.Session
 
                 m_currentPos = wm.Translation + posGlobal;
 
-                PluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, ((MyPlanetItem)m_copiedItem).Size / 2, Color.LightGreen));
+                if(m_copiedItem.GetType() == typeof(MyPlanetItem))
+                    PluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, ((MyPlanetItem)m_copiedItem).Size / 2, Color.LightGreen));
             }
         }
 
+        /// <summary>
+        /// Gets the paste world matrix used to calculate the position of the object in relation to the camera.
+        /// </summary>
+        /// <returns>The head matrix or world matrix of the player.</returns>
         private static MatrixD GetPasteMatrix()
         {
             if (MySession.Static.ControlledEntity != null &&
