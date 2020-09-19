@@ -192,7 +192,6 @@
     <Compile Include="Networking\Attributes\ClientAttribute.cs" />
     <Compile Include="Networking\Attributes\EventAttribute.cs" />
     <Compile Include="Networking\Attributes\EventOwnerAttribute.cs" />
-    <Compile Include="Networking\Attributes\ReliableAttribute.cs" />
     <Compile Include="Networking\Attributes\ServerAttribute.cs" />
     <Compile Include="Networking\PluginEventHandler.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_AsteroidGenerator.cs" />

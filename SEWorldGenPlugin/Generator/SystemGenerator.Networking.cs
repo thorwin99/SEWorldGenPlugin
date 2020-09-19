@@ -136,7 +136,6 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="name">Name of the object</param>
         /// <param name="callback">Callback id of the callback to call on the client</param>
         [Event(100)]
-        [Reliable]
         [Server]
         static void SendGetServer(ulong client, string name, ulong callback)
         {
@@ -171,7 +170,6 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="item">The planet item</param>
         /// <param name="callback">Callback id of the callback to call</param>
         [Event(101)]
-        [Reliable]
         [Client]
         static void SendGetPlanetClient(bool success, MyPlanetItem item, ulong callback)
         {
@@ -186,7 +184,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="item">The moon item</param>
         /// <param name="callback">Callback id of the callback to call</param>
         [Event(102)]
-        [Reliable]
+        
         [Client]
         static void SendGetMoonClient(bool success, MyPlanetMoonItem item, ulong callback)
         {
@@ -201,7 +199,6 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="item">The belt item</param>
         /// <param name="callback">Callback id of the callback to call</param>
         [Event(103)]
-        [Reliable]
         [Client]
         static void SendGetBeltClient(bool success, MySystemBeltItem item, ulong callback)
         {
@@ -216,7 +213,6 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="item">The ring item</param>
         /// <param name="callback">Callback id of the callback to call</param>
         [Event(104)]
-        [Reliable]
         [Client]
         static void SendGetRingClient(bool success, MyPlanetRingItem item, ulong callback)
         {
@@ -230,7 +226,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="planetName">Name of the planet</param>
         /// <param name="ringBase">Ring item to add to the planet</param>
         [Event(105)]
-        [Reliable]
+        
         [Server]
         static void SendAddRingToPlanet(string planetName, MyPlanetRingItem ringBase)
         {
@@ -253,7 +249,6 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="planet">Planet item to add</param>
         [Event(106)]
-        [Reliable]
         [Server]
         static void SendAddPlanet(MyPlanetItem planet)
         {
@@ -281,7 +276,6 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="planetName">Name of the planet</param>
         /// <param name="planetName">Name of the planet</param>
         [Event(107)]
-        [Reliable]
         [Server]
         static void SendRemoveRingFromPlanet(string planetName)
         {
