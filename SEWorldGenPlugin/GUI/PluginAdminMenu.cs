@@ -706,6 +706,7 @@ namespace SEWorldGenPlugin.GUI
                 {
                     SystemGenerator.Static.AddRingToPlanet(m_selectedPlanet.DisplayName, item);
                 }
+                LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
                 PlanetListItemClicked(m_planetListBox);
             }
         }
@@ -727,6 +728,7 @@ namespace SEWorldGenPlugin.GUI
                 {
                     SystemGenerator.Static.RemoveRingFromPlanet(m_selectedPlanet.DisplayName);
                 }
+                LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
                 PlanetListItemClicked(m_planetListBox);
             }
         }
@@ -764,23 +766,15 @@ namespace SEWorldGenPlugin.GUI
         {
             if (box.SelectedItems.Count > 0)
             {
-                MyEntityList.MyEntityListInfoItem myEntityListInfoItem = (MyEntityList.MyEntityListInfoItem)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
+                var data = (Tuple<MySystemItem, MyEntityList.MyEntityListInfoItem>)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
+                MyEntityList.MyEntityListInfoItem myEntityListInfoItem = data.Item2;
+                MyPlanetItem planet = (MyPlanetItem)data.Item1;
+                MyPlanet entityPlanet = (MyPlanet)MyEntities.GetEntityById(myEntityListInfoItem.EntityId);
+
                 m_attachedEntity = myEntityListInfoItem.EntityId;
                 if (SNAP_CAMERA_TO_PLANET && !TryAttachCamera(myEntityListInfoItem.EntityId))
                 {
                     MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator, null, myEntityListInfoItem.Position + Vector3.One * 50f);
-                }
-
-                MyPlanet planetEntity = (MyPlanet)MyEntities.GetEntityById(myEntityListInfoItem.EntityId);
-
-                string name = "";
-                if (myEntityListInfoItem.DisplayName.StartsWith("Planet"))
-                {
-                    name = myEntityListInfoItem.DisplayName.Replace("_", " ").Split('-')[0].Trim();
-                }
-                else
-                {
-                    name = myEntityListInfoItem.DisplayName.Replace("_", " ");
                 }
 
                 if(m_selectedPlanet != null)
@@ -788,97 +782,87 @@ namespace SEWorldGenPlugin.GUI
                     PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
                 }
 
-                SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
+                m_selectedPlanet = planet;
+                m_newPlanet = false;
+
+                m_ringDistanceSlider.MinValue = entityPlanet.AverageRadius * 2 * 0.75f - entityPlanet.AverageRadius;
+                m_ringDistanceSlider.MinValue -= m_ringDistanceSlider.MinValue % 1000;
+                m_ringDistanceSlider.MaxValue = entityPlanet.AverageRadius * 2 * 2 - entityPlanet.AverageRadius;
+                m_ringDistanceSlider.MaxValue -= m_ringDistanceSlider.MaxValue % 1000;
+                m_ringDistanceSlider.Value = entityPlanet.AverageRadius * 2 * 1.25f - entityPlanet.AverageRadius;
+                m_ringDistanceSlider.Value -= m_ringDistanceSlider.Value % 1000;
+
+                bool hasRing = m_selectedPlanet.PlanetRing != null;
+
+                m_ringAngleXSlider.Enabled = !hasRing;
+                m_ringAngleYSlider.Enabled = !hasRing;
+                m_ringAngleZSlider.Enabled = !hasRing;
+                m_ringDistanceSlider.Enabled = !hasRing;
+                m_ringWidthSlider.Enabled = !hasRing;
+                m_ringRoidSizeSlider.Enabled = !hasRing;
+                m_ringRoidSizeMaxSlider.Enabled = !hasRing;
+                m_addRingButton.Enabled = !hasRing;
+                m_removeRingButton.Enabled = hasRing;
+                m_teleportToRingButton.Enabled = hasRing;
+
+                if (hasRing)
                 {
-                    if (success)
-                    {
-                        m_selectedPlanet = (MyPlanetItem)obj;
-                        m_newPlanet = false;
-                    }
-                    else
-                    {
-                        m_selectedPlanet = new MyPlanetItem()
-                        {
-                            DisplayName = myEntityListInfoItem.DisplayName.Replace("_", " "),
-                            CenterPosition = planetEntity.PositionComp.GetPosition(),
-                            DefName = ((MyObjectBuilder_Planet)planetEntity.GetObjectBuilder()).Name,
-                            Generated = true,
-                            OffsetPosition = planetEntity.PositionLeftBottomCorner,
-                            PlanetMoons = new MyPlanetMoonItem[0],
-                            PlanetRing = null,
-                            Size = planetEntity.AverageRadius * 2,
-                            Type = SystemObjectType.PLANET
-                        };
-                        m_newPlanet = true;
-                    }
+                    m_ringDistanceSlider.Value = (float)m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
+                    m_ringWidthSlider.Value = m_selectedPlanet.PlanetRing.Width;
+                    m_ringAngleZSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
+                    m_ringAngleYSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesY;
+                    m_ringAngleXSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesX;
+                    m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;
+                    m_ringRoidSizeMaxSlider.Value = m_selectedPlanet.PlanetRing.RoidSizeMax;
+                }
+                else
+                {
+                    m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
+                    m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+                    m_ringAngleYSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+                    m_ringAngleZSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
+                    m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.MinValue;
+                    m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeMaxSlider.MaxValue;
+                    m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
+                    m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeMaxSlider.DefaultValue.Value;
+                }
 
-                    m_ringDistanceSlider.MinValue = planetEntity.AverageRadius * 2 * 0.75f - planetEntity.AverageRadius;
-                    m_ringDistanceSlider.MinValue -= m_ringDistanceSlider.MinValue % 1000;
-                    m_ringDistanceSlider.MaxValue = planetEntity.AverageRadius * 2 * 2 - planetEntity.AverageRadius;
-                    m_ringDistanceSlider.MaxValue -= m_ringDistanceSlider.MaxValue % 1000;
-                    m_ringDistanceSlider.Value = planetEntity.AverageRadius * 2 * 1.25f - planetEntity.AverageRadius;
-                    m_ringDistanceSlider.Value -= m_ringDistanceSlider.Value % 1000;
+                m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
+                m_ringAngleXValue.Text = String.Format("{0:0.00}", m_ringAngleXSlider.Value);
+                m_ringAngleYValue.Text = String.Format("{0:0.00}", m_ringAngleYSlider.Value);
+                m_ringAngleZValue.Text = String.Format("{0:0.00}", m_ringAngleZSlider.Value);
+                m_ringWidthValue.Text = m_ringWidthSlider.Value.ToString();
+                m_ringDistanceValue.Text = m_ringDistanceSlider.Value.ToString();
 
-                    bool hasRing = m_selectedPlanet.PlanetRing != null;
-
-                    m_ringAngleXSlider.Enabled = !hasRing;
-                    m_ringAngleYSlider.Enabled = !hasRing;
-                    m_ringAngleZSlider.Enabled = !hasRing;
-                    m_ringDistanceSlider.Enabled = !hasRing;
-                    m_ringWidthSlider.Enabled = !hasRing;
-                    m_ringRoidSizeSlider.Enabled = !hasRing;
-                    m_ringRoidSizeMaxSlider.Enabled = !hasRing;
-                    m_addRingButton.Enabled = !hasRing;
-                    m_removeRingButton.Enabled = hasRing;
-                    m_teleportToRingButton.Enabled = hasRing;
-
-                    if (hasRing)
-                    {
-                        m_ringDistanceSlider.Value = (float)m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
-                        m_ringWidthSlider.Value = m_selectedPlanet.PlanetRing.Width;
-                        m_ringAngleZSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
-                        m_ringAngleYSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesY;
-                        m_ringAngleXSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesX;
-                        m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;
-                        m_ringRoidSizeMaxSlider.Value = m_selectedPlanet.PlanetRing.RoidSizeMax;
-                    }
-                    else
-                    {
-                        m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
-                        m_ringAngleXSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
-                        m_ringAngleYSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
-                        m_ringAngleZSlider.Value = m_ringAngleXSlider.DefaultValue.Value;
-                        m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.MinValue;
-                        m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeMaxSlider.MaxValue;
-                        m_ringRoidSizeSlider.Value = m_ringRoidSizeSlider.DefaultValue.Value;
-                        m_ringRoidSizeMaxSlider.Value = m_ringRoidSizeMaxSlider.DefaultValue.Value;
-                    }
-
-                    m_ringRoidSizeValue.Text = m_ringRoidSizeSlider.Value.ToString();
-                    m_ringAngleXValue.Text = String.Format("{0:0.00}", m_ringAngleXSlider.Value);
-                    m_ringAngleYValue.Text = String.Format("{0:0.00}", m_ringAngleYSlider.Value);
-                    m_ringAngleZValue.Text = String.Format("{0:0.00}", m_ringAngleZSlider.Value);
-                    m_ringWidthValue.Text = m_ringWidthSlider.Value.ToString();
-                    m_ringDistanceValue.Text = m_ringDistanceSlider.Value.ToString();
-
-                    UpdateRingVisual();
-                });
+                UpdateRingVisual();
             }
         }
 
         /// <summary>
         /// Loads all planets that are in the world
         /// </summary>
-        private void LoadPlanetsInWorld()
+        private void LoadPlanetsInWorld(string selectPlanet = null)
         {
+            m_planetListBox.Items.Clear();
             List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
             foreach(var item in planets)
             {
-                string name = item.DisplayName.Replace("_", " ");
+                string name = item.DisplayName.Substring(0, item.DisplayName.LastIndexOf("-")).Replace("_", " ").Trim();
 
-                if (name.StartsWith("Moon ")) continue; //Needs rework, since this does not always work with the new naming scheme
-
-                m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, item));
+                SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
+                {
+                    if (success)
+                    {
+                        if(obj.Type == SystemObjectType.PLANET)
+                        {
+                            m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, Tuple.Create(obj, item)));
+                            if(selectPlanet != null && name.Equals(selectPlanet))
+                            {
+                                m_planetListBox.SelectSingleItem(m_planetListBox.Items[m_planetListBox.Items.Count - 1]);
+                            }
+                        }
+                    }
+                });
             }
         }
 
