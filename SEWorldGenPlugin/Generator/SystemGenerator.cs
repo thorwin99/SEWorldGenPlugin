@@ -216,7 +216,7 @@ namespace SEWorldGenPlugin.Generator
 
             using (MyRandom.Instance.PushSeed(m_seed))
             {
-                int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem);
+                int numberPlanets = MyRandom.Instance.Next(m_settings.MinObjectsInSystem, m_settings.MaxObjectsInSystem + 1);
                 long tmp_distance = 0;
                 int totalBelts = 0;
                 int totalPlanets = 0;
@@ -345,7 +345,7 @@ namespace SEWorldGenPlugin.Generator
             if (MyRandom.Instance.NextFloat() > m_settings.PlanetSettings.MoonProbability) return new MyPlanetMoonItem[0];
 
             int maxMoons = GetMaxMoonCount(surfaceGravity);
-            int numMoons = MyRandom.Instance.Next(maxMoons > 0 ? 1 : 0, maxMoons);
+            int numMoons = MyRandom.Instance.Next(maxMoons > 0 ? 1 : 0, maxMoons + 1);
             MyPlanetMoonItem[] moons = new MyPlanetMoonItem[numMoons];
 
             for(int i = 0; i < numMoons; i++)
@@ -425,7 +425,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 do
                 {
-                    def = AvailablePlanets[MyRandom.Instance.Next(0, AvailablePlanets.Count - 1)];
+                    def = AvailablePlanets[MyRandom.Instance.Next(0, AvailablePlanets.Count)];
                     size = SizeByGravity(def.SurfaceGravity);
                     tries++;
 
@@ -464,7 +464,7 @@ namespace SEWorldGenPlugin.Generator
 
             do
             {
-                def = AvailableMoons[MyRandom.Instance.Next(0, (AvailableMoons.Count - 1) * 2) % AvailableMoons.Count];
+                def = AvailableMoons[MyRandom.Instance.Next(0, AvailableMoons.Count * 2) % AvailableMoons.Count];
 
                 size = SizeByGravity(def.SurfaceGravity);
                 tries++;
@@ -519,7 +519,7 @@ namespace SEWorldGenPlugin.Generator
             if (n <= 0) return;
             while(n > 1)
             {
-                int index = MyRandom.Instance.Next(1, n - 1);
+                int index = MyRandom.Instance.Next(1, n);
                 var value = MandatoryPlanets[index];
                 MandatoryPlanets[index] = MandatoryPlanets[n];
                 MandatoryPlanets[n] = value;
