@@ -269,7 +269,7 @@ namespace SEWorldGenPlugin.GUI
             });
             m_worldSizeSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_worldSizeSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
             {
-                if(s.Value <= 0)
+                if(s.Value < 0)
                 {
                     m_worldSizeValue.Text = "Infinite";
                 }

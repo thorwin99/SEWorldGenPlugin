@@ -223,7 +223,7 @@ namespace SEWorldGenPlugin.Generator
 
                 for (int i = 0; i < numberPlanets; i++)
                 {
-                    if (tmp_distance >= m_settings.WorldSize && m_settings.WorldSize > 0) return;
+                    if (tmp_distance >= m_settings.WorldSize && m_settings.WorldSize > -1) return;
 
                     if (i != 0 || !m_settings.FirstPlanetCenter)
                     {
@@ -245,7 +245,7 @@ namespace SEWorldGenPlugin.Generator
 
                 if(MandatoryPlanets.Count != 0)
                 {
-                    int length = MandatoryPlanets.Count;
+                    int length = MandatoryPlanets.Count + totalPlanets;
                     for (int i = totalPlanets; i < length; i++)
                     {
                         if (tmp_distance > m_settings.WorldSize && m_settings.WorldSize != -1) return;
