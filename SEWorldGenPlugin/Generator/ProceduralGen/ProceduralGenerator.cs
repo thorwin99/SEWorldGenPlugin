@@ -38,6 +38,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
         private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
         private Dictionary<MyEntity, MyEntityTracker> m_toTrackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
+        private List<MyEntity> m_toRemoveTrackedEntities = new List<MyEntity>();
         private HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
         private ProceduralAsteroidsRingModule asteroidModule = null;
         private ProceduralPlanetModule planetModule = null;
@@ -107,7 +108,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
 
             planetModule.GeneratePlanets();
-
             foreach (var entity in m_toTrackedEntities)
             {
                 if (m_trackedEntities.ContainsKey(entity.Key))
@@ -119,6 +119,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     m_trackedEntities.Add(entity.Key, entity.Value);
                 }
             }
+
+            foreach(var entity in m_toRemoveTrackedEntities)
+            {
+                m_trackedEntities.Remove(entity);
+            }
+
             foreach(MyEntityTracker tracker in m_trackedEntities.Values)
             {
                 if (tracker.ShouldGenerate(true))
@@ -218,8 +224,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 m_toTrackedEntities.Add(entity, tracker);
                 entity.OnMarkForClose += (e) =>
                 {
-                    m_trackedEntities.Remove(e);
-                    m_toTrackedEntities.Remove(e);
+                    m_toRemoveTrackedEntities.Add(e);
                     asteroidModule.MarkToUnloadCells(tracker.BoundingVolume);
                 };
             }
