@@ -118,7 +118,7 @@ namespace SEWorldGenPlugin.Generator
             MyObjectBuilder_StarSystem b = GetConfig();
             Objects = b.SystemObjects;
 
-            m_seed = MySession.Static.Settings.ProceduralSeed + MyRandom.Instance.CreateRandomSeed();
+            m_seed = MySession.Static.Settings.ProceduralSeed + Guid.NewGuid().GetHashCode();
 
             m_settings = SettingsSession.Static.Settings.GeneratorSettings;
 
