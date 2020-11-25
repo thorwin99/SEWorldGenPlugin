@@ -680,11 +680,11 @@ namespace SEWorldGenPlugin.GUI
         /// Closes the screen and unloads data
         /// </summary>
         /// <returns>If the screen was closed</returns>
-        public override bool CloseScreen()
+        public override bool CloseScreen(bool isUnloading = false)
         {
             if(m_selectedPlanet != null)
                 PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
-            return base.CloseScreen();
+            return base.CloseScreen(isUnloading);
         }
 
         /// <summary>
