@@ -47,24 +47,24 @@ namespace SEWorldGenPlugin.Utilities
         /// a string message and a sender id, then calls the registered handler.
         public static void RegisterMessageHandler(ushort id, Action<ulong, string> handler)
         {
-            Action<byte[]> newHandler = delegate (byte[] data)
+            Action<ushort, byte[], ulong, bool> newHandler = delegate (ushort s, byte[] data, ulong i, bool b)
             {
                 ulong sender = NetDataToMsg(data, out string msg);
                 handler(sender, msg);
             };
-            MyAPIGateway.Multiplayer.RegisterMessageHandler(id, newHandler);
+            MyAPIGateway.Multiplayer.RegisterSecureMessageHandler(id, newHandler);
             if (unregActions.TryGetValue(id, out Action value))
             {
                 unregActions[id] += delegate
                 {
-                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(id, newHandler);
+                    MyAPIGateway.Multiplayer.UnregisterSecureMessageHandler(id, newHandler);
                 };
             }
             else
             {
                 unregActions[id] = delegate
                 {
-                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(id, newHandler);
+                    MyAPIGateway.Multiplayer.UnregisterSecureMessageHandler(id, newHandler);
                 };
             }
         }
@@ -78,24 +78,24 @@ namespace SEWorldGenPlugin.Utilities
         /// a byte[] data message and a sender id, then calls the registered handler.
         public static void RegisterMessageHandler(ushort id, Action<ulong, byte[]> handler)
         {
-            Action<byte[]> newHandler = delegate (byte[] data)
+            Action<ushort, byte[], ulong, bool> newHandler = delegate (ushort s, byte[] data, ulong i, bool b)
             {
                 ulong sender = ReadSenderId(data, out byte[] rawData);
                 handler(sender, rawData);
             };
-            MyAPIGateway.Multiplayer.RegisterMessageHandler(id, newHandler);
+            MyAPIGateway.Multiplayer.RegisterSecureMessageHandler(id, newHandler);
             if (unregActions.TryGetValue(id, out Action value))
             {
                 unregActions[id] += delegate
                 {
-                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(id, newHandler);
+                    MyAPIGateway.Multiplayer.UnregisterSecureMessageHandler(id, newHandler);
                 };
             }
             else
             {
                 unregActions[id] = delegate
                 {
-                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(id, newHandler);
+                    MyAPIGateway.Multiplayer.UnregisterSecureMessageHandler(id, newHandler);
                 };
             }
         }
