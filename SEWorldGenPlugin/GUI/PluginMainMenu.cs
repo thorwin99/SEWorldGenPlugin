@@ -119,36 +119,10 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="sender"></param>
         private void OnNewGameClick(object sender)
         {
-            if (!MyFakes.LIMITED_MAIN_MENU || MyInput.Static.ENABLE_DEVELOPER_KEYS)
+            RunWithTutorialCheck(delegate
             {
-                RunWithTutorialCheck(delegate
-                {
-                    MyGuiSandbox.AddScreen(new PluginGuiScreenNewGame());
-                });
-            }
-            else
-            {
-                QuickstartScenario("Red Ship");
-            }
-        }
-
-        /// <summary>
-        /// Starts a scenario with given name
-        /// </summary>
-        /// <param name="scenarioName">Scenario name</param>
-        private void QuickstartScenario(string scenarioName)
-        {
-            string path = "CustomWorlds";
-            string sessionPath = Path.Combine(MyFileSystem.ContentPath, path, scenarioName);
-            ulong sizeInBytes;
-            MyObjectBuilder_Checkpoint checkpoint = MyLocalCache.LoadCheckpoint(sessionPath, out sizeInBytes);
-            if (checkpoint != null)
-            {
-                MySessionLoader.LoadSingleplayerSession(checkpoint, sessionPath, sizeInBytes, delegate
-                {
-                    MyAsyncSaving.Start(null, Path.Combine(MyFileSystem.SavesPath, checkpoint.SessionName.Replace(':', '-')));
-                });
-            }
+                MyGuiSandbox.AddScreen(new PluginGuiScreenNewGame());
+            });
         }
 
         /// <summary>
