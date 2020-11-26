@@ -705,7 +705,11 @@ namespace SEWorldGenPlugin.GUI
                 }
                 else
                 {
-                    SystemGenerator.Static.AddRingToPlanet(m_selectedPlanet.DisplayName, item);
+                    SystemGenerator.Static.AddRingToPlanet(m_selectedPlanet.DisplayName, item, delegate (bool success)
+                    {
+                        LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
+                        PlanetListItemClicked(m_planetListBox);
+                    });
                 }
                 LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
                 PlanetListItemClicked(m_planetListBox);
@@ -730,7 +734,6 @@ namespace SEWorldGenPlugin.GUI
                     SystemGenerator.Static.RemoveRingFromPlanet(m_selectedPlanet.DisplayName);
                 }
                 LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
-                PlanetListItemClicked(m_planetListBox);
             }
         }
 
@@ -860,6 +863,7 @@ namespace SEWorldGenPlugin.GUI
                             if(selectPlanet != null && name.Equals(selectPlanet))
                             {
                                 m_planetListBox.SelectSingleItem(m_planetListBox.Items[m_planetListBox.Items.Count - 1]);
+                                PlanetListItemClicked(m_planetListBox);
                             }
                         }
                     }

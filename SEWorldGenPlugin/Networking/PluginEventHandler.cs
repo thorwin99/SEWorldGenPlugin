@@ -122,6 +122,30 @@ namespace SEWorldGenPlugin.Networking
         }
 
         /// <summary>
+        /// Raises a static event, using arg1, arg2 and arg3 as a parameters, to be executed over network. It executes it on receiver, if it is not
+        /// marked as broadcast or server.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first argument of the method that gets executed.</typeparam>
+        /// <typeparam name="T2">The type of the second argument of the method that gets executed.</typeparam>
+        /// <typeparam name="T3">The type of the third argument of the method that gets executed.</typeparam>
+        /// <typeparam name="T4">The type of the fourth argument of the method that gets executed.</typeparam>
+        /// <param name="action">The method to execute over network on the receiver</param>
+        /// <param name="arg1">The first method parameter</param>
+        /// <param name="arg2">The second method parameter</param>
+        /// <param name="arg3">The third method parameter</param>
+        /// <param name="arg4">The fourth method parameter</param>
+        /// <param name="receiver">Optional receiver, if the method is marked as client</param>
+        public void RaiseStaticEvent<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, T1 arg1, T2 arg2, T3 arg3, T4 arg4, ulong? receiver = null)
+        {
+            if (action.Method.CustomAttributes.Any(data => data.AttributeType == typeof(EventAttribute)))
+            {
+                ulong id = action.Method.GetCustomAttribute<EventAttribute>().Id;
+                byte[] data = PackData(id, arg1, arg2, arg3, arg4);
+                SendData(action.Method, data, receiver);
+            }
+        }
+
+        /// <summary>
         /// Registers all methods in of the given class type with the EventOwner attribute, that are marked as events,
         /// in the PluginHandler.
         /// </summary>
@@ -197,13 +221,17 @@ namespace SEWorldGenPlugin.Networking
             if(m_registeredMethods.TryGetValue(id, out MethodInfo info))
             {
                 var parameters = info.GetParameters();
-                if (parameters.Length > 3) return;
-                Type[] args = new Type[3] { typeof(ProtoNull), typeof(ProtoNull), typeof(ProtoNull) };
+                if (parameters.Length > 4) return;
+                Type[] args = new Type[4] { typeof(ProtoNull), typeof(ProtoNull), typeof(ProtoNull), typeof(ProtoNull) };
                 for(int i = 0; i < parameters.Length; i++)
                 {
                     args[i] = parameters[i].ParameterType;
+                    if(args[i] == null)
+                    {
+                        args[i] = typeof(ProtoNull);
+                    }
                 }
-                object[] paras = new object[5] { data, null, null, null, null };
+                object[] paras = new object[6] { data, null, null, null, null, null};
 
                 m_unpackData.MakeGenericMethod(args).Invoke(this, paras);
                 List<object> objs = new List<object>();
@@ -243,6 +271,34 @@ namespace SEWorldGenPlugin.Networking
         }
 
         /// <summary>
+        /// Packs the data for an event method into a serialized byte[].
+        /// The byte array starts with the methods event id and is followed by
+        /// the arguments of the method.
+        /// </summary>
+        /// <typeparam name="T1">The type of the first method parameter</typeparam>
+        /// <typeparam name="T2">The type of the second method parameter</typeparam>
+        /// <typeparam name="T3">The type of the third method parameter</typeparam>
+        /// <typeparam name="T4">The type of the fourth method parameter</typeparam>
+        /// <param name="id">The methods event id</param>
+        /// <param name="arg1">The methods first parameter</param>
+        /// <param name="arg2">The methods second parameter</param>
+        /// <param name="arg3">The methods third parameter</param>
+        /// <param name="arg4">The methods fourth parameter</param>
+        /// <returns>The byte[] of the packed data for the method.</returns>
+        private byte[] PackData<T1, T2, T3, T4>(ulong id, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            using (var ms = new MemoryStream())
+            {
+                Serializer.SerializeWithLengthPrefix(ms, id, PrefixStyle.Base128);
+                Serializer.SerializeWithLengthPrefix(ms, arg1, PrefixStyle.Base128);
+                Serializer.SerializeWithLengthPrefix(ms, arg2, PrefixStyle.Base128);
+                Serializer.SerializeWithLengthPrefix(ms, arg3, PrefixStyle.Base128);
+                Serializer.SerializeWithLengthPrefix(ms, arg4, PrefixStyle.Base128);
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
         /// Retreives the methods event id from the packed data of a method
         /// </summary>
         /// <param name="data">The packed data for the method</param>
@@ -261,19 +317,22 @@ namespace SEWorldGenPlugin.Networking
         /// <typeparam name="T1">The type of the first method parameter</typeparam>
         /// <typeparam name="T2">The type of the second method parameter</typeparam>
         /// <typeparam name="T3">The type of the third method parameter</typeparam>
+        /// <typeparam name="T4">The type of the fourth method parameter</typeparam>
         /// <param name="data">The packed data of the method</param>
         /// <param name="id">Output value for the methods event id.</param>
         /// <param name="arg1">Output value for the first method parameter.</param>
         /// <param name="arg2">Output value for the second method parameter.</param>
         /// <param name="arg3">Output value for the third method parameter.</param>
-        private void UnpackData<T1, T2, T3>(byte[] data, out ulong id, out T1 arg1, out T2 arg2, out T3 arg3)
+        /// <param name="arg4">Output value for the fourth method parameter.</param>
+        private void UnpackData<T1, T2, T3, T4>(byte[] data, out ulong id, out T1 arg1, out T2 arg2, out T3 arg3, out T4 arg4)
         {
-            using(var ms = new MemoryStream(data))
+            using (var ms = new MemoryStream(data))
             {
                 id = Serializer.DeserializeWithLengthPrefix<ulong>(ms, PrefixStyle.Base128);
                 arg1 = Serializer.DeserializeWithLengthPrefix<T1>(ms, PrefixStyle.Base128);
                 arg2 = Serializer.DeserializeWithLengthPrefix<T2>(ms, PrefixStyle.Base128);
                 arg3 = Serializer.DeserializeWithLengthPrefix<T3>(ms, PrefixStyle.Base128);
+                arg4 = Serializer.DeserializeWithLengthPrefix<T4>(ms, PrefixStyle.Base128);
 
                 return;
             }

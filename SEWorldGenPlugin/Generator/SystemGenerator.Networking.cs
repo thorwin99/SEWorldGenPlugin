@@ -13,15 +13,18 @@ namespace SEWorldGenPlugin.Generator
     /// </summary>
     public partial class SystemGenerator
     {
-        private Dictionary<ulong, Action<bool, MySystemItem>> m_getCallbacks;
+        private Dictionary<ulong, Action<bool, MySystemItem>> m_getActionCallbacks;
+        private Dictionary<ulong, Action<bool>> m_addActionsCallbacks;
         private ulong m_currentIndex;
+        private ulong m_currentAddIndex;
 
         /// <summary>
         /// Initializes a list for callbacks, for networking actions.
         /// </summary>
         private void InitNet()
         {
-            m_getCallbacks = new Dictionary<ulong, Action<bool, MySystemItem>>();
+            m_getActionCallbacks = new Dictionary<ulong, Action<bool, MySystemItem>>();
+            m_addActionsCallbacks = new Dictionary<ulong, Action<bool>>();
         }
 
         /// <summary>
@@ -38,7 +41,8 @@ namespace SEWorldGenPlugin.Generator
         private void UnloadNet()
         {
             m_currentIndex = 0;
-            m_getCallbacks = null;
+            m_getActionCallbacks = null;
+            m_addActionsCallbacks = null;
         }
 
         /// <summary>
@@ -48,7 +52,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="callback"></param>
         public void GetObject(string name, Action<bool, MySystemItem> callback)
         {
-            m_getCallbacks.Add(++m_currentIndex, callback);
+            m_getActionCallbacks.Add(++m_currentIndex, callback);
             PluginEventHandler.Static.RaiseStaticEvent(SendGetServer, Sync.MyId, name, m_currentIndex, null);
         }
 
@@ -56,9 +60,10 @@ namespace SEWorldGenPlugin.Generator
         /// Adds a planet to the system on the server.
         /// </summary>
         /// <param name="planet">Planet to add</param>
-        public void AddPlanet(MyPlanetItem planet)
+        public void AddPlanet(MyPlanetItem planet, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddPlanet, planet, null);
+            m_addActionsCallbacks.Add(++m_currentAddIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddPlanet, planet, m_currentAddIndex, Sync.MyId, null);
         }
 
         /// <summary>
@@ -66,18 +71,20 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="name">Name of the planet to add the ring to</param>
         /// <param name="ring">Ring data to add</param>
-        public void AddRingToPlanet(string name, MyPlanetRingItem ring)
+        public void AddRingToPlanet(string name, MyPlanetRingItem ring, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddRingToPlanet, name, ring, null);
+            m_addActionsCallbacks.Add(++m_currentAddIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddRingToPlanet, name, ring, m_currentAddIndex, Sync.MyId, null);
         }
 
         /// <summary>
         /// Removes the asteroid ring from a planet on the server
         /// </summary>
         /// <param name="name">Name of the ring</param>
-        public void RemoveRingFromPlanet(string name)
+        public void RemoveRingFromPlanet(string name, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, null);
+            m_addActionsCallbacks.Add(++m_currentAddIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, m_currentAddIndex, Sync.MyId, null);
         }
 
         /// <summary>
@@ -124,8 +131,8 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         static void SendGetPlanetClient(bool success, MyPlanetItem item, ulong callback)
         {
-            Static.m_getCallbacks[callback](success, item);
-            Static.m_getCallbacks.Remove(callback);
+            Static.m_getActionCallbacks[callback](success, item);
+            Static.m_getActionCallbacks.Remove(callback);
         }
 
         /// <summary>
@@ -135,12 +142,11 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="item">The moon item</param>
         /// <param name="callback">Callback id of the callback to call</param>
         [Event(102)]
-        
         [Client]
         static void SendGetMoonClient(bool success, MyPlanetMoonItem item, ulong callback)
         {
-            Static.m_getCallbacks[callback](success, item);
-            Static.m_getCallbacks.Remove(callback);
+            Static.m_getActionCallbacks[callback](success, item);
+            Static.m_getActionCallbacks.Remove(callback);
         }
 
         /// <summary>
@@ -153,8 +159,8 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         static void SendGetBeltClient(bool success, MySystemBeltItem item, ulong callback)
         {
-            Static.m_getCallbacks[callback](success, item);
-            Static.m_getCallbacks.Remove(callback);
+            Static.m_getActionCallbacks[callback](success, item);
+            Static.m_getActionCallbacks.Remove(callback);
         }
 
         /// <summary>
@@ -167,8 +173,8 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         static void SendGetRingClient(bool success, MyPlanetRingItem item, ulong callback)
         {
-            Static.m_getCallbacks[callback](success, item);
-            Static.m_getCallbacks.Remove(callback);
+            Static.m_getActionCallbacks[callback](success, item);
+            Static.m_getActionCallbacks.Remove(callback);
         }
 
         /// <summary>
@@ -177,9 +183,8 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="planetName">Name of the planet</param>
         /// <param name="ringBase">Ring item to add to the planet</param>
         [Event(105)]
-        
         [Server]
-        static void SendAddRingToPlanet(string planetName, MyPlanetRingItem ringBase)
+        static void SendAddRingToPlanet(string planetName, MyPlanetRingItem ringBase, ulong callback, ulong client)
         {
             if(Static.TryGetObject(planetName, out MySystemItem obj))
             {
@@ -190,9 +195,13 @@ namespace SEWorldGenPlugin.Generator
                     {
                         ringBase.Center = planet.CenterPosition;
                         planet.PlanetRing = ringBase;
+
+                        PluginEventHandler.Static.RaiseStaticEvent(SendAddCallbackClient, true, callback, client);
+                        return;
                     }
                 }
             }
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddCallbackClient, false, callback, client);
         }
 
         /// <summary>
@@ -201,7 +210,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="planet">Planet item to add</param>
         [Event(106)]
         [Server]
-        static void SendAddPlanet(MyPlanetItem planet)
+        static void SendAddPlanet(MyPlanetItem planet, ulong callback, ulong client)
         {
             if(planet != null)
             {
@@ -218,7 +227,11 @@ namespace SEWorldGenPlugin.Generator
                     Static.Objects.Remove(obj);
                 }
                 Static.Objects.Add(planet);
+
+                PluginEventHandler.Static.RaiseStaticEvent(SendAddCallbackClient, true, callback, client);
+                return;
             }
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddCallbackClient, false, callback, client);
         }
 
         /// <summary>
@@ -228,7 +241,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="planetName">Name of the planet</param>
         [Event(107)]
         [Server]
-        static void SendRemoveRingFromPlanet(string planetName)
+        static void SendRemoveRingFromPlanet(string planetName, ulong callback, ulong client)
         {
             if (Static.TryGetObject(planetName, out MySystemItem obj))
             {
@@ -238,9 +251,31 @@ namespace SEWorldGenPlugin.Generator
                     if (planet.PlanetRing != null)
                     {
                         planet.PlanetRing = null;
+                        PluginEventHandler.Static.RaiseStaticEvent(SendAddCallbackClient, true, callback, client);
+                        return;
                     }
                 }
             }
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddCallbackClient, false, callback, client);
+        }
+
+        /// <summary>
+        /// Client Event: Sends a boolean to the client to check if the add event was successfull.
+        /// </summary>
+        /// <param name="success">Whether or not the planet is valid</param>
+        /// <param name="item">The planet item</param>
+        /// <param name="callback">Callback id of the callback to call</param>
+        [Event(108)]
+        [Client]
+        static void SendAddCallbackClient(bool success, ulong callback)
+        {
+            if(Static.m_addActionsCallbacks[callback] == null)
+            {
+                Static.m_addActionsCallbacks.Remove(callback);
+                return;
+            }
+            Static.m_addActionsCallbacks[callback](success);
+            Static.m_addActionsCallbacks.Remove(callback);
         }
     }
 }
