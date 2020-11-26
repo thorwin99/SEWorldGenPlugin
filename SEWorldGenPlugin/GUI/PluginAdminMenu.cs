@@ -153,15 +153,18 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="creator">GUI creator callback</param>
         private void CheckBuildPluginControls(Action creator)
         {
+            BuildPluginMenuHeader();
             if (!m_pluginInstalled)
             {
                 NetUtil.PingServer(delegate
                 {
                     m_pluginInstalled = true;
-                    //RecreateControls(false);
+                    creator?.Invoke();
                 });
             }
-            creator?.Invoke();
+            else {
+                creator?.Invoke();
+            }
         }
 
         /// <summary>
@@ -205,8 +208,6 @@ namespace SEWorldGenPlugin.GUI
             Vector2 controlPadding = new Vector2(0.02f, 0.02f);
             float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
             float num2 = (SCREEN_SIZE.Y - 1f) / 2f;
-
-            BuildPluginMenuHeader();
 
             MyGuiControlLabel listBoxLabel = new MyGuiControlLabel
             {
@@ -293,8 +294,6 @@ namespace SEWorldGenPlugin.GUI
 
             Vector2 controlPadding = new Vector2(0.02f, 0.02f);
             float num = SCREEN_SIZE.X - HIDDEN_PART_RIGHT - controlPadding.X * 2f;
-
-            BuildPluginMenuHeader();
 
             MyGuiControlLabel listBoxLabel = new MyGuiControlLabel
             {

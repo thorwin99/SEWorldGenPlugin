@@ -14,7 +14,6 @@ namespace SEWorldGenPlugin.Generator
     public partial class SystemGenerator
     {
         private Dictionary<ulong, Action<bool, MySystemItem>> m_getCallbacks;
-        private bool m_handshakeDone;
         private ulong m_currentIndex;
 
         /// <summary>
@@ -30,7 +29,6 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void LoadNet()
         {
-            m_handshakeDone = false;
             m_currentIndex = 0;
         }
 
@@ -39,7 +37,6 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void UnloadNet()
         {
-            m_handshakeDone = false;
             m_currentIndex = 0;
             m_getCallbacks = null;
         }
@@ -51,20 +48,8 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="callback"></param>
         public void GetObject(string name, Action<bool, MySystemItem> callback)
         {
-            if (!m_handshakeDone)
-            {
-                NetUtil.PingServer(delegate
-                {
-                    m_handshakeDone = true;
-                    m_getCallbacks.Add(++m_currentIndex, callback);
-                    PluginEventHandler.Static.RaiseStaticEvent(SendGetServer, Sync.MyId, name, m_currentIndex, null);
-                });
-            }
-            else
-            {
-                m_getCallbacks.Add(++m_currentIndex, callback);
-                PluginEventHandler.Static.RaiseStaticEvent(SendGetServer, Sync.MyId, name, m_currentIndex, null);
-            }
+            m_getCallbacks.Add(++m_currentIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendGetServer, Sync.MyId, name, m_currentIndex, null);
         }
 
         /// <summary>
@@ -73,19 +58,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="planet">Planet to add</param>
         public void AddPlanet(MyPlanetItem planet)
         {
-            if (!m_handshakeDone)
-            {
-                NetUtil.PingServer(delegate //Handshake needed to know, that server runs plugin
-                {
-                    m_handshakeDone = true;
-                    PluginEventHandler.Static.RaiseStaticEvent(SendAddPlanet, planet, null);
-                });
-
-            }
-            else
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(SendAddPlanet, planet, null);
-            }
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddPlanet, planet, null);
         }
 
         /// <summary>
@@ -95,18 +68,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="ring">Ring data to add</param>
         public void AddRingToPlanet(string name, MyPlanetRingItem ring)
         {
-            if (!m_handshakeDone)
-            {
-                NetUtil.PingServer(delegate //Handshake needed to check, if plugin is installed on the server, since it would crash the server to send data to it without it knowing what to do.
-                {
-                    m_handshakeDone = true;
-                    PluginEventHandler.Static.RaiseStaticEvent(SendAddRingToPlanet, name, ring, null);
-                });
-            }
-            else
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(SendAddRingToPlanet, name, ring, null);
-            }
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddRingToPlanet, name, ring, null);
         }
 
         /// <summary>
@@ -115,18 +77,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="name">Name of the ring</param>
         public void RemoveRingFromPlanet(string name)
         {
-            if (!m_handshakeDone)
-            {
-                NetUtil.PingServer(delegate //Handshake needed to check, if plugin is installed on the server, since it would crash the server to send data to it without it knowing what to do.
-                {
-                    m_handshakeDone = true;
-                    PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, null);
-                });
-            }
-            else
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, null);
-            }
+            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveRingFromPlanet, name, null);
         }
 
         /// <summary>
