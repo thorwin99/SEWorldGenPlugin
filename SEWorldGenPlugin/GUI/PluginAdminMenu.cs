@@ -96,10 +96,12 @@ namespace SEWorldGenPlugin.GUI
 
             MyGuiControlCombobox modeCombo = GetCombo();
 
+            int oldCount = modeCombo.GetItemsCount();
+
             if (MySession.Static.IsUserSpaceMaster(Sync.MyId) && MySession.Static.IsUserAdmin(Sync.MyId))
             {
-                modeCombo.AddItem(9L, "SEWorldGenPlugin - Rings");
-                modeCombo.AddItem(10L, "SEWorldGenPlugin - Planets");
+                modeCombo.AddItem(oldCount, "SEWorldGenPlugin - Rings");
+                modeCombo.AddItem(oldCount + 1, "SEWorldGenPlugin - Planets");
             }
 
             MyGuiControlCombobox newCombo = AddCombo();
@@ -120,7 +122,7 @@ namespace SEWorldGenPlugin.GUI
             newCombo.ItemSelected += delegate
             {
                 m_currentKey = newCombo.GetSelectedKey();
-                if (newCombo.GetSelectedKey() > 8)
+                if (newCombo.GetSelectedKey() >= oldCount)
                 {
                     RecreateControls(false);
                 }
@@ -132,12 +134,12 @@ namespace SEWorldGenPlugin.GUI
                     RecreateControls(false);
                 }
             };
-            if(newCombo.GetSelectedKey() == 9)
+            if(newCombo.GetSelectedKey() == oldCount)
             {
                 ClearControls();
                 CheckBuildPluginControls(BuildRingMenu);
             }
-            else if(newCombo.GetSelectedKey() == 10)
+            else if(newCombo.GetSelectedKey() == oldCount + 1)
             {
                 ClearControls();
                 CheckBuildPluginControls(BuildPlanetMenu);
