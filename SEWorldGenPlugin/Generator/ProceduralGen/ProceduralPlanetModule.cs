@@ -59,7 +59,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
 
                 MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.DefName, planet.CenterPosition - GetPlanetOffset(definition, planet.Size), m_seed, planet.Size, true, id, false, true);
-                
+
                 if(generatedPlanet == null)
                 {
                     continue;
@@ -89,7 +89,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     var position = new Vector3D(0, 0, 0);
                     long mId = MyRandom.Instance.NextLong();
-                    string storageNameMoon = ("Moon " + moon.DisplayName + " - " + moonDef.Id.SubtypeId).Replace(" ", "_");
+                    string storageNameMoon = (moon.DisplayName + " - " + moonDef.Id.SubtypeId).Replace(" ", "_");
                     var threshold = 0;
 
                     do

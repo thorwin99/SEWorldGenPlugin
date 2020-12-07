@@ -1,7 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
-using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
@@ -855,17 +854,44 @@ namespace SEWorldGenPlugin.GUI
 
                 SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
                 {
-                    if (success)
+                    if (obj.Type == SystemObjectType.MOON) return;
+                    if(obj.Type == SystemObjectType.PLANET)
                     {
-                        if(obj.Type == SystemObjectType.PLANET)
+                        m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, Tuple.Create(obj, item)));
+                        if(selectPlanet != null && name.Equals(selectPlanet))
                         {
-                            m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, Tuple.Create(obj, item)));
-                            if(selectPlanet != null && name.Equals(selectPlanet))
-                            {
-                                m_planetListBox.SelectSingleItem(m_planetListBox.Items[m_planetListBox.Items.Count - 1]);
-                                PlanetListItemClicked(m_planetListBox);
-                            }
+                            m_planetListBox.SelectSingleItem(m_planetListBox.Items[m_planetListBox.Items.Count - 1]);
+                            PlanetListItemClicked(m_planetListBox);
                         }
+                    }
+                    else
+                    {
+                        MyPlanet e = MyEntities.GetEntityById(item.EntityId) as MyPlanet;
+                        MyPlanetItem p = new MyPlanetItem()
+                        {
+                            OffsetPosition = e.PositionLeftBottomCorner,
+                            DefName = item.DisplayName,
+                            DisplayName = item.DisplayName.Replace("_", " "),
+                            Generated = true,
+                            PlanetMoons = new MyPlanetMoonItem[0],
+                            PlanetRing = null,
+                            Size = e.MaximumRadius * 2,
+                            Type = SystemObjectType.PLANET,
+                            CenterPosition = e.PositionComp.GetPosition()
+                        };
+
+                        SystemGenerator.Static.AddPlanet(p, delegate (bool s)
+                        {
+                            if (s)
+                            {
+                                m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, Tuple.Create(obj, item)));
+                                if (selectPlanet != null && name.Equals(selectPlanet))
+                                {
+                                    m_planetListBox.SelectSingleItem(m_planetListBox.Items[m_planetListBox.Items.Count - 1]);
+                                    PlanetListItemClicked(m_planetListBox);
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -913,7 +939,7 @@ namespace SEWorldGenPlugin.GUI
                 {
                     OffsetPosition = Vector3D.Zero,
                     DefName = m_selectedDefinition.Id.SubtypeId.ToString(),
-                    DisplayName = m_selectedDefinition.Id.SubtypeId.ToString() + "_" + size + "_" + MyRandom.Instance.Next(),
+                    DisplayName = m_selectedDefinition.Id.SubtypeId.ToString() + " " + size + " " + MyRandom.Instance.Next(),
                     Generated = false,
                     PlanetMoons = new MyPlanetMoonItem[0],
                     PlanetRing = null,

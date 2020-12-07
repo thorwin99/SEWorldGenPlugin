@@ -198,6 +198,26 @@ namespace SEWorldGenPlugin.Generator
                     obj = o;
                     return true;
                 }
+                else if(o.Type == SystemObjectType.PLANET)
+                {
+                    MyPlanetItem p = (MyPlanetItem)o;
+                    foreach(var moon in p.PlanetMoons)
+                    {
+                        if (moon.DisplayName.Equals(name))
+                        {
+                            obj = moon;
+                            return true;
+                        }
+                    }
+                    if(p.PlanetRing != null)
+                    {
+                        if (p.PlanetRing.DisplayName.Equals(name))
+                        {
+                            obj = p.PlanetRing;
+                            return true;
+                        }
+                    }
+                }
             }
             obj = null;
             return false;
