@@ -258,7 +258,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_currentPosition.Y += 0.025f;
 
-            m_planetSizeSlider = new MyGuiControlClickableSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, 2400f, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
+            m_planetSizeSlider = new MyGuiControlClickableSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, (float)SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
             m_planetSizeSlider.Size = new Vector2(0.285f, 1f);
             m_planetSizeSlider.DefaultValue = 1200f;
             m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue.Value;
