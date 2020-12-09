@@ -120,7 +120,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
             }
 
-            foreach(var entity in m_toRemoveTrackedEntities)
+            foreach(var entity in m_toRemoveTrackedEntities.ToArray())
             {
                 m_trackedEntities.Remove(entity);
             }
