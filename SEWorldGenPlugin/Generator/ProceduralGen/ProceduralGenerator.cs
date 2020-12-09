@@ -120,10 +120,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
             }
 
-            foreach(var entity in m_toRemoveTrackedEntities.ToArray())
+            lock(m_toRemoveTrackedEntities)
             {
-                m_trackedEntities.Remove(entity);
+                foreach (var entity in m_toRemoveTrackedEntities.ToArray())
+                {
+                    m_trackedEntities.Remove(entity);
+                }
             }
+            
 
             foreach(MyEntityTracker tracker in m_trackedEntities.Values)
             {
