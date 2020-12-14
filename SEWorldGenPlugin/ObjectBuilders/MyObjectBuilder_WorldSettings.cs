@@ -9,9 +9,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// wheter it is enabled or not, and the Generator settings.
     /// </summary>
     [ProtoContract]
-    public class MyObjectBuilder_PluginSettings
+    public class MyObjectBuilder_WorldSettings
     {
-        public MyObjectBuilder_PluginSettings()
+        public MyObjectBuilder_WorldSettings()
         {
             Enable = false;
             if(MySettings.Static != null)
@@ -38,9 +38,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(2)]
         public GeneratorSettings GeneratorSettings;
 
-        public MyObjectBuilder_PluginSettings copy()
+        public MyObjectBuilder_WorldSettings copy()
         {
-            MyObjectBuilder_PluginSettings s = new MyObjectBuilder_PluginSettings();
+            MyObjectBuilder_WorldSettings s = new MyObjectBuilder_WorldSettings();
             s.Enable = Enable;
             s.GeneratorSettings = GeneratorSettings.copy();
             return s;

@@ -194,9 +194,11 @@
     <Compile Include="Networking\Attributes\EventOwnerAttribute.cs" />
     <Compile Include="Networking\Attributes\ServerAttribute.cs" />
     <Compile Include="Networking\PluginEventHandler.cs" />
+    <Compile Include="ObjectBuilders\MyAbstractConfigObjectBuilder.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_AsteroidGenerator.cs" />
+    <Compile Include="ObjectBuilders\MyObjectBuilder_GlobalSettings.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_GpsManager.cs" />
-    <Compile Include="ObjectBuilders\MyObjectBuilder_PluginSettings.cs" />
+    <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_StarSystem.cs" />
     <Compile Include="Session\GlobalGpsManager.cs" />
     <Compile Include="Session\PlayerTracker.cs" />

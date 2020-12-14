@@ -25,7 +25,7 @@ namespace SEWorldGenPlugin.GUI
     {
 
         public static MyGuiScreenWorldSettings Static;
-        public MyObjectBuilder_PluginSettings PluginSettings;
+        public MyObjectBuilder_WorldSettings PluginSettings;
 
         private MyGuiControlCheckbox m_enablePlugin;
         private MyGuiControlLabel m_enablePluginLabel;
@@ -43,7 +43,7 @@ namespace SEWorldGenPlugin.GUI
 
         internal PluginSettingsGui SettingsGui;
 
-        public MyObjectBuilder_PluginSettings PlSettings;
+        public MyObjectBuilder_WorldSettings PlSettings;
 
         /// <summary>
         /// If the world should use the global configuration file
@@ -129,7 +129,7 @@ namespace SEWorldGenPlugin.GUI
                                 }
                                 else
                                 {
-                                    MySettings.Static.SessionSettings = new MyObjectBuilder_PluginSettings();
+                                    MySettings.Static.SessionSettings = new MyObjectBuilder_WorldSettings();
                                     MySettings.Static.SessionSettings.Enable = m_enablePlugin.IsChecked;
                                 }
                             };
@@ -179,11 +179,11 @@ namespace SEWorldGenPlugin.GUI
             var path = Path.Combine(MyFileSystem.SavesPath, Checkpoint.SessionName.Replace(":", "-"));
             if(FileUtils.FileExistsInPath(path, SettingsSession.FILE_NAME, typeof(PluginWorldSettings)))
             {
-                PlSettings = FileUtils.ReadXmlFileFromPath<MyObjectBuilder_PluginSettings>(path, SettingsSession.FILE_NAME, typeof(PluginWorldSettings));
+                PlSettings = FileUtils.ReadXmlFileFromPath<MyObjectBuilder_WorldSettings>(path, SettingsSession.FILE_NAME, typeof(PluginWorldSettings));
             }
             else
             {
-                PlSettings = new MyObjectBuilder_PluginSettings();
+                PlSettings = new MyObjectBuilder_WorldSettings();
             }
             m_enablePlugin.IsChecked = PlSettings.Enable;
         }
