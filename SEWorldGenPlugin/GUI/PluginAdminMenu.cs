@@ -658,6 +658,12 @@ namespace SEWorldGenPlugin.GUI
             PluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
         }
 
+        protected override void OnClosed()
+        {
+            PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
+            base.OnClosed();
+        }
+
         /// <summary>
         /// Callback for button, to teleport the player to the currently selected planets ring
         /// </summary>
