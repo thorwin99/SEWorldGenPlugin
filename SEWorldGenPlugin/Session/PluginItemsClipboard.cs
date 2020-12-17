@@ -71,17 +71,6 @@ namespace SEWorldGenPlugin.Session
         }
 
         /// <summary>
-        /// Deactivates this clipboard.
-        /// </summary>
-        public void Deactivate()
-        {
-            m_copiedItem = null;
-            m_callback = null;
-            m_isActive = false;
-            m_distanceToCam = 0f;
-        }
-
-        /// <summary>
         /// Handles player input. When the escape key is pressed, the copy and paste is cancelled
         /// and all cleared. When you press the left mouse button, the item is pasted and the callback is called, if the clipboard is active.
         /// </summary>
