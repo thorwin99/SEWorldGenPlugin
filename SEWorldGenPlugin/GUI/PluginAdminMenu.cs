@@ -924,7 +924,8 @@ namespace SEWorldGenPlugin.GUI
 
                 PluginItemsClipboard.Static.Activate(planet, SpawnPlanet, size);
 
-                CloseScreenNow();
+                HideScreen();
+                //CloseScreenNow();
             }
         }
 
@@ -942,6 +943,7 @@ namespace SEWorldGenPlugin.GUI
 
                 SystemGenerator.Static.AddPlanet(p);
             }
+            CloseScreenNow();
         }
 
         /// <summary>
@@ -1040,6 +1042,12 @@ namespace SEWorldGenPlugin.GUI
                 return ret;
             }
             return base.Update(hasFocus);
+        }
+
+        protected override void OnClosed()
+        {
+            base.OnClosed();
+            PluginItemsClipboard.Static.Deactivate();
         }
     }
 }
