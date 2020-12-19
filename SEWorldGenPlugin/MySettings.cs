@@ -27,7 +27,7 @@ namespace SEWorldGenPlugin
         /// <summary>
         /// Global configuration settings
         /// </summary>
-        public MyObjectBuilder_WorldSettings Settings
+        public LegacyMyObjectBuilder_WorldSettings Settings
         {
             get;
             private set;
@@ -36,7 +36,7 @@ namespace SEWorldGenPlugin
         /// <summary>
         /// To be loaded session settings
         /// </summary>
-        public MyObjectBuilder_WorldSettings SessionSettings
+        public LegacyMyObjectBuilder_WorldSettings SessionSettings
         {
             get;
             set;
@@ -48,7 +48,7 @@ namespace SEWorldGenPlugin
         public MySettings()
         {
             Static = this;
-            Settings = new MyObjectBuilder_WorldSettings();
+            Settings = new LegacyMyObjectBuilder_WorldSettings();
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace SEWorldGenPlugin
                 {
                     using (var reader = FileUtils.ReadFileInGlobalStorage(FILENAME))
                     {
-                        MyObjectBuilder_WorldSettings saveFile = FileUtils.SerializeFromXml<MyObjectBuilder_WorldSettings>(reader.ReadToEnd());
+                        LegacyMyObjectBuilder_WorldSettings saveFile = FileUtils.SerializeFromXml<LegacyMyObjectBuilder_WorldSettings>(reader.ReadToEnd());
                         if (saveFile != null)
                             Settings = saveFile;
                     }
@@ -73,13 +73,13 @@ namespace SEWorldGenPlugin
                     PluginLog.Log("Couldnt load Plugin config file.", LogLevel.ERROR);
                     PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
                     FileUtils.DeleteFileInGlobalStorage(FILENAME);
-                    Settings = new MyObjectBuilder_WorldSettings();
+                    Settings = new LegacyMyObjectBuilder_WorldSettings();
                 }
             }
             else
             {
                 PluginLog.Log("Config does not exist, creating default one");
-                Settings = new MyObjectBuilder_WorldSettings();
+                Settings = new LegacyMyObjectBuilder_WorldSettings();
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Moon");
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Titan");
                 Settings.GeneratorSettings.PlanetSettings.Moons.Add("Europa");

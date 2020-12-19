@@ -4,7 +4,10 @@ using System.Collections.Generic;
 
 namespace SEWorldGenPlugin.ObjectBuilders
 {
-    [Serializable]
+    /// <summary>
+    /// Serializable object builder used to store the global settings of the plugin.
+    /// Those are valid for all worlds.
+    /// </summary>
     [ProtoContract]
     public class MyObjectBuilder_GlobalSettings : MyAbstractConfigObjectBuilder
     {

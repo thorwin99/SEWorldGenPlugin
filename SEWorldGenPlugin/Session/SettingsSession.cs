@@ -24,7 +24,7 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// The current sessions plugin settings.
         /// </summary>
-        public MyObjectBuilder_WorldSettings Settings
+        public LegacyMyObjectBuilder_WorldSettings Settings
         {
             get;
             set;
@@ -39,7 +39,7 @@ namespace SEWorldGenPlugin.Session
             Static = this;
             if (FileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(SettingsSession)))
             {
-                Settings = FileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldSettings>(FILE_NAME, typeof(SettingsSession));
+                Settings = FileUtils.ReadXmlFileFromWorld<LegacyMyObjectBuilder_WorldSettings>(FILE_NAME, typeof(SettingsSession));
             }
             else
             {

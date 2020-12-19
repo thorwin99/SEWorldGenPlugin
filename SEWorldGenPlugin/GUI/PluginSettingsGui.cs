@@ -483,7 +483,7 @@ namespace SEWorldGenPlugin.GUI
             Controls.Add(scrollPane);
         }
 
-        public void SetSettings(MyObjectBuilder_WorldSettings settings, bool useGlobal)
+        public void SetSettings(LegacyMyObjectBuilder_WorldSettings settings, bool useGlobal)
         {
             m_useGlobalCheck.IsChecked = useGlobal;
 
@@ -534,10 +534,10 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         /// <param name="settings">The plugin settings to set</param>
         /// <returns>If global config should be used</returns>
-        public bool GetSettings(ref MyObjectBuilder_WorldSettings settings)
+        public bool GetSettings(ref LegacyMyObjectBuilder_WorldSettings settings)
         {
             if (settings == null)
-                settings = new MyObjectBuilder_WorldSettings();
+                settings = new LegacyMyObjectBuilder_WorldSettings();
 
             settings.GeneratorSettings.SemiRandomizedGeneration = m_useSemiRandomGenerationCheck.IsChecked;
             settings.GeneratorSettings.UseVanillaPlanets = m_useVanillaPlanetsCheck.IsChecked;
