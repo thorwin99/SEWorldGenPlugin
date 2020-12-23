@@ -660,7 +660,8 @@ namespace SEWorldGenPlugin.GUI
 
         protected override void OnClosed()
         {
-            PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
+            if(m_selectedPlanet != null)
+                PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
             base.OnClosed();
         }
 
