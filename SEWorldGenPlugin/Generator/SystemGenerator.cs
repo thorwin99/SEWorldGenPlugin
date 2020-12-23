@@ -115,7 +115,7 @@ namespace SEWorldGenPlugin.Generator
 
             if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
 
-            MyObjectBuilder_StarSystem b = GetConfig();
+            LegacyMyObjectBuilder_StarSystem b = GetConfig();
             Objects = b.SystemObjects;
 
             m_seed = MySession.Static.Settings.ProceduralSeed + Guid.NewGuid().GetHashCode();
@@ -602,7 +602,7 @@ namespace SEWorldGenPlugin.Generator
         /// Loads the systemData.xml of the world, if it exist
         /// </summary>
         /// <returns>MyObjectBuilder_StarSystem system data</returns>
-        private MyObjectBuilder_StarSystem GetConfig()
+        private LegacyMyObjectBuilder_StarSystem GetConfig()
         {
             if (MyAPIGateway.Utilities.FileExistsInWorldStorage(STORAGE_FILE, typeof(SystemGenerator)))
             {
@@ -610,7 +610,7 @@ namespace SEWorldGenPlugin.Generator
                 {
                     using (var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator)))
                     {
-                        MyObjectBuilder_StarSystem saveFile = MyAPIGateway.Utilities.SerializeFromXML<MyObjectBuilder_StarSystem>(reader.ReadToEnd());
+                        LegacyMyObjectBuilder_StarSystem saveFile = MyAPIGateway.Utilities.SerializeFromXML<LegacyMyObjectBuilder_StarSystem>(reader.ReadToEnd());
                         return saveFile;
                     }
                 }
@@ -625,7 +625,7 @@ namespace SEWorldGenPlugin.Generator
             }
             else
             {
-                return new MyObjectBuilder_StarSystem();
+                return new LegacyMyObjectBuilder_StarSystem();
             }
         }
 
@@ -634,7 +634,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void SaveConfig()
         {
-            MyObjectBuilder_StarSystem conf = new MyObjectBuilder_StarSystem();
+            LegacyMyObjectBuilder_StarSystem conf = new LegacyMyObjectBuilder_StarSystem();
 
             conf.SystemObjects = Objects;
 

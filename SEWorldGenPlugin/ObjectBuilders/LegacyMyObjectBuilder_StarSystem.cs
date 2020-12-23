@@ -14,7 +14,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// </summary>
     [ProtoContract]
     [Serializable]
-    public class MyObjectBuilder_StarSystem
+    public class LegacyMyObjectBuilder_StarSystem
     {
         [ProtoMember(3010)]
         public HashSet<MySystemItem> SystemObjects = new HashSet<MySystemItem>();

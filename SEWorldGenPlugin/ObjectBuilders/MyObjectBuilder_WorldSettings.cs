@@ -97,7 +97,11 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     /// <summary>
-    /// Enum to set which asteroid generator the plugin uses.
+    /// Enum to set which system generator the plugin uses.
+    /// Full random means, every planet has the same chance to be generated,
+    /// Mandatory first, that first, all available mandatory planets get generated,
+    /// and only after that full random happens,
+    /// Mandatory only means that only mandatory planets are used.
     /// </summary>
     public enum SystemGenerationMethod
     {
