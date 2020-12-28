@@ -744,7 +744,7 @@ namespace SEWorldGenPlugin.GUI
         {
             if (m_selectedPlanet.PlanetRing != null) return m_selectedPlanet.PlanetRing;
             MyPlanetRingItem item = new MyPlanetRingItem();
-            item.Type = SystemObjectType.RING;
+            item.Type = LegacySystemObjectType.RING;
             item.DisplayName = "";
             item.AngleDegrees = m_ringAngleZSlider.Value;
             item.AngleDegreesX = m_ringAngleXSlider.Value;
@@ -854,8 +854,8 @@ namespace SEWorldGenPlugin.GUI
 
                 SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
                 {
-                    if (obj.Type == SystemObjectType.MOON) return;
-                    if(obj.Type == SystemObjectType.PLANET)
+                    if (obj.Type == LegacySystemObjectType.MOON) return;
+                    if(obj.Type == LegacySystemObjectType.PLANET && success)
                     {
                         m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, Tuple.Create(obj, item)));
                         if(selectPlanet != null && name.Equals(selectPlanet))
@@ -876,7 +876,7 @@ namespace SEWorldGenPlugin.GUI
                             PlanetMoons = new MyPlanetMoonItem[0],
                             PlanetRing = null,
                             Size = e.MaximumRadius * 2,
-                            Type = SystemObjectType.PLANET,
+                            Type = LegacySystemObjectType.PLANET,
                             CenterPosition = e.PositionComp.GetPosition()
                         };
 
@@ -944,7 +944,7 @@ namespace SEWorldGenPlugin.GUI
                     PlanetMoons = new MyPlanetMoonItem[0],
                     PlanetRing = null,
                     Size = size,
-                    Type = SystemObjectType.PLANET,
+                    Type = LegacySystemObjectType.PLANET,
                     CenterPosition = Vector3D.Zero
                 };
 
@@ -961,7 +961,7 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="position">Position to spawn at</param>
         private void SpawnPlanet(MySystemItem planet, Vector3D position)
         {
-            if(planet.Type == SystemObjectType.PLANET)
+            if(planet.Type == LegacySystemObjectType.PLANET)
             {
                 MyPlanetItem p = (MyPlanetItem)planet;
                 p.CenterPosition = position;
