@@ -198,7 +198,7 @@ namespace SEWorldGenPlugin.Generator
                     obj = o;
                     return true;
                 }
-                else if(o.Type == SystemObjectType.PLANET)
+                else if(o.Type == LegacySystemObjectType.PLANET)
                 {
                     MyPlanetItem p = (MyPlanetItem)o;
                     foreach(var moon in p.PlanetMoons)
@@ -298,7 +298,7 @@ namespace SEWorldGenPlugin.Generator
             ++beltIndex;
 
             belt.DisplayName = name;
-            belt.Type = SystemObjectType.BELT;
+            belt.Type = LegacySystemObjectType.BELT;
             belt.Height = MyRandom.Instance.Next(m_settings.BeltSettings.MinBeltHeight, m_settings.BeltSettings.MaxBeltHeight);
             belt.Radius = distance;
             belt.Width = MyRandom.Instance.Next(belt.Height * 10, belt.Height * 100);
@@ -339,7 +339,7 @@ namespace SEWorldGenPlugin.Generator
             ++planetIndex;
 
             planet.DisplayName = name;
-            planet.Type = SystemObjectType.PLANET;
+            planet.Type = LegacySystemObjectType.PLANET;
             planet.DefName = def.Id.SubtypeId.String;
             planet.Size = size;
             planet.PlanetRing = GenerateRing(def.SurfaceGravity, planet.Size);
@@ -386,7 +386,7 @@ namespace SEWorldGenPlugin.Generator
                 .SetProperty("MoonPlanetName", planetName);
 
                 MyPlanetMoonItem item = new MyPlanetMoonItem();
-                item.Type = SystemObjectType.MOON;
+                item.Type = LegacySystemObjectType.MOON;
                 item.DefName = def.Id.SubtypeName.ToString();
                 item.Distance = dist;
                 item.Size = SizeByGravity(def.SurfaceGravity, isGasGiant);
@@ -410,7 +410,7 @@ namespace SEWorldGenPlugin.Generator
 
             MyPlanetRingItem ring = new MyPlanetRingItem();
 
-            ring.Type = SystemObjectType.RING;
+            ring.Type = LegacySystemObjectType.RING;
             ring.RoidSize = MyRandom.Instance.Next(64, Math.Min((int)(Math.Max(surfaceGravity * 0.5 * 128, 64)), 512));
             ring.Width = MyRandom.Instance.Next(m_settings.PlanetSettings.RingSettings.MinPlanetRingWidth, m_settings.PlanetSettings.RingSettings.MaxPlanetRingWidth);
             ring.Height = MyRandom.Instance.Next(m_settings.PlanetSettings.RingSettings.MinPlanetRingWidth / 10, ring.Width / 10);
@@ -655,7 +655,7 @@ namespace SEWorldGenPlugin.Generator
         {
             foreach (var obj in Objects)
             {
-                if (obj.Type != SystemObjectType.BELT) continue;
+                if (obj.Type != LegacySystemObjectType.BELT) continue;
 
                 Vector3D pos = new Vector3D(((MySystemBeltItem)obj).Radius + ((MySystemBeltItem)obj).Width / 2, 0, 0); ;
 

@@ -200,6 +200,7 @@
     <Compile Include="ObjectBuilders\MyObjectBuilder_GpsManager.cs" />
     <Compile Include="ObjectBuilders\LegacyMyObjectBuilder_WorldSettings.cs" />
     <Compile Include="ObjectBuilders\LegacyMyObjectBuilder_StarSystem.cs" />
+    <Compile Include="ObjectBuilders\MyObjectBuilder_SystemData.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
     <Compile Include="Session\GlobalGpsManager.cs" />
     <Compile Include="Session\PlayerTracker.cs" />

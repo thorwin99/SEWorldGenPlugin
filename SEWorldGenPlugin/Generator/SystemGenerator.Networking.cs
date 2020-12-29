@@ -104,16 +104,16 @@ namespace SEWorldGenPlugin.Generator
             }
             switch (item.Type)
             {
-                case SystemObjectType.PLANET:
+                case LegacySystemObjectType.PLANET:
                     PluginEventHandler.Static.RaiseStaticEvent(SendGetPlanetClient, success, (MyPlanetItem)item, callback, client);
                     break;
-                case SystemObjectType.BELT:
+                case LegacySystemObjectType.BELT:
                     PluginEventHandler.Static.RaiseStaticEvent(SendGetBeltClient, success, (MySystemBeltItem)item, callback, client);
                     break;
-                case SystemObjectType.RING:
+                case LegacySystemObjectType.RING:
                     PluginEventHandler.Static.RaiseStaticEvent(SendGetRingClient, success, (MyPlanetRingItem)item, callback, client);
                     break;
-                case SystemObjectType.MOON:
+                case LegacySystemObjectType.MOON:
                     PluginEventHandler.Static.RaiseStaticEvent(SendGetMoonClient, success, (MyPlanetMoonItem)item, callback, client);
                     break;
                 default:
@@ -188,7 +188,7 @@ namespace SEWorldGenPlugin.Generator
         {
             if(Static.TryGetObject(planetName, out MySystemItem obj))
             {
-                if (obj.Type == SystemObjectType.PLANET)
+                if (obj.Type == LegacySystemObjectType.PLANET)
                 {
                     MyPlanetItem planet = (MyPlanetItem)obj;
                     if(planet.PlanetRing == null)
@@ -216,7 +216,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 if (Static.TryGetObject(planet.DisplayName, out MySystemItem obj))
                 {
-                    if(obj.Type == SystemObjectType.PLANET)
+                    if(obj.Type == LegacySystemObjectType.PLANET)
                     {
                         if (((MyPlanetItem)obj).Generated) return;
                     }
@@ -245,7 +245,7 @@ namespace SEWorldGenPlugin.Generator
         {
             if (Static.TryGetObject(planetName, out MySystemItem obj))
             {
-                if (obj.Type == SystemObjectType.PLANET)
+                if (obj.Type == LegacySystemObjectType.PLANET)
                 {
                     MyPlanetItem planet = (MyPlanetItem)obj;
                     if (planet.PlanetRing != null)

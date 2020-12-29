@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             foreach(var obj in SystemGenerator.Static.Objects)
             {
                 if (obj == null) continue;
-                if (obj.Type != SystemObjectType.PLANET) continue;
+                if (obj.Type != LegacySystemObjectType.PLANET) continue;
 
                 MyPlanetItem planet = (MyPlanetItem)obj;
 

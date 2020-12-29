@@ -22,8 +22,8 @@
         public abstract MyAbstractConfigObjectBuilder copy();
 
         /// <summary>
-        /// This method verifies members of this class, and resets them
-        /// to default if needed.
+        /// This method verifies members of this class, and fixes them
+        /// if needed.
         /// </summary>
         public abstract void Verify();
     }

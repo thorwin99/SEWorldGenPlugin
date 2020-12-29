@@ -36,7 +36,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     public class MySystemItem
     {
         [ProtoMember(1)]
-        public SystemObjectType Type;
+        public LegacySystemObjectType Type;
 
         [ProtoMember(2)]
         public string DisplayName;
@@ -45,7 +45,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// <summary>
     /// Enum for the body type of an object in the solar system.
     /// </summary>
-    public enum SystemObjectType
+    public enum LegacySystemObjectType
     {
         PLANET,
         RING,
@@ -87,7 +87,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public MyPlanetItem()
         {
-            Type = SystemObjectType.PLANET;
+            Type = LegacySystemObjectType.PLANET;
             DisplayName = "Planet";
             DefName = "";
             Size = 0;
@@ -176,7 +176,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public MySystemBeltItem()
         {
-            Type = SystemObjectType.BELT;
+            Type = LegacySystemObjectType.BELT;
             DisplayName = "";
             Radius = 0;
             Width = 0;

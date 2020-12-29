@@ -93,10 +93,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     int minSize = OBJECT_SIZE_MIN;
                     int maxSize = OBJECT_SIZE_MAX;
 
-                    if (obj.Type == SystemObjectType.BELT)
+                    if (obj.Type == LegacySystemObjectType.BELT)
                         minSize = ((MySystemBeltItem)obj).RoidSize;
 
-                    if (obj.Type == SystemObjectType.RING)
+                    if (obj.Type == LegacySystemObjectType.RING)
                     {
                         minSize = ((MyPlanetRingItem)obj).RoidSize;
                         maxSize = ((MyPlanetRingItem)obj).RoidSizeMax;
@@ -183,7 +183,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             foreach(MySystemItem p in SystemGenerator.Static.Objects)
             {
-                if (p.Type != SystemObjectType.PLANET || ((MyPlanetItem)p).PlanetRing == null) continue;
+                if (p.Type != LegacySystemObjectType.PLANET || ((MyPlanetItem)p).PlanetRing == null) continue;
 
                 MyPlanetRingItem ring = ((MyPlanetItem)p).PlanetRing;
                 Vector3D entityPos = tracker.Entity.PositionComp.GetPosition();
@@ -224,7 +224,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             foreach(MySystemItem p in SystemGenerator.Static.Objects)
             {
-                if(p.Type == SystemObjectType.PLANET)
+                if(p.Type == LegacySystemObjectType.PLANET)
                 {
                     MyPlanetItem planet = (MyPlanetItem)p;
 
@@ -232,7 +232,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(planet.PlanetRing);
                     if (shape.Contains(position) == ContainmentType.Contains) return planet.PlanetRing;
                 }
-                else if(p.Type == SystemObjectType.BELT)
+                else if(p.Type == LegacySystemObjectType.BELT)
                 {
                     MySystemBeltItem belt = (MySystemBeltItem)p;
                     AsteroidBeltShape shape = AsteroidBeltShape.CreateFromBeltItem(belt);
