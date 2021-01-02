@@ -20,7 +20,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// </summary>
     [ProtoContract]
     [ProtoInclude(5001, typeof(MySystemPlanet))]
+    [ProtoInclude(5002, typeof(MySystemPlanetMoon))]
+    [ProtoInclude(5003, typeof(MySystemPlanetRing))]
+    [ProtoInclude(5004, typeof(MySystemBelt))]
     [XmlInclude(typeof(MySystemPlanet))]
+    [XmlInclude(typeof(MySystemPlanetMoon))]
+    [XmlInclude(typeof(MySystemPlanetRing))]
+    [XmlInclude(typeof(MySystemBelt))]
     [Serializable]
     public class MySystemObject
     {
@@ -42,6 +48,46 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             Type = MySystemObjectType.PLANET;
         }
+    }
+
+    /// <summary>
+    /// Class representing a moon of a planet in the solar system
+    /// </summary>
+    [ProtoContract]
+    [Serializable]
+    public class MySystemPlanetMoon : MySystemObject
+    {
+        public MySystemPlanetMoon()
+        {
+            Type = MySystemObjectType.MOON;
+        }
+    }
+
+    /// <summary>
+    /// Class representing a ring around a planet
+    /// </summary>
+    [ProtoContract]
+    [Serializable]
+    public class MySystemPlanetRing : MySystemObject
+    {
+        public MySystemPlanetRing()
+        {
+            Type = MySystemObjectType.RING;
+        }
+    }
+
+    /// <summary>
+    /// Class representing a belt in the system
+    /// </summary>
+    [ProtoContract]
+    [Serializable]
+    public class MySystemBelt : MySystemObject
+    {
+        public MySystemBelt()
+        {
+            Type = MySystemObjectType.BELT;
+        }
+
     }
 
     /// <summary>
