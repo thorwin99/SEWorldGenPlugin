@@ -202,6 +202,7 @@
     <Compile Include="ObjectBuilders\LegacyMyObjectBuilder_StarSystem.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_SystemData.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
+    <Compile Include="ObjectBuilders\MySerializableMinMax.cs" />
     <Compile Include="Session\GlobalGpsManager.cs" />
     <Compile Include="Session\PlayerTracker.cs" />
     <Compile Include="Session\PluginDrawSession.cs" />
