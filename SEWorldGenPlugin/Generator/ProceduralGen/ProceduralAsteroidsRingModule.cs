@@ -60,7 +60,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             m_data = GetData();
             m_providerType = typeof(MyProceduralWorldGenerator).Assembly.GetType("Sandbox.Game.World.Generator.MyCompositeShapeProvider");
             m_createRoid = m_providerType.GetMethod("CreateAsteroidShape");
-            m_density = SettingsSession.Static.Settings.GeneratorSettings.AsteroidDensity;
+            m_density = MySettingsSession.Static.Settings.GeneratorSettings.AsteroidDensity;
         }
 
         public override MyProceduralCell GenerateCell(ref Vector3I id)

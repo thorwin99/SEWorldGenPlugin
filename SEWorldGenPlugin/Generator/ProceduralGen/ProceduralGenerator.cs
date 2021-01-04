@@ -59,7 +59,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             planetModule = new ProceduralPlanetModule(m_seed);
 
-            if (!SettingsSession.Static.Settings.Enable || !Sync.IsServer || MySession.Static.Settings.WorldSizeKm != 0) return;
+            if (!MySettingsSession.Static.Settings.Enable || !Sync.IsServer || MySession.Static.Settings.WorldSizeKm != 0) return;
 
             MyObjectBuilder_AsteroidGenerator b = GetConfig();
 
@@ -67,7 +67,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
             proceduralDensity = b.ProceduralDensity == 0 ? MySession.Static.Settings.ProceduralDensity : b.ProceduralDensity;
 
-            if(SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
+            if(MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
             {
                 MySession.Static.Settings.ProceduralDensity = 0;
                 MySession.Static.OnSavingCheckpoint += delegate
@@ -100,9 +100,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             if (!Enabled)
                 return;
 
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
+            if (!Sync.IsServer || !MySettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
 
-            if (SettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
+            if (MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == AsteroidGenerator.PLUGIN)
             {
                 MySession.Static.Settings.ProceduralDensity = 0;
             }
@@ -141,7 +141,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                     asteroidModule.MarkToUnloadCells(oldBounding, tracker.BoundingVolume);
 
-                    if(tracker.Entity is MyCharacter && SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS)
+                    if(tracker.Entity is MyCharacter && MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS)
                     {
                         asteroidModule.UpdateGps(tracker);
                     }
@@ -238,7 +238,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         {
             PluginLog.Log("Initializing procedural generator");
 
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
+            if (!Sync.IsServer || !MySettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
             base.Init(sessionComponent);
 
             Enabled = true;

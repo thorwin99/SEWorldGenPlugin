@@ -258,7 +258,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_currentPosition.Y += 0.025f;
 
-            m_planetSizeSlider = new MyGuiControlClickableSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, (float)SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
+            m_planetSizeSlider = new MyGuiControlClickableSlider(m_currentPosition + new Vector2(0.001f, 0f), 120f, (float)MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SIZE);
             m_planetSizeSlider.Size = new Vector2(0.285f, 1f);
             m_planetSizeSlider.DefaultValue = 1200f;
             m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue.Value;
@@ -417,9 +417,9 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringWidthSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
+            m_ringWidthSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
             m_ringWidthSlider.Size = new Vector2(0.285f, 1f);
-            m_ringWidthSlider.DefaultValue = (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
+            m_ringWidthSlider.DefaultValue = (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
             m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
             m_ringWidthSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringWidthSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringWidthSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)

@@ -207,7 +207,7 @@
     <Compile Include="Session\PlayerTracker.cs" />
     <Compile Include="Session\PluginDrawSession.cs" />
     <Compile Include="Session\PluginItemsClipboard.cs" />
-    <Compile Include="Session\SettingsSession.cs" />
+    <Compile Include="Session\MySettingsSession.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\FileUtils.cs" />

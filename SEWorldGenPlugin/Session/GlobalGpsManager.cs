@@ -156,7 +156,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
-            if (SettingsSession.Static.Settings.Enable || true)
+            if (MySettingsSession.Static.Settings.Enable || true)
             {
                 foreach(var g in ToAddGpss)
                 {

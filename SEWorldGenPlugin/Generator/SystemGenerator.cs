@@ -113,14 +113,14 @@ namespace SEWorldGenPlugin.Generator
 
             InitNet();
 
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
+            if (!Sync.IsServer || !MySettingsSession.Static.Settings.Enable || MySession.Static.Settings.WorldSizeKm > 0) return;
 
             LegacyMyObjectBuilder_StarSystem b = GetConfig();
             Objects = b.SystemObjects;
 
             m_seed = MySession.Static.Settings.ProceduralSeed + Guid.NewGuid().GetHashCode();
 
-            m_settings = SettingsSession.Static.Settings.GeneratorSettings;
+            m_settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
             if (b == null || Objects == null || Objects.Count == 0)
             {
@@ -129,7 +129,7 @@ namespace SEWorldGenPlugin.Generator
 
             MySession.Static.OnReady += delegate
             {
-                if(SettingsSession.Static.Settings.GeneratorSettings.BeltSettings.ShowBeltGPS)
+                if(MySettingsSession.Static.Settings.GeneratorSettings.BeltSettings.ShowBeltGPS)
                     AddBeltsGpss();
             };
         } 
@@ -159,7 +159,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public override void SaveData()
         {
-            if (!Sync.IsServer || !SettingsSession.Static.Settings.Enable) return;
+            if (!Sync.IsServer || !MySettingsSession.Static.Settings.Enable) return;
 
             PluginLog.Log("Saving system data");
 
@@ -261,7 +261,7 @@ namespace SEWorldGenPlugin.Generator
                     }
                 }
 
-                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetsOnlyOnce) return;
+                if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetsOnlyOnce) return;
 
                 if(MandatoryPlanets.Count != 0)
                 {
@@ -288,7 +288,7 @@ namespace SEWorldGenPlugin.Generator
         {
             MySystemBeltItem belt = new MySystemBeltItem();
 
-            string name = SettingsSession.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat
+            string name = MySettingsSession.Static.Settings.GeneratorSettings.BeltSettings.BeltNameFormat
                 .SetProperty("ObjectNumber", beltIndex + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[beltIndex % greek_letters.Length])
                 .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(beltIndex + 1))
@@ -328,7 +328,7 @@ namespace SEWorldGenPlugin.Generator
             var height = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
             Vector3D pos = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Sin(height));
 
-            string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
+            string name = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetNameFormat
                 .SetProperty("ObjectNumber", planetIndex + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[planetIndex % greek_letters.Length])
                 .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(planetIndex + 1))
@@ -376,7 +376,7 @@ namespace SEWorldGenPlugin.Generator
 
                 if (dist + distance > m_settings.WorldSize && m_settings.WorldSize > 0) return moons;
 
-                string name = SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat
+                string name = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MoonNameFormat
                 .SetProperty("ObjectNumber", i + 1)
                 .SetProperty("ObjectNumberGreek", greek_letters[i % greek_letters.Length])
                 .SetProperty("ObjectNumberRoman", ConvertNumberToRoman(i + 1))
@@ -453,7 +453,7 @@ namespace SEWorldGenPlugin.Generator
             }
             
 
-            if (SettingsSession.Static.Settings.GeneratorSettings.PlanetsOnlyOnce && !m_usedAllPlanets)
+            if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetsOnlyOnce && !m_usedAllPlanets)
             {
                 AvailablePlanets.Remove(def);
                 if(AvailablePlanets.Count <= 0)
@@ -491,7 +491,7 @@ namespace SEWorldGenPlugin.Generator
 
             } while (size >= maximumSize && tries < 10000);
 
-            if (SettingsSession.Static.Settings.GeneratorSettings.MoonsOnlyOnce && !m_usedAllMoons)
+            if (MySettingsSession.Static.Settings.GeneratorSettings.MoonsOnlyOnce && !m_usedAllMoons)
             {
                 AvailableMoons.Remove(def);
                 if (AvailableMoons.Count <= 0)
@@ -560,26 +560,26 @@ namespace SEWorldGenPlugin.Generator
                     toRemovePlanets.Add(p);
                     continue;
                 }
-                if (!SettingsSession.Static.Settings.GeneratorSettings.UseVanillaPlanets && vanilla_planets.Contains(p.Id.SubtypeId.String))
+                if (!MySettingsSession.Static.Settings.GeneratorSettings.UseVanillaPlanets && vanilla_planets.Contains(p.Id.SubtypeId.String))
                 {
                     toRemovePlanets.Add(p);
                     continue;
                 }
-                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets.Contains(p.Id.SubtypeId.String))
+                if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.BlacklistedPlanets.Contains(p.Id.SubtypeId.String))
                 {
                     toRemovePlanets.Add(p);
                 }
-                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.Moons.Contains(p.Id.SubtypeId.String))
+                if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.Moons.Contains(p.Id.SubtypeId.String))
                 {
                     toRemovePlanets.Add(p);
                     m_moonDefinitions.Add(p);
                     AvailableMoons.Add(p);
                 }
-                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String) || SettingsSession.Static.Settings.GeneratorSettings.SemiRandomizedGeneration)
+                if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.MandatoryPlanets.Contains(p.Id.SubtypeId.String) || MySettingsSession.Static.Settings.GeneratorSettings.SemiRandomizedGeneration)
                 {
                     MandatoryPlanets.Add(p);
                 }
-                if (SettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants.Contains(p.Id.SubtypeId.String))
+                if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.GasGiants.Contains(p.Id.SubtypeId.String))
                 {
                     GasGiants.Add(p);
                 }

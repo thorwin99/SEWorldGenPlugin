@@ -9,22 +9,22 @@ namespace SEWorldGenPlugin.Session
     /// Sessioncomponent that manages the current sessions plugin settings.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 1000)]
-    public class SettingsSession : MySessionComponentBase
+    public class MySettingsSession : MySessionComponentBase
     {
         /// <summary>
         /// Name of the save file in the world folder for the plugin settings.
         /// </summary>
-        public const string FILE_NAME = "worldSettings.xml";
+        public const string FILE_NAME = "WorldSettings.xml";
 
         /// <summary>
         /// Singleton instance of this session component
         /// </summary>
-        public static SettingsSession Static;
+        public static MySettingsSession Static;
 
         /// <summary>
         /// The current sessions plugin settings.
         /// </summary>
-        public LegacyMyObjectBuilder_WorldSettings Settings
+        public MyObjectBuilder_WorldSettings Settings
         {
             get;
             set;
@@ -37,9 +37,9 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             Static = this;
-            if (FileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(SettingsSession)))
+            if (FileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(MySettingsSession)))
             {
-                Settings = FileUtils.ReadXmlFileFromWorld<LegacyMyObjectBuilder_WorldSettings>(FILE_NAME, typeof(SettingsSession));
+                Settings = FileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldSettings>(FILE_NAME, typeof(MySettingsSession));
             }
             else
             {
@@ -54,7 +54,7 @@ namespace SEWorldGenPlugin.Session
                 }
                 else
                 {
-                    Settings = MySettings.Static.Settings;
+                    Settings = new MyObjectBuilder_WorldSettings();
                 }
 
                 MySettings.Static.SessionSettings = null;
@@ -67,7 +67,7 @@ namespace SEWorldGenPlugin.Session
         public override void SaveData()
         {
             if(Sync.IsServer)
-                FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(SettingsSession));
+                FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
         }
 
         /// <summary>
@@ -75,7 +75,8 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         protected override void UnloadData()
         {
-            FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(SettingsSession));
+            if (Sync.IsServer)
+                FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
             Settings = null;
         }
     }
