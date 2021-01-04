@@ -98,6 +98,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(8)]
         public MyObjectBuilder_PlanetGenerationSettings PlanetSettings = new MyObjectBuilder_PlanetGenerationSettings();
 
+        /// <summary>
+        /// Specific settings used to generate the gpss for the system objects
+        /// </summary>
         [ProtoMember(9)]
         public MyObjectBuilder_GPSGenerationSettings GPSSettings = new MyObjectBuilder_GPSGenerationSettings();
 
