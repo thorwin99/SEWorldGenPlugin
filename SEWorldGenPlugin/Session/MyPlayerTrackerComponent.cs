@@ -8,7 +8,7 @@ namespace SEWorldGenPlugin.Session
     /// Sessioncomponent that manages the tracking of players for the procedural generator
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 501)]
-    public class PlayerTracker : MySessionComponentBase
+    public class MyPlayerTrackerComponent : MySessionComponentBase
     {
         /// <summary>
         /// Runs before simulation update. If the plugin is enabled, will
@@ -16,7 +16,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
-            if (!MySettings.Static.Settings.Enable) return;
+            if (!MySettingsSession.Static.Settings.Enabled) return;
 
             foreach(var player in MySession.Static.Players.GetAllPlayers())
             {
