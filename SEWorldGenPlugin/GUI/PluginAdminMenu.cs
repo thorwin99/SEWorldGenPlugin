@@ -155,7 +155,7 @@ namespace SEWorldGenPlugin.GUI
             BuildPluginMenuHeader();
             if (!m_pluginInstalled)
             {
-                NetUtil.PingServer(delegate
+                MyNetUtil.PingServer(delegate
                 {
                     m_pluginInstalled = true;
                     creator?.Invoke();

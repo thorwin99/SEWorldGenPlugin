@@ -9,7 +9,7 @@ namespace SEWorldGenPlugin.Utilities
     /// Utility class for network operation and plugin pingin. Can send and receive messages over network
     /// and ping a server to check if the plugin is on there.
     /// </summary>
-    public class NetUtil
+    public class MyNetUtil
     {
         /// <summary>
         /// Dictionary containing all actions to unregister a registered message handler.
@@ -31,7 +31,7 @@ namespace SEWorldGenPlugin.Utilities
         /// <summary>
         /// Creates a new net util instance
         /// </summary>
-        static NetUtil()
+        static MyNetUtil()
         {
             unregActions = new Dictionary<ushort, Action>();
             RegisterMessageHandler(PING_HANDLER, ServerPingHandler);

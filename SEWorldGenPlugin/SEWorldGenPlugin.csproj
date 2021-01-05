@@ -212,7 +212,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\MyFileUtils.cs" />
     <Compile Include="Utilities\MyPluginTexts.cs" />
-    <Compile Include="Utilities\NetUtil.cs" />
+    <Compile Include="Utilities\MyNetUtil.cs" />
     <Compile Include="Utilities\PluginLog.cs" />
     <Compile Include="Utilities\StringExtension.cs" />
     <Compile Include="Utilities\Verifier.cs" />

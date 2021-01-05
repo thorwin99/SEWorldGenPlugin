@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.Networking
         {
             m_registeredMethods = new Dictionary<ulong, MethodInfo>();
             Static = this;
-            NetUtil.RegisterMessageHandler(HANDLER_ID, MessageHandler);
+            MyNetUtil.RegisterMessageHandler(HANDLER_ID, MessageHandler);
 
             Register(typeof(SystemGenerator));
         }
@@ -172,7 +172,7 @@ namespace SEWorldGenPlugin.Networking
             m_registeredMethods.Clear();
             m_registeredMethods = null;
             Static = null;
-            NetUtil.UnregisterMessageHandlers(HANDLER_ID);
+            MyNetUtil.UnregisterMessageHandlers(HANDLER_ID);
         }
 
         /// <summary>
@@ -187,22 +187,22 @@ namespace SEWorldGenPlugin.Networking
             {
                 if(attr.AttributeType == typeof(ServerAttribute))
                 {
-                    NetUtil.SendPacketToServer(HANDLER_ID, data);
+                    MyNetUtil.SendPacketToServer(HANDLER_ID, data);
                 }
                 else if(attr.AttributeType == typeof(ClientAttribute))
                 {
                     if (receiver.HasValue)
                     {
-                        NetUtil.SendPacket(HANDLER_ID, data, receiver.Value);
+                        MyNetUtil.SendPacket(HANDLER_ID, data, receiver.Value);
                     }
                     else
                     {
-                        NetUtil.SendPacketToClients(HANDLER_ID, data);
+                        MyNetUtil.SendPacketToClients(HANDLER_ID, data);
                     }
                 }
                 else if(attr.AttributeType == typeof(BroadcastAttribute))
                 {
-                    NetUtil.SendPacketToClients(HANDLER_ID, data);
+                    MyNetUtil.SendPacketToClients(HANDLER_ID, data);
                 }
             }
         }
