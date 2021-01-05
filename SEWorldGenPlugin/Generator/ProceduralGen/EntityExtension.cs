@@ -1,4 +1,5 @@
 ﻿using Sandbox.Game.Entities;
+using SEWorldGenPlugin.Session;
 using VRage.Game.Entity;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGen
@@ -9,16 +10,16 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
     public static class EntityExtension
     {
         /// <summary>
-        /// This method adds the MyEntity to the Procedural Generator as a 
+        /// This method adds the MyEntity to the MyEntityTrackerComponent as a 
         /// tracked Entity.
         /// </summary>
         /// <param name="thisEntity">The Entiy this method executes on</param>
-        public static void ProceduralGeneratorTracking(this MyEntity thisEntity)
+        public static void EntityTracking(this MyEntity thisEntity)
         {
             if (thisEntity is MyVoxelBase) return;
-            if(ProceduralGenerator.Static != null)
+            if(MyEntityTrackerComponent.Static != null)
             {
-                ProceduralGenerator.Static.TrackEntity(thisEntity);
+                MyEntityTrackerComponent.Static.TrackEntity(thisEntity);
             }
         }
     }

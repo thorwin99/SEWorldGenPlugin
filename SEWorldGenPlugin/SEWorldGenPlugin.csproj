@@ -204,7 +204,8 @@
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
     <Compile Include="ObjectBuilders\MySerializableMinMax.cs" />
     <Compile Include="Session\GlobalGpsManager.cs" />
-    <Compile Include="Session\MyPlayerTrackerComponent.cs" />
+    <Compile Include="Session\IMyEntityTracker.cs" />
+    <Compile Include="Session\MyEntityTrackerComponent.cs" />
     <Compile Include="Session\PluginDrawSession.cs" />
     <Compile Include="Session\PluginItemsClipboard.cs" />
     <Compile Include="Session\MySettingsSession.cs" />
