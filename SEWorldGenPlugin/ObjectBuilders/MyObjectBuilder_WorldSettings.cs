@@ -115,8 +115,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MinMaxAsteroidObjects.Verify();
             MinMaxOrbitDistance.Verify();
 
-            Verifier.VerifyFloat(0f, 1f, 0.6f, "AsteroidDensity", ref AsteroidDensity);
-            Verifier.VerifyLong(-1, long.MaxValue, -1, "WorldSize", ref WorldSize);
+            MyValueVerifier.VerifyFloat(0f, 1f, 0.6f, "AsteroidDensity", ref AsteroidDensity);
+            MyValueVerifier.VerifyLong(-1, long.MaxValue, -1, "WorldSize", ref WorldSize);
 
             PlanetSettings.Verify();
             GPSSettings.Verify();
@@ -156,8 +156,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public override void Verify()
         {
-            Verifier.VerifyFloat(0.1f, 100f, 2.0f, "PlanetSizeMultiplier", ref PlanetSizeMultiplier);
-            Verifier.VerifyInt(1, int.MaxValue, 1200000, "PlanetSizeCap", ref PlanetSizeCap);
+            MyValueVerifier.VerifyFloat(0.1f, 100f, 2.0f, "PlanetSizeMultiplier", ref PlanetSizeMultiplier);
+            MyValueVerifier.VerifyInt(1, int.MaxValue, 1200000, "PlanetSizeCap", ref PlanetSizeCap);
         }
     }
 

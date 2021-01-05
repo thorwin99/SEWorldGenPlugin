@@ -56,7 +56,7 @@ namespace SEWorldGenPlugin
         /// </summary>
         public void LoadSettings()
         {
-            PluginLog.Log("Loading the global config file");
+            MyPluginLog.Log("Loading the global config file");
             if (MyFileUtils.FileExistsInGlobalStorage(FILENAME))
             {
                 try
@@ -70,15 +70,15 @@ namespace SEWorldGenPlugin
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Log("Couldnt load Plugin config file.", LogLevel.ERROR);
-                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
+                    MyPluginLog.Log("Couldnt load Plugin config file.", LogLevel.ERROR);
+                    MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
                     MyFileUtils.DeleteFileInGlobalStorage(FILENAME);
                     Settings = new MyObjectBuilder_GlobalSettings();
                 }
             }
             else
             {
-                PluginLog.Log("Config does not exist, creating default one");
+                MyPluginLog.Log("Config does not exist, creating default one");
                 Settings = new MyObjectBuilder_GlobalSettings();
                 Settings.MoonDefinitions.Add("Moon");
                 Settings.MoonDefinitions.Add("Titan");
@@ -86,7 +86,7 @@ namespace SEWorldGenPlugin
                 Settings.MoonDefinitions.Add("Triton");
             }
             Settings.Verify();
-            PluginLog.Log("Config loaded");
+            MyPluginLog.Log("Config loaded");
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace SEWorldGenPlugin
 
             string xml = MyFileUtils.SerializeToXml(Settings);
 
-            PluginLog.Log("Saving global SEWorldGenPlugin config file: " + xml);
+            MyPluginLog.Log("Saving global SEWorldGenPlugin config file: " + xml);
 
             using (var writer = MyFileUtils.WriteFileInGlobalStorage(FILENAME))
             {

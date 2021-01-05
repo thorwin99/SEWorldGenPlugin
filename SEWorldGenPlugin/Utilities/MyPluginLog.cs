@@ -15,7 +15,7 @@ namespace SEWorldGenPlugin.Utilities
     /// <summary>
     /// Utility class to easily log message to the logfile with different log levels.
     /// </summary>
-    public class PluginLog
+    public class MyPluginLog
     {
 
         /// <summary>

@@ -213,9 +213,9 @@
     <Compile Include="Utilities\MyFileUtils.cs" />
     <Compile Include="Utilities\MyPluginTexts.cs" />
     <Compile Include="Utilities\MyNetUtil.cs" />
-    <Compile Include="Utilities\PluginLog.cs" />
+    <Compile Include="Utilities\MyPluginLog.cs" />
     <Compile Include="Utilities\StringExtension.cs" />
-    <Compile Include="Utilities\Verifier.cs" />
+    <Compile Include="Utilities\MyValueVerifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

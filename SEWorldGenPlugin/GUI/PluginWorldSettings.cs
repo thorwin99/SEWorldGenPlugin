@@ -125,7 +125,7 @@ namespace SEWorldGenPlugin.GUI
                                 if (!UseGlobal)
                                 {
                                     MySettings.Static.SessionSettings = PlSettings;
-                                    PluginLog.Log("Settings: " + PlSettings.ToString());
+                                    MyPluginLog.Log("Settings: " + PlSettings.ToString());
                                 }
                                 else
                                 {

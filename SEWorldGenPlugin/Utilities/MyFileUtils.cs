@@ -331,8 +331,8 @@ namespace SEWorldGenPlugin.Utilities
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Log("Couldnt load save file.", LogLevel.ERROR);
-                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
+                    MyPluginLog.Log("Couldnt load save file.", LogLevel.ERROR);
+                    MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
                     DeleteFileInWorldStorage(file, callingType);
                     return default(T);
                 }
@@ -383,8 +383,8 @@ namespace SEWorldGenPlugin.Utilities
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Log("Couldnt load save file.", LogLevel.ERROR);
-                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
+                    MyPluginLog.Log("Couldnt load save file.", LogLevel.ERROR);
+                    MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
                     DeleteFileInPath(path, file, callingType);
                     return default(T);
                 }

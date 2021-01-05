@@ -4,7 +4,7 @@
     /// Utility class to verify numerical values by checking min and max,
     /// and setting it to a default value, if it is out of bounds
     /// </summary>
-    public class Verifier
+    public class MyValueVerifier
     {
         /// <summary>
         /// Verifies an integer and sets it to def, if it is outside of the min max bounds.
@@ -20,7 +20,7 @@
             {
                 value = def;
 
-                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
+                MyPluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
 
@@ -38,7 +38,7 @@
             {
                 value = def;
 
-                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
+                MyPluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
 
@@ -56,7 +56,7 @@
             {
                 value = def;
 
-                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
+                MyPluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
 
@@ -74,7 +74,7 @@
             {
                 value = def;
 
-                PluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
+                MyPluginLog.Log("Config value " + name + " of was invalid and will be set to default.", LogLevel.WARNING);
             }
         }
     }

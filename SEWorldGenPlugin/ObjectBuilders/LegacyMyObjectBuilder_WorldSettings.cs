@@ -142,12 +142,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public void Verify()
         {
-            Verifier.VerifyInt(0, MaxObjectsInSystem, 5, "MinObjectsInSystem", ref MinObjectsInSystem);
-            Verifier.VerifyInt(MinObjectsInSystem, int.MaxValue, 25, "MaxObjectsInSystem", ref MaxObjectsInSystem);
-            Verifier.VerifyInt(0, MinOrbitDistance, 4000000, "MinOrbitDistance", ref MinOrbitDistance);
-            Verifier.VerifyInt(MinOrbitDistance, int.MaxValue, 10000000, "MaxOrbitDistance", ref MaxOrbitDistance);
-            Verifier.VerifyFloat(0f, 1f, 0.5f, "AsteroidDensity", ref AsteroidDensity);
-            Verifier.VerifyLong(-1, long.MaxValue, 10000000, "MaxOrbitDistance", ref WorldSize);
+            MyValueVerifier.VerifyInt(0, MaxObjectsInSystem, 5, "MinObjectsInSystem", ref MinObjectsInSystem);
+            MyValueVerifier.VerifyInt(MinObjectsInSystem, int.MaxValue, 25, "MaxObjectsInSystem", ref MaxObjectsInSystem);
+            MyValueVerifier.VerifyInt(0, MinOrbitDistance, 4000000, "MinOrbitDistance", ref MinOrbitDistance);
+            MyValueVerifier.VerifyInt(MinOrbitDistance, int.MaxValue, 10000000, "MaxOrbitDistance", ref MaxOrbitDistance);
+            MyValueVerifier.VerifyFloat(0f, 1f, 0.5f, "AsteroidDensity", ref AsteroidDensity);
+            MyValueVerifier.VerifyLong(-1, long.MaxValue, 10000000, "MaxOrbitDistance", ref WorldSize);
 
             PlanetSettings.Verify();
             BeltSettings.Verify();
@@ -237,9 +237,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public void Verify()
         {
-            Verifier.VerifyFloat(0, float.MaxValue, 2, "PlanetSettings.SizeMultiplier", ref SizeMultiplier);
-            Verifier.VerifyDouble(0, double.MaxValue, 1200000, "PlanetSettings.PlanetSizeCap", ref PlanetSizeCap);
-            Verifier.VerifyFloat(0, 1, 0.5f, "PlanetSettings.MoonProbability", ref MoonProbability);
+            MyValueVerifier.VerifyFloat(0, float.MaxValue, 2, "PlanetSettings.SizeMultiplier", ref SizeMultiplier);
+            MyValueVerifier.VerifyDouble(0, double.MaxValue, 1200000, "PlanetSettings.PlanetSizeCap", ref PlanetSizeCap);
+            MyValueVerifier.VerifyFloat(0, 1, 0.5f, "PlanetSettings.MoonProbability", ref MoonProbability);
 
             RingSettings.Verify();
         }
@@ -284,9 +284,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public void Verify()
         {
-            Verifier.VerifyInt(0, MaxPlanetRingWidth, 10000, "PlanetRingSettings.MinPlanetRingWidth", ref MinPlanetRingWidth);
-            Verifier.VerifyInt(MinPlanetRingWidth, int.MaxValue, 100000, "PlanetRingSettings.MaxPlanetRingWidth", ref MaxPlanetRingWidth);
-            Verifier.VerifyFloat(0, 1, 0.5f, "PlanetRingSettings.PlanetRingProbability", ref PlanetRingProbability);
+            MyValueVerifier.VerifyInt(0, MaxPlanetRingWidth, 10000, "PlanetRingSettings.MinPlanetRingWidth", ref MinPlanetRingWidth);
+            MyValueVerifier.VerifyInt(MinPlanetRingWidth, int.MaxValue, 100000, "PlanetRingSettings.MaxPlanetRingWidth", ref MaxPlanetRingWidth);
+            MyValueVerifier.VerifyFloat(0, 1, 0.5f, "PlanetRingSettings.PlanetRingProbability", ref PlanetRingProbability);
         }
     }
 
@@ -333,9 +333,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public void Verify()
         {
-            Verifier.VerifyInt(0, MaxBeltHeight, 4000, "BeltSettings.MinBeltHeight", ref MinBeltHeight);
-            Verifier.VerifyInt(MinBeltHeight, int.MaxValue, 40000, "BeltSettings.MaxBeltHeight", ref MaxBeltHeight);
-            Verifier.VerifyFloat(0, 1, 0.4f, "BeltSettings.BeltProbability", ref BeltProbability);
+            MyValueVerifier.VerifyInt(0, MaxBeltHeight, 4000, "BeltSettings.MinBeltHeight", ref MinBeltHeight);
+            MyValueVerifier.VerifyInt(MinBeltHeight, int.MaxValue, 40000, "BeltSettings.MaxBeltHeight", ref MaxBeltHeight);
+            MyValueVerifier.VerifyFloat(0, 1, 0.4f, "BeltSettings.BeltProbability", ref BeltProbability);
         }
     }
 

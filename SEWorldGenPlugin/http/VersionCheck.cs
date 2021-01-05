@@ -57,7 +57,7 @@ namespace SEWorldGenPlugin.http
                 return m_latestBuild;
             }catch(Exception e)
             {
-                PluginLog.Log(e.Message, LogLevel.ERROR);
+                MyPluginLog.Log(e.Message, LogLevel.ERROR);
                 m_latestBuild = m_version;
                 return m_version;
             }

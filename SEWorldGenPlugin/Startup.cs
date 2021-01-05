@@ -40,15 +40,15 @@ namespace SEWorldGenPlugin
         /// <param name="gameInstance">Isntance of the game</param>
         public void Init(object gameInstance)
         {
-            PluginLog.Log("Begin init");
+            MyPluginLog.Log("Begin init");
 
             settings = new MySettings();
             settings.LoadSettings();
             settings.SaveSettings();
 
             updater = new VersionCheck();
-            PluginLog.Log("Version is " + updater.GetVersion());
-            PluginLog.Log("Latest Version is " + updater.GetNewestVersion());
+            MyPluginLog.Log("Version is " + updater.GetVersion());
+            MyPluginLog.Log("Latest Version is " + updater.GetNewestVersion());
 
             MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.ProceduralGeneratorTracking;
 
@@ -56,7 +56,7 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(PluginAdminMenu);
 
-            PluginLog.Log("Init completed");
+            MyPluginLog.Log("Init completed");
         }
 
         /// <summary>

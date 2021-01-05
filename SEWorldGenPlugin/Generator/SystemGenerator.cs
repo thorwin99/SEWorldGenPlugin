@@ -109,7 +109,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="sessionComponent"></param>
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            PluginLog.Log("Initializing system generator");
+            MyPluginLog.Log("Initializing system generator");
 
             InitNet();
 
@@ -139,7 +139,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public override void LoadData()
         {
-            PluginLog.Log("Loading definitions and network data");
+            MyPluginLog.Log("Loading definitions and network data");
 
             Static = this;
 
@@ -161,7 +161,7 @@ namespace SEWorldGenPlugin.Generator
         {
             if (!Sync.IsServer || !MySettingsSession.Static.Settings.Enable) return;
 
-            PluginLog.Log("Saving system data");
+            MyPluginLog.Log("Saving system data");
 
             SaveConfig();
         }
@@ -171,7 +171,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         protected override void UnloadData()
         {
-            PluginLog.Log("Unloading system generator data");
+            MyPluginLog.Log("Unloading system generator data");
 
             UnloadNet();
             Objects?.Clear();
@@ -230,7 +230,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void GenerateSystem()
         {
-            PluginLog.Log("Generating new solar system");
+            MyPluginLog.Log("Generating new solar system");
 
             Objects = new HashSet<MySystemItem>();
 
@@ -616,8 +616,8 @@ namespace SEWorldGenPlugin.Generator
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Log("Couldnt load Starsystem save file.", LogLevel.ERROR);
-                    PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
+                    MyPluginLog.Log("Couldnt load Starsystem save file.", LogLevel.ERROR);
+                    MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
 
                     MyAPIGateway.Utilities.DeleteFileInWorldStorage(STORAGE_FILE, typeof(SystemGenerator));
                     return null;

@@ -351,7 +351,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
             }
             if (myAsteroidGeneratorDefinition == null)
             {
-                PluginLog.Log("Generator of version " + voxelGeneratorVersion + "not found!");
+                MyPluginLog.Log("Generator of version " + voxelGeneratorVersion + "not found!");
                 {
                     foreach (MyAsteroidGeneratorDefinition value2 in MyDefinitionManager.Static.GetAsteroidGeneratorDefinitions().Values)
                     {
