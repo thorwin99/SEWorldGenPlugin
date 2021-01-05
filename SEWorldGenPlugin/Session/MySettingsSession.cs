@@ -37,9 +37,9 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             Static = this;
-            if (FileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(MySettingsSession)))
+            if (MyFileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(MySettingsSession)))
             {
-                Settings = FileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldSettings>(FILE_NAME, typeof(MySettingsSession));
+                Settings = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldSettings>(FILE_NAME, typeof(MySettingsSession));
             }
             else
             {
@@ -67,7 +67,7 @@ namespace SEWorldGenPlugin.Session
         public override void SaveData()
         {
             if(Sync.IsServer)
-                FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
+                MyFileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SEWorldGenPlugin.Session
         protected override void UnloadData()
         {
             if (Sync.IsServer)
-                FileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
+                MyFileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
             Settings = null;
         }
     }

@@ -94,9 +94,9 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             MyObjectBuilder_GpsManager builder;
-            if (FileUtils.FileExistsInWorldStorage(FILENAME, typeof(GlobalGpsManager)))
+            if (MyFileUtils.FileExistsInWorldStorage(FILENAME, typeof(GlobalGpsManager)))
             {
-                builder = FileUtils.ReadXmlFileFromWorld<MyObjectBuilder_GpsManager>(FILENAME, typeof(GlobalGpsManager));
+                builder = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_GpsManager>(FILENAME, typeof(GlobalGpsManager));
             }
             else
             {
@@ -146,7 +146,7 @@ namespace SEWorldGenPlugin.Session
                 builder.DynamicGpss.Add(data);
             }
 
-            FileUtils.WriteXmlFileToWorld(builder, FILENAME, typeof(GlobalGpsManager));
+            MyFileUtils.WriteXmlFileToWorld(builder, FILENAME, typeof(GlobalGpsManager));
         }
 
         /// <summary>

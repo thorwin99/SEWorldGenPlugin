@@ -16,7 +16,7 @@ namespace SEWorldGenPlugin.Utilities
     /// since they already implemented all those methods in their mod api. However, this api is not available at plugin initialization, so I needed to implement
     /// it again.
     /// </summary>
-    public class FileUtils
+    public class MyFileUtils
     {
         /// <summary>
         /// Storage folder name in the world and SE data folder.

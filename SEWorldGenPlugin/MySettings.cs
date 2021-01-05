@@ -57,13 +57,13 @@ namespace SEWorldGenPlugin
         public void LoadSettings()
         {
             PluginLog.Log("Loading the global config file");
-            if (FileUtils.FileExistsInGlobalStorage(FILENAME))
+            if (MyFileUtils.FileExistsInGlobalStorage(FILENAME))
             {
                 try
                 {
-                    using (var reader = FileUtils.ReadFileInGlobalStorage(FILENAME))
+                    using (var reader = MyFileUtils.ReadFileInGlobalStorage(FILENAME))
                     {
-                        MyObjectBuilder_GlobalSettings saveFile = FileUtils.SerializeFromXml<MyObjectBuilder_GlobalSettings>(reader.ReadToEnd());
+                        MyObjectBuilder_GlobalSettings saveFile = MyFileUtils.SerializeFromXml<MyObjectBuilder_GlobalSettings>(reader.ReadToEnd());
                         if (saveFile != null)
                             Settings = saveFile;
                     }
@@ -72,7 +72,7 @@ namespace SEWorldGenPlugin
                 {
                     PluginLog.Log("Couldnt load Plugin config file.", LogLevel.ERROR);
                     PluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
-                    FileUtils.DeleteFileInGlobalStorage(FILENAME);
+                    MyFileUtils.DeleteFileInGlobalStorage(FILENAME);
                     Settings = new MyObjectBuilder_GlobalSettings();
                 }
             }
@@ -94,13 +94,13 @@ namespace SEWorldGenPlugin
         /// </summary>
         public void SaveSettings()
         {
-            FileUtils.DeleteFileInGlobalStorage(FILENAME);
+            MyFileUtils.DeleteFileInGlobalStorage(FILENAME);
 
-            string xml = FileUtils.SerializeToXml(Settings);
+            string xml = MyFileUtils.SerializeToXml(Settings);
 
             PluginLog.Log("Saving global SEWorldGenPlugin config file: " + xml);
 
-            using (var writer = FileUtils.WriteFileInGlobalStorage(FILENAME))
+            using (var writer = MyFileUtils.WriteFileInGlobalStorage(FILENAME))
             {
                 writer.Write(xml);
                 writer.Close();
