@@ -61,6 +61,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public AsteroidGenerationMethod AsteroidGenerator = AsteroidGenerationMethod.PLUGIN;
 
         /// <summary>
+        /// If Vanilla planets are allowed in the generation
+        /// </summary>
+        [ProtoMember(2)]
+        public bool AllowVanillaPlanets = true;
+
+        /// <summary>
         /// The minimum and maximum amount of planets in the system.
         /// </summary>
         [ProtoMember(3)]

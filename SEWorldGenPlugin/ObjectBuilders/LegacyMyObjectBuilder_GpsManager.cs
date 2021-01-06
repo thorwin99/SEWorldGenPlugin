@@ -10,7 +10,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// Contains saved gpss and dynamic gpss.
     /// </summary>
     [ProtoContract]
-    public class MyObjectBuilder_GpsManager
+    public class LegacyMyObjectBuilder_GpsManager
     {
         [ProtoMember(1)]
         public HashSet<GpsData> Gpss;
@@ -18,7 +18,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(2)]
         public HashSet<DynamicGpsData> DynamicGpss;
 
-        public MyObjectBuilder_GpsManager()
+        public LegacyMyObjectBuilder_GpsManager()
         {
             Gpss = new HashSet<GpsData>();
             DynamicGpss = new HashSet<DynamicGpsData>();

@@ -93,14 +93,14 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void LoadData()
         {
-            MyObjectBuilder_GpsManager builder;
+            LegacyMyObjectBuilder_GpsManager builder;
             if (MyFileUtils.FileExistsInWorldStorage(FILENAME, typeof(GlobalGpsManager)))
             {
-                builder = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_GpsManager>(FILENAME, typeof(GlobalGpsManager));
+                builder = MyFileUtils.ReadXmlFileFromWorld<LegacyMyObjectBuilder_GpsManager>(FILENAME, typeof(GlobalGpsManager));
             }
             else
             {
-                builder = new MyObjectBuilder_GpsManager();
+                builder = new LegacyMyObjectBuilder_GpsManager();
             }
 
             Gpss = new HashSet<MyGps>();
@@ -125,7 +125,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void SaveData()
         {
-            MyObjectBuilder_GpsManager builder = new MyObjectBuilder_GpsManager();
+            LegacyMyObjectBuilder_GpsManager builder = new LegacyMyObjectBuilder_GpsManager();
             foreach(var gps in Gpss)
             {
                 GpsData data = new GpsData();
