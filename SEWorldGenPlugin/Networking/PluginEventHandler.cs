@@ -42,7 +42,8 @@ namespace SEWorldGenPlugin.Networking
             Static = this;
             MyNetUtil.RegisterMessageHandler(HANDLER_ID, MessageHandler);
 
-            Register(typeof(SystemGenerator));
+            RegisterAll();
+            //Register(typeof(SystemGenerator));
         }
 
         /// <summary>
@@ -142,6 +143,24 @@ namespace SEWorldGenPlugin.Networking
                 ulong id = action.Method.GetCustomAttribute<EventAttribute>().Id;
                 byte[] data = PackData(id, arg1, arg2, arg3, arg4);
                 SendData(action.Method, data, receiver);
+            }
+        }
+
+        /// <summary>
+        /// Registers all types with the EventOwnerAttribute.
+        /// </summary>
+        public void RegisterAll()
+        {
+            foreach(var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach(var type in assembly.GetTypes())
+                {
+                    if(type.GetCustomAttributes(typeof(EventOwnerAttribute), true).Length > 0)
+                    {
+                        MyPluginLog.Log("Registering type " + type.Name + " in PluginEventHandler.");
+                        Register(type);
+                    }
+                }
             }
         }
 
