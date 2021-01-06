@@ -208,8 +208,8 @@
     <Compile Include="Session\IMyEntityTracker.cs" />
     <Compile Include="Session\MyEntityTrackerComponent.cs" />
     <Compile Include="Session\MyGPSManager.cs" />
-    <Compile Include="Session\PluginDrawSession.cs" />
-    <Compile Include="Session\PluginItemsClipboard.cs" />
+    <Compile Include="Session\MyPluginDrawSession.cs" />
+    <Compile Include="Session\MyPluginItemsClipboard.cs" />
     <Compile Include="Session\MySettingsSession.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

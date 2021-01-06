@@ -14,12 +14,12 @@ namespace SEWorldGenPlugin.Session
     /// into the world. It will update a visual for the item, which currently only works with planets.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-    public class PluginItemsClipboard : MySessionComponentBase
+    public class MyPluginItemsClipboard : MySessionComponentBase
     {
         /// <summary>
         /// Singleton instance of this session component
         /// </summary>
-        public static PluginItemsClipboard Static;
+        public static MyPluginItemsClipboard Static;
 
         /// <summary>
         /// Currently copied item
@@ -81,7 +81,7 @@ namespace SEWorldGenPlugin.Session
             {
                 if (m_isActive)
                 {
-                    PluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
+                    MyPluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
                     m_copiedItem = null;
                     m_callback = null;
                     m_distanceToCam = 0;
@@ -93,7 +93,7 @@ namespace SEWorldGenPlugin.Session
             {
                 if (m_isActive)
                 {
-                    PluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
+                    MyPluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
                     m_callback?.Invoke(m_copiedItem, m_currentPos);
                     m_copiedItem = null;
                     m_callback = null;
@@ -111,7 +111,7 @@ namespace SEWorldGenPlugin.Session
         {
             if (m_isActive)
             {
-                PluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
+                MyPluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
 
                 MatrixD wm = GetPasteMatrix();
 
@@ -120,7 +120,7 @@ namespace SEWorldGenPlugin.Session
                 m_currentPos = wm.Translation + posGlobal;
 
                 if(m_copiedItem.GetType() == typeof(MyPlanetItem))
-                    PluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, ((MyPlanetItem)m_copiedItem).Size / 2, Color.LightGreen));
+                    MyPluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, ((MyPlanetItem)m_copiedItem).Size / 2, Color.LightGreen));
             }
         }
 

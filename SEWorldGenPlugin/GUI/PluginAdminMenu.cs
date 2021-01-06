@@ -650,11 +650,11 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         private void UpdateRingVisual()
         {
-            PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
+            MyPluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
 
             AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(GenerateRingItem());
 
-            PluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
+            MyPluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
         }
 
         /// <summary>
@@ -683,7 +683,7 @@ namespace SEWorldGenPlugin.GUI
         public override bool CloseScreen(bool isUnloading = false)
         {
             if(m_selectedPlanet != null)
-                PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
+                MyPluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
             return base.CloseScreen(isUnloading);
         }
 
@@ -782,7 +782,7 @@ namespace SEWorldGenPlugin.GUI
 
                 if(m_selectedPlanet != null)
                 {
-                    PluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
+                    MyPluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
                 }
 
                 m_selectedPlanet = planet;
@@ -948,7 +948,7 @@ namespace SEWorldGenPlugin.GUI
                     CenterPosition = Vector3D.Zero
                 };
 
-                PluginItemsClipboard.Static.Activate(planet, SpawnPlanet, size);
+                MyPluginItemsClipboard.Static.Activate(planet, SpawnPlanet, size);
 
                 CloseScreenNow();
             }

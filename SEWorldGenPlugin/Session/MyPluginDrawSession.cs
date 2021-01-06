@@ -9,12 +9,12 @@ namespace SEWorldGenPlugin.Session
     /// Session component, that manages the drawing of objects rendered by the plugin.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-    public class PluginDrawSession : MySessionComponentBase
+    public class MyPluginDrawSession : MySessionComponentBase
     {
         /// <summary>
         /// Singleton instance of this session component
         /// </summary>
-        public static PluginDrawSession Static;
+        public static MyPluginDrawSession Static;
 
         /// <summary>
         /// Initializes this component and sets the singleton instance
