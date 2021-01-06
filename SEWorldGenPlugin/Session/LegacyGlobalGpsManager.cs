@@ -14,7 +14,7 @@ namespace SEWorldGenPlugin.Session
     /// one player and can be dynamically updated.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 400)]
-    public class GlobalGpsManager : MySessionComponentBase
+    public class LegacyGlobalGpsManager : MySessionComponentBase
     {
         /// <summary>
         /// Struct that represents the id for a dynamic gps. The ID of a dynamic gps is
@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Singleton GlobalGpsManager instance
         /// </summary>
-        public static GlobalGpsManager Static;
+        public static LegacyGlobalGpsManager Static;
 
         /// <summary>
         /// All currently managed global gpss
@@ -94,9 +94,9 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             LegacyMyObjectBuilder_GpsManager builder;
-            if (MyFileUtils.FileExistsInWorldStorage(FILENAME, typeof(GlobalGpsManager)))
+            if (MyFileUtils.FileExistsInWorldStorage(FILENAME, typeof(LegacyGlobalGpsManager)))
             {
-                builder = MyFileUtils.ReadXmlFileFromWorld<LegacyMyObjectBuilder_GpsManager>(FILENAME, typeof(GlobalGpsManager));
+                builder = MyFileUtils.ReadXmlFileFromWorld<LegacyMyObjectBuilder_GpsManager>(FILENAME, typeof(LegacyGlobalGpsManager));
             }
             else
             {
@@ -146,7 +146,7 @@ namespace SEWorldGenPlugin.Session
                 builder.DynamicGpss.Add(data);
             }
 
-            MyFileUtils.WriteXmlFileToWorld(builder, FILENAME, typeof(GlobalGpsManager));
+            MyFileUtils.WriteXmlFileToWorld(builder, FILENAME, typeof(LegacyGlobalGpsManager));
         }
 
         /// <summary>

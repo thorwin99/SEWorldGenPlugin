@@ -197,7 +197,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 if (Vector3D.Subtract(ring.Center, entityPos).Length() > 5000000)
                 {
-                    GlobalGpsManager.Static.RemoveDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
+                    LegacyGlobalGpsManager.Static.RemoveDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
                     continue;
                 }
 
@@ -205,12 +205,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
 
                 if (shape.Contains(tracker.LastPosition) == ContainmentType.Contains)
                 {
-                    GlobalGpsManager.Static.RemoveDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
+                    LegacyGlobalGpsManager.Static.RemoveDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId());
                     continue;
                 }
 
                 Vector3D pos = shape.ClosestPointAtRingCenter(entityPos);
-                GlobalGpsManager.Static.AddOrUpdateDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId(), pos, Color.Gold);
+                LegacyGlobalGpsManager.Static.AddOrUpdateDynamicGps(name, ((MyCharacter)tracker.Entity).GetPlayerIdentityId(), pos, Color.Gold);
             }
         }
 

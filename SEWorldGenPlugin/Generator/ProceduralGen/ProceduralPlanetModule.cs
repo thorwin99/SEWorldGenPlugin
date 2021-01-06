@@ -106,13 +106,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     spawnedMoons.Add(spawnedMoon.PositionComp.GetPosition());
 
                     if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.ShowMoonGPS)
-                        GlobalGpsManager.Static.AddGps(moon.DisplayName, Color.Aqua, spawnedMoon.PositionComp.GetPosition());
+                        LegacyGlobalGpsManager.Static.AddGps(moon.DisplayName, Color.Aqua, spawnedMoon.PositionComp.GetPosition());
                 }
                 
                 planet.Generated = true;
 
                 if (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS)
-                    GlobalGpsManager.Static.AddGps(planet.DisplayName, Color.Aqua, generatedPlanet.PositionComp.GetPosition());
+                    LegacyGlobalGpsManager.Static.AddGps(planet.DisplayName, Color.Aqua, generatedPlanet.PositionComp.GetPosition());
             }
         }
 

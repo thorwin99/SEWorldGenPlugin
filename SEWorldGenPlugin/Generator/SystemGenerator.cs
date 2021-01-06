@@ -659,7 +659,7 @@ namespace SEWorldGenPlugin.Generator
 
                 Vector3D pos = new Vector3D(((MySystemBeltItem)obj).Radius + ((MySystemBeltItem)obj).Width / 2, 0, 0); ;
 
-                GlobalGpsManager.Static.AddGps(obj.DisplayName, Color.Aqua, pos);
+                LegacyGlobalGpsManager.Static.AddGps(obj.DisplayName, Color.Aqua, pos);
             }
         }
 

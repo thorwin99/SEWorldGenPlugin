@@ -204,7 +204,7 @@
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldGpsData.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
     <Compile Include="ObjectBuilders\MySerializableMinMax.cs" />
-    <Compile Include="Session\GlobalGpsManager.cs" />
+    <Compile Include="Session\LegacyGlobalGpsManager.cs" />
     <Compile Include="Session\IMyEntityTracker.cs" />
     <Compile Include="Session\MyEntityTrackerComponent.cs" />
     <Compile Include="Session\MyGPSManager.cs" />
