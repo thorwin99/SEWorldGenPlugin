@@ -133,6 +133,9 @@ namespace SEWorldGenPlugin.Generator
             UnloadNetworking();
         }
 
+        /// <summary>
+        /// Creates all GPSs that are persistent.
+        /// </summary>
         private void AddAllPersistentGps()
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
