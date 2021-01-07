@@ -93,7 +93,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         /// <summary>
         /// The max distance objects will still be generated at, if value is > 0.
-        /// If it is < 0, then no limit is set.
+        /// If it is < 0, then no limit is set. In meters
         /// </summary>
         [ProtoMember(7)]
         public long WorldSize = -1;
@@ -227,7 +227,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// <summary>
     /// Enum to set which system generator the plugin uses.
     /// Full random means, every planet has the same chance to be generated,
-    /// Unique means, that no planet will be repeated, until necessary.
+    /// Unique means, that the system generator tries to keep planets and moons
+    /// unique, but duplicates can occour, if there are less planets loaded with the world,
+    /// than the minimum amount of planets defined.
     /// Mandatory first, that first, all available mandatory planets get generated,
     /// and only after that full random happens,
     /// Mandatory only means that only mandatory planets are used.

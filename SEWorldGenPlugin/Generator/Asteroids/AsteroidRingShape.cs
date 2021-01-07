@@ -12,8 +12,8 @@ namespace SEWorldGenPlugin.Generator.Asteroids
     {
         public Vector3D center;
         public double radius;
-        public int width;
-        public int height;
+        public double width;
+        public double height;
         public Vector3D rotation;
         public Vector3D normal;
         public MatrixD worldMatrix;
@@ -24,19 +24,19 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         /// </summary>
         /// <param name="ring">The ring to create a shape representation for.</param>
         /// <returns>An AsteroidRingShape representing the given ring in worldspace</returns>
-        public static AsteroidRingShape CreateFromRingItem(MyPlanetRingItem ring)
+        public static AsteroidRingShape CreateFromRingItem(MySystemPlanetRing ring)
         {
             AsteroidRingShape shape = new AsteroidRingShape();
-            shape.center = ring.Center;
+            shape.center = ring.CenterPosition;
             shape.radius = ring.Radius;
             shape.width = ring.Width;
             shape.height = ring.Height;
             shape.rotation = new Vector3D(1, 0, 0);
             shape.normal = new Vector3D(0, 0, 1);
 
-            double angleZ = 2 * Math.PI / 360 * (ring.AngleDegrees);
-            double angleY = 2 * Math.PI / 360 * (ring.AngleDegreesY);
-            double angleX = 2 * Math.PI / 360 * (ring.AngleDegreesX);
+            double angleZ = 2 * Math.PI / 360 * (ring.AngleDegrees.Z);
+            double angleY = 2 * Math.PI / 360 * (ring.AngleDegrees.Y);
+            double angleX = 2 * Math.PI / 360 * (ring.AngleDegrees.X);
 
             //shape.rotation.X = Math.Cos(angleZ);
             //shape.rotation.Y = Math.Sin(angleZ); 
@@ -108,9 +108,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         public Vector3D LocationInRing(int angle)
         {
             Vector3D pos = Vector3D.Zero;
-            pos.X = (float)((radius + width / 2) * Math.Cos(MathHelper.ToRadians(angle)));
+            pos.X = (radius + width / 2) * Math.Cos(MathHelper.ToRadians(angle));
             pos.Y = 0;
-            pos.Z = (float)((radius + width / 2) * Math.Sin(MathHelper.ToRadians(angle)));
+            pos.Z = (radius + width / 2) * Math.Sin(MathHelper.ToRadians(angle));
             return Vector3D.Transform(pos, worldMatrix);
         }
 

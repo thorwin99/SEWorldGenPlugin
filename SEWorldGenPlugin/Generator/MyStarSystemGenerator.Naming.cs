@@ -3,7 +3,7 @@ using SEWorldGenPlugin.Utilities;
 
 namespace SEWorldGenPlugin.Generator
 {
-    public partial class MySystemGenerator
+    public partial class MyStarSystemGenerator
     {
         /// <summary>
         /// Greek letters used with the name formats.

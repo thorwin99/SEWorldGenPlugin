@@ -172,7 +172,7 @@
     <Compile Include="Generator\Asteroids\AsteroidBeltShape.cs" />
     <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
-    <Compile Include="Generator\MySystemGenerator.Naming.cs" />
+    <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />
     <Compile Include="Generator\ProceduralGen\EntityExtension.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralAsteroidsRingModule.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />
@@ -224,7 +224,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Compile Include="Generator\MySystemGenerator.Networking.cs" />
+    <Compile Include="Generator\MyStarSystemGenerator.Networking.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

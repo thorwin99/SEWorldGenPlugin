@@ -149,20 +149,20 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <summary>
         /// The radius of the asteroid ring to the center.
         /// This is the distance of the area, where asteroids spawn
-        /// to the center.
+        /// to the center. In meters
         /// </summary>
         [ProtoMember(4)]
         public double Radius;
 
         /// <summary>
         /// The width of the asteroid ring. This is the width of the area where
-        /// asteroids will spawn.
+        /// asteroids will spawn. In meters
         /// </summary>
         [ProtoMember(5)]
         public double Width;
 
         /// <summary>
-        /// The height of the area, where asteroids will spawn.
+        /// The height of the area, where asteroids will spawn. In meters
         /// </summary>
         [ProtoMember(6)]
         public double Height;
@@ -211,13 +211,14 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         /// <summary>
         /// The width of the asteroid belt. This is the width of the area where
-        /// asteroids will spawn.
+        /// asteroids will spawn. In meters
         /// </summary>
         [ProtoMember(5)]
         public double Width;
 
         /// <summary>
         /// The height of the area, where asteroids will spawn.
+        /// In meters
         /// </summary>
         [ProtoMember(6)]
         public double Height;
