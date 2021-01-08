@@ -20,7 +20,38 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Objects that are located in this star system.
         /// </summary>
         [ProtoMember(1)]
-        public HashSet<MySystemObject> Objects = new HashSet<MySystemObject>();
+        public MySystemObject CenterObject;
+
+        public int Count()
+        {
+            return 1 + CenterObject.ChildCount();
+        }
+
+        /// <summary>
+        /// Finds a system object by name
+        /// </summary>
+        /// <param name="name">Name of the object</param>
+        /// <returns>The object or null if not present</returns>
+        public MySystemObject FindObjectByName(string name)
+        {
+            if (name == null) return null;
+            foreach(var child in CenterObject.GetAllChildren())
+            {
+                if (child.DisplayName.ToLower() == name.ToLower()) return child;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if an object with given name exists
+        /// </summary>
+        /// <param name="name">Name of object</param>
+        /// <returns>true if it exists</returns>
+        public bool ObjectExists(string name)
+        {
+            return FindObjectByName(name) != null;
+        }
     }
 
     /// <summary>
@@ -29,12 +60,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
     [ProtoContract]
     [ProtoInclude(5001, typeof(MySystemPlanet))]
     [ProtoInclude(5002, typeof(MySystemPlanetMoon))]
-    [ProtoInclude(5003, typeof(MySystemPlanetRing))]
-    [ProtoInclude(5004, typeof(MySystemBelt))]
+    [ProtoInclude(5003, typeof(MySystemRing))]
     [XmlInclude(typeof(MySystemPlanet))]
     [XmlInclude(typeof(MySystemPlanetMoon))]
-    [XmlInclude(typeof(MySystemPlanetRing))]
-    [XmlInclude(typeof(MySystemBelt))]
+    [XmlInclude(typeof(MySystemRing))]
     [Serializable]
     public class MySystemObject
     {
@@ -55,6 +84,64 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         [ProtoMember(3)]
         public SerializableVector3D CenterPosition;
+
+        /// <summary>
+        /// All Child objects, such as moons.
+        /// </summary>
+        [ProtoMember(4)]
+        [Serialize(MyObjectFlags.Nullable)]
+        public HashSet<MySystemObject> ChildObjects;
+
+        /// <summary>
+        /// Initializes a new empty system object
+        /// </summary>
+        public MySystemObject()
+        {
+            Type = MySystemObjectType.EMPTY;
+            DisplayName = "";
+            CenterPosition = Vector3D.Zero;
+            ChildObjects = null;
+        }
+
+        /// <summary>
+        /// Returns the amount of objects in this tree
+        /// </summary>
+        /// <returns></returns>
+        public int ChildCount()
+        {
+            int count = 0;
+
+            if (ChildObjects == null) return 0;
+
+            foreach(var child in ChildObjects)
+            {
+                count += child.ChildCount();
+            }
+
+            count += ChildObjects.Count;
+
+            return count;
+        }
+
+        /// <summary>
+        /// Gets all children of this object recursively
+        /// </summary>
+        /// <returns>All children</returns>
+        public HashSet<MySystemObject> GetAllChildren()
+        {
+            HashSet<MySystemObject> children = new HashSet<MySystemObject>();
+
+            foreach(var child in children)
+            {
+                foreach(var c in child.GetAllChildren())
+                {
+                    children.Add(c);
+                }
+                children.Add(child);
+            }
+
+            return children;
+        }
     }
 
     /// <summary>
@@ -82,22 +169,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(6)]
         public bool Generated;
 
-        /// <summary>
-        /// The moons of this planet. null, if no moons are present.
-        /// </summary>
-        [ProtoMember(7)]
-        [DefaultValue(null)]
-        [XmlArrayItem("MySystemPlanetMoon")]
-        [Serialize(MyObjectFlags.Nullable)]
-        public MySystemPlanetMoon[] Moons;
-
-        /// <summary>
-        /// The ring around the planet. null, if not present.
-        /// </summary>
-        [ProtoMember(8)]
-        [Serialize(MyObjectFlags.Nullable)]
-        public MySystemPlanetRing Ring;
-
         public MySystemPlanet()
         {
             Type = MySystemObjectType.PLANET;
@@ -115,20 +186,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// </summary>
     [ProtoContract]
     [Serializable]
-    public class MySystemPlanetMoon : MySystemObject
+    public class MySystemPlanetMoon : MySystemPlanet
     {
-        /// <summary>
-        /// The subtype id of the moon. This is the id defined for the planet in its definition file.
-        /// </summary>
-        [ProtoMember(4)]
-        public string SubtypeId;
-
-        /// <summary>
-        /// The diameter of the moon in meters.
-        /// </summary>
-        [ProtoMember(5)]
-        public double Diameter;
-
         public MySystemPlanetMoon()
         {
             Type = MySystemObjectType.MOON;
@@ -136,15 +195,16 @@ namespace SEWorldGenPlugin.ObjectBuilders
             CenterPosition = Vector3D.Zero;
             SubtypeId = "";
             Diameter = 0;
+            Generated = false;
         }
     }
 
     /// <summary>
-    /// Class representing a ring around a planet
+    /// Class representing a ring or belt
     /// </summary>
     [ProtoContract]
     [Serializable]
-    public class MySystemPlanetRing : MySystemObject
+    public class MySystemRing : MySystemObject
     {
         /// <summary>
         /// The radius of the asteroid ring to the center.
@@ -181,7 +241,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(8)]
         public MySerializableMinMax AsteroidSize;
 
-        public MySystemPlanetRing()
+        public MySystemRing()
         {
             Type = MySystemObjectType.RING;
             DisplayName = "";
@@ -195,54 +255,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     /// <summary>
-    /// Class representing a belt in the system
-    /// </summary>
-    [ProtoContract]
-    [Serializable]
-    public class MySystemBelt : MySystemObject
-    {
-        /// <summary>
-        /// The radius of the asteroid belt to the center.
-        /// This is the distance of the area, where asteroids spawn
-        /// to the center.
-        /// </summary>
-        [ProtoMember(4)]
-        public double Radius;
-
-        /// <summary>
-        /// The width of the asteroid belt. This is the width of the area where
-        /// asteroids will spawn. In meters
-        /// </summary>
-        [ProtoMember(5)]
-        public double Width;
-
-        /// <summary>
-        /// The height of the area, where asteroids will spawn.
-        /// In meters
-        /// </summary>
-        [ProtoMember(6)]
-        public double Height;
-
-        /// <summary>
-        /// The minimum and maximum size of the asteroids in this belt in meters.
-        /// </summary>
-        [ProtoMember(7)]
-        public MySerializableMinMax AsteroidSize;
-
-        public MySystemBelt()
-        {
-            Type = MySystemObjectType.BELT;
-            DisplayName = "";
-            CenterPosition = Vector3D.Zero;
-            Radius = 0;
-            Width = 0;
-            Height = 0;
-            AsteroidSize = new MySerializableMinMax(0, 0);
-        }
-
-    }
-
-    /// <summary>
     /// Enum for the body type of an object in the solar system.
     /// </summary>
     public enum MySystemObjectType
@@ -250,6 +262,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
         PLANET,
         RING,
         MOON,
-        BELT
+        EMPTY
     }
 }

@@ -24,7 +24,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         /// </summary>
         /// <param name="ring">The ring to create a shape representation for.</param>
         /// <returns>An AsteroidRingShape representing the given ring in worldspace</returns>
-        public static AsteroidRingShape CreateFromRingItem(MySystemPlanetRing ring)
+        public static AsteroidRingShape CreateFromRingItem(MySystemRing ring)
         {
             AsteroidRingShape shape = new AsteroidRingShape();
             shape.center = ring.CenterPosition;

@@ -39,14 +39,12 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private readonly List<string> VANILLA_PLANETS = new List<string> { "Alien", "EarthLike", "EarthLikeTutorial", "Europa", "Mars", "MarsTutorial", "Moon", "MoonTutorial", "Pertam", "Titan", "Triton" };
 
+        public static MyStarSystemGenerator Static;
+
         /// <summary>
         /// All celestial bodies present in the solar system
         /// </summary>
-        public HashSet<MySystemObject> SystemObjects
-        {
-            get;
-            private set;
-        }
+        public MyObjectBuilder_SystemData StarSystem;
 
         private List<MyPlanetGeneratorDefinition> m_planets;
 
@@ -67,9 +65,9 @@ namespace SEWorldGenPlugin.Generator
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
 
-            if(SystemObjects.Count <= 0)
+            if(StarSystem.Count() <= 0)
             {
-                SystemObjects = GenerateNewStarSystem();
+                StarSystem = GenerateNewStarSystem();
             }
 
             AddAllPersistentGps();
@@ -81,12 +79,16 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public override void LoadData()
         {
+            Static = this;
+
+            LoadNetworking();
+
             if (!MySettingsSession.Static.IsEnabled()) return;
 
             MyPluginLog.Log("Loading definitions and network data");
             var data = LoadSystemData();
 
-            SystemObjects = data.Objects;
+            StarSystem = data;
 
             m_planets = new List<MyPlanetGeneratorDefinition>();
             m_moons = new List<MyPlanetGeneratorDefinition>();
@@ -95,8 +97,6 @@ namespace SEWorldGenPlugin.Generator
             m_mandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
 
             LoadPlanetDefinitions();
-
-            LoadNetworking();
         }
 
         /// <summary>
@@ -108,10 +108,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 MyPluginLog.Log("Saving system data");
 
-                MyObjectBuilder_SystemData data = new MyObjectBuilder_SystemData();
-                data.Objects = SystemObjects;
-
-                MyFileUtils.WriteXmlFileToWorld(data, STORAGE_FILE, typeof(MyStarSystemGenerator));
+                MyFileUtils.WriteXmlFileToWorld(StarSystem, STORAGE_FILE, typeof(MyStarSystemGenerator));
             }
         }
 
@@ -123,7 +120,7 @@ namespace SEWorldGenPlugin.Generator
             MyPluginLog.Log("Unloading star system generation data");
 
             SaveData();
-            SystemObjects.Clear();
+            StarSystem = null;
             m_planets.Clear();
             m_suns.Clear();
             m_gasGiants.Clear();
@@ -131,6 +128,8 @@ namespace SEWorldGenPlugin.Generator
             m_mandatoryPlanets.Clear();
 
             UnloadNetworking();
+
+            Static = null;
         }
 
         /// <summary>
@@ -142,16 +141,10 @@ namespace SEWorldGenPlugin.Generator
 
             MySession.Static.OnReady += delegate
             {
-                foreach(var item in SystemObjects)
+                foreach(var item in StarSystem.CenterObject.ChildObjects)
                 {
                     switch (item.Type)
                     {
-                        case MySystemObjectType.BELT:
-                            if(settings.BeltGPSMode == MyGPSGenerationMode.PERSISTENT)
-                            {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.White, Vector3D.Add(item.CenterPosition, new Vector3D(((MySystemBelt) item).Radius, 0, 0)));
-                            }
-                            break;
                         case MySystemObjectType.MOON:
                             if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
@@ -167,7 +160,7 @@ namespace SEWorldGenPlugin.Generator
                         case MySystemObjectType.RING:
                             if (settings.RingGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
-                                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(item as MySystemPlanetRing);
+                                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(item as MySystemRing);
 
                                 MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.Yellow, shape.LocationInRing(0));
                             }
@@ -182,12 +175,12 @@ namespace SEWorldGenPlugin.Generator
         /// world settings.
         /// </summary>
         /// <returns></returns>
-        private HashSet<MySystemObject> GenerateNewStarSystem()
+        private MyObjectBuilder_SystemData GenerateNewStarSystem()
         {
             MyPluginLog.Log("Generating a new Solar system ...");
 
             int seed = MySession.Static.Settings.ProceduralSeed + Guid.NewGuid().GetHashCode();
-            HashSet<MySystemObject> system = new HashSet<MySystemObject>();
+            MyObjectBuilder_SystemData system = new MyObjectBuilder_SystemData();
 
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
@@ -215,13 +208,17 @@ namespace SEWorldGenPlugin.Generator
                     sun.SubtypeId = sunDef.Id.SubtypeId.String;
                     sun.DisplayName = sunDef.DisplayNameText;
                     sun.Diameter = CalculatePlanetDiameter(sunDef) * 2;
-                    sun.Moons = null;
-                    sun.Ring = null;
+                    sun.ChildObjects = new HashSet<MySystemObject>();
                     sun.Generated = false;
                     sun.Type = MySystemObjectType.PLANET;
 
-                    system.Add(sun);
+                    system.CenterObject = sun;
                     currentOrbitDistance += (long)sun.Diameter;
+                }
+                else
+                {
+                    system.CenterObject = new MySystemObject();
+                    system.CenterObject.Type = MySystemObjectType.EMPTY;
                 }
 
                 while(planetCount > 0)
@@ -233,7 +230,7 @@ namespace SEWorldGenPlugin.Generator
 
                     if (MyRandom.Instance.NextDouble() <= planetProb) // Generate planet
                     {
-                        GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count - 1) * Math.PI / systemSize), currentOrbitDistance);
+                        GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count() - 1) * Math.PI / systemSize), currentOrbitDistance);
                     }
                     else // Generate belt
                     {
@@ -254,12 +251,13 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="orbitDistance">Distance the orbit of the object has to the center of the system</param>
         /// <param name="width">Width of the belt in me</param>
         /// <returns></returns>
-        private MySystemBelt GenerateAsteroidBelt(int asteroidObjectIndex, long orbitDistance, double width)
+        private MySystemRing GenerateAsteroidBelt(int asteroidObjectIndex, long orbitDistance, double width)
         {
-            MySystemBelt belt = new MySystemBelt();
+            MySystemRing belt = new MySystemRing();
 
             belt.DisplayName = GetBeltName(asteroidObjectIndex);
             belt.CenterPosition = Vector3D.Zero;
+            belt.AngleDegrees = Vector3D.Zero;
             belt.AsteroidSize = new MySerializableMinMax(256, 1024);
             belt.Width = width;
             belt.Height = width / 100;
@@ -293,18 +291,20 @@ namespace SEWorldGenPlugin.Generator
                 DisplayName = name,
                 Generated = false,
                 SubtypeId = def.Id.SubtypeId.String,
-                Ring = null,
-                Moons = null
+                ChildObjects = null
             };
 
             if(MyRandom.Instance.NextFloat() > 0.25f * def.SurfaceGravity)
             {
-                planet.Ring = GenratePlanetRing(planet);
+                planet.ChildObjects.Add(GenrateRing(planet));
             }
 
             if (MyRandom.Instance.NextFloat() > 0.3f * def.SurfaceGravity)
             {
-                planet.Moons = GeneratePlanetMoons(planet);
+                foreach(var moon in GeneratePlanetMoons(planet))
+                {
+                    planet.ChildObjects.Add(moon);
+                }
             }
 
             return planet;
@@ -354,6 +354,7 @@ namespace SEWorldGenPlugin.Generator
                 moon.Diameter = diameter;
                 moon.DisplayName = GetMoonName(i, definition.Id.SubtypeId.String, parentPlanet.DisplayName);
                 moon.SubtypeId = definition.Id.SubtypeId.String;
+                moon.ChildObjects = null;
 
                 moons[i] = moon;
             }
@@ -366,9 +367,9 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="parentPlanet">Planet the ring is based on</param>
         /// <returns>The ring for the planet</returns>
-        private MySystemPlanetRing GenratePlanetRing(MySystemPlanet parentPlanet)
+        private MySystemRing GenrateRing(MySystemPlanet parentPlanet)
         {
-            MySystemPlanetRing ring = new MySystemPlanetRing();
+            MySystemRing ring = new MySystemRing();
             ring.AngleDegrees = new Vector3D(MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20));
             ring.AsteroidSize = new MySerializableMinMax(64, 512);
             ring.Width = MyRandom.Instance.Next((int)parentPlanet.Diameter / 10, (int)parentPlanet.Diameter / 5);
@@ -392,13 +393,20 @@ namespace SEWorldGenPlugin.Generator
         {
             if (Vector3D.Distance(position, parentPlanet.CenterPosition) < moonDiameter + parentPlanet.Diameter) return true;
 
-            if (parentPlanet.Ring != null) 
+            foreach(var child in parentPlanet.ChildObjects)
             {
-                //TODO: Needs rework of asteroid ring shape
-                AsteroidRingShape asteroidRing = AsteroidRingShape.CreateFromRingItem(parentPlanet.Ring);
-                if (Vector3D.Distance(asteroidRing.ClosestPointAtRingCenter(position), position) <= moonDiameter)
+                if(child.Type == MySystemObjectType.RING)
                 {
-                    return true;
+                    AsteroidRingShape asteroidRing = AsteroidRingShape.CreateFromRingItem(child as MySystemRing);
+                    if (Vector3D.Distance(asteroidRing.ClosestPointAtRingCenter(position), position) <= moonDiameter)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (child.GetType() == typeof(MySystemPlanet))
+                        if (Vector3D.Distance(child.CenterPosition, position) < moonDiameter + (child as MySystemPlanet).Diameter) return true;
                 }
             }
 
