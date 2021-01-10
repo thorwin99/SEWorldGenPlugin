@@ -170,7 +170,7 @@
     <Compile Include="Draw\RenderHollowCylinder.cs" />
     <Compile Include="Draw\RenderSphere.cs" />
     <Compile Include="Generator\Asteroids\AsteroidBeltShape.cs" />
-    <Compile Include="Generator\Asteroids\AsteroidRingShape.cs" />
+    <Compile Include="Generator\Asteroids\MyAsteroidRingShape.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />
     <Compile Include="Generator\ProceduralGen\EntityExtension.cs" />

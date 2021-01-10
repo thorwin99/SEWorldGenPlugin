@@ -8,7 +8,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
     /// A struct that represents the shape of an asteroid ring,
     /// and contains a method to check relations of points to the ring.
     /// </summary>
-    public struct AsteroidRingShape
+    public struct MyAsteroidRingShape
     {
         public Vector3D center;
         public double radius;
@@ -24,9 +24,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         /// </summary>
         /// <param name="ring">The ring to create a shape representation for.</param>
         /// <returns>An AsteroidRingShape representing the given ring in worldspace</returns>
-        public static AsteroidRingShape CreateFromRingItem(MySystemRing ring)
+        public static MyAsteroidRingShape CreateFromRingItem(MySystemRing ring)
         {
-            AsteroidRingShape shape = new AsteroidRingShape();
+            MyAsteroidRingShape shape = new MyAsteroidRingShape();
             shape.center = ring.CenterPosition;
             shape.radius = ring.Radius;
             shape.width = ring.Width;

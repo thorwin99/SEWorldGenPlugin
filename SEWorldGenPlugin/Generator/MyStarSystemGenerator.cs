@@ -160,7 +160,7 @@ namespace SEWorldGenPlugin.Generator
                         case MySystemObjectType.RING:
                             if (settings.RingGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
-                                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(item as MySystemRing);
+                                MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(item as MySystemRing);
 
                                 MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.Yellow, shape.LocationInRing(0));
                             }
@@ -397,7 +397,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 if(child.Type == MySystemObjectType.RING)
                 {
-                    AsteroidRingShape asteroidRing = AsteroidRingShape.CreateFromRingItem(child as MySystemRing);
+                    MyAsteroidRingShape asteroidRing = MyAsteroidRingShape.CreateFromRingItem(child as MySystemRing);
                     if (Vector3D.Distance(asteroidRing.ClosestPointAtRingCenter(position), position) <= moonDiameter)
                     {
                         return true;

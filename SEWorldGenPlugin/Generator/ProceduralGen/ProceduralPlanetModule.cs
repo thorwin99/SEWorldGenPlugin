@@ -162,7 +162,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                 }
                 if (ring != null)
                 {
-                    AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(ring);
+                    MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(ring);
                     return shape.Contains(position) != ContainmentType.Disjoint;
                 }
             }

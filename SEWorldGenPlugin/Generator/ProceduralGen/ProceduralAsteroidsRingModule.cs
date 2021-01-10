@@ -201,7 +201,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     continue;
                 }
 
-                AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(ring);
+                MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(ring);
 
                 if (shape.Contains(tracker.LastPosition) == ContainmentType.Contains)
                 {
@@ -229,7 +229,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
                     MyPlanetItem planet = (MyPlanetItem)p;
 
                     if (planet.PlanetRing == null) continue;
-                    AsteroidRingShape shape = AsteroidRingShape.CreateFromRingItem(planet.PlanetRing);
+                    MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(planet.PlanetRing);
                     if (shape.Contains(position) == ContainmentType.Contains) return planet.PlanetRing;
                 }
                 else if(p.Type == LegacySystemObjectType.BELT)
