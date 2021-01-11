@@ -1,6 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Game.World;
-using SEWorldGenPlugin.Generator.Asteroids;
+using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -160,7 +160,7 @@ namespace SEWorldGenPlugin.Generator
                         case MySystemObjectType.RING:
                             if (settings.RingGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
-                                MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(item as MySystemRing);
+                                MyAsteroidObjectShapeRing shape = MyAsteroidObjectShapeRing.CreateFromRingItem(item as MySystemRing);
 
                                 MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.Yellow, shape.LocationInRing(0));
                             }
@@ -397,7 +397,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 if(child.Type == MySystemObjectType.RING)
                 {
-                    MyAsteroidRingShape asteroidRing = MyAsteroidRingShape.CreateFromRingItem(child as MySystemRing);
+                    MyAsteroidObjectShapeRing asteroidRing = MyAsteroidObjectShapeRing.CreateFromRingItem(child as MySystemRing);
                     if (Vector3D.Distance(asteroidRing.ClosestPointAtRingCenter(position), position) <= moonDiameter)
                     {
                         return true;

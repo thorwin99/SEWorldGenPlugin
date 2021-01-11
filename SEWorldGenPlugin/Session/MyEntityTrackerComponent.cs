@@ -42,6 +42,8 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
+            if (!MySettingsSession.Static.IsEnabled()) return;
+
             lock (m_toUntrackEntities) lock (m_entityTrackers)
             {
                 foreach(var entity in m_toUntrackEntities)

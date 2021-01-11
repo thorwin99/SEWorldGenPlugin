@@ -169,10 +169,15 @@
     <Compile Include="Draw\IRenderObject.cs" />
     <Compile Include="Draw\RenderHollowCylinder.cs" />
     <Compile Include="Draw\RenderSphere.cs" />
-    <Compile Include="Generator\Asteroids\AsteroidBeltShape.cs" />
-    <Compile Include="Generator\Asteroids\MyAsteroidRingShape.cs" />
+    <Compile Include="Generator\AsteroidObjectShapes\AsteroidBeltShape.cs" />
+    <Compile Include="Generator\AsteroidObjectShapes\IMyAsteroidObjectShape.cs" />
+    <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeRing.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />
+    <Compile Include="Generator\ProceduralGeneration\IMyProceduralGeneratorModule.cs" />
+    <Compile Include="Generator\ProceduralGeneration\MyAbstractProceduralCellModule.cs" />
+    <Compile Include="Generator\ProceduralGeneration\MyAbstractProceduralObjectModul.cs" />
+    <Compile Include="Generator\ProceduralGeneration\MyProceduralGeneratorComponent.cs" />
     <Compile Include="Generator\ProceduralGen\EntityExtension.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralAsteroidsRingModule.cs" />
     <Compile Include="Generator\ProceduralGen\ProceduralGenerator.cs" />

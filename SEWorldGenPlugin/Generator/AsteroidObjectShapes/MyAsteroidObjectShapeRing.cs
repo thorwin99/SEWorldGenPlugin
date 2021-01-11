@@ -2,13 +2,13 @@
 using System;
 using VRageMath;
 
-namespace SEWorldGenPlugin.Generator.Asteroids
+namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
 {
     /// <summary>
     /// A struct that represents the shape of an asteroid ring,
     /// and contains a method to check relations of points to the ring.
     /// </summary>
-    public struct MyAsteroidRingShape
+    public struct MyAsteroidObjectShapeRing : IMyAsteroidObjectShape
     {
         public Vector3D center;
         public double radius;
@@ -24,9 +24,9 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         /// </summary>
         /// <param name="ring">The ring to create a shape representation for.</param>
         /// <returns>An AsteroidRingShape representing the given ring in worldspace</returns>
-        public static MyAsteroidRingShape CreateFromRingItem(MySystemRing ring)
+        public static MyAsteroidObjectShapeRing CreateFromRingItem(MySystemRing ring)
         {
-            MyAsteroidRingShape shape = new MyAsteroidRingShape();
+            MyAsteroidObjectShapeRing shape = new MyAsteroidObjectShapeRing();
             shape.center = ring.CenterPosition;
             shape.radius = ring.Radius;
             shape.width = ring.Width;
@@ -123,6 +123,12 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         {
             if (rad < radius || rad > radius + width) throw new ArgumentOutOfRangeException("The radius " + rad + " has to be less than " + (radius + width) + " and larger than " + radius);
             return Math.Sin((rad - radius) * Math.PI / width) * Math.Sin((rad - radius) * Math.PI / width) * 0.5 * height + 100;//Plus 100 to make asteroids on edges possible
+        }
+
+        public Vector3D GetClosestPoint(Vector3D point)
+        {
+            //Is not really the closest point
+            return ClosestPointAtRingCenter(point);
         }
     }
 }
