@@ -33,21 +33,131 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// The vanilla procedural density overwritten by this component, IF the plugin
         /// asteroid generator is used.
         /// </summary>
-        private int m_procDensity;
+        private float m_procDensity;
 
         /// <summary>
         /// All currently tracked entities
         /// </summary>
         private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
 
+        /// <summary>
+        /// List of all registered cell modules
+        /// </summary>
+        private List<MyAbstractProceduralCellModule> m_cellModules = new List<MyAbstractProceduralCellModule>();
+
+        /// <summary>
+        /// List of all registered object modules
+        /// </summary>
+        private List<MyAbstractProceduralObjectModul> m_objectModules = new List<MyAbstractProceduralObjectModul>();
+
+        /// <summary>
+        /// If the plugin is enabled on this local session. Does not reflect server state.
+        /// Used to save some calls in update
+        /// </summary>
+        private bool m_isEnabled;
+
+        /// <summary>
+        /// Final initialization of this component
+        /// </summary>
+        /// <param name="sessionComponent"></param>
+        public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
+        {
+            base.Init(sessionComponent);
+
+            if (MySettingsSession.Static.IsEnabled())
+            {
+                MyEntityTrackerComponent.Static.RegisterTracker(this);
+            }
+        }
+
+        /// <summary>
+        /// Loads data used by the procedural generator
+        /// </summary>
         public override void LoadData()
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
+
+            Static = this;
+
+            m_procDensity = MySession.Static.Settings.ProceduralDensity;
+
+            if(MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == ObjectBuilders.AsteroidGenerationMethod.PLUGIN)
+            {
+                MySession.Static.Settings.ProceduralDensity = 0f;
+            }
+
+            m_isEnabled = true;
+
+            //Add default impl of registering of standard generator components
         }
 
+        /// <summary>
+        /// Updates all modules
+        /// </summary>
+        public override void UpdateBeforeSimulation()
+        {
+            if (!m_isEnabled) return;
+
+            foreach(var objectModule in m_objectModules)
+            {
+                objectModule.GenerateObjects();
+            }
+
+            foreach(var tracker in m_trackedEntities)
+            {
+                foreach(var module in m_cellModules)
+                {
+                    var oldBounds = tracker.Value.BoundingVolume;
+                    tracker.Value.UpdateLastPosition();
+
+                    module.MarkForUnloadCellsInBounds(oldBounds);
+                    module.MarkToLoadCellsInBounds(tracker.Value.BoundingVolume);
+
+                    if(tracker.Key is MyCharacter)
+                        module.UpdateGpsForPlayer(tracker.Value);
+                }
+            }
+
+            foreach (var module in m_cellModules)
+            {
+                module.UnloadCells();
+                module.LoadCells();
+                module.GenerateLoadedCellObjects();
+            }
+        }
+
+        /// <summary>
+        /// Unloads used data.
+        /// </summary>
         protected override void UnloadData()
         {
             m_trackedEntities.Clear();
+            m_cellModules.Clear();
+            m_objectModules.Clear();
+        }
+
+        /// <summary>
+        /// Registers a new module for this instance of the procedural generator
+        /// </summary>
+        /// <param name="module"></param>
+        public void RegisterModule(MyAbstractProceduralCellModule module)
+        {
+            if (!m_cellModules.Contains(module))
+            {
+                m_cellModules.Add(module);
+            }
+        }
+
+        /// <summary>
+        /// Registers a new module for this instance of the procedural generator
+        /// </summary>
+        /// <param name="module"></param>
+        public void RegisterModule(MyAbstractProceduralObjectModul module)
+        {
+            if (!m_objectModules.Contains(module))
+            {
+                m_objectModules.Add(module);
+            }
         }
 
         public void TrackEntity(MyEntity entity)

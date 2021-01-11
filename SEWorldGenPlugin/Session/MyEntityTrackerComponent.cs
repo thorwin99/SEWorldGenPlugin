@@ -104,6 +104,7 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Registers a new Entity tracker and notifies him about all
         /// currently tracked entities.
+        /// Only run in or after init phase
         /// </summary>
         /// <param name="tracker">Tracker to register</param>
         public void RegisterTracker(IMyEntityTracker tracker)
@@ -118,6 +119,7 @@ namespace SEWorldGenPlugin.Session
 
         /// <summary>
         /// Unregisters an Entity tracker
+        /// Only run in or after init phase
         /// </summary>
         /// <param name="tracker"></param>
         public void UnregisterTracker(IMyEntityTracker tracker)

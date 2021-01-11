@@ -11,7 +11,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
     /// Cell based generator module. Will only generate objects of loaded cells
     /// and will handle unloading of said cells.
     /// </summary>
-    public abstract class MyAbstractProceduralCellModule
+    public abstract class MyAbstractProceduralCellModule : IMyProceduralGeneratorModule
     {
         /// <summary>
         /// Seed used in this module
@@ -32,6 +32,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// All cells, that should get unloaded, if no entity is in range of it.
         /// </summary>
         protected CachingHashSet<MyProceduralCell> m_toUnloadCells = new CachingHashSet<MyProceduralCell>();
+
+        /// <summary>
+        /// All cells, that should get loaded, if entities are in range of it.
+        /// </summary>
+        protected CachingHashSet<MyProceduralCell> m_toLoadCells = new CachingHashSet<MyProceduralCell>();
 
         /// <summary>
         /// All currently existing object seeds.
@@ -61,7 +66,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         /// <param name="cellId">The cell id of the cell</param>
         /// <returns>The new Procedural cell</returns>
-        public abstract MyProceduralCell GenerateCellSeeds(Vector3I cellId);
+        protected abstract MyProceduralCell GenerateCellSeeds(Vector3I cellId);
 
         /// <summary>
         /// Generates all objects inside the currently loaded cells, if they are not
@@ -74,5 +79,42 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         /// <param name="seed">The MyObjectSeed of the object that should be removed.</param>
         public abstract void CloseObject(MyObjectSeed seed);
+
+        public abstract void UpdateGpsForPlayer(MyEntityTracker entity);
+
+        /// <summary>
+        /// Marks cells to load inside the bounds
+        /// </summary>
+        /// <param name="bounds">Spherical bounds</param>
+        public void MarkToLoadCellsInBounds(BoundingSphereD bounds)
+        {
+
+        }
+
+        /// <summary>
+        /// Generates all loaded cells and marked to be loaded cells
+        /// </summary>
+        public void LoadCells()
+        {
+
+        }
+
+        /// <summary>
+        /// Marks all cells inside the bounds to be unloaded.
+        /// </summary>
+        /// <param name="bounds">Spherical bounds</param>
+        public void MarkForUnloadCellsInBounds(BoundingSphereD bounds)
+        {
+
+        }
+
+        /// <summary>
+        /// Unloads all marked cells, except those, that are also marked to be loaded, due 
+        /// to overlapping bounds when marking.
+        /// </summary>
+        public void UnloadCells()
+        {
+
+        }
     }
 }
