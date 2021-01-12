@@ -110,7 +110,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     var oldBounds = tracker.Value.BoundingVolume;
                     tracker.Value.UpdateLastPosition();
 
-                    module.MarkForUnloadCellsInBounds(oldBounds);
+                    module.MarkForUnloadCellsInBounds(oldBounds, tracker.Value.BoundingVolume);
                     module.MarkToLoadCellsInBounds(tracker.Value.BoundingVolume);
 
                     if(tracker.Key is MyCharacter)

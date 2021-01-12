@@ -31,12 +31,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <summary>
         /// All cells, that should get unloaded, if no entity is in range of it.
         /// </summary>
-        protected CachingHashSet<MyProceduralCell> m_toUnloadCells = new CachingHashSet<MyProceduralCell>();
+        private CachingHashSet<MyProceduralCell> m_toUnloadCells = new CachingHashSet<MyProceduralCell>();
 
         /// <summary>
         /// All cells, that should get loaded, if entities are in range of it.
         /// </summary>
-        protected CachingHashSet<MyProceduralCell> m_toLoadCells = new CachingHashSet<MyProceduralCell>();
+        private CachingHashSet<Vector3I> m_toLoadCells = new CachingHashSet<Vector3I>();
 
         /// <summary>
         /// All currently existing object seeds.
@@ -88,24 +88,79 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <param name="bounds">Spherical bounds</param>
         public void MarkToLoadCellsInBounds(BoundingSphereD bounds)
         {
+            BoundingBoxD box = BoundingBoxD.CreateFromSphere(bounds);
+            Vector3I cellId = Vector3I.Floor(box.Min / m_cellSize);
 
+            for (var it = GetCellsIterator(box); it.IsValid(); it.GetNext(out cellId))
+            {
+                if (m_toLoadCells.Contains(cellId)) continue;
+
+                BoundingBoxD cellBounds = new BoundingBoxD(cellId * m_cellSize, (cellId + 1) * m_cellSize);
+                if (bounds.Contains(cellBounds) == ContainmentType.Disjoint) continue;
+
+                m_toLoadCells.Add(cellId);
+            }
+
+            m_toLoadCells.ApplyAdditions();
         }
 
         /// <summary>
-        /// Generates all loaded cells and marked to be loaded cells
+        /// Gets an iterator for all Vector3I within the bounding box bbox
+        /// </summary>
+        /// <param name="bbox">Bounding box</param>
+        /// <returns>Vector3I Iterator for all vectors inside bbox</returns>
+        protected Vector3I_RangeIterator GetCellsIterator(BoundingBoxD bbox)
+        {
+            Vector3I min = Vector3I.Floor(bbox.Min / m_cellSize);
+            Vector3I max = Vector3I.Floor(bbox.Max / m_cellSize);
+
+            return new Vector3I_RangeIterator(ref min, ref max);
+        }
+
+        /// <summary>
+        /// Generates all marked to be loaded cells seeds
         /// </summary>
         public void LoadCells()
         {
+            m_toLoadCells.ApplyAdditions();
 
+            foreach(var cellId in m_toLoadCells)
+            {
+                if (m_loadedCells.ContainsKey(cellId)) continue;
+
+                MyProceduralCell cell = GenerateCellSeeds(cellId);
+                if (cell != null)
+                {
+                    m_loadedCells.Add(cellId, cell);
+
+                    BoundingBoxD aabb = cell.BoundingVolume;
+                    cell.proxyId = m_cellsTree.AddProxy(ref aabb, cell, 0u);
+                }
+            }
+
+            m_toLoadCells.Clear();
         }
 
         /// <summary>
         /// Marks all cells inside the bounds to be unloaded.
         /// </summary>
         /// <param name="bounds">Spherical bounds</param>
-        public void MarkForUnloadCellsInBounds(BoundingSphereD bounds)
+        public void MarkForUnloadCellsInBounds(BoundingSphereD bounds, BoundingSphereD? exclude = null)
         {
+            Vector3I cellId = Vector3I.Floor((bounds.Center - bounds.Radius) / m_cellSize);
+            for (var iter = GetCellsIterator(BoundingBoxD.CreateFromSphere(bounds)); iter.IsValid(); iter.GetNext(out cellId))
+            {
+                if (m_toLoadCells.Contains(cellId)) continue;
 
+                MyProceduralCell cell;
+                if (m_loadedCells.TryGetValue(cellId, out cell))
+                {
+                    if(exclude == null || !exclude.HasValue || exclude.Value.Contains(cell.BoundingVolume) == ContainmentType.Disjoint)
+                    {
+                        m_toUnloadCells.Add(cell);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -114,7 +169,33 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         public void UnloadCells()
         {
+            m_toUnloadCells.ApplyAdditions();
 
+            if (m_toUnloadCells.Count == 0) return;
+
+            foreach(var cell in m_toUnloadCells)
+            {
+                List<MyObjectSeed> seeds = new List<MyObjectSeed>();
+
+                cell.GetAll(seeds);
+
+                foreach(var seed in seeds)
+                {
+                    if (seed.Params.Generated)
+                    {
+                        CloseObject(seed);
+                    }
+                }
+                seeds.Clear();
+            }
+
+            foreach (var cell in m_toUnloadCells)
+            {
+                m_loadedCells.Remove(cell.CellId);
+                m_cellsTree.RemoveProxy(cell.proxyId);
+            }
+
+            m_toUnloadCells.Clear();
         }
     }
 }
