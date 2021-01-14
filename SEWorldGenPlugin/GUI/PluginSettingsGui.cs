@@ -164,7 +164,7 @@ namespace SEWorldGenPlugin.GUI
             m_ringProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.5f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.RING_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
             m_beltHeightSlider = new MyGuiControlClickableSlider(Vector2.Zero, 4000f, 40000f, x2, 22000f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_HEIGHT_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
             m_beltProbSlider = new MyGuiControlClickableSlider(Vector2.Zero, 0f, 1f, x2, 0.4f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.BELT_PROB_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: false);
-            m_worldSizeSlider = new MyGuiControlClickableSlider(Vector2.Zero, -1f, 1000000 - 1, x2, -1, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
+            m_worldSizeSlider = new MyGuiControlClickableSlider(Vector2.Zero, -1f, 1000000 - 1, x2, -1f, null, null, 0, 0.8f, 0.05f, "White", MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER, MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, intValue: true);
 
             m_asteroidDensityValue = MakeLabel(String.Format("{0:0.00}", m_asteroidDensitySlider.Value));
             m_asteroidDensityValue.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_RIGHT_AND_VERTICAL_CENTER;
@@ -525,7 +525,12 @@ namespace SEWorldGenPlugin.GUI
 
             m_beltHeightSlider.Value = (settings.GeneratorSettings.BeltSettings.MinBeltHeight + settings.GeneratorSettings.BeltSettings.MaxBeltHeight) / 2;
         
-            m_worldSizeSlider.Value = settings.GeneratorSettings.WorldSize / 1000;
+            m_worldSizeSlider.Value = settings.GeneratorSettings.WorldSize > 0 ? settings.GeneratorSettings.WorldSize / 1000 : -1;
+
+            if(m_worldSizeSlider.Value < 0)
+            {
+                m_worldSizeValue.Text = "Infinite";
+            }
         }
 
         /// <summary>

@@ -147,7 +147,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             Verifier.VerifyInt(0, MinOrbitDistance, 4000000, "MinOrbitDistance", ref MinOrbitDistance);
             Verifier.VerifyInt(MinOrbitDistance, int.MaxValue, 10000000, "MaxOrbitDistance", ref MaxOrbitDistance);
             Verifier.VerifyFloat(0f, 1f, 0.5f, "AsteroidDensity", ref AsteroidDensity);
-            Verifier.VerifyLong(-1, long.MaxValue, 10000000, "MaxOrbitDistance", ref WorldSize);
+            Verifier.VerifyLong(-1, long.MaxValue, -1, "MaxOrbitDistance", ref WorldSize);
 
             PlanetSettings.Verify();
             BeltSettings.Verify();
