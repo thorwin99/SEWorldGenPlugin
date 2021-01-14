@@ -89,6 +89,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             m_isEnabled = true;
 
             //Add default impl of registering of standard generator components
+            RegisterModule(new MyProceduralPlanetModule(m_seed));
         }
 
         /// <summary>

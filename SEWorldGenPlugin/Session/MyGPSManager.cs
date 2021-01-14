@@ -79,10 +79,10 @@ namespace SEWorldGenPlugin.Session
         /// <param name="pos">Position of the gps</param>
         /// <param name="player">Player, the gps belongs to</param>
         /// <returns>False, if the gps is already added, else true</returns>
-        public bool AddDynamicGps(string name, Color color, Vector3D pos, MyPlayer player)
+        public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId)
         {
             MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, player.Identity.IdentityId);
+            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key)) return false;
             MyGps gps = new MyGps
@@ -97,7 +97,7 @@ namespace SEWorldGenPlugin.Session
             gps.CalculateHash();
             gps.UpdateHash();
 
-            MySession.Static.Gpss.SendAddGps(player.Identity.IdentityId, ref gps, playSoundOnCreation: false);
+            MySession.Static.Gpss.SendAddGps(playerId, ref gps, playSoundOnCreation: false);
             m_dynamicGpss.Add(key, gps.Hash);
 
             return true;
@@ -111,21 +111,21 @@ namespace SEWorldGenPlugin.Session
         /// <param name="pos">New Position of the gps</param>
         /// <param name="player"></param>
         /// <returns></returns>
-        public bool ModifyDynamicGps(string name, Color color, Vector3D pos, MyPlayer player)
+        public bool ModifyDynamicGps(string name, Color color, Vector3D pos, long playerId)
         {
             MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, player.Identity.IdentityId);
+            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
                 MyGps gps;
-                MySession.Static.Gpss[player.Identity.IdentityId].TryGetValue(m_dynamicGpss[key], out gps);
+                MySession.Static.Gpss[playerId].TryGetValue(m_dynamicGpss[key], out gps);
 
                 if (gps == null) return false;
 
                 gps.Coords = pos;
 
-                MySession.Static.Gpss.SendModifyGps(player.Identity.IdentityId, gps);
+                MySession.Static.Gpss.SendModifyGps(playerId, gps);
 
                 gps.UpdateHash();
                 m_dynamicGpss[key] = gps.Hash;
@@ -143,10 +143,10 @@ namespace SEWorldGenPlugin.Session
         /// <param name="color">Color of the gps</param>
         /// <param name="player">Player, the gps belongs to</param>
         /// <returns></returns>
-        public bool RemoveDynamicGps(string name, Color color, MyPlayer player)
+        public bool RemoveDynamicGps(string name, Color color, long playerId)
         {
             MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, player.Identity.IdentityId);
+            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
@@ -164,10 +164,10 @@ namespace SEWorldGenPlugin.Session
         /// <param name="color">Color of the gps</param>
         /// <param name="player">Player, the gps belongs to</param>
         /// <returns></returns>
-        public bool DynamicGpsExists(string name, Color color, MyPlayer player)
+        public bool DynamicGpsExists(string name, Color color, long playerId)
         {
             MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, player.Identity.IdentityId);
+            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
 
             return m_dynamicGpss.ContainsKey(key);
         }

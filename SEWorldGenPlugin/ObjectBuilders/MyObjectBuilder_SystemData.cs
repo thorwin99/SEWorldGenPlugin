@@ -22,6 +22,23 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(1)]
         public MySystemObject CenterObject;
 
+        public HashSet<MySystemObject> GetAllObjects()
+        {
+            HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
+
+            foreach(var o in CenterObject.GetAllChildren())
+            {
+                objs.Add(o);
+            }
+            objs.Add(CenterObject);
+
+            return objs;
+        }
+
+        /// <summary>
+        /// Returns the amount of objects in the system
+        /// </summary>
+        /// <returns></returns>
         public int Count()
         {
             return 1 + CenterObject.ChildCount();
@@ -148,6 +165,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// Class representing a planets data in the solar system
     /// </summary>
     [ProtoContract]
+    [ProtoInclude(5004, typeof(MySystemPlanetMoon))]
+    [XmlInclude(typeof(MySystemPlanetMoon))]
     [Serializable]
     public class MySystemPlanet : MySystemObject
     {

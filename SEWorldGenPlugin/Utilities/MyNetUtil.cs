@@ -216,7 +216,7 @@ namespace SEWorldGenPlugin.Utilities
         /// <param name="msg">Incoming ping message</param>
         private static void ServerPingHandler(ulong senderId, string msg)
         {
-            if (!MySettingsSession.Static.Settings.Enable) return;
+            if (!MySettingsSession.Static.IsEnabled()) return;
             if (!int.TryParse(msg.Replace(GetPingRawMsg(), " ").Trim(), out int id))return;
             if (msg.Contains(GetPingRawMsg())){
                 SendPacket(PING_HANDLER, GetPongMsg(id), senderId);
