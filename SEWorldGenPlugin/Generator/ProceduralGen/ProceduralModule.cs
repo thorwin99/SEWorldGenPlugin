@@ -1,4 +1,5 @@
 ﻿using Sandbox.Game.World.Generator;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using VRage.Collections;
@@ -68,43 +69,46 @@ namespace SEWorldGenPlugin.Generator.ProceduralGen
         /// <param name="trackedEntities">List of tracked entities</param>
         public void UnloadCells(Dictionary<MyEntity, MyEntityTracker> trackedEntities)
         {
-            m_toUnloadCells.ApplyAdditions();
-            if (m_toUnloadCells.Count == 0) return;
-
-            List<MyObjectSeed> cellObjects = new List<MyObjectSeed>();
-
-            foreach (MyProceduralCell cell in m_toUnloadCells)
+            lock (m_toUnloadCells)
             {
-                foreach (MyEntityTracker tracker in trackedEntities.Values)
+                m_toUnloadCells.ApplyAdditions();
+                if (m_toUnloadCells.Count == 0) return;
+
+                List<MyObjectSeed> cellObjects = new List<MyObjectSeed>();
+
+                foreach (MyProceduralCell cell in m_toUnloadCells)
                 {
-                    BoundingSphereD boundingVolume = tracker.BoundingVolume;
-                    if (boundingVolume.Contains(cell.BoundingVolume) != ContainmentType.Disjoint)
+                    foreach (MyEntityTracker tracker in trackedEntities.Values)
                     {
-                        m_toUnloadCells.Remove(cell);
-                        break;
+                        BoundingSphereD boundingVolume = tracker.BoundingVolume;
+                        if (boundingVolume.Contains(cell.BoundingVolume) != ContainmentType.Disjoint)
+                        {
+                            m_toUnloadCells.Remove(cell);
+                            break;
+                        }
                     }
                 }
-            }
-            m_toUnloadCells.ApplyRemovals();
-            foreach (var cell in m_toUnloadCells)
-            {
-                cell.GetAll(cellObjects);
-
-                foreach (MyObjectSeed obj in cellObjects)
+                m_toUnloadCells.ApplyRemovals();
+                foreach (var cell in m_toUnloadCells)
                 {
-                    if (obj.Params.Generated)
+                    cell.GetAll(cellObjects);
+
+                    foreach (MyObjectSeed obj in cellObjects)
                     {
-                        CloseObject(obj);
+                        if (obj.Params.Generated)
+                        {
+                            CloseObject(obj);
+                        }
                     }
+                    cellObjects.Clear();
                 }
-                cellObjects.Clear();
+                foreach (MyProceduralCell cell in m_toUnloadCells)
+                {
+                    m_cells.Remove(cell.CellId);
+                    m_cellsTree.RemoveProxy(cell.proxyId);
+                }
+                m_toUnloadCells.Clear();
             }
-            foreach (MyProceduralCell cell in m_toUnloadCells)
-            {
-                m_cells.Remove(cell.CellId);
-                m_cellsTree.RemoveProxy(cell.proxyId);
-            }
-            m_toUnloadCells.Clear();
         }
 
         /// <summary>
