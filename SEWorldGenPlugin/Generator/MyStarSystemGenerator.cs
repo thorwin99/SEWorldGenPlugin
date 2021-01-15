@@ -32,7 +32,7 @@ namespace SEWorldGenPlugin.Generator
         /// <summary>
         /// File name for the file containing the system data for the world
         /// </summary>
-        private readonly string STORAGE_FILE = "SystemData.xml";
+        private readonly string STORAGE_FILE = "SolarSystem.xml";
 
         /// <summary>
         /// List of all vanilla planets, to allow users to exclude them from world generation
