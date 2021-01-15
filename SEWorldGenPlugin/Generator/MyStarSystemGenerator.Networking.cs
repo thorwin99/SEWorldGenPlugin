@@ -125,6 +125,8 @@ namespace SEWorldGenPlugin.Generator
                         Static.StarSystem.CenterObject.ChildObjects.Add(obj);
                         PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectClient, true, callbackId, clientId);
                     }
+
+                    Static.AddAllPersistentGps();
                 }
             }
             PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectClient, false, callbackId, clientId);

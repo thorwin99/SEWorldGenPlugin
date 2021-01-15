@@ -35,6 +35,13 @@ namespace SEWorldGenPlugin.Generator
         private readonly string STORAGE_FILE = "SolarSystem.xml";
 
         /// <summary>
+        /// Colors used for persistent gps generation
+        /// </summary>
+        private readonly Color PLANET_GPS_COLOR = Color.White;
+        private readonly Color MOON_GPS_COLOR = Color.White;
+        private readonly Color RING_GPS_COLOR = Color.Yellow;
+
+        /// <summary>
         /// List of all vanilla planets, to allow users to exclude them from world generation
         /// </summary>
         private readonly List<string> VANILLA_PLANETS = new List<string> { "Alien", "EarthLike", "EarthLikeTutorial", "Europa", "Mars", "MarsTutorial", "Moon", "MoonTutorial", "Pertam", "Titan", "Triton" };
@@ -148,13 +155,13 @@ namespace SEWorldGenPlugin.Generator
                         case MySystemObjectType.MOON:
                             if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.White, item.CenterPosition);
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition);
                             }
                             break;
                         case MySystemObjectType.PLANET:
                             if (settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.White, item.CenterPosition);
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition);
                             }
                             break;
                         case MySystemObjectType.RING:
@@ -162,7 +169,7 @@ namespace SEWorldGenPlugin.Generator
                             {
                                 MyAsteroidObjectShapeRing shape = MyAsteroidObjectShapeRing.CreateFromRingItem(item as MySystemRing);
 
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, Color.Yellow, shape.LocationInRing(0));
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.LocationInRing(0));
                             }
                             break;
                     }
