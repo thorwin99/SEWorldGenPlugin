@@ -72,6 +72,19 @@ namespace SEWorldGenPlugin.Session
         }
 
         /// <summary>
+        /// Checks if a given persistent gps already exists
+        /// </summary>
+        /// <param name="name">Name of the gps</param>
+        /// <param name="color">Color of the gps</param>
+        /// <param name="pos">Position of the gps</param>
+        /// <returns>True if the persistent gps exists</returns>
+        public bool PersistenGpsExists(string name, Color color, Vector3D pos)
+        {
+            MyGpsId id = new MyGpsId(name, color, pos);
+            return m_globalGpss.ContainsKey(id);
+        }
+
+        /// <summary>
         /// Adds a new Dynamic gps to the player
         /// </summary>
         /// <param name="name">Name of the gps</param>
