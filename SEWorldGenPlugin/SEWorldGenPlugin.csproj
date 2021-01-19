@@ -177,6 +177,7 @@
     <Compile Include="Generator\ProceduralGeneration\IMyProceduralGeneratorModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyAbstractProceduralCellModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyAbstractProceduralObjectModul.cs" />
+    <Compile Include="Generator\ProceduralGeneration\MyProceduralAsteroidsModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyProceduralGeneratorComponent.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGen\EntityExtension.cs" />

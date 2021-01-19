@@ -41,7 +41,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <summary>
         /// All currently existing object seeds.
         /// </summary>
-        protected HashSet<MyObjectSeedParams> m_existingObjectSeeds = new HashSet<MyObjectSeedParams>();
+        protected HashSet<MyObjectSeed> m_existingObjectSeeds = new HashSet<MyObjectSeed>();
 
         /// <summary>
         /// Size of the cells of this module
@@ -196,6 +196,20 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             }
 
             m_toUnloadCells.Clear();
+        }
+
+        /// <summary>
+        /// Gets the seed of the object based on the objects hashcode.
+        /// </summary>
+        /// <param name="obj">The MyObjectSeed for the object</param>
+        /// <returns>The seed of the object</returns>
+        protected int GetObjectIdSeed(MyObjectSeed obj)
+        {
+            int hash = obj.CellId.GetHashCode();
+            hash = (hash * 397) ^ m_seed;
+            hash = (hash * 397) ^ obj.Params.Index;
+            hash = (hash * 397) ^ obj.Params.Seed;
+            return hash;
         }
     }
 }

@@ -90,6 +90,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
             //Add default impl of registering of standard generator components
             RegisterModule(new MyProceduralPlanetModule(m_seed));
+            RegisterModule(new MyProceduralAsteroidsModule(m_seed));
         }
 
         /// <summary>

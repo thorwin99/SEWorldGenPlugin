@@ -230,7 +230,7 @@ namespace SEWorldGenPlugin.Generator
 
                 while(planetCount > 0)
                 {
-                    currentOrbitDistance += MyRandom.Instance.Next(orbitDistances.Min, orbitDistances.Max) * 1000;
+                    currentOrbitDistance += MyRandom.Instance.Next(orbitDistances.Min, orbitDistances.Max);
 
                     //Maybe rework to override orbit distance, so all objects fit
                     if (worldSize >= 0 && currentOrbitDistance >= worldSize) return system;

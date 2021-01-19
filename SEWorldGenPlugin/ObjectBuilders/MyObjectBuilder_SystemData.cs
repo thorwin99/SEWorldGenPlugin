@@ -22,6 +22,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(1)]
         public MySystemObject CenterObject;
 
+        /// <summary>
+        /// Gets all objects currently in the system
+        /// </summary>
+        /// <returns>All objects</returns>
         public HashSet<MySystemObject> GetAllObjects()
         {
             HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
