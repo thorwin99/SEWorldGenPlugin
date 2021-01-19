@@ -1,5 +1,5 @@
 ﻿using Sandbox.Game;
-using SEWorldGenPlugin.Generator.ProceduralGen;
+using SEWorldGenPlugin.Generator.ProceduralGenerator;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Utilities;
@@ -50,7 +50,7 @@ namespace SEWorldGenPlugin
             MyPluginLog.Log("Version is " + updater.GetVersion());
             MyPluginLog.Log("Latest Version is " + updater.GetNewestVersion());
 
-            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += EntityExtension.EntityTracking;
+            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += MyEntityExtension.EntityTracking;
 
             MyPerGameSettings.GUI.MainMenu = typeof(PluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);

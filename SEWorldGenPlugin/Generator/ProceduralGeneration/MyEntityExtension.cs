@@ -2,12 +2,12 @@
 using SEWorldGenPlugin.Session;
 using VRage.Game.Entity;
 
-namespace SEWorldGenPlugin.Generator.ProceduralGen
+namespace SEWorldGenPlugin.Generator.ProceduralGenerator
 {
     /// <summary>
     /// Extension class for VRage.Game.Entity.MyEntity which holds extension methods.
     /// </summary>
-    public static class EntityExtension
+    public static class MyEntityExtension
     {
         /// <summary>
         /// This method adds the MyEntity to the MyEntityTrackerComponent as a 
