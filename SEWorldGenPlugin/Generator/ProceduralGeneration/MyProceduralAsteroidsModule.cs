@@ -173,7 +173,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     voxelMap.RangeChanged += del;
 
                     seed.UserData = voxelMap;
-                    MyPluginLog.Log("Generated Voxel map with user data " + seed.UserData.GetType(), LogLevel.DEBUG);
+                    MyPluginLog.Debug("Generated Voxel map with user data " + seed.UserData.GetType(), LogLevel.INFO);
                 }
             }
         }

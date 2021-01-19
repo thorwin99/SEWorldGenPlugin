@@ -9,8 +9,7 @@ namespace SEWorldGenPlugin.Utilities
     {
         INFO,
         WARNING,
-        ERROR,
-        DEBUG
+        ERROR
     };
 
     /// <summary>
@@ -37,14 +36,35 @@ namespace SEWorldGenPlugin.Utilities
                 case LogLevel.ERROR:
                     MyLog.Default.Error("SEWorldGenPlugin - " + level.ToString() + " " + message);
                     break;
-#if DEBUG
-                case LogLevel.DEBUG:
-                    MyLog.Default.WriteLine("SEWorldGenPlugin - " + level.ToString() + " " + message);
-                    break;
-#endif
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// Writes a message to the log file with an optional log level. Will only print something when 
+        /// application is compiled in debug configuration.
+        /// </summary>
+        /// <param name="message">Message to log</param>
+        /// <param name="level">Optional log level</param>
+        public static void Debug(string message, LogLevel level = LogLevel.INFO)
+        {
+#if DEBUG
+            switch (level)
+            {
+                case LogLevel.INFO:
+                    MyLog.Default.WriteLine("SEWorldGenPlugin - " + level.ToString() + " " + message);
+                    break;
+                case LogLevel.WARNING:
+                    MyLog.Default.Warning("SEWorldGenPlugin - " + level.ToString() + " " + message);
+                    break;
+                case LogLevel.ERROR:
+                    MyLog.Default.Error("SEWorldGenPlugin - " + level.ToString() + " " + message);
+                    break;
+                default:
+                    break;
+            }
+#endif
         }
     }
 }
