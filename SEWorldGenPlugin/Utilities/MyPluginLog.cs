@@ -9,7 +9,8 @@ namespace SEWorldGenPlugin.Utilities
     {
         INFO,
         WARNING,
-        ERROR
+        ERROR,
+        DEBUG
     };
 
     /// <summary>
@@ -35,6 +36,13 @@ namespace SEWorldGenPlugin.Utilities
                     break;
                 case LogLevel.ERROR:
                     MyLog.Default.Error("SEWorldGenPlugin - " + level.ToString() + " " + message);
+                    break;
+#if DEBUG
+                case LogLevel.DEBUG:
+                    MyLog.Default.WriteLine("SEWorldGenPlugin - " + level.ToString() + " " + message);
+                    break;
+#endif
+                default:
                     break;
             }
         }
