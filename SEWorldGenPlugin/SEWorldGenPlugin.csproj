@@ -185,7 +185,7 @@
     <Compile Include="GUI\PluginAdminMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
     <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
-    <Compile Include="GUI\PluginMainMenu.cs" />
+    <Compile Include="GUI\MyPluginMainMenu.cs" />
     <Compile Include="GUI\PluginSettingsGui.cs" />
     <Compile Include="GUI\PluginWorldSettings.cs" />
     <Compile Include="http\Responses\GitHubVersionResponse.cs" />

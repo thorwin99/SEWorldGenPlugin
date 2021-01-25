@@ -1,21 +1,14 @@
 ﻿using Sandbox;
-using Sandbox.Engine.Networking;
-using Sandbox.Engine.Utils;
 using Sandbox.Game.Screens;
-using Sandbox.Game.Screens.Helpers;
-using Sandbox.Game.World;
 using Sandbox.Graphics;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Utilities;
 using SpaceEngineers.Game.GUI;
 using System;
-using System.IO;
 using System.Text;
 using VRage;
-using VRage.FileSystem;
 using VRage.Game;
-using VRage.Input;
 using VRage.Utils;
 using VRageMath;
 
@@ -25,22 +18,20 @@ namespace SEWorldGenPlugin.GUI
     /// Replacement for the main menu, to add plugin specific information, such as the version of the plugin and if it is enabled.
     /// Also replaces the new game button to insert its own new game menu.
     /// </summary>
-    public class PluginMainMenu : MyGuiScreenMainMenu
+    public class MyPluginMainMenu : MyGuiScreenMainMenu
     {
-        private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin version {0} is loaded and by default ");
-        private static readonly StringBuilder PLUGIN_ENABLED = new StringBuilder("ENABLED");
-        private static readonly StringBuilder PLUGIN_DISABLED = new StringBuilder("DISABLED");
+        private static readonly StringBuilder PLUGIN_LOADED = new StringBuilder("SEWorldGenPlugin version {0} installed");
 
         private static bool OPENED_VERSION_NOTIFICATION = false;
 
         private MyGuiControlElementGroup m_elemtents;
 
-        public PluginMainMenu() : this(false)
+        public MyPluginMainMenu() : this(false)
         {
 
         }
 
-        public PluginMainMenu(bool pauseGame) : base(pauseGame)
+        public MyPluginMainMenu(bool pauseGame) : base(pauseGame)
         {
             m_pauseGame = pauseGame;
         }
@@ -163,20 +154,11 @@ namespace SEWorldGenPlugin.GUI
             StringBuilder pluginWithVersion = new StringBuilder();
             pluginWithVersion.AppendFormat(PLUGIN_LOADED.ToString(), VersionCheck.Static.GetVersion());
 
-            MyGuiManager.DrawString(MyFontEnum.BuildInfo, pluginWithVersion.ToString(), textLeftBottomPosition, 1, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
+            MyGuiManager.DrawString(MyFontEnum.BuildInfo, pluginWithVersion.ToString(), textLeftBottomPosition, 0.5f, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
 
             size = MyGuiManager.MeasureString(MyFontEnum.BuildInfo, pluginWithVersion, 1);
 
             textLeftBottomPosition.X += size.X;
-
-            if (MySettings.Static.Settings.Enable)
-            {
-                MyGuiManager.DrawString(MyFontEnum.BuildInfoHighlight, PLUGIN_ENABLED.ToString(), textLeftBottomPosition, 1, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
-            }
-            else
-            {
-                MyGuiManager.DrawString(MyFontEnum.BuildInfoHighlight, PLUGIN_DISABLED.ToString(), textLeftBottomPosition, 1, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
-            }
         }
     }
 }
