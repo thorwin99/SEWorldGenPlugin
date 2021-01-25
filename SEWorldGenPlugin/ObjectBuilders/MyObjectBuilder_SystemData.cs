@@ -107,9 +107,16 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public SerializableVector3D CenterPosition;
 
         /// <summary>
-        /// All Child objects, such as moons.
+        /// The name of this objects parent
         /// </summary>
         [ProtoMember(4)]
+        [Serialize(MyObjectFlags.Nullable)]
+        public string ParentName;
+
+        /// <summary>
+        /// All Child objects, such as moons.
+        /// </summary>
+        [ProtoMember(5)]
         [Serialize(MyObjectFlags.Nullable)]
         public HashSet<MySystemObject> ChildObjects;
 
@@ -200,6 +207,26 @@ namespace SEWorldGenPlugin.ObjectBuilders
             SubtypeId = "";
             Diameter = 0;
             Generated = false;
+        }
+
+        /// <summary>
+        /// Tries to get a ring that is a child of this planet
+        /// </summary>
+        /// <param name="ring">Out the ring of the planet</param>
+        /// <returns>True, if a ring was found</returns>
+        public bool TryGetPlanetRing(out MySystemRing ring)
+        {
+            foreach(var child in ChildObjects)
+            {
+                if(child is MySystemRing)
+                {
+                    ring = child as MySystemRing;
+                    return true;
+                }
+            }
+
+            ring = null;
+            return false;
         }
     }
 
