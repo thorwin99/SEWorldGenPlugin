@@ -8,6 +8,7 @@ using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.Generator.Asteroids;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
@@ -61,7 +62,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlButton m_removeRingButton;
         private MyGuiControlButton m_teleportToRingButton;
 
-        private MyPlanetItem m_selectedPlanet;
+        private MySystemPlanet m_selectedPlanet;
         private bool m_newPlanet;
 
         //Elements for Planet Menu
@@ -417,9 +418,9 @@ namespace SEWorldGenPlugin.GUI
 
             vector.Y += 0.025f;
 
-            m_ringWidthSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth, MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
+            m_ringWidthSlider = new MyGuiControlClickableSlider(vector + new Vector2(0.001f, 0f), (float)m_selectedPlanet.Diameter / 10, (float)m_selectedPlanet.Diameter / 5, intValue: true, toolTip: MyPluginTexts.TOOLTIPS.ADMIN_RING_WIDTH, showLabel: false);
             m_ringWidthSlider.Size = new Vector2(0.285f, 1f);
-            m_ringWidthSlider.DefaultValue = (MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
+            m_ringWidthSlider.DefaultValue = ((float)m_selectedPlanet.Diameter / 10 + (float)m_selectedPlanet.Diameter / 5) / 2;
             m_ringWidthSlider.Value = m_ringWidthSlider.DefaultValue.Value;
             m_ringWidthSlider.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
             m_ringWidthSlider.ValueChanged = (Action<MyGuiControlSlider>)Delegate.Combine(m_ringWidthSlider.ValueChanged, (Action<MyGuiControlSlider>)delegate (MyGuiControlSlider s)
@@ -652,9 +653,9 @@ namespace SEWorldGenPlugin.GUI
         {
             MyPluginDrawSession.Static.RemoveRenderObject(m_selectedPlanet.GetHashCode());
 
-            MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(GenerateRingItem());
+            MyAsteroidObjectShapeRing shape = MyAsteroidObjectShapeRing.CreateFromRingItem(GenerateRingItem());
 
-            MyPluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + shape.width, (float)shape.radius, shape.height, Color.LightGreen.ToVector4()));
+            MyPluginDrawSession.Static.AddRenderObject(m_selectedPlanet.GetHashCode(), new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + (float)shape.width, (float)shape.radius, (float)shape.height, Color.LightGreen.ToVector4()));
         }
 
         /// <summary>
@@ -666,13 +667,16 @@ namespace SEWorldGenPlugin.GUI
             if(MySession.Static.CameraController != MySession.Static.LocalCharacter)
             {
                 CloseScreen();
-                MyAsteroidRingShape shape = MyAsteroidRingShape.CreateFromRingItem(m_selectedPlanet.PlanetRing);
+                MySystemRing ring = null; ;
+                if (m_selectedPlanet.TryGetPlanetRing(out ring))
+                {
+                    MyAsteroidObjectShapeRing shape = MyAsteroidObjectShapeRing.CreateFromRingItem(ring);
 
-                MyMultiplayer.TeleportControlledEntity(shape.LocationInRing(0));
-                m_attachedEntity = 0L;
-                m_selectedPlanet = null;
-                MyGuiScreenGamePlay.SetCameraController();
-                
+                    MyMultiplayer.TeleportControlledEntity(shape.LocationInRing(0));
+                    m_attachedEntity = 0L;
+                    m_selectedPlanet = null;
+                    MyGuiScreenGamePlay.SetCameraController();
+                }
             }
         }
 
@@ -698,13 +702,14 @@ namespace SEWorldGenPlugin.GUI
                 var item = GenerateRingItem();
                 if (m_newPlanet)
                 {
-                    item.Center = m_selectedPlanet.CenterPosition;
-                    m_selectedPlanet.PlanetRing = item;
-                    SystemGenerator.Static.AddPlanet(m_selectedPlanet);
+                    item.CenterPosition = m_selectedPlanet.CenterPosition;
+                    m_selectedPlanet.ChildObjects.Add(item);
+
+                    MyStarSystemGenerator.Static.AddObjectToSystem(m_selectedPlanet, "", null);
                 }
                 else
                 {
-                    SystemGenerator.Static.AddRingToPlanet(m_selectedPlanet.DisplayName, item, delegate (bool success)
+                    MyStarSystemGenerator.Static.AddObjectToSystem(item, m_selectedPlanet.DisplayName, delegate (bool success)
                     {
                         LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
                         PlanetListItemClicked(m_planetListBox);
@@ -723,16 +728,12 @@ namespace SEWorldGenPlugin.GUI
         {
             if (m_planetListBox.SelectedItems.Count > 0)
             {
-                if (m_newPlanet)
+                MySystemRing ring = null;
+                if(m_selectedPlanet.TryGetPlanetRing(out ring))
                 {
-                    m_selectedPlanet.PlanetRing = null;
-                    SystemGenerator.Static.AddPlanet(m_selectedPlanet);
+                    MyStarSystemGenerator.Static.RemoveObjectFromSystem(ring.DisplayName);
+                    LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
                 }
-                else
-                {
-                    SystemGenerator.Static.RemoveRingFromPlanet(m_selectedPlanet.DisplayName);
-                }
-                LoadPlanetsInWorld(m_selectedPlanet.DisplayName);
             }
         }
 
@@ -740,23 +741,22 @@ namespace SEWorldGenPlugin.GUI
         /// Generates an MyPlanetRingItem with the current slider values in the ring menu
         /// </summary>
         /// <returns>The generated MyPlanetRingItem</returns>
-        private MyPlanetRingItem GenerateRingItem()
+        private MySystemRing GenerateRingItem()
         {
-            if (m_selectedPlanet.PlanetRing != null) return m_selectedPlanet.PlanetRing;
-            MyPlanetRingItem item = new MyPlanetRingItem();
-            item.Type = LegacySystemObjectType.RING;
-            item.DisplayName = "";
-            item.AngleDegrees = m_ringAngleZSlider.Value;
-            item.AngleDegreesX = m_ringAngleXSlider.Value;
-            item.AngleDegreesY = m_ringAngleYSlider.Value;
-            item.Radius = m_ringDistanceSlider.Value + m_selectedPlanet.Size / 2f;
-            item.Width = (int)m_ringWidthSlider.Value;
-            item.Height = item.Width / 10;
-            item.RoidSize = (int)m_ringRoidSizeSlider.Value;
-            item.RoidSizeMax = (int)m_ringRoidSizeMaxSlider.Value;
-            item.Center = m_selectedPlanet.CenterPosition;
+            MySystemRing ring = null;
+            if(m_selectedPlanet.TryGetPlanetRing(out ring)) return ring;
 
-            return item;
+            //Display name needs to be queried from the server.
+            ring = new MySystemRing();
+            ring.DisplayName = "";
+            ring.AngleDegrees = new Vector3D(m_ringAngleXSlider.Value, m_ringAngleYSlider.Value, m_ringAngleZSlider.Value);
+            ring.Radius = m_ringDistanceSlider.Value + m_selectedPlanet.Diameter / 2f;
+            ring.Width = m_ringWidthSlider.Value;
+            ring.Height = ring.Width / 10;
+            ring.AsteroidSize = new MySerializableMinMax((int)m_ringRoidSizeSlider.Value);
+            ring.CenterPosition = m_selectedPlanet.CenterPosition;
+
+            return ring;
         }
 
         /// <summary>
@@ -769,9 +769,9 @@ namespace SEWorldGenPlugin.GUI
         {
             if (box.SelectedItems.Count > 0)
             {
-                var data = (Tuple<MySystemItem, MyEntityList.MyEntityListInfoItem>)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
+                var data = (Tuple<MySystemObject, MyEntityList.MyEntityListInfoItem>)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
                 MyEntityList.MyEntityListInfoItem myEntityListInfoItem = data.Item2;
-                MyPlanetItem planet = (MyPlanetItem)data.Item1;
+                MySystemPlanet planet = data.Item1 as MySystemPlanet;
                 MyPlanet entityPlanet = (MyPlanet)MyEntities.GetEntityById(myEntityListInfoItem.EntityId);
 
                 m_attachedEntity = myEntityListInfoItem.EntityId;
@@ -795,7 +795,8 @@ namespace SEWorldGenPlugin.GUI
                 m_ringDistanceSlider.Value = entityPlanet.AverageRadius * 2 * 1.25f - entityPlanet.AverageRadius;
                 m_ringDistanceSlider.Value -= m_ringDistanceSlider.Value % 1000;
 
-                bool hasRing = m_selectedPlanet.PlanetRing != null;
+                MySystemRing ring = null;
+                bool hasRing = m_selectedPlanet.TryGetPlanetRing(out ring);
 
                 m_ringAngleXSlider.Enabled = !hasRing;
                 m_ringAngleYSlider.Enabled = !hasRing;
@@ -810,13 +811,13 @@ namespace SEWorldGenPlugin.GUI
 
                 if (hasRing)
                 {
-                    m_ringDistanceSlider.Value = (float)m_selectedPlanet.PlanetRing.Radius - m_selectedPlanet.Size / 2;
-                    m_ringWidthSlider.Value = m_selectedPlanet.PlanetRing.Width;
-                    m_ringAngleZSlider.Value = m_selectedPlanet.PlanetRing.AngleDegrees;
-                    m_ringAngleYSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesY;
-                    m_ringAngleXSlider.Value = m_selectedPlanet.PlanetRing.AngleDegreesX;
-                    m_ringRoidSizeSlider.Value = m_selectedPlanet.PlanetRing.RoidSize;
-                    m_ringRoidSizeMaxSlider.Value = m_selectedPlanet.PlanetRing.RoidSizeMax;
+                    m_ringDistanceSlider.Value = (float)ring.Radius - (float)m_selectedPlanet.Diameter / 2;
+                    m_ringWidthSlider.Value = (float)ring.Width;
+                    m_ringAngleZSlider.Value = (float)ring.AngleDegrees.X;
+                    m_ringAngleYSlider.Value = (float)ring.AngleDegrees.X;
+                    m_ringAngleXSlider.Value = (float)ring.AngleDegrees.X;
+                    m_ringRoidSizeSlider.Value = ring.AsteroidSize.Min;
+                    m_ringRoidSizeMaxSlider.Value = ring.AsteroidSize.Max;
                 }
                 else
                 {
@@ -852,10 +853,10 @@ namespace SEWorldGenPlugin.GUI
             {
                 string name = item.DisplayName.Substring(0, item.DisplayName.LastIndexOf("-")).Replace("_", " ").Trim();
 
-                SystemGenerator.Static.GetObject(name, delegate (bool success, MySystemItem obj)
+                MyStarSystemGenerator.Static.GetSystemObjectByName(name, delegate (bool success, MySystemObject obj)
                 {
-                    if (obj.Type == LegacySystemObjectType.MOON) return;
-                    if(obj.Type == LegacySystemObjectType.PLANET && success)
+                    if (obj.Type == MySystemObjectType.MOON) return;
+                    if(obj.Type == MySystemObjectType.PLANET && success)
                     {
                         m_planetListBox.Items.Add(new MyGuiControlListbox.Item(new StringBuilder(name), null, null, Tuple.Create(obj, item)));
                         if(selectPlanet != null && name.Equals(selectPlanet))
@@ -867,20 +868,16 @@ namespace SEWorldGenPlugin.GUI
                     else
                     {
                         MyPlanet e = MyEntities.GetEntityById(item.EntityId) as MyPlanet;
-                        MyPlanetItem p = new MyPlanetItem()
+                        MySystemPlanet p = new MySystemPlanet()
                         {
-                            OffsetPosition = e.PositionLeftBottomCorner,
-                            DefName = item.DisplayName,
-                            DisplayName = item.DisplayName.Replace("_", " "),
+                            CenterPosition = e.PositionComp.GetPosition(),
+                            DisplayName = "",//Needs to be fetched from server
                             Generated = true,
-                            PlanetMoons = new MyPlanetMoonItem[0],
-                            PlanetRing = null,
-                            Size = e.MaximumRadius * 2,
-                            Type = LegacySystemObjectType.PLANET,
-                            CenterPosition = e.PositionComp.GetPosition()
+                            Diameter = e.MaximumRadius * 2,
+                            SubtypeId = item.DisplayName
                         };
-
-                        SystemGenerator.Static.AddPlanet(p, delegate (bool s)
+                        
+                        MyStarSystemGenerator.Static.AddObjectToSystem(p, "", delegate (bool s)
                         {
                             if (s)
                             {
@@ -902,7 +899,7 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         private void LoadPlanetDefinitions()
         {
-            var definitions = SystemGenerator.Static.PlanetDefinitions;
+            var definitions = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions();
             foreach (var item in definitions)
             {
                 string name = item.Id.SubtypeName.ToString();
@@ -935,17 +932,13 @@ namespace SEWorldGenPlugin.GUI
             if (m_planetDefListBox.SelectedItems.Count > 0)
             {
                 float size = m_planetSizeSlider.Value * 1000;
-                MyPlanetItem planet = new MyPlanetItem()
+                MySystemPlanet planet = new MySystemPlanet()
                 {
-                    OffsetPosition = Vector3D.Zero,
-                    DefName = m_selectedDefinition.Id.SubtypeId.ToString(),
-                    DisplayName = m_selectedDefinition.Id.SubtypeId.ToString() + " " + size + " " + MyRandom.Instance.Next(),
+                    CenterPosition = Vector3D.Zero,
+                    SubtypeId = m_selectedDefinition.Id.SubtypeId.ToString(),
                     Generated = false,
-                    PlanetMoons = new MyPlanetMoonItem[0],
-                    PlanetRing = null,
-                    Size = size,
-                    Type = LegacySystemObjectType.PLANET,
-                    CenterPosition = Vector3D.Zero
+                    DisplayName = "", //Needs to be fetched from server.
+                    Diameter = size
                 };
 
                 MyPluginItemsClipboard.Static.Activate(planet, SpawnPlanet, size);
@@ -959,14 +952,14 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         /// <param name="planet">Planet to spawn</param>
         /// <param name="position">Position to spawn at</param>
-        private void SpawnPlanet(MySystemItem planet, Vector3D position)
+        private void SpawnPlanet(MySystemPlanet planet, Vector3D position)
         {
-            if(planet.Type == LegacySystemObjectType.PLANET)
+            if(planet.Type == MySystemObjectType.PLANET)
             {
-                MyPlanetItem p = (MyPlanetItem)planet;
+                MySystemPlanet p = planet;
                 p.CenterPosition = position;
 
-                SystemGenerator.Static.AddPlanet(p);
+                MyStarSystemGenerator.Static.AddObjectToSystem(p);
             }
         }
 
