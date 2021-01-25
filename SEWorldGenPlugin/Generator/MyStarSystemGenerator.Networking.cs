@@ -13,22 +13,22 @@ namespace SEWorldGenPlugin.Generator
     public partial class MyStarSystemGenerator
     {
         private Dictionary<ulong, Action<bool, MySystemObject>> m_getActionCallbacks;
-        private Dictionary<ulong, Action<bool>> m_addActionsCallbacks;
+        private Dictionary<ulong, Action<bool>> m_simpleActionsCallbacks;
         private ulong m_currentGetIndex;
-        private ulong m_currentAddIndex;
+        private ulong m_currentSimpleIndex;
 
         private void LoadNetworking()
         {
             m_getActionCallbacks = new Dictionary<ulong, Action<bool, MySystemObject>>();
-            m_addActionsCallbacks = new Dictionary<ulong, Action<bool>>();
-            m_currentAddIndex = 0;
+            m_simpleActionsCallbacks = new Dictionary<ulong, Action<bool>>();
+            m_currentSimpleIndex = 0;
             m_currentGetIndex = 0;
         }
 
         private void UnloadNetworking()
         {
             m_getActionCallbacks.Clear();
-            m_addActionsCallbacks.Clear();
+            m_simpleActionsCallbacks.Clear();
         }
 
         /// <summary>
@@ -49,11 +49,22 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="systemObject">Object to add</param>
         /// <param name="parentName">Name of the parent object</param>
         /// <param name="callback">Callback to run when object was added</param>
-        public void AddObjectToSystem(MySystemObject systemObject, string parentName, Action<bool> callback)
+        public void AddObjectToSystem(MySystemObject systemObject, string parentName = "", Action<bool> callback = null)
         {
             if (systemObject.Type == MySystemObjectType.MOON) return;
-            m_addActionsCallbacks.Add(++m_currentAddIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentName, m_currentGetIndex, Sync.MyId);
+            m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentName == null ? "" : parentName, m_currentGetIndex, Sync.MyId);
+        }
+
+        /// <summary>
+        /// Removes an object from the system.
+        /// </summary>
+        /// <param name="objectName">Name of the object to remove</param>
+        /// <param name="callback">Callback to run, if the object was removed or not</param>
+        public void RemoveObjectFromSystem(string objectName, Action<bool> callback = null)
+        {
+            m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectName, m_currentSimpleIndex, Sync.MyId);
         }
 
         /// <summary>
@@ -103,9 +114,9 @@ namespace SEWorldGenPlugin.Generator
         /// <summary>
         /// Server Event: Adds a new system object to the system on the server.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="callbackId"></param>
-        /// <param name="clientId"></param>
+        /// <param name="obj">Object to add</param>
+        /// <param name="callbackId">Id of the callback to run</param>
+        /// <param name="clientId">Id of the client, that requested this</param>
         [Event(102)]
         [Server]
         private static void SendAddSystemObjectServer(MySystemObject obj, string parentName, ulong callbackId, ulong clientId)
@@ -118,34 +129,59 @@ namespace SEWorldGenPlugin.Generator
                     if (parent != null)
                     {
                         parent.ChildObjects.Add(obj);
-                        PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectClient, true, callbackId, clientId);
+                        obj.ParentName = parent.DisplayName;
+                        PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
                     }
                     else
                     {
                         Static.StarSystem.CenterObject.ChildObjects.Add(obj);
-                        PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectClient, true, callbackId, clientId);
+                        obj.ParentName = Static.StarSystem.CenterObject.DisplayName;
+                        PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
                     }
 
                     Static.AddAllPersistentGps();
                 }
             }
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectClient, false, callbackId, clientId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, callbackId, clientId);
         }
 
         /// <summary>
-        /// Client Event: Callback if the addition of an item was successfull.
+        /// Client Event: Callback, if a simple action was executed sucessfully 
         /// </summary>
-        /// <param name="success">If the addition of an item was successfull</param>
+        /// <param name="success">If the action was sucessfull</param>
         /// <param name="callbackId">Id of the callback to run</param>
         [Event(103)]
         [Server]
-        private static void SendAddSystemObjectClient(bool success, ulong callbackId)
+        private static void SendSimpleActionCallbackClient(bool success, ulong callbackId)
         {
-            if(Static.m_addActionsCallbacks.ContainsKey(callbackId))
+            if(Static.m_simpleActionsCallbacks.ContainsKey(callbackId))
             {
-                Static.m_addActionsCallbacks[callbackId](success);
-                Static.m_addActionsCallbacks.Remove(callbackId);
+                Static.m_simpleActionsCallbacks[callbackId](success);
+                Static.m_simpleActionsCallbacks.Remove(callbackId);
             }
+        }
+
+        /// <summary>
+        /// Server Event: Removes a system object from the servers system data. Cant be the center object
+        /// </summary>
+        /// <param name="objectName">Name of the object</param>
+        /// <param name="callbackId">Id of the callback</param>
+        /// <param name="clientId">Id of the client, that send this request</param>
+        [Event(104)]
+        [Server]
+        private static void SendRemoveSystemObjectServer(string objectName, ulong callbackId, ulong clientId)
+        {
+            MySystemObject o = Static.StarSystem.FindObjectByName(objectName);
+            if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
+            {
+                MySystemObject parent = Static.StarSystem.FindObjectByName(o.ParentName);
+                if (parent != null)
+                {
+                    parent.ChildObjects.Remove(o);
+                    PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, clientId);
+                }
+            }
+            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, clientId);
         }
     }
 }

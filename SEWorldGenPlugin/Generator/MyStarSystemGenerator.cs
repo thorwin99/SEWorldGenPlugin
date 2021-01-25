@@ -235,14 +235,19 @@ namespace SEWorldGenPlugin.Generator
                     //Maybe rework to override orbit distance, so all objects fit
                     if (worldSize >= 0 && currentOrbitDistance >= worldSize) return system;
 
+                    MySystemObject obj;
+
                     if (MyRandom.Instance.NextDouble() <= planetProb) // Generate planet
                     {
-                        GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count() - 1) * Math.PI / systemSize), currentOrbitDistance);
+                        obj = GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count() - 1) * Math.PI / systemSize), currentOrbitDistance);
                     }
                     else // Generate belt
                     {
-                        GenerateAsteroidBelt(currentAsteroidIndex++, currentOrbitDistance, orbitDistances.Min * 100);
+                        obj = GenerateAsteroidBelt(currentAsteroidIndex++, currentOrbitDistance, orbitDistances.Min * 100);
                     }
+
+                    obj.ParentName = system.CenterObject.DisplayName;
+                    system.CenterObject.ChildObjects.Add(obj);
                 }
             }
 
@@ -362,6 +367,7 @@ namespace SEWorldGenPlugin.Generator
                 moon.DisplayName = GetMoonName(i, definition.Id.SubtypeId.String, parentPlanet.DisplayName);
                 moon.SubtypeId = definition.Id.SubtypeId.String;
                 moon.ChildObjects = null;
+                moon.ParentName = parentPlanet.DisplayName;
 
                 moons[i] = moon;
             }
@@ -383,6 +389,7 @@ namespace SEWorldGenPlugin.Generator
             ring.Height = MyRandom.Instance.NextDouble() * (ring.Width / 10 - ring.Width / 20) + ring.Width / 20;
             ring.Radius = MyRandom.Instance.NextDouble() * (parentPlanet.Diameter * 2 - parentPlanet.Diameter * 0.75) + parentPlanet.Diameter * 0.75;
             ring.CenterPosition = parentPlanet.CenterPosition;
+            ring.ParentName = parentPlanet.DisplayName;
 
             return ring;
         }
