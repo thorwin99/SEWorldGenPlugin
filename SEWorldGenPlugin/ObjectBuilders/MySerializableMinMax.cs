@@ -57,6 +57,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
+        /// Returns the median of min and max
+        /// </summary>
+        /// <returns>The median</returns>
+        public int GetMedian()
+        {
+            return (Min + Max) / 2;
+        }
+
+        /// <summary>
         /// Sets a new maximum value. If the new maximum value is less than the current
         /// minimum one, it will instead be a new minimum and the old minimum the maximum.
         /// </summary>
