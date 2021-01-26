@@ -952,11 +952,11 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         /// <param name="planet">Planet to spawn</param>
         /// <param name="position">Position to spawn at</param>
-        private void SpawnPlanet(MySystemPlanet planet, Vector3D position)
+        private void SpawnPlanet(MySystemObject planet, Vector3D position)
         {
             if(planet.Type == MySystemObjectType.PLANET)
             {
-                MySystemPlanet p = planet;
+                MySystemPlanet p = planet as MySystemPlanet;
                 p.CenterPosition = position;
 
                 MyStarSystemGenerator.Static.AddObjectToSystem(p);

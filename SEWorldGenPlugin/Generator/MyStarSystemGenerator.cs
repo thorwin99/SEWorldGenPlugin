@@ -148,7 +148,7 @@ namespace SEWorldGenPlugin.Generator
 
             MySession.Static.OnReady += delegate
             {
-                foreach(var item in StarSystem.CenterObject.ChildObjects)
+                foreach(var item in StarSystem.GetAllObjects())
                 {
                     switch (item.Type)
                     {
@@ -228,23 +228,26 @@ namespace SEWorldGenPlugin.Generator
                     system.CenterObject.Type = MySystemObjectType.EMPTY;
                 }
 
-                while(planetCount > 0)
+                while(planetCount > 0 || asteroidObjectCount > 0)
                 {
                     currentOrbitDistance += MyRandom.Instance.Next(orbitDistances.Min, orbitDistances.Max);
 
                     //Maybe rework to override orbit distance, so all objects fit
                     if (worldSize >= 0 && currentOrbitDistance >= worldSize) return system;
 
-                    MySystemObject obj;
+                    MySystemObject obj = null;
 
-                    if (MyRandom.Instance.NextDouble() <= planetProb) // Generate planet
+                    if (asteroidObjectCount <= 0 || (MyRandom.Instance.NextDouble() <= planetProb && planetCount > 0)) // Generate planet
                     {
                         obj = GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count() - 1) * Math.PI / systemSize), currentOrbitDistance);
+                        planetCount--;
                     }
-                    else // Generate belt
+                    else if(asteroidObjectCount > 0) // Generate belt
                     {
                         obj = GenerateAsteroidBelt(currentAsteroidIndex++, currentOrbitDistance, orbitDistances.Min * 100);
+                        asteroidObjectCount--;
                     }
+                    if (obj == null) continue;
 
                     obj.ParentName = system.CenterObject.DisplayName;
                     system.CenterObject.ChildObjects.Add(obj);
@@ -265,6 +268,8 @@ namespace SEWorldGenPlugin.Generator
         /// <returns></returns>
         private MySystemRing GenerateAsteroidBelt(int asteroidObjectIndex, long orbitDistance, double width)
         {
+            MyPluginLog.Debug("Generating new Asteroid belt");
+
             MySystemRing belt = new MySystemRing();
 
             belt.DisplayName = GetBeltName(asteroidObjectIndex);
@@ -287,6 +292,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns>A new MySystemPlanet</returns>
         private MySystemPlanet GeneratePlanet(int planetIndex, double maxDiameter, long orbitDistance)
         {
+            MyPluginLog.Debug("Generating new planet");
             var def = FindPlanetDefinitionForSize(maxDiameter);
             var diameter = CalculatePlanetDiameter(def);
 
@@ -303,7 +309,6 @@ namespace SEWorldGenPlugin.Generator
                 DisplayName = name,
                 Generated = false,
                 SubtypeId = def.Id.SubtypeId.String,
-                ChildObjects = null
             };
 
             if(MyRandom.Instance.NextFloat() > 0.25f * def.SurfaceGravity)
@@ -315,10 +320,11 @@ namespace SEWorldGenPlugin.Generator
             {
                 foreach(var moon in GeneratePlanetMoons(planet))
                 {
+                    if (moon == null) continue;
                     planet.ChildObjects.Add(moon);
                 }
             }
-
+            MyPluginLog.Debug("Planet generated");
             return planet;
         }
 
@@ -329,6 +335,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns></returns>
         private MySystemPlanetMoon[] GeneratePlanetMoons(MySystemPlanet parentPlanet)
         {
+            MyPluginLog.Debug("Generating moons for planet " + parentPlanet.DisplayName);
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
             int maxMoons = (int)Math.Ceiling(parentPlanet.Diameter / 120 * 2);
@@ -366,7 +373,6 @@ namespace SEWorldGenPlugin.Generator
                 moon.Diameter = diameter;
                 moon.DisplayName = GetMoonName(i, definition.Id.SubtypeId.String, parentPlanet.DisplayName);
                 moon.SubtypeId = definition.Id.SubtypeId.String;
-                moon.ChildObjects = null;
                 moon.ParentName = parentPlanet.DisplayName;
 
                 moons[i] = moon;
@@ -382,6 +388,8 @@ namespace SEWorldGenPlugin.Generator
         /// <returns>The ring for the planet</returns>
         private MySystemRing GenrateRing(MySystemPlanet parentPlanet)
         {
+            MyPluginLog.Debug("Generating moons for planet " + parentPlanet.DisplayName);
+
             MySystemRing ring = new MySystemRing();
             ring.AngleDegrees = new Vector3D(MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20));
             ring.AsteroidSize = new MySerializableMinMax(64, 512);
@@ -480,6 +488,7 @@ namespace SEWorldGenPlugin.Generator
 
             if(m_planets.Count <= 0)
             {
+                MyPluginLog.Debug("No planet definitions found.");
                 LoadPlanetDefinitions();
                 if (m_planets.Count <= 0) return null;
             }

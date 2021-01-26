@@ -13,8 +13,8 @@ namespace SEWorldGenPlugin.Generator.Asteroids
     {
         public Vector3D center;
         public double radius;
-        public int width;
-        public int height;
+        public double width;
+        public double height;
 
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace SEWorldGenPlugin.Generator.Asteroids
         /// </summary>
         /// <param name="belt">The belt it should create the shape for.</param>
         /// <returns>The shape representation of the given belt</returns>
-        public static AsteroidBeltShape CreateFromBeltItem(MySystemBeltItem belt)
+        public static AsteroidBeltShape CreateFromBeltItem(MySystemRing belt)
         {
             AsteroidBeltShape shape = new AsteroidBeltShape();
             shape.center = Vector3D.Zero;

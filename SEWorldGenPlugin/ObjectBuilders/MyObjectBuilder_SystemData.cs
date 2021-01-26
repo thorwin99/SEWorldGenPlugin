@@ -129,7 +129,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             Type = MySystemObjectType.EMPTY;
             DisplayName = "";
             CenterPosition = Vector3D.Zero;
-            ChildObjects = null;
+            ChildObjects = new HashSet<MySystemObject>();
         }
 
         /// <summary>

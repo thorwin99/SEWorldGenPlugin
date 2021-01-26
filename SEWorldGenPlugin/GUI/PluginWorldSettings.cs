@@ -25,7 +25,7 @@ namespace SEWorldGenPlugin.GUI
     {
 
         public static MyGuiScreenWorldSettings Static;
-        public LegacyMyObjectBuilder_WorldSettings PluginSettings;
+        public MyObjectBuilder_WorldSettings PluginSettings;
 
         private MyGuiControlCheckbox m_enablePlugin;
         private MyGuiControlLabel m_enablePluginLabel;
@@ -43,7 +43,7 @@ namespace SEWorldGenPlugin.GUI
 
         internal PluginSettingsGui SettingsGui;
 
-        public LegacyMyObjectBuilder_WorldSettings PlSettings;
+        public MyObjectBuilder_WorldSettings PlSettings;
 
         /// <summary>
         /// If the world should use the global configuration file
@@ -92,11 +92,11 @@ namespace SEWorldGenPlugin.GUI
             {
                 if (PlSettings != null)
                 {
-                    PlSettings.Enable = s.IsChecked;
+                    PlSettings.Enabled = s.IsChecked;
                 }
             });
 
-            m_enablePlugin.IsChecked = MySettings.Static.Settings.Enable;
+            m_enablePlugin.IsChecked = false;
 
             m_pluginSettingsButton = new MyGuiControlButton(null, MyGuiControlButtonStyleEnum.Small, null, null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Plugin settings"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_ACTIVE, OnSettingsClick);
             Controls.Add(m_enablePluginLabel);
@@ -129,8 +129,8 @@ namespace SEWorldGenPlugin.GUI
                                 }
                                 else
                                 {
-                                    MySettings.Static.SessionSettings = new LegacyMyObjectBuilder_WorldSettings();
-                                    MySettings.Static.SessionSettings.Enable = m_enablePlugin.IsChecked;
+                                    MySettings.Static.SessionSettings = new MyObjectBuilder_WorldSettings();
+                                    MySettings.Static.SessionSettings.Enabled = m_enablePlugin.IsChecked;
                                 }
                             };
                         }
@@ -149,7 +149,7 @@ namespace SEWorldGenPlugin.GUI
 
             if (m_isNewGame)
             {
-                PlSettings = MySettings.Static.Settings.copy();
+                PlSettings = new MyObjectBuilder_WorldSettings();
             }
             else
             {
@@ -179,13 +179,14 @@ namespace SEWorldGenPlugin.GUI
             var path = Path.Combine(MyFileSystem.SavesPath, Checkpoint.SessionName.Replace(":", "-"));
             if(MyFileUtils.FileExistsInPath(path, MySettingsSession.FILE_NAME, typeof(PluginWorldSettings)))
             {
-                PlSettings = MyFileUtils.ReadXmlFileFromPath<LegacyMyObjectBuilder_WorldSettings>(path, MySettingsSession.FILE_NAME, typeof(PluginWorldSettings));
+                PlSettings = MyFileUtils.ReadXmlFileFromPath<MyObjectBuilder_WorldSettings>(path, MySettingsSession.FILE_NAME, typeof(PluginWorldSettings));
             }
             else
             {
-                PlSettings = new LegacyMyObjectBuilder_WorldSettings();
+                PlSettings = new MyObjectBuilder_WorldSettings();
+                PlSettings.GeneratorSettings = new MyObjectBuilder_GeneratorSettings();
             }
-            m_enablePlugin.IsChecked = PlSettings.Enable;
+            m_enablePlugin.IsChecked = PlSettings.Enabled;
         }
 
         /// <summary>

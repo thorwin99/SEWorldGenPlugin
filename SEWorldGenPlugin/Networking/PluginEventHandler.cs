@@ -153,14 +153,21 @@ namespace SEWorldGenPlugin.Networking
         {
             foreach(var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach(var type in assembly.GetTypes())
+                MyPluginLog.Debug("Registering: " + assembly.FullName);
+                try
                 {
-                    if(type.GetCustomAttributes(typeof(EventOwnerAttribute), true).Length > 0)
+                    foreach (var type in assembly.GetTypes())
                     {
-                        MyPluginLog.Log("Registering type " + type.Name + " in PluginEventHandler.");
-                        Register(type);
+                        if (type.GetCustomAttributes(typeof(EventOwnerAttribute), true).Length > 0)
+                        {
+                            MyPluginLog.Log("Registering type " + type.Name + " in PluginEventHandler.");
+                            Register(type);
+                        }
                     }
-                }
+                }catch(ReflectionTypeLoadException)
+                {
+                    MyPluginLog.Log("Couldnt register Types for assembly " + assembly.FullName, LogLevel.ERROR);
+                }                
             }
         }
 

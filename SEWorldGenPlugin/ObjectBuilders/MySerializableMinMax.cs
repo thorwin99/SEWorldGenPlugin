@@ -16,13 +16,22 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Minimum value
         /// </summary>
         [ProtoMember(1)]
-        public int Min { get; private set; }
+        public int Min;
 
         /// <summary>
         /// Maximum value
         /// </summary>
         [ProtoMember(2)]
-        public int Max { get; private set; }
+        public int Max;
+
+        /// <summary>
+        /// Parameterless constructor used for serialization
+        /// </summary>
+        public MySerializableMinMax()
+        {
+            Min = 0;
+            Max = 0;
+        }
 
         /// <summary>
         /// Initializes a new instance, where min and max are equal

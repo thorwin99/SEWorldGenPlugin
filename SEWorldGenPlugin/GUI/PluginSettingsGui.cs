@@ -483,49 +483,49 @@ namespace SEWorldGenPlugin.GUI
             Controls.Add(scrollPane);
         }
 
-        public void SetSettings(LegacyMyObjectBuilder_WorldSettings settings, bool useGlobal)
+        public void SetSettings(MyObjectBuilder_WorldSettings settings, bool useGlobal)
         {
             m_useGlobalCheck.IsChecked = useGlobal;
 
             if (useGlobal || settings == null) return;
 
-            m_useSemiRandomGenerationCheck.IsChecked = settings.GeneratorSettings.SemiRandomizedGeneration;
+            //m_useSemiRandomGenerationCheck.IsChecked = settings.GeneratorSettings.SemiRandomizedGeneration;
 
-            m_useVanillaPlanetsCheck.IsChecked = settings.GeneratorSettings.UseVanillaPlanets;
+            //m_useVanillaPlanetsCheck.IsChecked = settings.GeneratorSettings.UseVanillaPlanets;
 
-            m_planetsOnlyOnceCheck.IsChecked = settings.GeneratorSettings.PlanetsOnlyOnce;
+            //m_planetsOnlyOnceCheck.IsChecked = settings.GeneratorSettings.PlanetsOnlyOnce;
 
-            m_moonsOnlyOnceCheck.IsChecked = settings.GeneratorSettings.MoonsOnlyOnce;
+            //m_moonsOnlyOnceCheck.IsChecked = settings.GeneratorSettings.MoonsOnlyOnce;
 
-            m_planetGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS;
+            //m_planetGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS;
 
-            m_moonGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.ShowMoonGPS;
+            //m_moonGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.ShowMoonGPS;
 
-            m_beltGpsCheck.IsChecked = settings.GeneratorSettings.BeltSettings.ShowBeltGPS;
+            //m_beltGpsCheck.IsChecked = settings.GeneratorSettings.BeltSettings.ShowBeltGPS;
 
-            m_ringGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS;
+            //m_ringGpsCheck.IsChecked = settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS;
 
-            m_asteroidGeneratorCombo.SelectItemByKey((int)settings.GeneratorSettings.AsteroidGenerator);
+            //m_asteroidGeneratorCombo.SelectItemByKey((int)settings.GeneratorSettings.AsteroidGenerator);
 
-            m_asteroidDensitySlider.Value = settings.GeneratorSettings.AsteroidDensity;
+            //m_asteroidDensitySlider.Value = settings.GeneratorSettings.AsteroidDensity;
 
-            m_objAmountSlider.Value = (settings.GeneratorSettings.MinObjectsInSystem + settings.GeneratorSettings.MaxObjectsInSystem) / 2;
+            //m_objAmountSlider.Value = (settings.GeneratorSettings.MinObjectsInSystem + settings.GeneratorSettings.MaxObjectsInSystem) / 2;
 
-            m_orbDistanceSlider.Value = (settings.GeneratorSettings.MinOrbitDistance / 1000 + settings.GeneratorSettings.MaxOrbitDistance / 1000) / 2;
+            //m_orbDistanceSlider.Value = (settings.GeneratorSettings.MinOrbitDistance / 1000 + settings.GeneratorSettings.MaxOrbitDistance / 1000) / 2;
 
-            m_sizeMultiplierSlider.Value = settings.GeneratorSettings.PlanetSettings.SizeMultiplier;
+            //m_sizeMultiplierSlider.Value = settings.GeneratorSettings.PlanetSettings.SizeMultiplier;
 
-            m_sizeCapSlider.Value = (float)settings.GeneratorSettings.PlanetSettings.PlanetSizeCap / 1000;
+            //m_sizeCapSlider.Value = (float)settings.GeneratorSettings.PlanetSettings.PlanetSizeCap / 1000;
 
-            m_moonProbSlider.Value = settings.GeneratorSettings.PlanetSettings.MoonProbability;
+            //m_moonProbSlider.Value = settings.GeneratorSettings.PlanetSettings.MoonProbability;
 
-            m_ringWidthSlider.Value = (settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
+            //m_ringWidthSlider.Value = (settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth + settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth) / 2;
 
-            m_ringProbSlider.Value = settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability;
+            //m_ringProbSlider.Value = settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability;
 
-            m_beltHeightSlider.Value = (settings.GeneratorSettings.BeltSettings.MinBeltHeight + settings.GeneratorSettings.BeltSettings.MaxBeltHeight) / 2;
+            //m_beltHeightSlider.Value = (settings.GeneratorSettings.BeltSettings.MinBeltHeight + settings.GeneratorSettings.BeltSettings.MaxBeltHeight) / 2;
         
-            m_worldSizeSlider.Value = settings.GeneratorSettings.WorldSize / 1000;
+            //m_worldSizeSlider.Value = settings.GeneratorSettings.WorldSize / 1000;
         }
 
         /// <summary>
@@ -534,42 +534,42 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         /// <param name="settings">The plugin settings to set</param>
         /// <returns>If global config should be used</returns>
-        public bool GetSettings(ref LegacyMyObjectBuilder_WorldSettings settings)
+        public bool GetSettings(ref MyObjectBuilder_WorldSettings settings)
         {
-            if (settings == null)
-                settings = new LegacyMyObjectBuilder_WorldSettings();
+            //if (settings == null)
+            //    settings = new LegacyMyObjectBuilder_WorldSettings();
 
-            settings.GeneratorSettings.SemiRandomizedGeneration = m_useSemiRandomGenerationCheck.IsChecked;
-            settings.GeneratorSettings.UseVanillaPlanets = m_useVanillaPlanetsCheck.IsChecked;
-            settings.GeneratorSettings.PlanetsOnlyOnce = m_planetsOnlyOnceCheck.IsChecked;
-            settings.GeneratorSettings.MoonsOnlyOnce = m_moonsOnlyOnceCheck.IsChecked;
+            //settings.GeneratorSettings.SemiRandomizedGeneration = m_useSemiRandomGenerationCheck.IsChecked;
+            //settings.GeneratorSettings.UseVanillaPlanets = m_useVanillaPlanetsCheck.IsChecked;
+            //settings.GeneratorSettings.PlanetsOnlyOnce = m_planetsOnlyOnceCheck.IsChecked;
+            //settings.GeneratorSettings.MoonsOnlyOnce = m_moonsOnlyOnceCheck.IsChecked;
 
-            settings.GeneratorSettings.MinObjectsInSystem = (int)m_objAmountSlider.Value;
-            settings.GeneratorSettings.MaxObjectsInSystem = (int)m_objAmountSlider.Value;
+            //settings.GeneratorSettings.MinObjectsInSystem = (int)m_objAmountSlider.Value;
+            //settings.GeneratorSettings.MaxObjectsInSystem = (int)m_objAmountSlider.Value;
 
-            settings.GeneratorSettings.MinOrbitDistance = (int)m_orbDistanceSlider.Value * 1000 / 10;
-            settings.GeneratorSettings.MaxOrbitDistance = (int)(m_orbDistanceSlider.Value * 1000 * 2 - settings.GeneratorSettings.MinOrbitDistance);
+            //settings.GeneratorSettings.MinOrbitDistance = (int)m_orbDistanceSlider.Value * 1000 / 10;
+            //settings.GeneratorSettings.MaxOrbitDistance = (int)(m_orbDistanceSlider.Value * 1000 * 2 - settings.GeneratorSettings.MinOrbitDistance);
 
-            settings.GeneratorSettings.AsteroidGenerator = (AsteroidGenerator)m_asteroidGeneratorCombo.GetSelectedKey();
-            settings.GeneratorSettings.AsteroidDensity = m_asteroidDensitySlider.Value;
+            //settings.GeneratorSettings.AsteroidGenerator = (AsteroidGenerator)m_asteroidGeneratorCombo.GetSelectedKey();
+            //settings.GeneratorSettings.AsteroidDensity = m_asteroidDensitySlider.Value;
 
-            settings.GeneratorSettings.PlanetSettings.SizeMultiplier = (int)m_sizeMultiplierSlider.Value;
-            settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_sizeCapSlider.Value * 1000;
-            settings.GeneratorSettings.PlanetSettings.MoonProbability = m_moonProbSlider.Value;
-            settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS = m_planetGpsCheck.IsChecked;
-            settings.GeneratorSettings.PlanetSettings.ShowMoonGPS = m_moonGpsCheck.IsChecked;
+            //settings.GeneratorSettings.PlanetSettings.SizeMultiplier = (int)m_sizeMultiplierSlider.Value;
+            //settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_sizeCapSlider.Value * 1000;
+            //settings.GeneratorSettings.PlanetSettings.MoonProbability = m_moonProbSlider.Value;
+            //settings.GeneratorSettings.PlanetSettings.ShowPlanetGPS = m_planetGpsCheck.IsChecked;
+            //settings.GeneratorSettings.PlanetSettings.ShowMoonGPS = m_moonGpsCheck.IsChecked;
 
-            settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth = (int)m_ringWidthSlider.Value / 10;
-            settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth = (int)m_ringWidthSlider.Value * 2 - settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth;
-            settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability = m_ringProbSlider.Value;
-            settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS = m_ringGpsCheck.IsChecked;
+            //settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth = (int)m_ringWidthSlider.Value / 10;
+            //settings.GeneratorSettings.PlanetSettings.RingSettings.MaxPlanetRingWidth = (int)m_ringWidthSlider.Value * 2 - settings.GeneratorSettings.PlanetSettings.RingSettings.MinPlanetRingWidth;
+            //settings.GeneratorSettings.PlanetSettings.RingSettings.PlanetRingProbability = m_ringProbSlider.Value;
+            //settings.GeneratorSettings.PlanetSettings.RingSettings.ShowRingGPS = m_ringGpsCheck.IsChecked;
 
-            settings.GeneratorSettings.BeltSettings.MinBeltHeight = (int)m_beltHeightSlider.Value / 10;
-            settings.GeneratorSettings.BeltSettings.MaxBeltHeight = (int)m_beltHeightSlider.Value * 2 - settings.GeneratorSettings.BeltSettings.MinBeltHeight;
-            settings.GeneratorSettings.BeltSettings.BeltProbability = m_beltProbSlider.Value;
-            settings.GeneratorSettings.BeltSettings.ShowBeltGPS = m_beltGpsCheck.IsChecked;
+            //settings.GeneratorSettings.BeltSettings.MinBeltHeight = (int)m_beltHeightSlider.Value / 10;
+            //settings.GeneratorSettings.BeltSettings.MaxBeltHeight = (int)m_beltHeightSlider.Value * 2 - settings.GeneratorSettings.BeltSettings.MinBeltHeight;
+            //settings.GeneratorSettings.BeltSettings.BeltProbability = m_beltProbSlider.Value;
+            //settings.GeneratorSettings.BeltSettings.ShowBeltGPS = m_beltGpsCheck.IsChecked;
 
-            settings.GeneratorSettings.WorldSize = (long)m_worldSizeSlider.Value * 1000;
+            //settings.GeneratorSettings.WorldSize = (long)m_worldSizeSlider.Value * 1000;
 
             return m_useGlobalCheck.IsChecked;
         }

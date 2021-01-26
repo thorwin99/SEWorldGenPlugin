@@ -23,7 +23,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// The general generation settings for the world, this OB belongs to.
         /// </summary>
         [ProtoMember(2)]
-        public MyObjectBuilder_GeneratorSettings GeneratorSettings = null;
+        public MyObjectBuilder_GeneratorSettings GeneratorSettings = new MyObjectBuilder_GeneratorSettings();
 
         public override MyAbstractConfigObjectBuilder copy()
         {
@@ -197,7 +197,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// The gps generation method used for belts.
         /// </summary>
         [ProtoMember(4)]
-        public MyGPSGenerationMode BeltGPSMode = MyGPSGenerationMode.DISCOVERY;
+        public MyGPSGenerationMode BeltGPSMode = MyGPSGenerationMode.PERSISTENT;
 
         public override MyAbstractConfigObjectBuilder copy()
         {
