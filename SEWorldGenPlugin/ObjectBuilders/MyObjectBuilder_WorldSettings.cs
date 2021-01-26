@@ -193,19 +193,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(3)]
         public MyGPSGenerationMode RingGPSMode = MyGPSGenerationMode.DISCOVERY;
 
-        /// <summary>
-        /// The gps generation method used for belts.
-        /// </summary>
-        [ProtoMember(4)]
-        public MyGPSGenerationMode BeltGPSMode = MyGPSGenerationMode.PERSISTENT;
-
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_GPSGenerationSettings();
             copy.PlanetGPSMode = PlanetGPSMode;
             copy.MoonGPSMode = MoonGPSMode;
             copy.RingGPSMode = RingGPSMode;
-            copy.BeltGPSMode = BeltGPSMode;
 
             return copy;
         }
