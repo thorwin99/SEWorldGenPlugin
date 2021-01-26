@@ -160,7 +160,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             HashSet<MySystemObject> children = new HashSet<MySystemObject>();
 
-            foreach(var child in children)
+            foreach(var child in ChildObjects)
             {
                 foreach(var c in child.GetAllChildren())
                 {
