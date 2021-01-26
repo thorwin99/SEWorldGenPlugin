@@ -38,7 +38,7 @@ namespace SEWorldGenPlugin.Session
         /// <returns>True, if the plugin is enabled in this session.</returns>
         public bool IsEnabled()
         {
-            return (Sync.IsServer && Settings.GeneratorSettings.WorldSize > 0 && Settings.Enabled);
+            return (Sync.IsServer && Settings.Enabled);
         }
 
         /// <summary>
