@@ -205,7 +205,7 @@ namespace SEWorldGenPlugin.Generator
                 int currentAsteroidIndex = 0;
                 long currentOrbitDistance = 0;
 
-                double planetProb = planetCount / (planetCount + asteroidObjectCount);
+                double planetProb = planetCount / (double)(planetCount + asteroidObjectCount);
 
                 if(m_suns.Count > 0)
                 {
