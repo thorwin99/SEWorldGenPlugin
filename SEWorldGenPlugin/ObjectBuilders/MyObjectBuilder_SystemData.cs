@@ -45,6 +45,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <returns></returns>
         public int Count()
         {
+            if (CenterObject == null) return 0;
             return 1 + CenterObject.ChildCount();
         }
 
