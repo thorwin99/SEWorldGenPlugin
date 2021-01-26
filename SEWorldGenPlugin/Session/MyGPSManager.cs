@@ -67,6 +67,7 @@ namespace SEWorldGenPlugin.Session
 
             if (!m_globalGpss.ContainsKey(id))
             {
+                MyPluginLog.Debug("Adding new persistent gps " + name);
                 m_globalGpss[id] = new HashSet<long>();
             }
         }
@@ -220,6 +221,8 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void LoadData()
         {
+            Static = this;
+
             MyObjectBuilder_WorldGpsData ob;
             if (MyFileUtils.FileExistsInWorldStorage(FILENAME, typeof(MyGPSManager)))
             {

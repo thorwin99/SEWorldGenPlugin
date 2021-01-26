@@ -3,6 +3,7 @@ using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
@@ -76,6 +77,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         public override void LoadData()
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
+
+            MyPluginLog.Debug("Loading Procedural Generator Component");
 
             Static = this;
 

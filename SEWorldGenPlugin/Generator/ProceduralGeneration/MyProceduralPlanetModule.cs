@@ -6,6 +6,7 @@ using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using VRage.Game.Voxels;
 using VRage.Library.Utils;
 using VRage.Utils;
@@ -45,7 +46,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             foreach(var obj in objs)
             {
                 if (obj == null) continue;
-                if (obj.Type != MySystemObjectType.PLANET || obj.Type != MySystemObjectType.MOON) continue;
+                if (obj.Type != MySystemObjectType.PLANET && obj.Type != MySystemObjectType.MOON) continue;
+
+                MyPluginLog.Debug("Generating planet...");
 
                 MySystemPlanet planet = obj as MySystemPlanet;
 
@@ -67,6 +70,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     planet.Generated = true;
                 }
+                MyPluginLog.Debug("Planet generated...");
             }
         }
 
