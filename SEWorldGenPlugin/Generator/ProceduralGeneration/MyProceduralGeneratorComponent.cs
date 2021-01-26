@@ -80,8 +80,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             Static = this;
 
             m_procDensity = MySession.Static.Settings.ProceduralDensity;
+            m_seed = MySession.Static.Settings.ProceduralSeed;
 
-            if(MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == ObjectBuilders.AsteroidGenerationMethod.PLUGIN)
+            if (MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == ObjectBuilders.AsteroidGenerationMethod.PLUGIN)
             {
                 MySession.Static.Settings.ProceduralDensity = 0f;
             }
