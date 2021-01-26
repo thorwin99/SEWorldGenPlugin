@@ -24,12 +24,12 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Currently copied item
         /// </summary>
-        private MySystemItem m_copiedItem = null;
+        private MySystemObject m_copiedItem = null;
 
         /// <summary>
         /// Callpack for the paste event of the currently copied item
         /// </summary>
-        private Action<MySystemItem, Vector3D> m_callback;
+        private Action<MySystemObject, Vector3D> m_callback;
 
         /// <summary>
         /// If the clipboard is currently active
@@ -62,12 +62,23 @@ namespace SEWorldGenPlugin.Session
         /// <param name="item">Item to copy and paste</param>
         /// <param name="callback">Callback to call, when the item gets pasted</param>
         /// <param name="distanceToCam">The distance the object has to the camera</param>
-        public void Activate(MySystemItem item, Action<MySystemItem, Vector3D> callback, float distanceToCam)
+        public void Activate(MySystemObject item, Action<MySystemObject, Vector3D> callback, float distanceToCam)
         {
             m_copiedItem = item;
             m_callback = callback;
             m_isActive = true;
             m_distanceToCam = distanceToCam;
+        }
+
+        /// <summary>
+        /// Deactivates the currently used clipboard
+        /// </summary>
+        public void Deactivate()
+        {
+            m_copiedItem = null;
+            m_callback = null;
+            m_isActive = false;
+            m_distanceToCam = 0;
         }
 
         /// <summary>
@@ -119,8 +130,8 @@ namespace SEWorldGenPlugin.Session
 
                 m_currentPos = wm.Translation + posGlobal;
 
-                if(m_copiedItem.GetType() == typeof(MyPlanetItem))
-                    MyPluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, ((MyPlanetItem)m_copiedItem).Size / 2, Color.LightGreen));
+                if(m_copiedItem.GetType() == typeof(MySystemPlanet))
+                    MyPluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, (float)((MySystemPlanet)m_copiedItem).Diameter / 2, Color.LightGreen));
             }
         }
 
