@@ -66,10 +66,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
-        /// Returns the median of min and max
+        /// Returns the average of min and max
         /// </summary>
         /// <returns>The median</returns>
-        public int GetMedian()
+        public int GetAverage()
         {
             return (Min + Max) / 2;
         }
