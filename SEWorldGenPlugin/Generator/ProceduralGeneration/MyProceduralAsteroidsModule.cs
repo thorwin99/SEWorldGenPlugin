@@ -166,9 +166,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     MyVoxelBase.StorageChanged del = null;
                     del = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
                     {
-                        voxelMap.Save = true;
-                        tmp_voxelMaps.Remove(voxelMap);
-                        voxelMap.RangeChanged -= del;
+                        voxel.Save = true;
+                        m_tmpAsteroids.Remove(voxel);
+                        voxel.RangeChanged -= del;
                     };
                     voxelMap.RangeChanged += del;
 
