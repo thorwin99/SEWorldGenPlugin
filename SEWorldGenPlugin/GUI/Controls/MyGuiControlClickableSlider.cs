@@ -16,7 +16,6 @@ namespace SEWorldGenPlugin.GUI.Controls
         public MyGuiControlClickableSlider(Vector2? position = null, float minValue = 0f, float maxValue = 1f, float width = 0.29f, float? defaultValue = null, Vector4? color = null, string labelText = null, int labelDecimalPlaces = 1, float labelScale = 0.8f, float labelSpaceWidth = 0f, string labelFont = "White", string toolTip = null, MyGuiControlSliderStyleEnum visualStyle = MyGuiControlSliderStyleEnum.Default, MyGuiDrawAlignEnum originAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, bool intValue = false, bool showLabel = false)
             : base(position, minValue, maxValue, width, defaultValue, color, labelText, labelDecimalPlaces, labelScale, labelSpaceWidth, labelFont, toolTip, visualStyle, originAlign, intValue, showLabel)
         {
-
         }
 
         /// <summary>
