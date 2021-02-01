@@ -190,6 +190,7 @@ namespace SEWorldGenPlugin.GUI.Controls
             m_showLabel = showLabel;
             m_minValue = Math.Min(minValue, maxValue);
             m_maxValue = Math.Max(maxValue, minValue);
+            m_labelSpaceWidth = labelSpaceWidth;
 
             m_railTexture = MyGuiConstants.TEXTURE_SLIDER_RAIL;
             m_minThumb = new MyGuiSliderThumb(defaultMin);
