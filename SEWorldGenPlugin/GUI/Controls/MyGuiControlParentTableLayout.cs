@@ -1,4 +1,5 @@
 ﻿using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,6 +45,11 @@ namespace SEWorldGenPlugin.GUI.Controls
         private float m_tableHeight;
 
         /// <summary>
+        /// Wether column elements can overflow to the next one
+        /// </summary>
+        private bool m_overflowColumns;
+
+        /// <summary>
         /// The amount of controls a column is allowed to have in this table layout
         /// </summary>
         public int MaxColumns
@@ -58,11 +64,19 @@ namespace SEWorldGenPlugin.GUI.Controls
             }
         }
 
-        public MyGuiControlParentTableLayout(int columns) : base()
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="columns">The amount of columns</param>
+        /// <param name="overflowColumns">If a column can overflow to the next, if it is the last one of a row but not the last of the table.</param>
+        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false) : base()
         {
             m_tableRows = new List<MyGuiControlBase[]>();
             m_columnsMax = columns;
             m_columnWidths = new float[m_columnsMax];
+            m_overflowColumns = overflowColumns;
+
+            m_tableHeight = MARGIN_ROWS;
         }
 
         /// <summary>
@@ -82,7 +96,7 @@ namespace SEWorldGenPlugin.GUI.Controls
 
             for(int i = 0; i < rowControls.Length; i++)
             {
-                if(rowControls[i].Size.X > m_columnWidths[i])
+                if(rowControls[i].Size.X > m_columnWidths[i] && !(i == rowControls.Length - 1 && rowControls.Length < m_columnsMax && m_overflowColumns))
                 {
                     m_columnWidths[i] = rowControls[i].Size.X;
                 }
@@ -112,14 +126,12 @@ namespace SEWorldGenPlugin.GUI.Controls
 
             foreach(var columnWidth in m_columnWidths)
             {
-                tableWidth += columnWidth;
+                tableWidth += columnWidth + MARGIN_COLUMNS;
             }
 
-            tableWidth = Math.Min(MaxSize.X, tableWidth);
+            Size = new Vector2(tableWidth, m_tableHeight);
 
-            Size = new Vector2(tableWidth, m_tableHeight - MARGIN_ROWS);
-
-            Vector2 currentRowTopLeft = new Vector2(Size.X / -2, Size.Y / -2);
+            Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + MARGIN_ROWS, Size.Y / -2);
 
             foreach(var row in m_tableRows)
             {
