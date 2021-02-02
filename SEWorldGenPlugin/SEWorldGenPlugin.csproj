@@ -182,12 +182,13 @@
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
+    <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
+    <Compile Include="GUI\MyPluginSettingsMenu.cs" />
     <Compile Include="GUI\PluginAdminMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
     <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
     <Compile Include="GUI\MyPluginMainMenu.cs" />
-    <Compile Include="GUI\PluginSettingsGui.cs" />
     <Compile Include="GUI\PluginWorldSettings.cs" />
     <Compile Include="http\Responses\GitHubVersionResponse.cs" />
     <Compile Include="http\VersionCheck.cs" />

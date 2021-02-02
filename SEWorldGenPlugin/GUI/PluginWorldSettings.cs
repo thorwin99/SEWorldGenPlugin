@@ -41,18 +41,9 @@ namespace SEWorldGenPlugin.GUI
 
         private float MARGIN_LEFT_LIST = 90f / MyGuiConstants.GUI_OPTIMAL_SIZE.X;
 
-        internal PluginSettingsGui SettingsGui;
+        internal MyPluginSettingsMenu SettingsGui;
 
         public MyObjectBuilder_WorldSettings PlSettings;
-
-        /// <summary>
-        /// If the world should use the global configuration file
-        /// </summary>
-        public bool UseGlobal
-        {
-            get;
-            private set;
-        }
 
         public PluginWorldSettings(bool displayTabScenario = true, bool displayTabWorkshop = true, bool displayTabCustom = true) : this(null, null, displayTabScenario, displayTabWorkshop, displayTabCustom)
         {
@@ -62,7 +53,6 @@ namespace SEWorldGenPlugin.GUI
         {
             Static = this;
             m_isNewGame = (checkpoint == null);
-            UseGlobal = false;
         }
 
         /// <summary>
@@ -122,16 +112,8 @@ namespace SEWorldGenPlugin.GUI
                         {
                             b.ButtonClicked += delegate
                             {
-                                if (!UseGlobal)
-                                {
-                                    MySettings.Static.SessionSettings = PlSettings;
-                                    MyPluginLog.Log("Settings: " + PlSettings.ToString());
-                                }
-                                else
-                                {
-                                    MySettings.Static.SessionSettings = new MyObjectBuilder_WorldSettings();
-                                    MySettings.Static.SessionSettings.Enabled = m_enablePlugin.IsChecked;
-                                }
+                                MySettings.Static.SessionSettings = PlSettings;
+                                MyPluginLog.Log("Settings: " + PlSettings.ToString());
                             };
                         }
                         else
@@ -184,7 +166,6 @@ namespace SEWorldGenPlugin.GUI
             else
             {
                 PlSettings = new MyObjectBuilder_WorldSettings();
-                PlSettings.GeneratorSettings = new MyObjectBuilder_GeneratorSettings();
             }
             m_enablePlugin.IsChecked = PlSettings.Enabled;
         }
@@ -196,9 +177,9 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="sender"></param>
         private void OnSettingsClick(object sender)
         {
-            SettingsGui = new PluginSettingsGui(this);
+            SettingsGui = new MyPluginSettingsMenu(m_isNewGame);
             SettingsGui.OnOkButtonClicked += Settings_OnOkButtonClick;
-            SettingsGui.SetSettings(this.PlSettings, UseGlobal);
+            SettingsGui.SetSettings(PlSettings);
             MyGuiSandbox.AddScreen(SettingsGui);
         }
 
@@ -208,7 +189,7 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         private void Settings_OnOkButtonClick()
         {
-            UseGlobal = SettingsGui.GetSettings(ref PlSettings);
+            PlSettings = SettingsGui.GetSettings();
         }
 
         /// <summary>

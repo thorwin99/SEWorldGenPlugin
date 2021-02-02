@@ -13,6 +13,22 @@
     /// </summary>
     public class ToolTips
     {
+        public readonly string SYS_GEN_MODE_COMBO = "The mode of the star system generator for this world.";
+        public readonly string ASTEROID_GEN_MODE_COMBO = "The mode of the asteroid generator for this world.";
+        public readonly string VANILLA_PLANETS_CHECK = "If vanilla planets can be used for system generation.";
+        public readonly string PLANET_COUNT_SLIDER = "The minimum and maximum possible amount of planets in this world.";
+        public readonly string ASTEROID_COUNT_SLIDER = "The minimum and maximum possible amount of asteroid objects in this world.";
+        public readonly string ORBIT_DISTANCE_SLIDER = "The range for orbit distances between the system objects. In KM";
+        public readonly string ASTEROID_DENS_SLIDER = "The density for asteroid generation. 1 is the densest.";
+        public readonly string WORLD_SIZE_SLIDER = "The max size of the system. After that nothing will be generated. In KM";
+        public readonly string PLANET_SIZE_CAP_SLIDER = "The max size a planet can have in this system. In metres";
+        public readonly string PLANET_SIZE_MULT = "The multiplier for the planets size. 1G planet equals to 120km * this value. A gas giant will be double the size.";
+        public readonly string PLANET_GPS_COMBO = "The generation mode for planet gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.";
+        public readonly string MOON_GPS_COMBO = "The generation mode for moons gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.";
+        public readonly string ASTEROID_GPS_COMBO = "The generation mode for asteroid gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.";
+
+
+
         public readonly string SYS_OBJ_SLIDER = "Objects that should be generated in the system";
         public readonly string ORB_DIST_SLIDER = "Average distance between Orbits in kilometres.";
         public readonly string SIZE_MUL_SLIDER = "The diameter of each planet is scaled by this value";
@@ -33,7 +49,6 @@
         public readonly string RING_GPS_CHECK = "If a dynamic gps should be generated, that shows the player where a planetary asteroid ring is located in 5000km proximity to the player";
         public readonly string ROID_GEN_COMBO = "Which asteroid generator should be used. If plugin, belts and rings will be generated, but nothing else. If vanilla, the default generation will be used, but no rings or belts are generated.";
         public readonly string ROID_DENS_SLIDER = "The density of the asteroids, where 1 is the most dense.";
-        public readonly string WORLD_SIZE_SLIDER = "The max size of the wolrd in kilometers. Beyond this limit, the plugin wont be generating objects.";
 
         public readonly string ADMIN_RING_DISTANCE = "The distance of the ring to the planet in meters";
         public readonly string ADMIN_RING_WIDTH = "The width of the ring in meters";
