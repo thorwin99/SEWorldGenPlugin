@@ -99,6 +99,17 @@ namespace SEWorldGenPlugin.GUI.Controls
         }
 
         /// <summary>
+        /// Draws the control
+        /// </summary>
+        /// <param name="transitionAlpha"></param>
+        /// <param name="backgroundTransitionAlpha"></param>
+        public override void Draw(float transitionAlpha, float backgroundTransitionAlpha)
+        {
+            base.Draw(transitionAlpha, backgroundTransitionAlpha);
+            UpdateValueLabel();
+        }
+
+        /// <summary>
         /// Sets the value of the slider to the one returned by the input box
         /// </summary>
         /// <param name="value">Value to set</param>
