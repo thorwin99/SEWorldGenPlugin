@@ -50,6 +50,11 @@ namespace SEWorldGenPlugin.GUI.Controls
         private bool m_overflowColumns;
 
         /// <summary>
+        /// Padding for the table. It is the top left offset for the elements
+        /// </summary>
+        private Vector2 m_padding;
+
+        /// <summary>
         /// The amount of controls a column is allowed to have in this table layout
         /// </summary>
         public int MaxColumns
@@ -69,12 +74,21 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// </summary>
         /// <param name="columns">The amount of columns</param>
         /// <param name="overflowColumns">If a column can overflow to the next, if it is the last one of a row but not the last of the table.</param>
-        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false) : base()
+        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false, Vector2? padding = null) : base()
         {
             m_tableRows = new List<MyGuiControlBase[]>();
             m_columnsMax = columns;
             m_columnWidths = new float[m_columnsMax];
             m_overflowColumns = overflowColumns;
+
+            if(padding == null)
+            {
+                m_padding = new Vector2(MARGIN_COLUMNS, MARGIN_ROWS);
+            }
+            else
+            {
+                m_padding = padding.Value;
+            }
 
             m_tableHeight = MARGIN_ROWS;
         }
@@ -87,7 +101,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// </summary>
         /// <param name="rowControls"></param>
         /// <returns>True, when the row is </returns>
-        public bool AddTableRow(MyGuiControlBase[] rowControls)
+        public bool AddTableRow(params MyGuiControlBase[] rowControls)
         {
             if (rowControls.Length > m_columnsMax) return false;
             if (rowControls == null) return false;
@@ -114,6 +128,16 @@ namespace SEWorldGenPlugin.GUI.Controls
         }
 
         /// <summary>
+        /// Adds a separator into the table at after the last added row.
+        /// </summary>
+        /// <returns></returns>
+        public void AddTableSeparator()
+        {
+            m_tableRows.Add(null);
+            m_tableHeight += MARGIN_ROWS;
+        }
+
+        /// <summary>
         /// This applies all rows that are currently added and
         /// sets the size of this parent and the positions of the children.
         /// Only run, when all rows were added.
@@ -131,23 +155,40 @@ namespace SEWorldGenPlugin.GUI.Controls
 
             Size = new Vector2(tableWidth, m_tableHeight);
 
-            Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + MARGIN_ROWS, Size.Y / -2);
+            Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + m_padding.X, Size.Y / -2 + m_padding.Y);
 
             foreach(var row in m_tableRows)
             {
+                if(row == null)
+                {
+                    MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
+                    sep.AddHorizontal(currentRowTopLeft, tableWidth - MARGIN_COLUMNS);
+
+                    Controls.Add(sep);
+
+                    currentRowTopLeft += new Vector2(0, MARGIN_ROWS);
+
+                    continue;
+                }
+
                 float currentColumnOffset = 0;
                 float rowHeight = 0;
                 foreach(var col in row)
                 {
+                    if (col == null) continue;
                     rowHeight = Math.Max(rowHeight, col.Size.Y);
                 }
 
                 for(int i = 0; i < row.Length; i++)
                 {
                     var control = row[i];
-                    control.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
-                    control.Position = currentRowTopLeft + new Vector2(currentColumnOffset, rowHeight / 2);
-                    Controls.Add(control);
+
+                    if(control != null)
+                    {
+                        control.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+                        control.Position = currentRowTopLeft + new Vector2(currentColumnOffset, rowHeight / 2);
+                        Controls.Add(control);
+                    }
                     currentColumnOffset += m_columnWidths[i] + MARGIN_COLUMNS;
                 }
 
