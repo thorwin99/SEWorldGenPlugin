@@ -60,7 +60,7 @@ namespace SEWorldGenPlugin.GUI
 
         public MyPluginSettingsMenu(bool isNewGame) : base(new Vector2(0.5f, 0.5f), MyGuiConstants.SCREEN_BACKGROUND_COLOR, SIZE, false, null, MySandboxGame.Config.UIBkOpacity, MySandboxGame.Config.UIOpacity)
         {
-            m_isNewGame = true;
+            m_isNewGame = isNewGame;
             RecreateControls(true);
         }
 
@@ -109,7 +109,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_systemGeneratorCombo.Size = new Vector2(0.25f, m_systemGeneratorCombo.Size.Y);
 
-            parent.AddTableRow(new MyGuiControlBase[] { systemGenLabel, m_systemGeneratorCombo });
+            parent.AddTableRow(systemGenLabel, m_systemGeneratorCombo);
 
             m_asteroidGeneratorCombo = new MyGuiControlCombobox();
             m_asteroidGeneratorCombo.SetToolTip(MyPluginTexts.TOOLTIPS.ASTEROID_GEN_MODE_COMBO);
@@ -124,32 +124,32 @@ namespace SEWorldGenPlugin.GUI
 
             m_asteroidGeneratorCombo.Size = new Vector2(0.25f, m_asteroidGeneratorCombo.Size.Y);
 
-            parent.AddTableRow(new MyGuiControlBase[] { asteroidGenLabel, m_asteroidGeneratorCombo });
+            parent.AddTableRow(asteroidGenLabel, m_asteroidGeneratorCombo);
 
             m_enableVanillaPlanetsCheckbox = new MyGuiControlCheckbox();
             m_enableVanillaPlanetsCheckbox.SetToolTip(MyPluginTexts.TOOLTIPS.VANILLA_PLANETS_CHECK);
 
-            parent.AddTableRow(new MyGuiControlBase[] { enableVanillaLabel, m_enableVanillaPlanetsCheckbox });
+            parent.AddTableRow(enableVanillaLabel, m_enableVanillaPlanetsCheckbox);
 
             m_planetCountSlider = new MyGuiControlRangedSlider(0, 50, 5, 15, true, width: 0.25f);
             m_planetCountSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_COUNT_SLIDER);
 
-            parent.AddTableRow(new MyGuiControlBase[]{ planetCountLabel, m_planetCountSlider });
+            parent.AddTableRow(planetCountLabel, m_planetCountSlider);
 
             m_asteroidCountSlider = new MyGuiControlRangedSlider(0, 50, 5, 15, true, width: 0.25f);
             m_asteroidCountSlider.SetToolTip(MyPluginTexts.TOOLTIPS.ASTEROID_COUNT_SLIDER);
 
-            parent.AddTableRow(new MyGuiControlBase[] { asteroidCountLabel, m_asteroidCountSlider });
+            parent.AddTableRow(asteroidCountLabel, m_asteroidCountSlider);
 
             m_orbitDistancesSlider = new MyGuiControlRangedSlider(100, 100000, 4000, 10000, width: 0.25f);
             m_orbitDistancesSlider.SetToolTip(MyPluginTexts.TOOLTIPS.ORBIT_DISTANCE_SLIDER);
 
-            parent.AddTableRow(new MyGuiControlBase[] { oribtDistanceLabel, m_orbitDistancesSlider });
+            parent.AddTableRow(oribtDistanceLabel, m_orbitDistancesSlider);
 
             m_asteroidDensitySlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 1, defaultValue: 0.6f, width: 0.25f, showLabel: true);
             m_asteroidDensitySlider.SetToolTip(MyPluginTexts.TOOLTIPS.ASTEROID_DENS_SLIDER);
 
-            parent.AddTableRow(new MyGuiControlBase[] { asteroidDensityLabel, m_asteroidDensitySlider });
+            parent.AddTableRow(asteroidDensityLabel, m_asteroidDensitySlider);
 
             m_worldSizeSlider = new MyGuiControlClickableSlider(minValue: -1, maxValue: 1000000, defaultValue: -1, width: 0.25f, showLabel: true, labelSuffix: " Km");
             m_worldSizeSlider.SetToolTip(MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER);
@@ -161,17 +161,17 @@ namespace SEWorldGenPlugin.GUI
                 }
             };
 
-            parent.AddTableRow(new MyGuiControlBase[] { worldSizeLabel, m_worldSizeSlider });
+            parent.AddTableRow(worldSizeLabel, m_worldSizeSlider);
 
             m_planetSizeCapSlider = new MyGuiControlClickableSlider(minValue: 1, maxValue: 2400000, defaultValue: 1200000, intValue: true, width: 0.25f, showLabel: true, labelSuffix: " m");
             m_planetSizeCapSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_SIZE_CAP_SLIDER);
 
-            parent.AddTableRow(new MyGuiControlBase[] { planetSizeCapLabel, m_planetSizeCapSlider });
+            parent.AddTableRow(planetSizeCapLabel, m_planetSizeCapSlider);
 
             m_planetSizeMultSlider = new MyGuiControlClickableSlider(minValue: 0.1f, maxValue: 10, defaultValue: 2, width: 0.25f, showLabel: true);
             m_planetSizeMultSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_SIZE_MULT);
 
-            parent.AddTableRow(new MyGuiControlBase[] { planetSizeMultLabel, m_planetSizeMultSlider });
+            parent.AddTableRow(planetSizeMultLabel, m_planetSizeMultSlider);
 
             m_planetGPSModeCombo = new MyGuiControlCombobox();
             m_planetGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_GPS_COMBO);
@@ -181,7 +181,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_planetGPSModeCombo.Size = new Vector2(0.25f, m_planetGPSModeCombo.Size.Y);
 
-            parent.AddTableRow(new MyGuiControlBase[] { planetGpsModeLabel, m_planetGPSModeCombo});
+            parent.AddTableRow(planetGpsModeLabel, m_planetGPSModeCombo);
 
             m_moonGPSModeCombo = new MyGuiControlCombobox();
             m_moonGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.MOON_GPS_COMBO);
@@ -191,7 +191,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_moonGPSModeCombo.Size = new Vector2(0.25f, m_moonGPSModeCombo.Size.Y);
 
-            parent.AddTableRow(new MyGuiControlBase[] { moonGpsModeLabel, m_moonGPSModeCombo });
+            parent.AddTableRow(moonGpsModeLabel, m_moonGPSModeCombo);
 
             m_asteroidGPSModeCombo = new MyGuiControlCombobox();
             m_asteroidGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.ASTEROID_GPS_COMBO);
@@ -201,7 +201,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_asteroidGPSModeCombo.Size = new Vector2(0.25f, m_asteroidGPSModeCombo.Size.Y);
 
-            parent.AddTableRow(new MyGuiControlBase[] { asteroidGpsModeLabel, m_asteroidGPSModeCombo });
+            parent.AddTableRow(asteroidGpsModeLabel, m_asteroidGPSModeCombo);
 
             parent.ApplyRows();
 
@@ -240,7 +240,15 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidCountSlider.SetValues(worldSettings.GeneratorSettings.MinMaxAsteroidObjects.Min, worldSettings.GeneratorSettings.MinMaxAsteroidObjects.Max);
             m_orbitDistancesSlider.SetValues(worldSettings.GeneratorSettings.MinMaxOrbitDistance.Min / 1000, worldSettings.GeneratorSettings.MinMaxOrbitDistance.Max / 1000);
             m_asteroidDensitySlider.Value = worldSettings.GeneratorSettings.AsteroidDensity;
-            m_worldSizeSlider.Value = worldSettings.GeneratorSettings.WorldSize / 1000;
+
+            if(worldSettings.GeneratorSettings.WorldSize >= 0)
+            {
+                m_worldSizeSlider.Value = worldSettings.GeneratorSettings.WorldSize / 1000;
+            }
+            else
+            {
+                m_worldSizeSlider.Value = -1;
+            }
 
             m_planetSizeCapSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
             m_planetSizeMultSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier;
@@ -264,7 +272,7 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.MinMaxAsteroidObjects = new MySerializableMinMax((int)m_asteroidCountSlider.CurrentMin, (int)m_asteroidCountSlider.CurrentMax);
             settings.GeneratorSettings.MinMaxOrbitDistance = new MySerializableMinMax((int)(m_orbitDistancesSlider.CurrentMin * 1000), (int)(m_orbitDistancesSlider.CurrentMax * 1000));
             settings.GeneratorSettings.AsteroidDensity = m_asteroidDensitySlider.Value;
-            settings.GeneratorSettings.WorldSize = (long)(m_worldSizeSlider.Value * 1000);
+            settings.GeneratorSettings.WorldSize = m_worldSizeSlider.Value >= 0 ? (long)(m_worldSizeSlider.Value * 1000) : -1;
 
             settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_planetSizeCapSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier = m_planetSizeMultSlider.Value;
