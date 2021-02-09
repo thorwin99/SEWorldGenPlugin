@@ -30,11 +30,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
 
-            foreach(var o in CenterObject.GetAllChildren())
+            objs.Add(CenterObject);
+
+            foreach (var o in CenterObject.GetAllChildren())
             {
                 objs.Add(o);
             }
-            objs.Add(CenterObject);
 
             return objs;
         }
@@ -81,10 +82,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// </summary>
     [ProtoContract]
     [ProtoInclude(5001, typeof(MySystemPlanet))]
-    [ProtoInclude(5002, typeof(MySystemPlanetMoon))]
     [ProtoInclude(5003, typeof(MySystemRing))]
     [XmlInclude(typeof(MySystemPlanet))]
-    [XmlInclude(typeof(MySystemPlanetMoon))]
     [XmlInclude(typeof(MySystemRing))]
     [Serializable]
     public class MySystemObject
@@ -162,11 +161,11 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
             foreach(var child in ChildObjects)
             {
-                foreach(var c in child.GetAllChildren())
+                children.Add(child);
+                foreach (var c in child.GetAllChildren())
                 {
                     children.Add(c);
                 }
-                children.Add(child);
             }
 
             return children;
