@@ -1,4 +1,6 @@
 ﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.Networking;
+using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using VRage.Game.Components;
@@ -9,6 +11,7 @@ namespace SEWorldGenPlugin.Session
     /// Sessioncomponent that manages the current sessions plugin settings.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 1000)]
+    [EventOwner]
     public class MySettingsSession : MySessionComponentBase
     {
         /// <summary>
@@ -47,6 +50,13 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void LoadData()
         {
+            if (!Sync.IsServer)
+            {
+                PluginEventHandler.Static.RaiseStaticEvent(GetSettingsServer, Sync.MyId);
+                Static = this;
+                return;
+            }
+
             Static = this;
             if (MyFileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(MySettingsSession)))
             {
@@ -89,6 +99,31 @@ namespace SEWorldGenPlugin.Session
             if (Sync.IsServer)
                 MyFileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
             Settings = null;
+        }
+
+        /// <summary>
+        /// Server event: Retreives the servers world settings
+        /// </summary>
+        /// <param name="requestingClient">The client id of the client that requests the settings</param>
+        [Event(200)]
+        [Server]
+        private static void GetSettingsServer(ulong requestingClient)
+        {
+            if (!Sync.IsServer) return;
+
+            PluginEventHandler.Static.RaiseStaticEvent(GetSettingsClient, Static.Settings, requestingClient);
+        }
+
+        /// <summary>
+        /// Client event: Sets the retreived server world settigns for use on the client
+        /// </summary>
+        /// <param name="settings"></param>
+        [Event(201)]
+        [Client]
+        private static void GetSettingsClient(MyObjectBuilder_WorldSettings settings)
+        {
+            if (Sync.IsServer) return;
+            Static.Settings = settings;
         }
     }
 }
