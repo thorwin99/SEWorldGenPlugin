@@ -48,8 +48,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 if (obj == null) continue;
                 if (obj.Type != MySystemObjectType.PLANET && obj.Type != MySystemObjectType.MOON) continue;
 
-                MyPluginLog.Debug("Generating planet...");
-
                 MySystemPlanet planet = obj as MySystemPlanet;
 
                 if (planet.Generated) continue;
@@ -70,7 +68,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     planet.Generated = true;
                 }
-                MyPluginLog.Debug("Planet generated...");
             }
         }
 
