@@ -83,6 +83,7 @@ namespace SEWorldGenPlugin.GUI
                 if (PlSettings != null)
                 {
                     PlSettings.Enabled = s.IsChecked;
+                    m_pluginSettingsButton.Enabled = m_enablePlugin.IsChecked;
                 }
             });
 
@@ -95,6 +96,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_enablePluginLabel.Position = vector + value * 5;
             m_enablePluginLabel.PositionY += MyGuiConstants.BACK_BUTTON_SIZE.Y * 2;
+            m_pluginSettingsButton.Enabled = m_enablePlugin.IsChecked;
             m_enablePlugin.Position = GetControlPosition();
             m_enablePlugin.PositionY = m_enablePluginLabel.PositionY;
             m_enablePlugin.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
@@ -108,6 +110,12 @@ namespace SEWorldGenPlugin.GUI
                     MyGuiControlButton b = (MyGuiControlButton)c;
                     if(b.Text == MyTexts.GetString(MyCommonTexts.Start) || b.Text == MyTexts.GetString(MyCommonTexts.Ok))
                     {
+                        if (!m_enablePlugin.IsChecked)
+                        {
+                            PlSettings = new MyObjectBuilder_WorldSettings();
+                            PlSettings.Enabled = m_enablePlugin.IsChecked;
+                        }
+
                         if (m_isNewGame)
                         {
                             b.ButtonClicked += delegate
@@ -190,6 +198,7 @@ namespace SEWorldGenPlugin.GUI
         private void Settings_OnOkButtonClick()
         {
             PlSettings = SettingsGui.GetSettings();
+            PlSettings.Enabled = m_enablePlugin.IsChecked;
         }
 
         /// <summary>
