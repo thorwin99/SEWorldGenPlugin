@@ -99,6 +99,17 @@ namespace SEWorldGenPlugin.Generator
 
             StarSystem = data;
 
+            foreach(var obj in StarSystem.GetAllObjects())
+            {
+                if(obj.Type == MySystemObjectType.ASTEROIDS)
+                {
+                    var asteroid = obj as MySystemAsteroids;
+
+                    var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
+                    provider.TryLoadObject(asteroid);
+                }
+            }
+
             m_planets = new List<MyPlanetGeneratorDefinition>();
             m_moons = new List<MyPlanetGeneratorDefinition>();
             m_suns = new List<MyPlanetGeneratorDefinition>();
