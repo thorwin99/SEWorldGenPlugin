@@ -1,4 +1,4 @@
-﻿using SEWorldGenPlugin.ObjectBuilders;
+﻿using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using System;
 using VRageMath;
 
@@ -129,6 +129,15 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
         {
             //Is not really the closest point
             return ClosestPointAtRingCenter(point);
+        }
+
+        public Vector3D GetPointInShape()
+        {
+            Vector3D pos = Vector3D.Zero;
+            pos.X = (radius + width / 2) * Math.Cos(MathHelper.ToRadians(0));
+            pos.Y = 0;
+            pos.Z = (radius + width / 2) * Math.Sin(MathHelper.ToRadians(0));
+            return Vector3D.Transform(pos, worldMatrix);
         }
     }
 }

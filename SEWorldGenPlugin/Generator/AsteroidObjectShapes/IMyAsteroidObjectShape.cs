@@ -17,5 +17,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
         /// <param name="point">The point in space</param>
         /// <returns>The closest point in this shape</returns>
         Vector3D GetClosestPoint(Vector3D point);
+
+        /// <summary>
+        /// Returns a point inside of the shape area
+        /// </summary>
+        /// <returns>A random point in the shape</returns>
+        Vector3D GetPointInShape();
     }
 }

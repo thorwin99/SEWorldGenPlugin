@@ -1,5 +1,7 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Game.World;
+using SEWorldGenPlugin.Generator.AsteroidObjects;
+using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
@@ -164,12 +166,15 @@ namespace SEWorldGenPlugin.Generator
                                 MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition);
                             }
                             break;
-                        case MySystemObjectType.RING:
-                            if (settings.RingGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        case MySystemObjectType.ASTEROIDS:
+                            if (settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT)
                             {
-                                MyAsteroidObjectShapeRing shape = MyAsteroidObjectShapeRing.CreateFromRingItem(item as MySystemRing);
-
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.LocationInRing(0));
+                                MySystemAsteroids asteroid = item as MySystemAsteroids;
+                                MyAbstractAsteroidObjectProvider provider = null;
+                                if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out provider))
+                                {
+                                    MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, provider.GetAsteroidObjectShape(asteroid).GetPointInShape());
+                                }
                             }
                             break;
                     }
@@ -195,6 +200,8 @@ namespace SEWorldGenPlugin.Generator
             var planetsAmount = settings.MinMaxPlanets;
             var asteroidObjectAmount = settings.MinMaxAsteroidObjects;
             var worldSize = settings.WorldSize;
+
+            var asteroidProviders = MyAsteroidObjectsManager.Static.AsteroidObjectProviders;
 
             using (MyRandom.Instance.PushSeed(seed))
             {
@@ -242,9 +249,24 @@ namespace SEWorldGenPlugin.Generator
                         obj = GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count() - 1) * Math.PI / systemSize), currentOrbitDistance);
                         planetCount--;
                     }
-                    else if(asteroidObjectCount > 0) // Generate belt
+                    else if (asteroidObjectCount > 0) // Generate asteroid object
                     {
-                        obj = GenerateAsteroidBelt(currentAsteroidIndex++, currentOrbitDistance, orbitDistances.Min * 100);
+                        int providerIndex = MyRandom.Instance.Next(0, asteroidProviders.Keys.Count);
+                        MyAbstractAsteroidObjectProvider provider = null;
+                        foreach(var prov in asteroidProviders)
+                        {
+                            if (!prov.Value.IsSystemGeneratable()) continue;
+
+                            if(providerIndex-- == 0)
+                            {
+                                provider = prov.Value;
+                            }
+                        }
+
+                        if (provider == null) continue;
+
+                        obj = provider.GenerateInstance(currentAsteroidIndex++, null, currentOrbitDistance);
+                        
                         asteroidObjectCount--;
                     }
                     if (obj == null) continue;
@@ -257,30 +279,6 @@ namespace SEWorldGenPlugin.Generator
             MyPluginLog.Log("Solar system generated ...");
 
             return system;
-        }
-
-        /// <summary>
-        /// Generates a new Asteroid belt, in the system
-        /// </summary>
-        /// <param name="asteroidObjectIndex">Index of the asteroid object</param>
-        /// <param name="orbitDistance">Distance the orbit of the object has to the center of the system</param>
-        /// <param name="width">Width of the belt in me</param>
-        /// <returns></returns>
-        private MySystemRing GenerateAsteroidBelt(int asteroidObjectIndex, long orbitDistance, double width)
-        {
-            MyPluginLog.Debug("Generating new Asteroid belt");
-
-            MySystemRing belt = new MySystemRing();
-
-            belt.DisplayName = GetBeltName(asteroidObjectIndex);
-            belt.CenterPosition = Vector3D.Zero;
-            belt.AngleDegrees = Vector3D.Zero;
-            belt.AsteroidSize = new MySerializableMinMax(256, 1024);
-            belt.Width = width;
-            belt.Height = width / 100;
-            belt.Radius = orbitDistance;
-
-            return belt;
         }
 
         /// <summary>
@@ -386,18 +384,12 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="parentPlanet">Planet the ring is based on</param>
         /// <returns>The ring for the planet</returns>
-        private MySystemRing GenrateRing(MySystemPlanet parentPlanet)
+        private MySystemAsteroids GenrateRing(MySystemPlanet parentPlanet)
         {
-            MyPluginLog.Debug("Generating moons for planet " + parentPlanet.DisplayName);
+            MyPluginLog.Debug("Generating ring for planet " + parentPlanet.DisplayName);
 
-            MySystemRing ring = new MySystemRing();
-            ring.AngleDegrees = new Vector3D(MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20));
-            ring.AsteroidSize = new MySerializableMinMax(64, 512);
-            ring.Width = MyRandom.Instance.Next((int)parentPlanet.Diameter / 10, (int)parentPlanet.Diameter / 5);
-            ring.Height = MyRandom.Instance.NextDouble() * (ring.Width / 10 - ring.Width / 20) + ring.Width / 20;
-            ring.Radius = MyRandom.Instance.NextDouble() * (parentPlanet.Diameter * 2 - parentPlanet.Diameter * 0.75) + parentPlanet.Diameter * 0.75;
-            ring.CenterPosition = parentPlanet.CenterPosition;
-            ring.ParentName = parentPlanet.DisplayName;
+            var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[MyAsteroidRingProvider.TYPE_NAME];
+            var ring = provider.GenerateInstance(0, parentPlanet, 0);
 
             return ring;
         }
@@ -417,10 +409,11 @@ namespace SEWorldGenPlugin.Generator
 
             foreach(var child in parentPlanet.ChildObjects)
             {
-                if(child.Type == MySystemObjectType.RING)
+                if(child.Type == MySystemObjectType.ASTEROIDS)
                 {
-                    MyAsteroidObjectShapeRing asteroidRing = MyAsteroidObjectShapeRing.CreateFromRingItem(child as MySystemRing);
-                    if (Vector3D.Distance(asteroidRing.ClosestPointAtRingCenter(position), position) <= moonDiameter)
+                    var asteroid = child as MySystemAsteroids;
+                    IMyAsteroidObjectShape shape = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName].GetAsteroidObjectShape(asteroid);
+                    if (Vector3D.Distance(shape.GetClosestPoint(position), position) <= moonDiameter)
                     {
                         return true;
                     }

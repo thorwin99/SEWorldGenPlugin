@@ -183,33 +183,35 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             if (!(entity.Entity is MyCharacter)) return;
 
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
-            if (settings.RingGPSMode != MyGPSGenerationMode.DISCOVERY) return;
+            if (settings.AsteroidGPSMode != MyGPSGenerationMode.DISCOVERY) return;
 
             var objects = MyStarSystemGenerator.Static.StarSystem.GetAllObjects();
             MyCharacter player = entity.Entity as MyCharacter;
 
             foreach(var obj in objects)
             {
-                if (obj.Type != MySystemObjectType.RING) continue;
+                if (obj.Type != MySystemObjectType.ASTEROIDS) continue;
 
-                MySystemRing ring = obj as MySystemRing;
+                MySystemAsteroids asteroid = obj as MySystemAsteroids;
                 Vector3D entityPosition = player.PositionComp.GetPosition();
-                MyAsteroidObjectShapeRing shape = MyAsteroidObjectShapeRing.CreateFromRingItem(ring);
+                var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
+
+                IMyAsteroidObjectShape shape = provider.GetAsteroidObjectShape(asteroid);
 
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
 
                 if(Vector3D.Subtract(entityPosition, closestPos).Length() > 5000000)
                 {
-                    MyGPSManager.Static.RemoveDynamicGps(ring.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
+                    MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
                 }
                 else
                 {
-                    if(MyGPSManager.Static.DynamicGpsExists(ring.DisplayName, Color.Yellow, player.GetPlayerIdentityId()))
+                    if(MyGPSManager.Static.DynamicGpsExists(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId()))
                     {
-                        MyGPSManager.Static.ModifyDynamicGps(ring.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
+                        MyGPSManager.Static.ModifyDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
                         continue;
                     }
-                    MyGPSManager.Static.AddDynamicGps(ring.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
+                    MyGPSManager.Static.AddDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
                 }
             }
         }
@@ -240,7 +242,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if (!MyEntities.IsInsideWorld(position) || (settings.WorldSize >= 0 && position.Length() > settings.WorldSize)) continue;
 
-                    var ring = GetRingAt(position);
+                    var ring = GetAsteroidObjectAt(position);
 
                     if (ring == null) continue;
 
@@ -304,16 +306,20 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         /// <param name="position">Position</param>
         /// <returns>The first ring found, that contains the given position.</returns>
-        private MySystemRing GetRingAt(Vector3D position)
+        private MySystemAsteroids GetAsteroidObjectAt(Vector3D position)
         {
             var systemObjects = MyStarSystemGenerator.Static.StarSystem.GetAllObjects();
 
             foreach(var obj in systemObjects)
             {
-                if (obj.Type != MySystemObjectType.RING) continue;
-                MyAsteroidObjectShapeRing ring = MyAsteroidObjectShapeRing.CreateFromRingItem(obj as MySystemRing);
+                if (obj.Type != MySystemObjectType.ASTEROIDS) continue;
+                var asteroids = obj as MySystemAsteroids;
 
-                if (ring.Contains(position) == ContainmentType.Contains) return obj as MySystemRing;
+                var prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName];
+
+                IMyAsteroidObjectShape shape = prov.GetAsteroidObjectShape(asteroids);
+
+                if (shape.Contains(position) == ContainmentType.Contains) return obj as MySystemAsteroids;
             }
 
             return null;

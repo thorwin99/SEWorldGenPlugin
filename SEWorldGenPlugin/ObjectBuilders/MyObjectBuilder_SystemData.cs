@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -214,13 +215,17 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         /// <param name="ring">Out the ring of the planet</param>
         /// <returns>True, if a ring was found</returns>
-        public bool TryGetPlanetRing(out MySystemRing ring)
+        public bool TryGetPlanetRing(out MySystemAsteroids ring)
         {
             foreach(var child in ChildObjects)
             {
-                if(child is MySystemRing)
+                if(child is MySystemAsteroids)
                 {
-                    ring = child as MySystemRing;
+                    var asteroid = child as MySystemAsteroids;
+                    if (asteroid.AsteroidTypeName != MyAsteroidRingProvider.TYPE_NAME) continue;
+
+                    ring = child as MySystemAsteroids;
+
                     return true;
                 }
             }
@@ -250,56 +255,29 @@ namespace SEWorldGenPlugin.ObjectBuilders
     }
 
     /// <summary>
-    /// Class representing a ring or belt
+    /// Class for all asteroid objects.
     /// </summary>
     [ProtoContract]
     [Serializable]
-    public class MySystemRing : MySystemObject
+    public class MySystemAsteroids : MySystemObject
     {
         /// <summary>
-        /// The radius of the asteroid ring to the center.
-        /// This is the distance of the area, where asteroids spawn
-        /// to the center. In meters
+        /// Name of the type this asteroid consists of.
         /// </summary>
         [ProtoMember(4)]
-        public double Radius;
+        public string AsteroidTypeName;
 
         /// <summary>
-        /// The width of the asteroid ring. This is the width of the area where
-        /// asteroids will spawn. In meters
+        /// The minimum and maximum size of the asteroids in this object in meters.
         /// </summary>
         [ProtoMember(5)]
-        public double Width;
-
-        /// <summary>
-        /// The height of the area, where asteroids will spawn. In meters
-        /// </summary>
-        [ProtoMember(6)]
-        public double Height;
-
-        /// <summary>
-        /// The angle of the asteroid ring around the planet. Needs to have 3 components.
-        /// X is the angle around the x axis, y around the y axis and z around the z axis.
-        /// The angles should be in degrees (0 to 360)
-        /// </summary>
-        [ProtoMember(7)]
-        public SerializableVector3D AngleDegrees;
-
-        /// <summary>
-        /// The minimum and maximum size of the asteroids in this ring in meters.
-        /// </summary>
-        [ProtoMember(8)]
         public MySerializableMinMax AsteroidSize;
 
-        public MySystemRing()
+        public MySystemAsteroids()
         {
-            Type = MySystemObjectType.RING;
+            Type = MySystemObjectType.ASTEROIDS;
             DisplayName = "";
             CenterPosition = Vector3D.Zero;
-            Radius = 0;
-            Width = 0;
-            Height = 0;
-            AngleDegrees = Vector3D.Zero;
             AsteroidSize = new MySerializableMinMax(0, 0);
         }
     }
@@ -310,8 +288,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
     public enum MySystemObjectType
     {
         PLANET,
-        RING,
         MOON,
+        ASTEROIDS,
         EMPTY
     }
 }

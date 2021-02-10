@@ -191,14 +191,14 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// The gps generation method used for rings.
         /// </summary>
         [ProtoMember(3)]
-        public MyGPSGenerationMode RingGPSMode = MyGPSGenerationMode.DISCOVERY;
+        public MyGPSGenerationMode AsteroidGPSMode = MyGPSGenerationMode.DISCOVERY;
 
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_GPSGenerationSettings();
             copy.PlanetGPSMode = PlanetGPSMode;
             copy.MoonGPSMode = MoonGPSMode;
-            copy.RingGPSMode = RingGPSMode;
+            copy.AsteroidGPSMode = AsteroidGPSMode;
 
             return copy;
         }
