@@ -99,14 +99,17 @@ namespace SEWorldGenPlugin.Generator
 
             StarSystem = data;
 
-            foreach(var obj in StarSystem.GetAllObjects())
+            if(StarSystem.CenterObject != null)
             {
-                if(obj.Type == MySystemObjectType.ASTEROIDS)
+                foreach (var obj in StarSystem.GetAllObjects())
                 {
-                    var asteroid = obj as MySystemAsteroids;
+                    if (obj.Type == MySystemObjectType.ASTEROIDS)
+                    {
+                        var asteroid = obj as MySystemAsteroids;
 
-                    var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
-                    provider.TryLoadObject(asteroid);
+                        var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
+                        provider.TryLoadObject(asteroid);
+                    }
                 }
             }
 
@@ -277,7 +280,8 @@ namespace SEWorldGenPlugin.Generator
                         if (provider == null) continue;
 
                         obj = provider.GenerateInstance(currentAsteroidIndex++, null, currentOrbitDistance);
-                        
+                        (obj as MySystemAsteroids).AsteroidTypeName = provider.GetTypeName();
+
                         asteroidObjectCount--;
                     }
                     if (obj == null) continue;

@@ -83,9 +83,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// </summary>
     [ProtoContract]
     [ProtoInclude(5001, typeof(MySystemPlanet))]
-    [ProtoInclude(5003, typeof(MySystemRing))]
+    [ProtoInclude(5003, typeof(MySystemAsteroids))]
     [XmlInclude(typeof(MySystemPlanet))]
-    [XmlInclude(typeof(MySystemRing))]
+    [XmlInclude(typeof(MySystemAsteroids))]
     [Serializable]
     public class MySystemObject
     {
