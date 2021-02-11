@@ -39,6 +39,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// List of asteroids, that should only get synced up, but not saved.
         /// </summary>
         private List<MyVoxelBase> m_tmpAsteroids;
+        private bool m_isSaving = false;
 
         public MyProceduralAsteroidsModule(int seed) : base(seed, CELL_SIZE)
         {
@@ -52,6 +53,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 {
                     roid.Save = false;
                 }
+                m_isSaving = true;
             };
         }
 
@@ -171,8 +173,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                         voxel.RangeChanged -= del;
                     };
                     voxelMap.RangeChanged += del;
-
+                    
                     seed.UserData = voxelMap;
+                    m_tmpAsteroids.Add(voxelMap);
                     MyPluginLog.Debug("Generated Voxel map with user data " + seed.UserData.GetType(), LogLevel.INFO);
                 }
             }
@@ -333,6 +336,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         protected int CalculateCellSeed(Vector3I cellId)
         {
             return m_seed + cellId.X * 16785407 + cellId.Y * 39916801 + cellId.Z * 479001599;
+        }
+
+        public override void UpdateCells()
+        {
+            if(m_isSaving && !MySession.Static.IsSaveInProgress)
+            {
+                foreach(var roid in m_tmpAsteroids)
+                {
+                    roid.Save = true;
+                }
+                m_isSaving = false;
+            }
         }
     }
 }

@@ -129,6 +129,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 module.UnloadCells();
                 module.LoadCells();
                 module.GenerateLoadedCellObjects();
+                module.UpdateCells();
             }
         }
 

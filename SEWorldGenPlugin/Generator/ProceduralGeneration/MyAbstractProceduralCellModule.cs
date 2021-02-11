@@ -69,6 +69,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         protected abstract MyProceduralCell GenerateCellSeeds(Vector3I cellId);
 
         /// <summary>
+        /// Method to call when simulation updates, to update all cells if necessary
+        /// </summary>
+        public abstract void UpdateCells();
+
+        /// <summary>
         /// Generates all objects inside the currently loaded cells, if they are not
         /// already generated.
         /// </summary>

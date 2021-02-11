@@ -123,7 +123,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         private Vector3D GetPlanetOffset(MyPlanetGeneratorDefinition definition, double size)
         {
             MyPlanetStorageProvider myPlanetStorageProvider = new MyPlanetStorageProvider();
-            myPlanetStorageProvider.Init(0, definition, size / 2f);
+            myPlanetStorageProvider.Init(0, definition, size / 2f, false);
             IMyStorage myStorage = new MyOctreeStorage(myPlanetStorageProvider, myPlanetStorageProvider.StorageSize);
 
             return myStorage.Size / 2.0f;
