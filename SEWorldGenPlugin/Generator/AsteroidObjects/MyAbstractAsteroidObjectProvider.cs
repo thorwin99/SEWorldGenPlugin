@@ -9,6 +9,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
     /// </summary>
     public abstract class MyAbstractAsteroidObjectProvider
     {
+        private IMyAsteroidAdminMenuCreator m_adminMenuCreator;
+
         /// <summary>
         /// Returns the name of the asteroid type provided by this
         /// </summary>
@@ -34,8 +36,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <summary>
         /// Returns the admin menu creator for this asteroid object type.
         /// </summary>
-        /// <returns>The admin menu creator or null, if should not be added to the plugins admin spawn and edit menu</returns>
-        public abstract IMyAsteroidAdminMenuCreator GetAdminMenuCreator();
+        /// <returns>The admin menu creator or null, if it should not be added to the plugins admin spawn and edit menu</returns>
+        public IMyAsteroidAdminMenuCreator GetAdminMenuCreator()
+        {
+            if(m_adminMenuCreator == null)
+            {
+                m_adminMenuCreator = CreateAdminMenuCreatorInstance();
+            }
+            return m_adminMenuCreator;
+        }
+
+        /// <summary>
+        /// Creates a new instance for the admin menu creator for this type and returns it.
+        /// </summary>
+        /// <returns>A new instance for an admin menu creator</returns>
+        protected abstract IMyAsteroidAdminMenuCreator CreateAdminMenuCreatorInstance();
 
         /// <summary>
         /// Generates an instance of the asteroid object provided by this class.
