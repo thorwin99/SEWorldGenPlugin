@@ -201,6 +201,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 IMyAsteroidObjectShape shape = provider.GetAsteroidObjectShape(asteroid);
 
+                if (shape == null) continue;
+
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
 
                 if(Vector3D.Subtract(entityPosition, closestPos).Length() > 5000000)
