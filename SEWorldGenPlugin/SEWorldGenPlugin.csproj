@@ -169,9 +169,11 @@
     <Compile Include="Draw\IRenderObject.cs" />
     <Compile Include="Draw\RenderHollowCylinder.cs" />
     <Compile Include="Draw\RenderSphere.cs" />
-    <Compile Include="Generator\AsteroidObjectShapes\AsteroidBeltShape.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\IMyAsteroidObjectShape.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeRing.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingAdminMenu.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingProvider.cs" />
+    <Compile Include="Generator\AsteroidObjects\MyAbstractAsteroidObjectProvider.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />
     <Compile Include="Generator\ProceduralGeneration\IMyProceduralGeneratorModule.cs" />
@@ -181,11 +183,15 @@
     <Compile Include="Generator\ProceduralGeneration\MyProceduralGeneratorComponent.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
+    <Compile Include="GUI\AdminMenu\IMyAsteroidAdminMenuCreator.cs" />
+    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.EditMenu.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
     <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
+    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.cs" />
+    <Compile Include="GUI\Controls\MyGuiScreenDialogCoordinate.cs" />
+    <Compile Include="GUI\MyPluginGuiHelper.cs" />
     <Compile Include="GUI\MyPluginSettingsMenu.cs" />
-    <Compile Include="GUI\PluginAdminMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
     <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
     <Compile Include="GUI\MyPluginMainMenu.cs" />
@@ -207,6 +213,7 @@
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
     <Compile Include="ObjectBuilders\MySerializableMinMax.cs" />
     <Compile Include="Session\IMyEntityTracker.cs" />
+    <Compile Include="Session\MyAsteroidObjectsManager.cs" />
     <Compile Include="Session\MyEntityTrackerComponent.cs" />
     <Compile Include="Session\MyGPSManager.cs" />
     <Compile Include="Session\MyPluginDrawSession.cs" />
@@ -215,6 +222,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\MyFileUtils.cs" />
+    <Compile Include="Utilities\MyNamingUtils.cs" />
     <Compile Include="Utilities\MyPluginTexts.cs" />
     <Compile Include="Utilities\MyNetUtil.cs" />
     <Compile Include="Utilities\MyPluginLog.cs" />
@@ -224,6 +232,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <Compile Include="Generator\MyStarSystemGenerator.Networking.cs" />
+    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.SpawnMenu.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

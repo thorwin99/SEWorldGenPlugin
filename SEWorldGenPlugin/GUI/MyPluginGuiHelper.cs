@@ -28,6 +28,7 @@ namespace SEWorldGenPlugin.GUI
             myGuiControlButton.VisualStyle = MyGuiControlButtonStyleEnum.Rectangular;
             myGuiControlButton.Size = new Vector2(usableWidth, myGuiControlButton.Size.Y);
             myGuiControlButton.Enabled = enabled;
+            myGuiControlButton.Text = text;
             if (tooltip == null)
             {
                 myGuiControlButton.SetToolTip(tooltip);
@@ -45,6 +46,17 @@ namespace SEWorldGenPlugin.GUI
         {
             MyGuiScreenMessageBox message = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Error, MyMessageBoxButtonsType.OK, new StringBuilder(error), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, null, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null, onClosing: callback); ;
             MyGuiSandbox.AddScreen(message);
+        }
+        /// <summary>
+        /// Displays a message box to the user and calls the given callback, when it is closed.
+        /// </summary>
+        /// <param name="message">The message</param>
+        /// <param name="caption">The caption of the box</param>
+        /// <param name="callback">Callback to call when closed</param>
+        public static void DisplayMessage(string message, string caption, Action callback = null)
+        {
+            MyGuiScreenMessageBox msg = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.OK, new StringBuilder(message), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, null, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null, onClosing: callback); ;
+            MyGuiSandbox.AddScreen(msg);
         }
     }
 }

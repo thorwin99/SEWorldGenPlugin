@@ -54,7 +54,7 @@ namespace SEWorldGenPlugin
 
             MyPerGameSettings.GUI.MainMenu = typeof(MyPluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
-            MyPerGameSettings.GUI.AdminMenuScreen = typeof(PluginAdminMenu);
+            MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyPluginAdminMenu);
 
             MyPluginLog.Log("Init completed");
         }

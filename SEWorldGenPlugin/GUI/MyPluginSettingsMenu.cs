@@ -254,7 +254,7 @@ namespace SEWorldGenPlugin.GUI
             m_planetSizeMultSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier;
 
             m_planetGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.PlanetGPSMode);
-            m_asteroidGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.RingGPSMode);
+            m_asteroidGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.AsteroidGPSMode);
             m_moonGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.MoonGPSMode);
         }
 
@@ -279,7 +279,7 @@ namespace SEWorldGenPlugin.GUI
 
             settings.GeneratorSettings.GPSSettings.PlanetGPSMode = (MyGPSGenerationMode)m_planetGPSModeCombo.GetSelectedKey();
             settings.GeneratorSettings.GPSSettings.MoonGPSMode = (MyGPSGenerationMode)m_moonGPSModeCombo.GetSelectedKey();
-            settings.GeneratorSettings.GPSSettings.RingGPSMode = (MyGPSGenerationMode)m_asteroidGPSModeCombo.GetSelectedKey();
+            settings.GeneratorSettings.GPSSettings.AsteroidGPSMode = (MyGPSGenerationMode)m_asteroidGPSModeCombo.GetSelectedKey();
 
 
             return settings;
