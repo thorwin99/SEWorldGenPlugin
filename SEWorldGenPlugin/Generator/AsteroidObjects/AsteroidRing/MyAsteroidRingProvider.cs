@@ -1,6 +1,9 @@
 ﻿using ProtoBuf;
+using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
+using SEWorldGenPlugin.Networking;
+using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
@@ -12,17 +15,27 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 {
+    [EventOwner]
     public class MyAsteroidRingProvider : MyAbstractAsteroidObjectProvider
     {
         public static readonly string TYPE_NAME = "AsteroidRing";
 
-        private Dictionary<string, MySystemRing> m_loadedRings;
+        public static MyAsteroidRingProvider Static;
 
-        private MyAsteroidRingAdminMenu m_adminMenuCreator;
+        private Dictionary<string, MySystemRing> m_loadedRings;
 
         public MyAsteroidRingProvider()
         {
-            m_loadedRings = new Dictionary<string, MySystemRing>();
+            if(Static == null)
+            {
+                m_loadedRings = new Dictionary<string, MySystemRing>();
+                Static = this;
+            }
+            else
+            {
+                m_loadedRings = Static.m_loadedRings;
+                Static = this;
+            }
         }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject parent, double objectOrbitRadius)
@@ -34,13 +47,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 MySystemPlanet planet = parent as MySystemPlanet;
 
                 MySystemAsteroids asteroidObject = new MySystemAsteroids();
+                asteroidObject.AsteroidTypeName = GetTypeName();
                 asteroidObject.DisplayName = GetRingName(parent.DisplayName);
                 asteroidObject.ParentName = parent.DisplayName;
                 asteroidObject.CenterPosition = parent.CenterPosition;
+                asteroidObject.AsteroidSize = new MySerializableMinMax(64, 1024);
 
                 MySystemRing ring = new MySystemRing();
                 ring.AngleDegrees = new Vector3D(MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20));
-                ring.AsteroidSize = new MySerializableMinMax(64, 512);
                 ring.Width = MyRandom.Instance.Next((int)planet.Diameter / 10, (int)planet.Diameter / 5);
                 ring.Height = MyRandom.Instance.NextDouble() * (ring.Width / 10 - ring.Width / 20) + ring.Width / 20;
                 ring.Radius = MyRandom.Instance.NextDouble() * (planet.Diameter * 2 - planet.Diameter * 0.75) + planet.Diameter * 0.75;
@@ -59,10 +73,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 MySystemAsteroids asteroidObject = new MySystemAsteroids();
                 asteroidObject.DisplayName = GetBeltName(systemIndex);
                 asteroidObject.CenterPosition = Vector3D.Zero;
+                asteroidObject.AsteroidSize = new MySerializableMinMax(256, 1024);
+                asteroidObject.AsteroidTypeName = GetTypeName();
 
                 MySystemRing belt = new MySystemRing();
                 belt.AngleDegrees = Vector3D.Zero;
-                belt.AsteroidSize = new MySerializableMinMax(256, 1024);
                 belt.Width = settings.MinMaxOrbitDistance.Min;
                 belt.Height = belt.Width / 100;
                 belt.Radius = objectOrbitRadius;
@@ -81,18 +96,16 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return true;
         }
 
-        public override IMyAsteroidAdminMenuCreator GetAdminMenuCreator()
+        protected override IMyAsteroidAdminMenuCreator CreateAdminMenuCreatorInstance()
         {
-            if(m_adminMenuCreator == null)
-            {
-                m_adminMenuCreator = new MyAsteroidRingAdminMenu();
-            }
-            return m_adminMenuCreator;
+            return new MyAsteroidRingAdminMenu();
         }
 
         public override IMyAsteroidObjectShape GetAsteroidObjectShape(MySystemAsteroids instance)
         {
-            return MyAsteroidObjectShapeRing.CreateFromRingItem(m_loadedRings[instance.DisplayName]);
+            if(m_loadedRings.ContainsKey(instance.DisplayName))
+                return MyAsteroidObjectShapeRing.CreateFromRingItem(m_loadedRings[instance.DisplayName]);
+            return null;
         }
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
@@ -116,6 +129,41 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public override string GetTypeName()
         {
             return TYPE_NAME;
+        }
+
+        /// <summary>
+        /// Adds a new instance of an asteroid ring to the star system.
+        /// </summary>
+        /// <param name="systemInstance">Instance of the system asteroid object to add</param>
+        /// <param name="ringData">The asteroid ring data for the ring to add</param>
+        /// <param name="successCallback">A callback that gets called, when the action was a success or not</param>
+        public void AddInstance(MySystemAsteroids systemInstance, MySystemRing ringData, Action<bool> successCallback)
+        {
+            if (ringData == null || systemInstance == null)
+            {
+                successCallback?.Invoke(false);
+            }
+            MyStarSystemGenerator.Static.AddObjectToSystem(systemInstance, systemInstance.ParentName, delegate (bool success)
+            {
+                if (success)
+                {
+                    MyPluginLog.Debug("Successfully added asteroid object to system");
+
+                    PluginEventHandler.Static.RaiseStaticEvent(AddRingServer, systemInstance, ringData);
+                    successCallback?.Invoke(true);
+                }
+                else
+                {
+                    successCallback?.Invoke(false);
+                }
+            });
+        }
+
+        [Event(100001)]
+        [Server]
+        private static void AddRingServer(MySystemAsteroids systemInstance, MySystemRing ringData)
+        {
+            Static?.m_loadedRings.Add(systemInstance.DisplayName, ringData);
         }
 
         /// <summary>
@@ -145,6 +193,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private string GetRingName(string parentPlanetName)
         {
             return parentPlanetName + " Ring";
+        }
+
+        public override bool RemoveInstance(MySystemAsteroids systemInstance)
+        {
+            MyPluginLog.Debug("Removing instance from asteroid provider");
+            if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
+            if (!m_loadedRings.ContainsKey(systemInstance.DisplayName)) return false;
+
+            m_loadedRings.Remove(systemInstance.DisplayName);
+
+            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidRingProvider));
+
+            MyPluginLog.Debug("Successfully removed instance");
+
+            return true;
         }
     }
 
@@ -190,19 +253,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         [ProtoMember(5)]
         public SerializableVector3D AngleDegrees;
 
-        /// <summary>
-        /// The minimum and maximum size of the asteroids in this ring in meters.
-        /// </summary>
-        [ProtoMember(6)]
-        public MySerializableMinMax AsteroidSize;
-
         public MySystemRing()
         {
             Radius = 0;
             Width = 0;
             Height = 0;
             AngleDegrees = Vector3D.Zero;
-            AsteroidSize = new MySerializableMinMax(0, 0);
         }
     }
 }
