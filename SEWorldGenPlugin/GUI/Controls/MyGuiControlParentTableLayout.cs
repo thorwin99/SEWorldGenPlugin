@@ -70,11 +70,14 @@ namespace SEWorldGenPlugin.GUI.Controls
         }
 
         /// <summary>
-        /// Creates a new instance
+        /// Creates a new instance. If minWidth is larger then the width of the table when rows are applied, the last column
+        /// will fill the space and separator will get adjusted accordingly.
         /// </summary>
         /// <param name="columns">The amount of columns</param>
         /// <param name="overflowColumns">If a column can overflow to the next, if it is the last one of a row but not the last of the table.</param>
-        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false, Vector2? padding = null) : base()
+        /// <param name="padding">The padding of the Table from the top left corner</param>
+        /// <param name="minWidth">The minimum width the table should have</param>
+        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false, Vector2? padding = null, float minWidth = 0) : base()
         {
             m_tableRows = new List<MyGuiControlBase[]>();
             m_columnsMax = columns;
@@ -91,6 +94,8 @@ namespace SEWorldGenPlugin.GUI.Controls
             }
 
             m_tableHeight = MARGIN_ROWS;
+
+            MinSize = new Vector2(minWidth, MinSize.Y);
         }
 
         /// <summary>
@@ -153,6 +158,11 @@ namespace SEWorldGenPlugin.GUI.Controls
                 tableWidth += columnWidth + MARGIN_COLUMNS;
             }
 
+            if(MinSize.X > tableWidth)
+            {
+                tableWidth = MinSize.X;
+            }
+
             Size = new Vector2(tableWidth, m_tableHeight);
 
             Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + m_padding.X, Size.Y / -2 + m_padding.Y);
@@ -194,6 +204,21 @@ namespace SEWorldGenPlugin.GUI.Controls
 
                 currentRowTopLeft += new Vector2(0, rowHeight + MARGIN_ROWS);
             }
+        }
+
+        /// <summary>
+        /// Clears the table
+        /// </summary>
+        public void ClearTable()
+        {
+            Controls.Clear();
+            if(m_tableRows != null)
+                m_tableRows.Clear();
+
+            if (m_columnWidths != null)
+                m_columnWidths = new float[m_columnsMax];
+
+            m_tableHeight = MARGIN_ROWS;
         }
     }
 }
