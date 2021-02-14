@@ -59,7 +59,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public MySystemObject FindObjectByName(string name)
         {
             if (name == null) return null;
-            foreach(var child in CenterObject.GetAllChildren())
+            foreach(var child in GetAllObjects())
             {
                 if (child.DisplayName.ToLower() == name.ToLower()) return child;
             }
