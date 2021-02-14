@@ -1,4 +1,5 @@
 ﻿using SEWorldGenPlugin.GUI.Controls;
+using SEWorldGenPlugin.ObjectBuilders;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu
 {
@@ -26,8 +27,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// <param name="usableWidth">Usable width of all elements.</param>
         /// <param name="parentTable">The parent table of the elements.</param>
         /// <param name="adminScreen">The admin menu screen.</param>
+        /// <param name="asteroidObject">The asteroid object this menu gets generated for</param>
         /// <returns>True, if a menu was created</returns>
-        bool CreateEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen);
+        bool CreateEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject);
 
         /// <summary>
         /// Called, when the admin menu gets closed.
