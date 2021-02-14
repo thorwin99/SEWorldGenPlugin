@@ -2,6 +2,7 @@
 using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,7 @@ namespace SEWorldGenPlugin.Generator
         {
             if (systemObject.Type == MySystemObjectType.MOON) return;
             m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentName == null ? "" : parentName, m_currentGetIndex, Sync.MyId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentName == null ? "" : parentName, m_currentSimpleIndex, Sync.MyId);
         }
 
         /// <summary>
@@ -134,7 +135,8 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         private static void SendAddSystemObjectServer(MySystemObject obj, string parentName, ulong callbackId, ulong clientId)
         {
-            if(obj != null)
+            MyPluginLog.Log("Server: Add object " + obj.DisplayName + " to system");
+            if (obj != null)
             {
                 if (!Static.StarSystem.ObjectExists(obj.DisplayName))
                 {
@@ -167,7 +169,8 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         private static void SendSimpleActionCallbackClient(bool success, ulong callbackId)
         {
-            if(Static.m_simpleActionsCallbacks.ContainsKey(callbackId))
+            MyPluginLog.Log("Client: Getting simple callback with success=" + success + " from server");
+            if (Static.m_simpleActionsCallbacks.ContainsKey(callbackId))
             {
                 Static.m_simpleActionsCallbacks[callbackId](success);
                 Static.m_simpleActionsCallbacks.Remove(callbackId);
@@ -184,17 +187,36 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         private static void SendRemoveSystemObjectServer(string objectName, ulong callbackId, ulong clientId)
         {
+            MyPluginLog.Log("Server: Removing object " + objectName + " from system");
             MySystemObject o = Static.StarSystem.FindObjectByName(objectName);
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
                 MySystemObject parent = Static.StarSystem.FindObjectByName(o.ParentName);
                 if (parent != null)
                 {
-                    parent.ChildObjects.Remove(o);
-                    PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, clientId);
+                    if(o.Type == MySystemObjectType.ASTEROIDS)
+                    {
+                        var asteroids = o as MySystemAsteroids;
+                        if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroids.AsteroidTypeName))
+                        {
+                            bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids);
+                            if (removed)
+                            {
+                                parent.ChildObjects.Remove(o);
+                                PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        parent.ChildObjects.Remove(o);
+                        PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
+                        return;
+                    }
                 }
             }
-            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, clientId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, callbackId, clientId);
         }
 
         /// <summary>
@@ -206,7 +228,7 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         private static void SendGetStarSystemServer(ulong callbackId, ulong clientId)
         {
-            MyPluginLog.Debug("Get star system server");
+            MyPluginLog.Debug("Server: Get star system");
             PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemClient, Static.StarSystem, callbackId, clientId);
         }
 
@@ -219,7 +241,7 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem, ulong callbackId)
         {
-            MyPluginLog.Debug("Received star system");
+            MyPluginLog.Debug("Client: Received star system");
             if (Static.m_getSystemCallbacks.ContainsKey(callbackId))
             {
                 Static.m_getSystemCallbacks[callbackId](starSystem);
