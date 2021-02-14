@@ -1,6 +1,7 @@
 ﻿using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.ObjectBuilders;
+using System.IO;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects
 {
@@ -9,6 +10,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
     /// </summary>
     public abstract class MyAbstractAsteroidObjectProvider
     {
+
         private IMyAsteroidAdminMenuCreator m_adminMenuCreator;
 
         /// <summary>
@@ -64,6 +66,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         public abstract MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject systemParent, double objectOrbitRadius);
 
         /// <summary>
+        /// Tries to remove the given asteroid instance from this provider
+        /// </summary>
+        /// <param name="systemInstance">Instance to remove</param>
+        /// <returns>True, if removed</returns>
+        public abstract bool RemoveInstance(MySystemAsteroids systemInstance);
+
+        /// <summary>
         /// Tries to load the given asteroid
         /// </summary>
         public abstract bool TryLoadObject(MySystemAsteroids asteroid);
@@ -80,7 +89,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <returns>The file name for the asteroid object</returns>
         protected string GetFileName(string objectName)
         {
-            return objectName.Replace(" ", "_") + ".xml";
+            return objectName.Replace(" ", "_") + ".roid";
         }
     }
 }
