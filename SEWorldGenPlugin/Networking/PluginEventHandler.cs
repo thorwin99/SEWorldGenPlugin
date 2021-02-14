@@ -184,6 +184,11 @@ namespace SEWorldGenPlugin.Networking
                 {
                     if (m.CustomAttributes.Any(data => data.AttributeType == typeof(EventAttribute)))
                     {
+                        ulong id = m.GetCustomAttribute<EventAttribute>().Id;
+                        if (m_registeredMethods.ContainsKey(id))
+                        {
+                            MyPluginLog.Log("A networking event with id " + id + " already exists. Wont register method " + m.GetBaseDefinition().Name + " from type " + type.Name + ".", LogLevel.ERROR);
+                        }
                         m_registeredMethods.Add(m.GetCustomAttribute<EventAttribute>().Id, m);
                     }
                 }
