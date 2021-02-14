@@ -247,6 +247,7 @@ namespace SEWorldGenPlugin.Generator
                 {
                     system.CenterObject = new MySystemObject();
                     system.CenterObject.Type = MySystemObjectType.EMPTY;
+                    system.CenterObject.DisplayName = "System center";
                 }
 
                 while(planetCount > 0 || asteroidObjectCount > 0)
