@@ -207,6 +207,7 @@ namespace SEWorldGenPlugin.Utilities
         /// </summary>
         /// <param name="file">File name</param>
         /// <param name="callingType">Calling type</param>
+        /// <exception cref="FileNotFoundException">When no file cannot be created</exception>
         /// <returns>A TextWriter, to write to the file</returns>
         public static TextWriter WriteFileInWorldStorage(string file, Type callingType)
         {
