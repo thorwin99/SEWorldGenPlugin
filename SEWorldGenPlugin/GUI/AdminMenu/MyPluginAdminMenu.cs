@@ -15,18 +15,39 @@ namespace SEWorldGenPlugin.GUI
 {
     public partial class MyPluginAdminMenu : MyGuiScreenAdminMenu
     {
+        /// <summary>
+        /// Vertical margin between objects of the admin menu
+        /// </summary>
         private static readonly float MARGIN_VERT = 25f / MyGuiConstants.GUI_OPTIMAL_SIZE.Y;
 
+        /// <summary>
+        /// Usable width for elements in admin menu to preserve padding
+        /// </summary>
         private float m_usableWidth;
 
+        /// <summary>
+        /// Whether the plugin is installed on the server
+        /// </summary>
         private bool m_pluginInstalled = false;
 
+        /// <summary>
+        /// The currently selected index of the admin menu in the combo box
+        /// </summary>
         private int m_selectedMenuIndex = 0;
 
+        /// <summary>
+        /// A list of providers for asteroid objects
+        /// </summary>
         private List<MyAbstractAsteroidObjectProvider> m_asteroidProviders;
 
+        /// <summary>
+        /// If the admin menu is currently recreating. 
+        /// </summary>
         private bool m_isRecreating = false;
 
+        /// <summary>
+        /// If the admin menu should recreate the next frame
+        /// </summary>
         private bool m_shouldRecreate = false;
 
         /// <summary>
@@ -45,6 +66,9 @@ namespace SEWorldGenPlugin.GUI
             }
         }
 
+        /// <summary>
+        /// Initializes the admin menu
+        /// </summary>
         public MyPluginAdminMenu() : base()
         {
             m_asteroidProviders = new List<MyAbstractAsteroidObjectProvider>();
@@ -59,6 +83,11 @@ namespace SEWorldGenPlugin.GUI
             m_shouldRecreate = false;
         }
 
+        /// <summary>
+        /// Runs every frame, recreates the admin menu, when
+        /// ShouldRecreate is set to true.
+        /// </summary>
+        /// <returns></returns>
         public override bool Draw()
         {
             bool ret = base.Draw();
