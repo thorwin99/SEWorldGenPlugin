@@ -13,24 +13,54 @@ namespace SEWorldGenPlugin.GUI
 {
     public partial class MyPluginAdminMenu
     {
+        /// <summary>
+        /// The currently selected type of object to spawn. 0 is planet, 1 is asteroid object
+        /// </summary>
         private long m_spawnType = 0L;
 
+        /// <summary>
+        /// The currently selected type of asteroid object to spawn.
+        /// </summary>
         private long m_asteroidType = 0;
 
+        /// <summary>
+        /// Combobox to select the system object type to spawn
+        /// </summary>
         private MyGuiControlCombobox m_spawnTypeCombo;
 
+        /// <summary>
+        /// Combobox to select the asteroid type to spawn
+        /// </summary>
         private MyGuiControlCombobox m_asteroidTypeCombo;
 
+        /// <summary>
+        /// Listbox containing all loaded planet definitions to spawn them
+        /// </summary>
         private MyGuiControlListbox m_planetDefList;
 
+        /// <summary>
+        /// Textbox for the name of the planet to spawn
+        /// </summary>
         private MyGuiControlTextbox m_nameBox;
 
+        /// <summary>
+        /// Slider for the planet size
+        /// </summary>
         private MyGuiControlClickableSlider m_planetSizeSlider;
 
+        /// <summary>
+        /// Button to spawn the planet with currently entered parameters
+        /// </summary>
         private MyGuiControlButton m_spawnPlanetButton;
 
-        MyGuiControlButton m_spawnPlanetCoordsButton;
+        /// <summary>
+        /// Button to spawn the planet with the currently entered parameters at the given coordinate
+        /// </summary>
+        private MyGuiControlButton m_spawnPlanetCoordsButton;
 
+        /// <summary>
+        /// Builds the spawn menu
+        /// </summary>
         private void BuildSpawnMenu()
         {
             MyPluginLog.Debug("Create Spawn Menu");
@@ -85,6 +115,10 @@ namespace SEWorldGenPlugin.GUI
             MyPluginLog.Debug("Added spawn menu");
         }
 
+        /// <summary>
+        /// Builds the menu to spawn planets
+        /// </summary>
+        /// <param name="table">Tablet to add editing elements to</param>
         private void CreatePlanetSpawnMenu(MyGuiControlParentTableLayout table)
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
@@ -155,6 +189,10 @@ namespace SEWorldGenPlugin.GUI
             LoadPlanetDefs(m_planetDefList);
         }
 
+        /// <summary>
+        /// Creates the menu to spawn asteroid objects
+        /// </summary>
+        /// <param name="table">Table to add elements to</param>
         private void CreateAsteroidSpawnMenu(MyGuiControlParentTableLayout table)
         {
             m_asteroidTypeCombo = new MyGuiControlCombobox();
@@ -177,6 +215,10 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidProviders[(int)m_asteroidType].GetAdminMenuCreator().CreateSpawnMenu(m_usableWidth, table, this);
         }
 
+        /// <summary>
+        /// Action to spawn a planet
+        /// </summary>
+        /// <param name="coordSpawn">If the planet should be spawned at coordinates instead of direct placement</param>
         private void OnSpawnPlanet(bool coordSpawn = false)
         {
             StringBuilder name = new StringBuilder();
@@ -224,6 +266,10 @@ namespace SEWorldGenPlugin.GUI
             CloseScreenNow();
         }
 
+        /// <summary>
+        /// Action when the object type to spawn changes.
+        /// Updates m_spawnType
+        /// </summary>
         private void OnSpawnTypeChange()
         {
             m_spawnType = m_spawnTypeCombo.GetSelectedKey();
