@@ -203,6 +203,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 if (shape == null) continue;
 
+                if(shape.Contains(entityPosition) == ContainmentType.Contains)
+                {
+                    MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
+                }
+
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
 
                 if(Vector3D.Subtract(entityPosition, closestPos).Length() > 5000000)
