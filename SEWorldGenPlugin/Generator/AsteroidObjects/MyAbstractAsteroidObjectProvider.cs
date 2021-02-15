@@ -10,7 +10,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
     /// </summary>
     public abstract class MyAbstractAsteroidObjectProvider
     {
-
+        /// <summary>
+        /// The private instance of the admin menu creator, so that only one ever exists.
+        /// </summary>
         private IMyAsteroidAdminMenuCreator m_adminMenuCreator;
 
         /// <summary>
