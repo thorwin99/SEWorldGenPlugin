@@ -14,6 +14,7 @@ namespace SEWorldGenPlugin.Generator
     /// </summary>
     public partial class MyStarSystemGenerator
     {
+        /// Callback dictionaries and indexes, to track callbacks
         private Dictionary<ulong, Action<bool, MySystemObject>> m_getActionCallbacks;
         private Dictionary<ulong, Action<bool>> m_simpleActionsCallbacks;
         private Dictionary<ulong, Action<MyObjectBuilder_SystemData>> m_getSystemCallbacks;
@@ -21,6 +22,9 @@ namespace SEWorldGenPlugin.Generator
         private ulong m_currentSimpleIndex;
         private ulong m_getSystemIndex;
 
+        /// <summary>
+        /// Initializes networking for the system generator
+        /// </summary>
         private void LoadNetworking()
         {
             m_getActionCallbacks = new Dictionary<ulong, Action<bool, MySystemObject>>();
@@ -31,10 +35,18 @@ namespace SEWorldGenPlugin.Generator
             m_getSystemIndex = 0;
         }
 
+        /// <summary>
+        /// Unloads networking data
+        /// </summary>
         private void UnloadNetworking()
         {
             m_getActionCallbacks.Clear();
             m_simpleActionsCallbacks.Clear();
+            m_getSystemCallbacks.Clear();
+
+            m_currentGetIndex = 0;
+            m_currentSimpleIndex = 0;
+            m_getSystemIndex = 0;
         }
 
         /// <summary>
@@ -73,6 +85,10 @@ namespace SEWorldGenPlugin.Generator
             PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectName, m_currentSimpleIndex, Sync.MyId);
         }
 
+        /// <summary>
+        /// Gets the current star system as represented on the server
+        /// </summary>
+        /// <param name="callback">Callback to call, when star system was retreived</param>
         public void GetStarSystem(Action<MyObjectBuilder_SystemData> callback)
         {
             MyPluginLog.Debug("Get star system");
