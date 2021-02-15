@@ -15,15 +15,30 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 {
+    /// <summary>
+    /// The provider class for the asteroid ring object
+    /// </summary>
     [EventOwner]
     public class MyAsteroidRingProvider : MyAbstractAsteroidObjectProvider
     {
+        /// <summary>
+        /// The type name, for the system asteroid object, this class provides
+        /// </summary>
         public static readonly string TYPE_NAME = "AsteroidRing";
 
+        /// <summary>
+        /// Static instance of this provider, so that there is only one provider existent ever.
+        /// </summary>
         public static MyAsteroidRingProvider Static;
 
+        /// <summary>
+        /// The dictionary contains all currently loaded asteroid rings and belts
+        /// </summary>
         private Dictionary<string, MySystemRing> m_loadedRings;
 
+        /// <summary>
+        /// Creates new asteroid ring provider instance, replaces the old one
+        /// </summary>
         public MyAsteroidRingProvider()
         {
             if(Static == null)
@@ -159,6 +174,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             });
         }
 
+        /// <summary>
+        /// Server event: Adds a new Asteroid ring on the server, if the provider is loaded on the server
+        /// </summary>
+        /// <param name="systemInstance">The instance of the object as an SystemAsteroids object</param>
+        /// <param name="ringData">The custom data for the asteroid ring</param>
         [Event(100001)]
         [Server]
         private static void AddRingServer(MySystemAsteroids systemInstance, MySystemRing ringData)
