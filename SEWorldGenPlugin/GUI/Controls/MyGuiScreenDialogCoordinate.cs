@@ -20,9 +20,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// </summary>
         private string m_caption;
 
-        /// <summary>
-        /// Gui elements
-        /// </summary>
+        // Gui elements
         private MyGuiControlButton m_okButton;
         private MyGuiControlButton m_cancelButton;
         private MyGuiControlTextbox m_xBox;
