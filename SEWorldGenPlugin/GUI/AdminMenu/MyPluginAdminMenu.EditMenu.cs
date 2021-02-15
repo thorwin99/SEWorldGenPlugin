@@ -11,11 +11,30 @@ namespace SEWorldGenPlugin.GUI
 {
     public partial class MyPluginAdminMenu
     {
+        /// <summary>
+        /// The current fetched star system of the server
+        /// </summary>
         MyObjectBuilder_SystemData m_fetchedStarSytem;
 
+        /// <summary>
+        /// A list box containing all system objects
+        /// </summary>
         MyGuiControlListbox m_systemObjectsBox;
+
+        /// <summary>
+        /// The currently selected object in the edit menu
+        /// </summary>
         MySystemObject m_selectedObject;
+
+        /// <summary>
+        /// Table for the scrollpane containing the editing gui elements for the currently
+        /// selected system object
+        /// </summary>
         MyGuiControlParentTableLayout m_scrollTable;
+
+        /// <summary>
+        /// The scrollpane used to scroll editing menu elements
+        /// </summary>
         MyGuiControlScrollablePanel m_scrollPane;
 
         /// <summary>
@@ -23,6 +42,9 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         public bool ForceFetchStarSystem = false;
 
+        /// <summary>
+        /// Builds the edit menu
+        /// </summary>
         private void BuildEditMenu()
         {
             MyPluginLog.Debug("Adding edit menu");
@@ -89,6 +111,10 @@ namespace SEWorldGenPlugin.GUI
             MyPluginLog.Debug("Added edit menu");
         }
 
+        /// <summary>
+        /// Creates the sub menu for the currently selected system object, that contains the 
+        /// elements to edit it.
+        /// </summary>
         private void BuildEditingSubMenu()
         {
             if(m_scrollTable != null)
@@ -160,6 +186,11 @@ namespace SEWorldGenPlugin.GUI
             table.AddTableRow(new MyGuiControlLabel(null, null, "This object cant be edited.", font: "Red"));
         }
 
+        /// <summary>
+        /// Action when system object is clicked in the system object list box.
+        /// Sets the currently selected system object
+        /// </summary>
+        /// <param name="box"></param>
         private void OnSystemObjectSelect(MyGuiControlListbox box)
         {
             m_selectedObject = box.SelectedItems[box.SelectedItems.Count - 1].UserData as MySystemObject;
