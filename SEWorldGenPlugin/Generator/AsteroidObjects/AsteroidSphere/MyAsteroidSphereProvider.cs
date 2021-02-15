@@ -3,6 +3,7 @@ using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
+using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 {
@@ -60,15 +61,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
     public class MyAsteroidSphereData
     {
         /// <summary>
-        /// The inner radius for the hollow sphere of asteroids
+        /// The center of the hollow sphere asteroids object
         /// </summary>
         [ProtoMember(1)]
+        public Vector3D Center;
+
+        /// <summary>
+        /// The inner radius for the hollow sphere of asteroids
+        /// </summary>
+        [ProtoMember(2)]
         public double InnerRadius;
 
         /// <summary>
         /// The outer radius for the hollow sphere asteroids
         /// </summary>
-        [ProtoMember(2)]
+        [ProtoMember(3)]
         public double OuterRadius;
     }
 }
