@@ -34,7 +34,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// <summary>
         /// The dictionary contains all currently loaded asteroid rings and belts
         /// </summary>
-        private Dictionary<string, MySystemRing> m_loadedRings;
+        private Dictionary<string, MyAsteroidRingData> m_loadedRings;
 
         /// <summary>
         /// Creates new asteroid ring provider instance, replaces the old one
@@ -43,7 +43,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             if(Static == null)
             {
-                m_loadedRings = new Dictionary<string, MySystemRing>();
+                m_loadedRings = new Dictionary<string, MyAsteroidRingData>();
                 Static = this;
             }
             else
@@ -68,7 +68,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 asteroidObject.CenterPosition = parent.CenterPosition;
                 asteroidObject.AsteroidSize = new MySerializableMinMax(64, 1024);
 
-                MySystemRing ring = new MySystemRing();
+                MyAsteroidRingData ring = new MyAsteroidRingData();
                 ring.AngleDegrees = new Vector3D(MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20));
                 ring.Width = MyRandom.Instance.Next((int)planet.Diameter / 10, (int)planet.Diameter / 5);
                 ring.Height = MyRandom.Instance.NextDouble() * (ring.Width / 10 - ring.Width / 20) + ring.Width / 20;
@@ -91,7 +91,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 asteroidObject.AsteroidSize = new MySerializableMinMax(256, 1024);
                 asteroidObject.AsteroidTypeName = GetTypeName();
 
-                MySystemRing belt = new MySystemRing();
+                MyAsteroidRingData belt = new MyAsteroidRingData();
                 belt.AngleDegrees = Vector3D.Zero;
                 belt.Width = settings.MinMaxOrbitDistance.Min;
                 belt.Height = belt.Width / 100;
@@ -126,7 +126,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
             if (m_loadedRings.ContainsKey(asteroid.DisplayName)) return false;
-            var ring = MyFileUtils.ReadXmlFileFromWorld<MySystemRing>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidRingProvider));
+            var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidRingProvider));
 
             m_loadedRings.Add(asteroid.DisplayName, ring);
 
@@ -152,7 +152,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// <param name="systemInstance">Instance of the system asteroid object to add</param>
         /// <param name="ringData">The asteroid ring data for the ring to add</param>
         /// <param name="successCallback">A callback that gets called, when the action was a success or not</param>
-        public void AddInstance(MySystemAsteroids systemInstance, MySystemRing ringData, Action<bool> successCallback)
+        public void AddInstance(MySystemAsteroids systemInstance, MyAsteroidRingData ringData, Action<bool> successCallback)
         {
             if (ringData == null || systemInstance == null)
             {
@@ -181,7 +181,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// <param name="ringData">The custom data for the asteroid ring</param>
         [Event(100001)]
         [Server]
-        private static void AddRingServer(MySystemAsteroids systemInstance, MySystemRing ringData)
+        private static void AddRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
         {
             Static?.m_loadedRings.Add(systemInstance.DisplayName, ringData);
         }
@@ -236,7 +236,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
     /// </summary>
     [ProtoContract]
     [Serializable]
-    public class MySystemRing
+    public class MyAsteroidRingData
     {
         /// <summary>
         /// The radius of the asteroid ring to the center.
@@ -273,7 +273,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         [ProtoMember(5)]
         public SerializableVector3D AngleDegrees;
 
-        public MySystemRing()
+        public MyAsteroidRingData()
         {
             Radius = 0;
             Width = 0;

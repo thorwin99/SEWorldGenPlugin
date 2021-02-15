@@ -236,7 +236,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 }
 
                 MySystemAsteroids instance;
-                MySystemRing ring;
+                MyAsteroidRingData ring;
                 GenerateAsteroidData(out ring, out instance);
 
                 if(ring == null || instance == null)
@@ -276,7 +276,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         private void UpdateRingVisual()
         {
-            MySystemRing ring = GenerateAsteroidRing();
+            MyAsteroidRingData ring = GenerateAsteroidRing();
             if (ring == null) return;
 
             var shape = MyAsteroidObjectShapeRing.CreateFromRingItem(ring);
@@ -342,7 +342,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         /// <param name="ringData">The out value for the ring data</param>
         /// <param name="systemObject">The out value for the system object</param>
-        private void GenerateAsteroidData(out MySystemRing ringData, out MySystemAsteroids systemObject)
+        private void GenerateAsteroidData(out MyAsteroidRingData ringData, out MySystemAsteroids systemObject)
         {
             if (m_parentObjectListBox.SelectedItems.Count <= 0)
             {
@@ -368,13 +368,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// Generates an asteroid ring from the current slider values in the spawn menu
         /// </summary>
         /// <returns>The generated system ring data</returns>
-        private MySystemRing GenerateAsteroidRing()
+        private MyAsteroidRingData GenerateAsteroidRing()
         {
             if (m_parentObjectListBox.SelectedItems.Count <= 0) return null;
             var selected = m_parentObjectListBox.SelectedItems[m_parentObjectListBox.SelectedItems.Count - 1];
             MySystemObject parent = selected.UserData as MySystemObject;
 
-            MySystemRing ring = new MySystemRing();
+            MyAsteroidRingData ring = new MyAsteroidRingData();
             ring.CenterPosition = parent.CenterPosition;
             ring.Width = m_widthSlider.Value * 1000;
             ring.Height = ring.Width / 10;
