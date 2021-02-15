@@ -68,9 +68,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private MyGuiControlTextbox m_nameBox;
 
         /// <summary>
+        /// Checkbox, to disable or enable snap to parent
+        /// </summary>
+        private MyGuiControlCheckbox m_snapToParentCheck;
+
+        /// <summary>
         /// The currently selected asteroid ring / belt in the edit menu
         /// </summary>
         private MySystemAsteroids m_currentSelectedAsteroid;
+
+        /// <summary>
+        /// If the camera should snap to the parent object in the spawn
+        /// menu
+        /// </summary>
+        private bool m_snapToParent = true;
 
         /// <summary>
         /// The admin menu instance, that used this class to generate the menu
@@ -134,6 +145,23 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             }
 
             parentTable.AddTableRow(m_parentObjectListBox);
+
+            var row = new MyGuiControlParentTableLayout(2, false, Vector2.Zero);
+
+            m_snapToParentCheck = new MyGuiControlCheckbox();
+            m_snapToParentCheck.IsChecked = m_snapToParent;
+            m_snapToParentCheck.IsCheckedChanged += delegate
+            {
+                m_snapToParent = m_snapToParentCheck.IsChecked;
+            };
+
+            row.AddTableRow(m_snapToParentCheck, new MyGuiControlLabel(null, null, "Snap camera to parent"));
+
+            row.ApplyRows();
+
+            parentTable.AddTableRow(row);
+
+            parentTable.AddTableSeparator();
 
             m_radiusSlider = new MyGuiControlClickableSlider(width: usableWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
             m_radiusSlider.Enabled = false;
@@ -388,7 +416,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                     m_angleZSlider.Enabled = true;
                     m_angleZSlider.Value = 0;
 
-                    CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
+                    if(m_snapToParent)
+                        CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
                     UpdateRingVisual();
                     return;
                 }
@@ -418,7 +447,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                 m_nameBox.SetText(new StringBuilder(""));
 
-                CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
+                if (m_snapToParent)
+                    CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
                 UpdateRingVisual();
             }
             else
