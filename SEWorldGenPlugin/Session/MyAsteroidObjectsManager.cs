@@ -13,8 +13,14 @@ namespace SEWorldGenPlugin.Session
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, priority: 1005)]
     public class MyAsteroidObjectsManager : MySessionComponentBase
     {
+        /// <summary>
+        /// Static instance of the asteroid object manager, so that only one exists
+        /// </summary>
         public static MyAsteroidObjectsManager Static;
 
+        /// <summary>
+        /// All loaded asteroid object providers mapped to their type name
+        /// </summary>
         public Dictionary<string, MyAbstractAsteroidObjectProvider> AsteroidObjectProviders;
 
         public override void LoadData()
@@ -47,7 +53,7 @@ namespace SEWorldGenPlugin.Session
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                MyPluginLog.Debug("Registering asteroid object providers in: " + assembly.FullName);
+                MyPluginLog.Log("Registering asteroid object providers in: " + assembly.FullName);
                 try
                 {
                     foreach (var type in assembly.GetTypes())
