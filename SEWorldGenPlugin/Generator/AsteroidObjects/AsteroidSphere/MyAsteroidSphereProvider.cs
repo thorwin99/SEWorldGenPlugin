@@ -1,6 +1,9 @@
 using ProtoBuf;
+using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
+using SEWorldGenPlugin.Networking;
+using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
@@ -12,6 +15,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
     /// <summary>
     /// Provider class for a hollow sphere asteroid object
     /// </summary>
+    [EventOwner]
     public class MyAsteroidSphereProvider : MyAbstractAsteroidObjectProvider
     {
         /// <summary>
@@ -28,6 +32,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// The dictionary contains all currently loaded asteroid spheres
         /// </summary>
         private Dictionary<string, MyAsteroidSphereData> m_loadedSpheres;
+
+        public MyAsteroidSphereProvider()
+        {
+            if(Static == null)
+            {
+                m_loadedSpheres = new Dictionary<string, MyAsteroidSphereData>();
+                Static = this;
+            }
+            else
+            {
+                m_loadedSpheres = Static.m_loadedSpheres;
+                Static = this;
+            }
+        }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject systemParent, double objectOrbitRadius)
         {
@@ -90,7 +108,42 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         protected override IMyAsteroidAdminMenuCreator CreateAdminMenuCreatorInstance()
         {
-            throw new NotImplementedException();
+            return new MyAsteroidSphereAdminMenu();
+        }
+
+        /// <summary>
+        /// Adds a new instance to this provider, if it doesnt exist
+        /// </summary>
+        /// <param name="instance">System object instance</param>
+        /// <param name="data">Data for sphere</param>
+        /// <param name="callback">Callback when action is complete</param>
+        public void AddInstance(MySystemAsteroids instance, MyAsteroidSphereData data, Action<bool> callback)
+        {
+            if (data == null || instance == null)
+            {
+                callback?.Invoke(false);
+            }
+            MyStarSystemGenerator.Static.AddObjectToSystem(instance, instance.ParentName, delegate (bool success)
+            {
+                if (success)
+                {
+                    MyPluginLog.Debug("Successfully added asteroid object to system");
+
+                    PluginEventHandler.Static.RaiseStaticEvent(AddInstanceServer, instance, data);
+                    callback?.Invoke(true);
+                }
+                else
+                {
+                    callback?.Invoke(false);
+                }
+            });
+        }
+
+        [Event(3001)]
+        [Server]
+        private static void AddInstanceServer(MySystemAsteroids instance, MyAsteroidSphereData data)
+        {
+            Static?.m_loadedSpheres.Add(instance.DisplayName, data);
         }
     }
 

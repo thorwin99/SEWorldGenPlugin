@@ -20,6 +20,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 {
     public class MyAsteroidRingAdminMenu : IMyAsteroidAdminMenuCreator
     {
+        /// <summary>
+        /// Id for the render preview
+        /// </summary>
         private static int PREVIEW_RENDER_ID = 1425;
 
         /// <summary>
@@ -66,6 +69,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// The textbox for the asteroid ring name in the spawn menu
         /// </summary>
         private MyGuiControlTextbox m_nameBox;
+
+        /// <summary>
+        /// Button to spawn the ring
+        /// </summary>
+        private MyGuiControlButton m_spawnRingButton;
 
         /// <summary>
         /// Checkbox, to disable or enable snap to parent
@@ -225,7 +233,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Name"));
             parentTable.AddTableRow(m_nameBox);
 
-            MyGuiControlButton spawnRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Add ring", delegate
+            m_spawnRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Add ring", delegate
             {
                 StringBuilder name = new StringBuilder();
                 m_nameBox.GetText(name);
@@ -258,7 +266,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 });
             });
 
-            parentTable.AddTableRow(spawnRingButton);
+            parentTable.AddTableRow(m_spawnRingButton);
 
             return true;
         }
@@ -360,6 +368,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             systemObject.CenterPosition = parentItem.CenterPosition;
             systemObject.AsteroidSize = new MySerializableMinMax((int)m_asteroidSizesSlider.CurrentMin, (int)m_asteroidSizesSlider.CurrentMax);
             systemObject.DisplayName = name.ToString();
+            systemObject.ParentName = parentItem.DisplayName;
 
             ringData = GenerateAsteroidRing();
         }
@@ -391,6 +400,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             if(box.SelectedItems.Count > 0)
             {
+                m_spawnRingButton.Enabled = true;
+
                 var parent = box.SelectedItems[box.SelectedItems.Count - 1].UserData as MySystemObject;
                 var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
@@ -403,7 +414,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                     m_widthSlider.MinValue = settings.MinMaxOrbitDistance.Min / 2000;
                     m_widthSlider.MaxValue = settings.MinMaxOrbitDistance.Max / 1000;
-                    m_widthSlider.DefaultValue = m_radiusSlider.MinValue + (m_radiusSlider.MaxValue - m_radiusSlider.MinValue) / 2;
+                    m_widthSlider.Value = m_widthSlider.MinValue + (m_widthSlider.MaxValue - m_widthSlider.MinValue) / 2;
                     m_widthSlider.Enabled = true;
 
                     m_asteroidSizesSlider.Enabled = true;
@@ -427,12 +438,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                 m_radiusSlider.MinValue = (int)planet.Diameter / 1000 * 0.75f;
                 m_radiusSlider.MaxValue = (int)planet.Diameter / 1000 * 2f;
-                m_radiusSlider.DefaultValue = m_radiusSlider.MinValue + (m_radiusSlider.MaxValue - m_radiusSlider.MinValue) / 2;
+                m_radiusSlider.Value = m_radiusSlider.MinValue + (m_radiusSlider.MaxValue - m_radiusSlider.MinValue) / 2;
                 m_radiusSlider.Enabled = true;
 
                 m_widthSlider.MinValue = (int)planet.Diameter / 1000 / 20f;
                 m_widthSlider.MaxValue = (int)planet.Diameter / 1000 / 1.25f;
-                m_widthSlider.DefaultValue = m_radiusSlider.MinValue + (m_radiusSlider.MaxValue - m_radiusSlider.MinValue) / 2;
+                m_widthSlider.Value = m_widthSlider.MinValue + (m_widthSlider.MaxValue - m_widthSlider.MinValue) / 2;
                 m_widthSlider.Enabled = true;
 
                 m_asteroidSizesSlider.Enabled = true;
@@ -459,6 +470,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 m_angleXSlider.Enabled = false;
                 m_angleYSlider.Enabled = false;
                 m_angleZSlider.Enabled = false;
+                m_spawnRingButton.Enabled = false;
             }
         }
 

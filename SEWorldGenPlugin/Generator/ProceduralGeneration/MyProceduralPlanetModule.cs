@@ -60,7 +60,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 string name = MyStarSystemGenerator.GetPlanetStorageName(planet);
 
                 MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.SubtypeId, planet.CenterPosition - GetPlanetOffset(definition, planet.Diameter), m_seed, (float)planet.Diameter, true, id, false, true);
-
                 if(generatedPlanet != null)
                 {
                     generatedPlanet.DisplayNameText = planet.DisplayName;

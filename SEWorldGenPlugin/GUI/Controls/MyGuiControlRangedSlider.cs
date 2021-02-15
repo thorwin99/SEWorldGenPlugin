@@ -440,6 +440,20 @@ namespace SEWorldGenPlugin.GUI.Controls
             RefreshInternals();
         }
 
+        /// <summary>
+        /// Sets the min and max range to the given values. The current values will be reset
+        /// to v1 and v2
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        public void SetRange(float v1, float v2)
+        {
+            m_minValue = Math.Min(v1, v2);
+            m_maxValue = Math.Max(v1, v2);
+
+            SetValues(v1, v2);
+        }
+
         private bool OnSliderClicked()
         {
             if(SliderClicked != null)

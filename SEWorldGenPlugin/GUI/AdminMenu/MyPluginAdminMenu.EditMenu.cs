@@ -154,6 +154,8 @@ namespace SEWorldGenPlugin.GUI
                     {
                         if (!creator.CreateEditMenu(m_usableWidth, m_scrollTable, this, asteroidObject))
                         {
+                            m_scrollTable.AddTableRow(new MyGuiControlLabel(null, null, "This object cant be edited.", font: "Red"));
+
                             m_scrollTable.AddTableSeparator();
                         }
                     }

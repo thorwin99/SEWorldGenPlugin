@@ -168,12 +168,14 @@
     <Compile Include="Draw\RenderCylinder.cs" />
     <Compile Include="Draw\IRenderObject.cs" />
     <Compile Include="Draw\RenderHollowCylinder.cs" />
+    <Compile Include="Draw\RenderHollowSphere.cs" />
     <Compile Include="Draw\RenderSphere.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\IMyAsteroidObjectShape.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeRing.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeSphere.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingAdminMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingProvider.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereAdminMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereProvider.cs" />
     <Compile Include="Generator\AsteroidObjects\MyAbstractAsteroidObjectProvider.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />

@@ -56,7 +56,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns>The storage name of the planet</returns>
         public static string GetPlanetStorageName(MySystemPlanet planet)
         {
-            return (planet.DisplayName + "-" + planet.SubtypeId + " " + planet.CenterPosition.GetHashCode()).Replace(" ", "_");
+            return (planet.DisplayName + "-" + planet.SubtypeId).Replace(" ", "_");
         }
 
         /// <summary>
