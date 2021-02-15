@@ -27,18 +27,54 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         private MyObjectBuilder_SystemData m_fetchedStarSytem;
 
+        /// <summary>
+        /// The listbox containing all possible parent system objects
+        /// </summary>
         private MyGuiControlListbox m_parentObjectListBox;
 
+        /// <summary>
+        /// The slider for the asteroid ring radius in the spawn menu
+        /// </summary>
         private MyGuiControlClickableSlider m_radiusSlider;
+
+        /// <summary>
+        /// The slider for the asteroid ring width in the spawn menu
+        /// </summary>
         private MyGuiControlClickableSlider m_widthSlider;
+
+        /// <summary>
+        /// The slider for the asteroid ring asteroid size range in the spawn menu
+        /// </summary>
         private MyGuiControlRangedSlider m_asteroidSizesSlider;
+
+        /// <summary>
+        /// The slider for the asteroid ring x axis angle in the spawn menu
+        /// </summary>
         private MyGuiControlClickableSlider m_angleXSlider;
+
+        /// <summary>
+        /// The slider for the asteroid ring y axis angle in the spawn menu
+        /// </summary>
         private MyGuiControlClickableSlider m_angleYSlider;
+
+        /// <summary>
+        /// The slider for the asteroid ring z axis angle in the spawn menu
+        /// </summary>
         private MyGuiControlClickableSlider m_angleZSlider;
+
+        /// <summary>
+        /// The textbox for the asteroid ring name in the spawn menu
+        /// </summary>
         private MyGuiControlTextbox m_nameBox;
 
+        /// <summary>
+        /// The currently selected asteroid ring / belt in the edit menu
+        /// </summary>
         private MySystemAsteroids m_currentSelectedAsteroid;
 
+        /// <summary>
+        /// The admin menu instance, that used this class to generate the menu
+        /// </summary>
         private MyPluginAdminMenu m_parentScreen;
 
         public bool CreateEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
@@ -222,6 +258,10 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             MyPluginDrawSession.Static.AddRenderObject(PREVIEW_RENDER_ID, new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + (float)shape.width, (float)shape.radius, (float)shape.height, Color.LightGreen.ToVector4()));
         }
 
+        /// <summary>
+        /// Action to remove the ring for the remove ring button
+        /// </summary>
+        /// <param name="button">Button that called this action</param>
         private void OnRemoveRing(MyGuiControlButton button)
         {
             MyPluginLog.Debug("Removing ring " + m_currentSelectedAsteroid.DisplayName);
