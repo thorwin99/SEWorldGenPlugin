@@ -1,4 +1,5 @@
 ﻿using Sandbox.Definitions;
+using Sandbox.Game.Entities;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
@@ -21,7 +22,7 @@ namespace SEWorldGenPlugin.Generator
     /// the current game session / world, and provides networking functions to
     /// manipulate it clientside. Is a singleton class
     /// </summary>
-    [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 600)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation, 600)]
     [EventOwner]
     public partial class MyStarSystemGenerator : MySessionComponentBase
     {
@@ -78,8 +79,6 @@ namespace SEWorldGenPlugin.Generator
             {
                 StarSystem = GenerateNewStarSystem();
             }
-
-            AddAllPersistentGps();
         }
 
         /// <summary>
@@ -161,39 +160,35 @@ namespace SEWorldGenPlugin.Generator
         private void AddAllPersistentGps()
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
-
-            MySession.Static.OnReady += delegate
+            foreach(var item in StarSystem.GetAllObjects())
             {
-                foreach(var item in StarSystem.GetAllObjects())
+                switch (item.Type)
                 {
-                    switch (item.Type)
-                    {
-                        case MySystemObjectType.MOON:
-                            if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT)
+                    case MySystemObjectType.MOON:
+                        if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        {
+                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition);
+                        }
+                        break;
+                    case MySystemObjectType.PLANET:
+                        if (settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        {
+                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition);
+                        }
+                        break;
+                    case MySystemObjectType.ASTEROIDS:
+                        if (settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        {
+                            MySystemAsteroids asteroid = item as MySystemAsteroids;
+                            MyAbstractAsteroidObjectProvider provider = null;
+                            if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out provider))
                             {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition);
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, provider.GetAsteroidObjectShape(asteroid).GetPointInShape());
                             }
-                            break;
-                        case MySystemObjectType.PLANET:
-                            if (settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT)
-                            {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition);
-                            }
-                            break;
-                        case MySystemObjectType.ASTEROIDS:
-                            if (settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT)
-                            {
-                                MySystemAsteroids asteroid = item as MySystemAsteroids;
-                                MyAbstractAsteroidObjectProvider provider = null;
-                                if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out provider))
-                                {
-                                    MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, provider.GetAsteroidObjectShape(asteroid).GetPointInShape());
-                                }
-                            }
-                            break;
-                    }
+                        }
+                        break;
                 }
-            };
+            }
         }
 
         /// <summary>
@@ -609,6 +604,28 @@ namespace SEWorldGenPlugin.Generator
                 return data;
             }
             return new MyObjectBuilder_SystemData();
+        }
+
+        public override void UpdateBeforeSimulation()
+        {
+            base.UpdateBeforeSimulation();
+
+            List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
+            foreach (var p in planets)
+            {
+                var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
+                if (!StarSystem.ObjectExists(GetPlanetNameForPlanetStorageName(e.StorageName)))
+                {
+                    MySystemPlanet vanillaPlanet = new MySystemPlanet();
+                    vanillaPlanet.CenterPosition = e.PositionComp.GetPosition();
+                    vanillaPlanet.Diameter = e.MaximumRadius * 2;
+                    vanillaPlanet.DisplayName = GetPlanetNameForPlanetStorageName(e.StorageName);
+                    vanillaPlanet.Generated = true;
+
+                    StarSystem.CenterObject.ChildObjects.Add(vanillaPlanet);
+                }
+            }
+            AddAllPersistentGps();
         }
     }
 }
