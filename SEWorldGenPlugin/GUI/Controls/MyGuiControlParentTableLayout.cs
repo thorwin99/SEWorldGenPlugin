@@ -50,7 +50,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         private bool m_overflowColumns;
 
         /// <summary>
-        /// Padding for the table. It is the top left offset for the elements
+        /// Padding for the table. It is the top left offset for the elements and the bottom padding of the table
         /// </summary>
         private Vector2 m_padding;
 
@@ -93,7 +93,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                 m_padding = padding.Value;
             }
 
-            m_tableHeight = MARGIN_ROWS;
+            m_tableHeight = 0;
 
             MinSize = new Vector2(minWidth, MinSize.Y);
         }
@@ -163,7 +163,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                 tableWidth = MinSize.X;
             }
 
-            Size = new Vector2(tableWidth, m_tableHeight);
+            Size = new Vector2(tableWidth, m_tableHeight - MARGIN_ROWS + m_padding.Y);
 
             Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + m_padding.X, Size.Y / -2 + m_padding.Y);
 
