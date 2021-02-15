@@ -105,7 +105,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             }
         }
 
-
         public override bool IsSystemGeneratable()
         {
             return true;
@@ -217,7 +216,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override bool RemoveInstance(MySystemAsteroids systemInstance)
         {
-            MyPluginLog.Debug("Removing instance from asteroid provider");
+            MyPluginLog.Debug("Removing instance from asteroid ring provider");
             if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
             if (!m_loadedRings.ContainsKey(systemInstance.DisplayName)) return false;
 

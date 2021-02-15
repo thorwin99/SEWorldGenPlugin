@@ -171,8 +171,10 @@
     <Compile Include="Draw\RenderSphere.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\IMyAsteroidObjectShape.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeRing.cs" />
+    <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeSphere.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingAdminMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingProvider.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereProvider.cs" />
     <Compile Include="Generator\AsteroidObjects\MyAbstractAsteroidObjectProvider.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />
@@ -238,6 +240,7 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -281,6 +281,9 @@ namespace SEWorldGenPlugin.Generator
                         if (provider == null) continue;
 
                         obj = provider.GenerateInstance(currentAsteroidIndex++, null, currentOrbitDistance);
+
+                        if (obj == null) continue;
+
                         (obj as MySystemAsteroids).AsteroidTypeName = provider.GetTypeName();
 
                         asteroidObjectCount--;
