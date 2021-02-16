@@ -46,6 +46,10 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         public bool ForceFetchStarSystem = false;
 
+        /// <summary>
+        /// The current asteroid admin menu creator used to create the editing elements
+        /// for the currently selected asteroid object, if one is selected.
+        /// </summary>
         private IMyAsteroidAdminMenuCreator m_currentAsteroidAdminMenu = null;
 
         /// <summary>

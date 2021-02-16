@@ -34,6 +34,12 @@ namespace SEWorldGenPlugin.Session
         private Dictionary<int, IRenderObject> m_toRender = new Dictionary<int, IRenderObject>();
 
         /// <summary>
+        /// List of objects to render, essentially the same as m_toRender, but used to thread
+        /// safe remove and add objects to render
+        /// </summary>
+        private List<IRenderObject> m_renderObjects = new List<IRenderObject>();
+
+        /// <summary>
         /// Adds a new IRenderObject that should be rendered.
         /// </summary>
         /// <param name="id">Id of the rendered object</param>
@@ -42,7 +48,10 @@ namespace SEWorldGenPlugin.Session
         public bool AddRenderObject(int id, IRenderObject render)
         {
             if (m_toRender.ContainsKey(id)) return false;
+
             m_toRender.Add(id, render);
+
+            m_renderObjects.Add(render);
             return true;
         }
 
@@ -52,6 +61,10 @@ namespace SEWorldGenPlugin.Session
         /// <param name="id">Id of the object</param>
         public void RemoveRenderObject(int id)
         {
+            if (!m_toRender.ContainsKey(id)) return;
+
+            m_renderObjects.Remove(m_toRender[id]);
+
             m_toRender.Remove(id);
         }
 
@@ -60,9 +73,10 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void Draw()
         {
-            foreach(IRenderObject obj in m_toRender.Values)
+            foreach (IRenderObject obj in m_renderObjects.ToArray())
             {
-                obj.Draw();
+                if(obj != null)
+                    obj.Draw();
             }
             base.Draw();
         }

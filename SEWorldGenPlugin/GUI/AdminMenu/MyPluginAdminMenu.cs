@@ -140,7 +140,13 @@ namespace SEWorldGenPlugin.GUI
 
             newCombo.ItemSelected += delegate
             {
-                m_selectedMenuIndex = newCombo.GetSelectedIndex();
+                m_selectedMenuIndex = newCombo.GetSelectedIndex(); 
+                
+                foreach (var provider in m_asteroidProviders)
+                {
+                    provider.GetAdminMenuCreator().Close();
+                }
+
                 if (newCombo.GetSelectedIndex() >= oldCount)
                 {
                     RecreateControls(false);
