@@ -74,6 +74,10 @@ namespace SEWorldGenPlugin
                     MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
                     MyFileUtils.DeleteFileInGlobalStorage(FILENAME);
                     Settings = new MyObjectBuilder_GlobalSettings();
+                    Settings.MoonDefinitions.Add("Moon");
+                    Settings.MoonDefinitions.Add("Titan");
+                    Settings.MoonDefinitions.Add("Europa");
+                    Settings.MoonDefinitions.Add("Triton");
                 }
             }
             else
