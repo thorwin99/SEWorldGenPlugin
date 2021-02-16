@@ -350,7 +350,7 @@ namespace SEWorldGenPlugin.Generator
             MyPluginLog.Debug("Generating moons for planet " + parentPlanet.DisplayName);
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
-            int maxMoons = (int)Math.Ceiling(parentPlanet.Diameter / 120 * 2);
+            int maxMoons = (int)Math.Ceiling(parentPlanet.Diameter / 120000 * 2);
             int numMoons = MyRandom.Instance.Next(1, maxMoons + 1);
 
             if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE)
@@ -441,6 +441,7 @@ namespace SEWorldGenPlugin.Generator
 
             foreach(var moon in moons)
             {
+                if (moon == null) continue;
                 if (Vector3D.Distance(moon.CenterPosition, position) < moonDiameter + moon.Diameter) return true;
             }
 
@@ -560,7 +561,7 @@ namespace SEWorldGenPlugin.Generator
 
                 if (!sessionSettings.AllowVanillaPlanets && VANILLA_PLANETS.Contains(subtypeId)) continue;
 
-                if (settings.MoonDefinitions.Contains(subtypeId))
+                if (settings.MoonDefinitions.Contains(subtypeId) || settings.MoonDefinitions.Count <= 0)
                 {
                     m_moons.Add(planet);
                     continue;
@@ -609,6 +610,8 @@ namespace SEWorldGenPlugin.Generator
         public override void UpdateBeforeSimulation()
         {
             base.UpdateBeforeSimulation();
+
+            if (!MySettingsSession.Static.IsEnabled()) return;
 
             List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
             foreach (var p in planets)
