@@ -183,7 +183,7 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="success">If the action was sucessfull</param>
         /// <param name="callbackId">Id of the callback to run</param>
         [Event(103)]
-        [Server]
+        [Client]
         private static void SendSimpleActionCallbackClient(bool success, ulong callbackId)
         {
             MyPluginLog.Log("Client: Getting simple callback with success=" + success + " from server");
