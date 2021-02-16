@@ -262,8 +262,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                         foreach(var p in planets)
                         {
                             var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
-                            MyPluginLog.Debug(e.StorageName + "  " + MyStarSystemGenerator.GetPlanetStorageName(planet));
-                            if(e.StorageName == MyStarSystemGenerator.GetPlanetStorageName(planet))
+                            if(e.EntityId == planet.EntityId)
                             {
                                 planetEntity = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
                             }

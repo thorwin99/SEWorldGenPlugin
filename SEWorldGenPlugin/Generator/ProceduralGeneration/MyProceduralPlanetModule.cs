@@ -57,7 +57,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 if (definition == null) continue;
 
                 long id = MyRandom.Instance.NextLong();
-                string name = MyStarSystemGenerator.GetPlanetStorageName(planet);
+                string name = GetPlanetStorageName(planet);
 
                 MyPlanet generatedPlanet = MyWorldGenerator.AddPlanet(name, planet.DisplayName, planet.SubtypeId, planet.CenterPosition - GetPlanetOffset(definition, planet.Diameter), m_seed, (float)planet.Diameter, true, id, false, true);
                 if(generatedPlanet != null)
@@ -127,6 +127,16 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             IMyStorage myStorage = new MyOctreeStorage(myPlanetStorageProvider, myPlanetStorageProvider.StorageSize);
 
             return myStorage.Size / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the storage name for the given planet
+        /// </summary>
+        /// <param name="planet">Planet to get a storage name for</param>
+        /// <returns>The storage name of the planet</returns>
+        private string GetPlanetStorageName(MySystemPlanet planet)
+        {
+            return (planet.DisplayName).Replace(" ", "_");
         }
     }
 }

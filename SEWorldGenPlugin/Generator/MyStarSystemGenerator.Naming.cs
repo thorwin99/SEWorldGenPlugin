@@ -50,23 +50,13 @@ namespace SEWorldGenPlugin.Generator
         }
 
         /// <summary>
-        /// Returns the storage name for the given planet
-        /// </summary>
-        /// <param name="planet">Planet to get a storage name for</param>
-        /// <returns>The storage name of the planet</returns>
-        public static string GetPlanetStorageName(MySystemPlanet planet)
-        {
-            return (planet.DisplayName).Replace(" ", "_");
-        }
-
-        /// <summary>
         /// Gets the object name from a storage name retreived with GetPlanetStorageName
         /// </summary>
         /// <param name="storageName">The storage name</param>
         /// <returns>The display name of the planet</returns>
         public static string GetPlanetNameForPlanetStorageName(string storageName)
         {
-            return storageName.Replace("_", " ");
+            return storageName.Substring(0, storageName.LastIndexOf("-")).Replace("_", " ");
         }
     }
 }
