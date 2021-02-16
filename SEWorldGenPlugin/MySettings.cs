@@ -78,6 +78,11 @@ namespace SEWorldGenPlugin
                     Settings.MoonDefinitions.Add("Titan");
                     Settings.MoonDefinitions.Add("Europa");
                     Settings.MoonDefinitions.Add("Triton");
+                    Settings.BlacklistedPlanetDefinitions.Add("EarthLikeTutorial");
+                    Settings.BlacklistedPlanetDefinitions.Add("MarsTutorial");
+                    Settings.BlacklistedPlanetDefinitions.Add("MoonTutorial");
+                    Settings.BlacklistedPlanetDefinitions.Add("SystemTestMap");
+                    Settings.BlacklistedPlanetDefinitions.Add("EarthLikeModExample");
                 }
             }
             else
@@ -88,6 +93,11 @@ namespace SEWorldGenPlugin
                 Settings.MoonDefinitions.Add("Titan");
                 Settings.MoonDefinitions.Add("Europa");
                 Settings.MoonDefinitions.Add("Triton");
+                Settings.BlacklistedPlanetDefinitions.Add("EarthLikeTutorial");
+                Settings.BlacklistedPlanetDefinitions.Add("MarsTutorial");
+                Settings.BlacklistedPlanetDefinitions.Add("MoonTutorial");
+                Settings.BlacklistedPlanetDefinitions.Add("SystemTestMap");
+                Settings.BlacklistedPlanetDefinitions.Add("EarthLikeModExample");
             }
             Settings.Verify();
             MyPluginLog.Log("Config loaded");

@@ -11,6 +11,7 @@ namespace SEWorldGenPlugin.Draw
         private float m_outerRadius;
         private Color m_color;
         private Color m_innerColor;
+        private float m_lineThickness;
 
         /// <summary>
         /// Creates a new sphere at the given position with given radius and color.
@@ -19,13 +20,14 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="innerRadius">The inner radius of the sphere</param>
         /// <param name="outerRadius">The outer radius of the sphere</param>
         /// <param name="color">The sphere color</param>
-        public RenderHollowSphere(Vector3D position, float innerRadius, float outerRadius, Color color)
+        public RenderHollowSphere(Vector3D position, float innerRadius, float outerRadius, Color color, float lineThickness)
         {
             m_position = position;
             m_innerRadius = innerRadius;
             m_outerRadius = outerRadius;
             m_color = color;
-            m_innerColor = m_color.ToGray();
+            m_innerColor = Color.Red;
+            m_lineThickness = lineThickness;
         }
 
         /// <summary>
@@ -35,8 +37,8 @@ namespace SEWorldGenPlugin.Draw
         public void Draw()
         {
             MatrixD wm = MatrixD.CreateWorld(m_position);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_innerRadius, ref m_innerColor, MySimpleObjectRasterizer.Wireframe, 100, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: 1000);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_outerRadius, ref m_color, MySimpleObjectRasterizer.Wireframe, 100, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: 1000);
+            MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_innerRadius, ref m_innerColor, MySimpleObjectRasterizer.Wireframe, 50, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: m_lineThickness);
+            MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_outerRadius, ref m_color, MySimpleObjectRasterizer.Wireframe, 150, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: m_lineThickness);
         }
     }
 }

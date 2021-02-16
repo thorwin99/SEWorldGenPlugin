@@ -323,7 +323,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
             if (data != null)
             {
-                MyPluginDrawSession.Static.AddRenderObject(PREVIEW_RENDER_ID, new RenderHollowSphere(data.Center, (float)data.OuterRadius, (float)data.OuterRadius, Color.LightGreen.ToVector4()));
+                MyPluginDrawSession.Static.AddRenderObject(PREVIEW_RENDER_ID, new RenderHollowSphere(data.Center, (float)data.OuterRadius, (float)data.OuterRadius, Color.LightGreen.ToVector4(), (float)data.OuterRadius / 500f));
             }
         }
 
