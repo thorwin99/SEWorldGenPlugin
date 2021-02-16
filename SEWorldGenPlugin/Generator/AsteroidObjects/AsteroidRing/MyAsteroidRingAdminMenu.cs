@@ -114,7 +114,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             var data  =MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject);
             var ring = data as MyAsteroidRingData;
 
-            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)ring.Radius * 2f);
+            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)ring.Radius * 1.5f);
 
             UpdateRingVisual(ring);
 
@@ -297,7 +297,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             MyPluginDrawSession.Static.RemoveRenderObject(PREVIEW_RENDER_ID);
 
-            MyPluginDrawSession.Static.AddRenderObject(PREVIEW_RENDER_ID, new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + (float)shape.width, (float)shape.radius, (float)shape.height, Color.LightGreen.ToVector4()));
+            MyPluginDrawSession.Static.AddRenderObject(PREVIEW_RENDER_ID, new RenderHollowCylinder(shape.worldMatrix, (float)shape.radius + (float)shape.width, (float)shape.radius, (float)shape.height, Color.LightGreen.ToVector4(), (float)shape.radius / 200f));
         }
 
         /// <summary>

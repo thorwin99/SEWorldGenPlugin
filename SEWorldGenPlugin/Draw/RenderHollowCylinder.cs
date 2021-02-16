@@ -15,6 +15,7 @@ namespace SEWorldGenPlugin.Draw
         private float m_height;
         private Vector4 m_color;
         private float m_innerRadius;
+        private float m_thickness;
 
         /// <summary>
         /// Constructs a new renderable hollow cylinder from a given world matrix, with
@@ -25,13 +26,14 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="innerRadius">The inner radius of the cylinder, which defines the hollow part of the cylinder</param>
         /// <param name="height">The height of the cylinder</param>
         /// <param name="color">The color of the cylinder</param>
-        public RenderHollowCylinder(MatrixD worldMatrix, float radius, float innerRadius, float height, Vector4 color)
+        public RenderHollowCylinder(MatrixD worldMatrix, float radius, float innerRadius, float height, Vector4 color, float lineThickness = 1000f)
         {
             m_worldMatrix = worldMatrix;
             m_radius = radius;
             m_height = height;
             m_color = color;
             m_innerRadius = innerRadius;
+            m_thickness = lineThickness;
         }
 
         /// <summary>
@@ -74,16 +76,16 @@ namespace SEWorldGenPlugin.Draw
 
                 if (i > 0)
                 {
-                    MySimpleObjectDraw.DrawLine(outPrevUp, outVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
-                    MySimpleObjectDraw.DrawLine(outPrevLow, outVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
-                    MySimpleObjectDraw.DrawLine(inPrevUp, inVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
-                    MySimpleObjectDraw.DrawLine(inPrevLow, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
+                    MySimpleObjectDraw.DrawLine(outPrevUp, outVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
+                    MySimpleObjectDraw.DrawLine(outPrevLow, outVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
+                    MySimpleObjectDraw.DrawLine(inPrevUp, inVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
+                    MySimpleObjectDraw.DrawLine(inPrevLow, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
                 }
 
-                MySimpleObjectDraw.DrawLine(outVertexUp, inVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
-                MySimpleObjectDraw.DrawLine(outVertexLow, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
-                MySimpleObjectDraw.DrawLine(outVertexUp, outVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
-                MySimpleObjectDraw.DrawLine(inVertexUp, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_height);
+                MySimpleObjectDraw.DrawLine(outVertexUp, inVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
+                MySimpleObjectDraw.DrawLine(outVertexLow, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
+                MySimpleObjectDraw.DrawLine(outVertexUp, outVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
+                MySimpleObjectDraw.DrawLine(inVertexUp, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_thickness);
 
                 outPrevUp = outVertexUp;
                 outPrevLow = outVertexLow;
