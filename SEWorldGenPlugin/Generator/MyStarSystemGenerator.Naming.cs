@@ -36,7 +36,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns>Name of the moon</returns>
         private string GetMoonName(int moonIndex, string subtypeId, string parentPlanetName)
         {
-            string namingScheme = MySettings.Static.Settings.PlanetNameFormat;
+            string namingScheme = MySettings.Static.Settings.MoonNameFormat;
 
             string name = namingScheme.SetProperty("ObjectNumber", moonIndex + 1)
                                       .SetProperty("ObjectNumberGreek", MyNamingUtils.GREEK_LETTERS[moonIndex % MyNamingUtils.GREEK_LETTERS.Length])
