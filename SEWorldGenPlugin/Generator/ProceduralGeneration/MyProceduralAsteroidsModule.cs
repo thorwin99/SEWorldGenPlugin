@@ -236,6 +236,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
+            if (settings.AsteroidGenerator == AsteroidGenerationMethod.VANILLA) return null;
+
             MyProceduralCell cell = new MyProceduralCell(cellId, CELL_SIZE);
             int cellSeed = CalculateCellSeed(cellId);
             int index = 0;
