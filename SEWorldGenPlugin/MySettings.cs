@@ -24,6 +24,12 @@ namespace SEWorldGenPlugin
             private set;
         }
 
+        static MySettings()
+        {
+            Static = new MySettings();
+            Static.LoadSettings();
+        }
+
         /// <summary>
         /// Global configuration settings
         /// </summary>
@@ -63,9 +69,13 @@ namespace SEWorldGenPlugin
                 {
                     using (var reader = MyFileUtils.ReadFileInGlobalStorage(FILENAME))
                     {
+                        MyPluginLog.Log("Reading global config file");
                         MyObjectBuilder_GlobalSettings saveFile = MyFileUtils.SerializeFromXml<MyObjectBuilder_GlobalSettings>(reader.ReadToEnd());
                         if (saveFile != null)
+                        {
+                            MyPluginLog.Log("Serialized global config file");
                             Settings = saveFile;
+                        }
                     }
                 }
                 catch (Exception e)

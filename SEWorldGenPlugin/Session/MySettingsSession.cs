@@ -3,6 +3,7 @@ using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
+using VRage.Game;
 using VRage.Game.Components;
 
 namespace SEWorldGenPlugin.Session
@@ -41,7 +42,21 @@ namespace SEWorldGenPlugin.Session
         /// <returns>True, if the plugin is enabled in this session.</returns>
         public bool IsEnabled()
         {
+            if (Settings == null) return Sync.IsServer;
+
             return (Sync.IsServer && Settings.Enabled);
+        }
+
+        public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
+        {
+            base.Init(sessionComponent);
+
+            if (!Sync.IsServer)
+            {
+                PluginEventHandler.Static.RaiseStaticEvent(GetSettingsServer, Sync.MyId);
+                Static = this;
+                return;
+            }
         }
 
         /// <summary>
@@ -50,20 +65,17 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void LoadData()
         {
-            if (!Sync.IsServer)
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(GetSettingsServer, Sync.MyId);
-                Static = this;
-                return;
-            }
-
+            MyPluginLog.Log("Loading Session settings data");
             Static = this;
             if (MyFileUtils.FileExistsInWorldStorage(FILE_NAME, typeof(MySettingsSession)))
             {
                 Settings = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldSettings>(FILE_NAME, typeof(MySettingsSession));
+
+                MyPluginLog.Log("Session settings read from file");
             }
             else
             {
+                MyPluginLog.Log("Session settings do not exist, creating new ones.");
                 if (MySettings.Static == null)
                 {
                     var s = new MySettings();
@@ -80,6 +92,8 @@ namespace SEWorldGenPlugin.Session
 
                 MySettings.Static.SessionSettings = null;
             }
+
+            MyPluginLog.Log("Loading Session settings data completed");
         }
 
         /// <summary>

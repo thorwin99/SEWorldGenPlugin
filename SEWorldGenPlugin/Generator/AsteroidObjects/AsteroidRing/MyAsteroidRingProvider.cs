@@ -124,6 +124,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
+            if (!Sync.IsServer)
+            {
+                PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataServer, asteroid, Sync.MyId);
+                return true;
+            }
+
             if (m_loadedRings.ContainsKey(asteroid.Id)) return false;
             var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidRingProvider));
 
@@ -211,6 +217,35 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private static void AddRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
         {
             Static?.m_loadedRings.Add(systemInstance.Id, ringData);
+        }
+
+        /// <summary>
+        /// Server event: Requests an instance from the server
+        /// </summary>
+        /// <param name="instance">The asteroid instance</param>
+        /// <param name="clientId">Client id of the requester</param>
+        [Event(100002)]
+        [Server]
+        private static void RequestInstanceDataServer(MySystemAsteroids instance, ulong clientId)
+        {
+            if (!Static.m_loadedRings.ContainsKey(instance.Id)) return;
+
+            PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataClient, instance, Static.m_loadedRings[instance.Id], clientId);
+        }
+
+        /// <summary>
+        /// Client event: Retreives an instance data from the server
+        /// </summary>
+        /// <param name="instance">Asteroid instance</param>
+        /// <param name="data">Asteroid data</param>
+        [Event(100003)]
+        [Client]
+        private static void RequestInstanceDataClient(MySystemAsteroids instance, MyAsteroidRingData data)
+        {
+            if(data != null && Static.m_loadedRings.ContainsKey(instance.Id))
+            {
+                Static.m_loadedRings.Add(instance.Id, data);
+            }
         }
 
         /// <summary>

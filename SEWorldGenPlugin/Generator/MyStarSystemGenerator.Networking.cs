@@ -69,7 +69,6 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="callback">Callback to run when object was added</param>
         public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null, Action<bool> callback = null)
         {
-            if (systemObject.Type == MySystemObjectType.MOON) return;
             m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
             PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentId == null ? Guid.Empty : parentId.Value, m_currentSimpleIndex, Sync.MyId);
         }
@@ -162,12 +161,14 @@ namespace SEWorldGenPlugin.Generator
                         parent.ChildObjects.Add(obj);
                         obj.ParentId = parentId;
                         PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
+                        return;
                     }
                     else
                     {
                         Static.StarSystem.CenterObject.ChildObjects.Add(obj);
                         obj.ParentId = Static.StarSystem.CenterObject.Id;
                         PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
+                        return;
                     }
 
                     Static.AddAllPersistentGps();

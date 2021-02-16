@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin
         /// <param name="gameInstance">Isntance of the game</param>
         public void Init(object gameInstance)
         {
-            MyPluginLog.Log("Begin init");
+            MyPluginLog.Log("Begin SEWorldGenPlugin init");
 
             settings = new MySettings();
             settings.LoadSettings();

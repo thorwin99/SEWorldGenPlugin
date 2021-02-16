@@ -43,7 +43,6 @@ namespace SEWorldGenPlugin.Networking
             MyNetUtil.RegisterMessageHandler(HANDLER_ID, MessageHandler);
 
             RegisterAll();
-            //Register(typeof(SystemGenerator));
         }
 
         /// <summary>
@@ -184,6 +183,7 @@ namespace SEWorldGenPlugin.Networking
                 {
                     if (m.CustomAttributes.Any(data => data.AttributeType == typeof(EventAttribute)))
                     {
+                        MyPluginLog.Log("Registering method " + m.Name + " in type " + type.Name);
                         ulong id = m.GetCustomAttribute<EventAttribute>().Id;
                         if (m_registeredMethods.ContainsKey(id))
                         {

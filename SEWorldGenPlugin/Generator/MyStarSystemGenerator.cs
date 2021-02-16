@@ -75,7 +75,9 @@ namespace SEWorldGenPlugin.Generator
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
 
-            if(StarSystem.Count() <= 0)
+            LoadPlanetDefinitions();
+
+            if (StarSystem.Count() <= 0)
             {
                 StarSystem = GenerateNewStarSystem();
             }
@@ -87,6 +89,8 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public override void LoadData()
         {
+            MyPluginLog.Log("Load Star system generator component");
+
             Static = this;
 
             LoadNetworking();
@@ -98,7 +102,7 @@ namespace SEWorldGenPlugin.Generator
 
             StarSystem = data;
 
-            if(StarSystem.CenterObject != null)
+            if(StarSystem != null && StarSystem.CenterObject != null)
             {
                 foreach (var obj in StarSystem.GetAllObjects())
                 {
@@ -118,7 +122,7 @@ namespace SEWorldGenPlugin.Generator
             m_gasGiants = new List<MyPlanetGeneratorDefinition>();
             m_mandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
 
-            LoadPlanetDefinitions();
+            MyPluginLog.Log("Load Star system generator component completed");
         }
 
         /// <summary>
@@ -143,11 +147,11 @@ namespace SEWorldGenPlugin.Generator
 
             SaveData();
             StarSystem = null;
-            m_planets.Clear();
-            m_suns.Clear();
-            m_gasGiants.Clear();
-            m_moons.Clear();
-            m_mandatoryPlanets.Clear();
+            m_planets?.Clear();
+            m_suns?.Clear();
+            m_gasGiants?.Clear();
+            m_moons?.Clear();
+            m_mandatoryPlanets?.Clear();
 
             UnloadNetworking();
 
@@ -546,6 +550,8 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void LoadPlanetDefinitions()
         {
+            MyPluginLog.Log("Loading planet definitions and sorting them");
+
             var planets = MyDefinitionManager.Static.GetPlanetsGeneratorsDefinitions();
             var settings = MySettings.Static.Settings;
             var sessionSettings = MySettingsSession.Static.Settings.GeneratorSettings;
@@ -566,24 +572,34 @@ namespace SEWorldGenPlugin.Generator
 
                 if (settings.MoonDefinitions.Contains(subtypeId) || settings.MoonDefinitions.Count <= 0)
                 {
+                    MyPluginLog.Log("Adding moon " + subtypeId);
+
                     m_moons.Add(planet);
                     continue;
                 }
                 else if (settings.SunDefinitions.Contains(subtypeId))
                 {
+                    MyPluginLog.Log("Adding sun " + subtypeId);
+
                     m_suns.Add(planet);
                     continue;
                 }
 
                 if (settings.MandatoryPlanetDefinitions.Contains(subtypeId))
                 {
+                    MyPluginLog.Log("Adding mandatory " + subtypeId);
+
                     m_mandatoryPlanets.Add(planet);
                 }
 
                 if (settings.GasGiantDefinitions.Contains(subtypeId))
                 {
+                    MyPluginLog.Log("Adding gas giant " + subtypeId);
+
                     m_gasGiants.Add(planet);
                 }
+
+                MyPluginLog.Log("Definition added " + subtypeId);
 
                 m_planets.Add(planet);
             }

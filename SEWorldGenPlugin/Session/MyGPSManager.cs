@@ -221,6 +221,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void LoadData()
         {
+            MyPluginLog.Log("Loading GPS manager data");
             Static = this;
 
             MyObjectBuilder_WorldGpsData ob;
@@ -241,6 +242,8 @@ namespace SEWorldGenPlugin.Session
                 var id = new MyGpsId(item.Name, item.Color, item.Position);
                 m_globalGpss[id] = item.PlayerIds;
             }
+
+            MyPluginLog.Log("Loading GPS manager data completed");
         }
 
         /// <summary>
@@ -249,6 +252,8 @@ namespace SEWorldGenPlugin.Session
         public override void SaveData()
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
+
+            MyPluginLog.Log("Saving GPS manager data");
 
             MyObjectBuilder_WorldGpsData ob = new MyObjectBuilder_WorldGpsData();
             foreach(var entry in m_globalGpss.Keys)
@@ -263,6 +268,8 @@ namespace SEWorldGenPlugin.Session
             }
 
             MyFileUtils.WriteXmlFileToWorld(ob, FILENAME, typeof(MyGPSManager));
+
+            MyPluginLog.Log("Saving GPS manager data completed");
         }
 
         /// <summary>
@@ -270,6 +277,8 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         protected override void UnloadData()
         {
+            MyPluginLog.Log("Unloading GPS manager data");
+
             base.UnloadData();
             SaveData();
 
@@ -284,6 +293,8 @@ namespace SEWorldGenPlugin.Session
 
             m_dynamicGpss.Clear();
             m_dynamicGpss = null;
+
+            MyPluginLog.Log("Unloading GPS manager data completed");
         }
     }
 }

@@ -1,4 +1,5 @@
 using ProtoBuf;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
@@ -99,6 +100,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
+            if (!Sync.IsServer)
+            {
+                PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataServer, asteroid, Sync.MyId);
+            }
+
             if (m_loadedSpheres.ContainsKey(asteroid.Id)) return false;
 
             if (!MyFileUtils.FileExistsInWorldStorage(GetFileName(asteroid.DisplayName), typeof(MyAsteroidSphereProvider))) return false;
@@ -157,6 +163,35 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         private static void AddInstanceServer(MySystemAsteroids instance, MyAsteroidSphereData data)
         {
             Static?.m_loadedSpheres.Add(instance.Id, data);
+        }
+
+        /// <summary>
+        /// Server event: Requests an instance from the server
+        /// </summary>
+        /// <param name="instance">The asteroid instance</param>
+        /// <param name="clientId">Client id of the requester</param>
+        [Event(3002)]
+        [Server]
+        private static void RequestInstanceDataServer(MySystemAsteroids instance, ulong clientId)
+        {
+            if (!Static.m_loadedSpheres.ContainsKey(instance.Id)) return;
+
+            PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataClient, instance, Static.m_loadedSpheres[instance.Id], clientId);
+        }
+
+        /// <summary>
+        /// Client event: Retreives an instance data from the server
+        /// </summary>
+        /// <param name="instance">Asteroid instance</param>
+        /// <param name="data">Asteroid data</param>
+        [Event(3003)]
+        [Client]
+        private static void RequestInstanceDataClient(MySystemAsteroids instance, MyAsteroidSphereData data)
+        {
+            if (data != null && Static.m_loadedSpheres.ContainsKey(instance.Id))
+            {
+                Static.m_loadedSpheres.Add(instance.Id, data);
+            }
         }
     }
 
