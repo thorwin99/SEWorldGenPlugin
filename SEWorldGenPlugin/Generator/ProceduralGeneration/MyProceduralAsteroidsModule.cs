@@ -207,18 +207,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 if (shape == null) continue;
 
-                if(shape.Contains(entityPosition) == ContainmentType.Contains)
+                if(shape.Contains(entityPosition) != ContainmentType.Disjoint)
                 {
                     MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
                 }
 
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
-
-                if(Vector3D.Subtract(entityPosition, closestPos).Length() > 5000000)
+                double distance = Vector3D.Subtract(entityPosition, closestPos).Length();
+                if (distance > 5000000)
                 {
                     MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
                 }
-                else
+                else if(distance > 5)
                 {
                     if(MyGPSManager.Static.DynamicGpsExists(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId()))
                     {
@@ -226,6 +226,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                         continue;
                     }
                     MyGPSManager.Static.AddDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
+                }
+                else
+                {
+                    MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
                 }
             }
         }
@@ -259,6 +263,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     if (!MyEntities.IsInsideWorld(position) || (settings.WorldSize >= 0 && position.Length() > settings.WorldSize)) continue;
 
                     var ring = GetAsteroidObjectAt(position);
+
+                    MyPluginLog.Debug("Asteroid object is there " + ring);
 
                     if (ring == null) continue;
 

@@ -161,17 +161,16 @@ namespace SEWorldGenPlugin.Generator
                         parent.ChildObjects.Add(obj);
                         obj.ParentId = parentId;
                         PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
-                        return;
                     }
                     else
                     {
                         Static.StarSystem.CenterObject.ChildObjects.Add(obj);
                         obj.ParentId = Static.StarSystem.CenterObject.Id;
                         PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
-                        return;
                     }
 
                     Static.AddAllPersistentGps();
+                    return;
                 }
             }
             PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, callbackId, clientId);

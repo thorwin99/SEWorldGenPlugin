@@ -109,9 +109,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 objectModule.GenerateObjects();
             }
 
+            MyPluginLog.Debug("Checking trackers");
+
             foreach(var tracker in m_trackedEntities)
             {
-                foreach(var module in m_cellModules)
+                MyPluginLog.Debug("Tracker: " + tracker.Key.Name);
+
+                foreach (var module in m_cellModules)
                 {
                     var oldBounds = tracker.Value.BoundingVolume;
                     tracker.Value.UpdateLastPosition();

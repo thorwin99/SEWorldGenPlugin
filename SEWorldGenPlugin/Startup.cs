@@ -50,8 +50,6 @@ namespace SEWorldGenPlugin
             MyPluginLog.Log("Version is " + updater.GetVersion());
             MyPluginLog.Log("Latest Version is " + updater.GetNewestVersion());
 
-            MyEntity.MyProceduralWorldGeneratorTrackEntityExtCallback += MyEntityExtension.EntityTracking;
-
             MyPerGameSettings.GUI.MainMenu = typeof(MyPluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyPluginAdminMenu);

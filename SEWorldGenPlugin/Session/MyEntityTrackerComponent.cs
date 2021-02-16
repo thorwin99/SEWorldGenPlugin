@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Sandbox.Game.Entities;
+using Sandbox.Game.Entities.Character;
+using System.Collections.Generic;
 using VRage.Game.Components;
 using VRage.Game.Entity;
 
@@ -43,6 +45,20 @@ namespace SEWorldGenPlugin.Session
         public override void UpdateBeforeSimulation()
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
+
+            var entities = MyEntities.GetEntities();
+
+            foreach(var entity in entities)
+            {
+                if(entity is MyCharacter)
+                {
+                    TrackEntity(entity);
+                }
+                if(entity is MyCubeGrid)
+                {
+                    TrackEntity(entity);
+                }
+            }
 
             lock (m_toUntrackEntities) lock (m_entityTrackers)
             {
