@@ -2,6 +2,7 @@
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -44,6 +45,8 @@ namespace SEWorldGenPlugin.GUI
         /// Forces the edit menu to refetch the star system
         /// </summary>
         public bool ForceFetchStarSystem = false;
+
+        private IMyAsteroidAdminMenuCreator m_currentAsteroidAdminMenu = null;
 
         /// <summary>
         /// Builds the edit menu
@@ -137,6 +140,8 @@ namespace SEWorldGenPlugin.GUI
                 m_scrollTable.ClearTable();
             }
 
+            m_currentAsteroidAdminMenu = null;
+
             if (m_selectedObject != null)
             {
                 if (m_selectedObject.Type == MySystemObjectType.PLANET || m_selectedObject.Type == MySystemObjectType.MOON)
@@ -163,6 +168,8 @@ namespace SEWorldGenPlugin.GUI
 
                             m_scrollTable.AddTableSeparator();
                         }
+
+                        m_currentAsteroidAdminMenu = creator;
                     }
                 }
             }
@@ -224,6 +231,10 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="box"></param>
         private void OnSystemObjectSelect(MyGuiControlListbox box)
         {
+            if(m_currentAsteroidAdminMenu != null)
+            {
+                m_currentAsteroidAdminMenu.Close();
+            }
             m_selectedObject = box.SelectedItems[box.SelectedItems.Count - 1].UserData as MySystemObject;
             BuildEditingSubMenu();
         }

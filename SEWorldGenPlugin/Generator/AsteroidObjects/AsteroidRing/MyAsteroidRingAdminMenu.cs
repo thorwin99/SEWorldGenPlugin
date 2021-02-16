@@ -277,7 +277,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return true;
         }
 
-        public void OnAdminMenuClose()
+        public void Close()
         {
             m_fetchedStarSytem = null;
             m_parentScreen = null;

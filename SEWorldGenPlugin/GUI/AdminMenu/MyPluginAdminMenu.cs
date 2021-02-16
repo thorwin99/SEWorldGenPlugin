@@ -171,7 +171,7 @@ namespace SEWorldGenPlugin.GUI
 
             foreach(var provider in m_asteroidProviders)
             {
-                provider.GetAdminMenuCreator().OnAdminMenuClose();
+                provider.GetAdminMenuCreator().Close();
             }
         }
 

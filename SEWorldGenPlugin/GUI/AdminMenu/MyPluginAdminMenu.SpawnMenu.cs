@@ -205,7 +205,12 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidTypeCombo.SelectItemByKey(m_asteroidType);
             m_asteroidTypeCombo.ItemSelected += delegate
             {
+                if(m_asteroidType != m_asteroidTypeCombo.GetSelectedKey())
+                {
+                    m_asteroidProviders[(int)m_asteroidType].GetAdminMenuCreator().Close();
+                }
                 m_asteroidType = m_asteroidTypeCombo.GetSelectedKey();
+
                 RecreateControls(false);
             };
             m_asteroidTypeCombo.Size = new Vector2(m_usableWidth * 0.9f, m_asteroidTypeCombo.Size.Y);
@@ -272,6 +277,11 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         private void OnSpawnTypeChange()
         {
+            if(m_spawnTypeCombo.GetSelectedKey() != 1L && m_spawnTypeCombo.GetSelectedKey() != m_spawnType)
+            {
+                m_asteroidProviders[(int)m_asteroidType].GetAdminMenuCreator().Close();
+            }
+
             m_spawnType = m_spawnTypeCombo.GetSelectedKey();
             RecreateControls(false);
         }

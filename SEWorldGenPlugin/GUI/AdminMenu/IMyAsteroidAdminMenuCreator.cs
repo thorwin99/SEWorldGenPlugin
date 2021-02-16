@@ -32,8 +32,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject);
 
         /// <summary>
-        /// Called, when the admin menu gets closed.
+        /// Called, when menus created by this get closed
         /// </summary>
-        void OnAdminMenuClose();
+        void Close();
     }
 }

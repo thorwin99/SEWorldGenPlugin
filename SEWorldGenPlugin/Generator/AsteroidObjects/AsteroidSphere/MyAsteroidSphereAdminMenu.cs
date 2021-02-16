@@ -196,7 +196,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             return true;
         }
 
-        public void OnAdminMenuClose()
+        public void Close()
         {
             m_fetchedStarSytem = null;
             MyPluginDrawSession.Static.RemoveRenderObject(PREVIEW_RENDER_ID);
