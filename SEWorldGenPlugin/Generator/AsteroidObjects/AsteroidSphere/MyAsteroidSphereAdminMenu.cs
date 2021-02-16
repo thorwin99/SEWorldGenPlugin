@@ -177,6 +177,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                     else
                     {
                         MyPluginGuiHelper.DisplayMessage("Sphere was created successfully.", "Success");
+                        m_parentScreen.ForceFetchStarSystem = true;
+                        m_parentScreen.ShouldRecreate = true;
                     }
                 });
 

@@ -31,13 +31,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// <summary>
         /// The dictionary contains all currently loaded asteroid spheres
         /// </summary>
-        private Dictionary<string, MyAsteroidSphereData> m_loadedSpheres;
+        private Dictionary<Guid, MyAsteroidSphereData> m_loadedSpheres;
 
         public MyAsteroidSphereProvider()
         {
             if(Static == null)
             {
-                m_loadedSpheres = new Dictionary<string, MyAsteroidSphereData>();
+                m_loadedSpheres = new Dictionary<Guid, MyAsteroidSphereData>();
                 Static = this;
             }
             else
@@ -54,8 +54,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override IMyAsteroidObjectShape GetAsteroidObjectShape(MySystemAsteroids instance)
         {
-            if (m_loadedSpheres.ContainsKey(instance.DisplayName))
-                return MyAsteroidObjectShapeSphere.CreateFromAsteroidSphereData(m_loadedSpheres[instance.DisplayName]);
+            if (m_loadedSpheres.ContainsKey(instance.Id))
+                return MyAsteroidObjectShapeSphere.CreateFromAsteroidSphereData(m_loadedSpheres[instance.Id]);
             return null;
         }
 
@@ -73,7 +73,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             foreach(var sphere in m_loadedSpheres)
             {
-                MyFileUtils.WriteXmlFileToWorld(sphere.Value, GetFileName(sphere.Key), typeof(MyAsteroidSphereProvider));
+                var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(sphere.Key);
+                if (instance == null) continue;
+                MyFileUtils.WriteXmlFileToWorld(sphere.Value, GetFileName(instance.DisplayName), typeof(MyAsteroidSphereProvider));
             }
         }
 
@@ -82,9 +84,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             MyPluginLog.Debug("Removing instance from asteroid sphere provider");
 
             if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
-            if (!m_loadedSpheres.ContainsKey(systemInstance.DisplayName)) return false;
+            if (!m_loadedSpheres.ContainsKey(systemInstance.Id)) return false;
 
-            m_loadedSpheres.Remove(systemInstance.DisplayName);
+            m_loadedSpheres.Remove(systemInstance.Id);
 
             MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidSphereProvider));
 
@@ -95,13 +97,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
-            if (m_loadedSpheres.ContainsKey(asteroid.DisplayName)) return false;
+            if (m_loadedSpheres.ContainsKey(asteroid.Id)) return false;
 
             if (!MyFileUtils.FileExistsInWorldStorage(GetFileName(asteroid.DisplayName), typeof(MyAsteroidSphereProvider))) return false;
 
             var data = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidSphereData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidSphereProvider));
 
-            m_loadedSpheres.Add(asteroid.DisplayName, data);
+            m_loadedSpheres.Add(asteroid.Id, data);
 
             return true;
         }
@@ -143,7 +145,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         [Server]
         private static void AddInstanceServer(MySystemAsteroids instance, MyAsteroidSphereData data)
         {
-            Static?.m_loadedSpheres.Add(instance.DisplayName, data);
+            Static?.m_loadedSpheres.Add(instance.Id, data);
         }
     }
 

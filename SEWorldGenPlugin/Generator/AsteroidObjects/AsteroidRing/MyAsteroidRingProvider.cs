@@ -34,7 +34,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// <summary>
         /// The dictionary contains all currently loaded asteroid rings and belts
         /// </summary>
-        private Dictionary<string, MyAsteroidRingData> m_loadedRings;
+        private Dictionary<Guid, MyAsteroidRingData> m_loadedRings;
 
         /// <summary>
         /// Creates new asteroid ring provider instance, replaces the old one
@@ -43,7 +43,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             if(Static == null)
             {
-                m_loadedRings = new Dictionary<string, MyAsteroidRingData>();
+                m_loadedRings = new Dictionary<Guid, MyAsteroidRingData>();
                 Static = this;
             }
             else
@@ -75,7 +75,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 ring.Radius = MyRandom.Instance.NextDouble() * (planet.Diameter * 2 - planet.Diameter * 0.75) + planet.Diameter * 0.75;
                 ring.CenterPosition = asteroidObject.CenterPosition;
 
-                m_loadedRings.Add(asteroidObject.DisplayName, ring);
+                m_loadedRings.Add(asteroidObject.Id, ring);
 
                 return asteroidObject;
             }
@@ -98,7 +98,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 belt.Radius = objectOrbitRadius;
                 belt.CenterPosition = asteroidObject.CenterPosition;
 
-                m_loadedRings.Add(asteroidObject.DisplayName, belt);
+                m_loadedRings.Add(asteroidObject.Id, belt);
 
                 return asteroidObject;
 
@@ -117,26 +117,28 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override IMyAsteroidObjectShape GetAsteroidObjectShape(MySystemAsteroids instance)
         {
-            if(m_loadedRings.ContainsKey(instance.DisplayName))
-                return MyAsteroidObjectShapeRing.CreateFromRingItem(m_loadedRings[instance.DisplayName]);
+            if(m_loadedRings.ContainsKey(instance.Id))
+                return MyAsteroidObjectShapeRing.CreateFromRingItem(m_loadedRings[instance.Id]);
             return null;
         }
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
-            if (m_loadedRings.ContainsKey(asteroid.DisplayName)) return false;
+            if (m_loadedRings.ContainsKey(asteroid.Id)) return false;
             var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidRingProvider));
 
-            m_loadedRings.Add(asteroid.DisplayName, ring);
+            m_loadedRings.Add(asteroid.Id, ring);
 
             return true;
         }
 
         public override void OnSave()
         {
-            foreach(var ringName in m_loadedRings.Keys)
+            foreach(var ringId in m_loadedRings.Keys)
             {
-                MyFileUtils.WriteXmlFileToWorld(m_loadedRings[ringName], GetFileName(ringName), typeof(MyAsteroidRingProvider));
+                var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(ringId);
+                if (instance == null) continue;
+                MyFileUtils.WriteXmlFileToWorld(m_loadedRings[ringId], GetFileName(instance.DisplayName), typeof(MyAsteroidRingProvider));
             }
         }
 
@@ -182,7 +184,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         [Server]
         private static void AddRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
         {
-            Static?.m_loadedRings.Add(systemInstance.DisplayName, ringData);
+            Static?.m_loadedRings.Add(systemInstance.Id, ringData);
         }
 
         /// <summary>
@@ -218,9 +220,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             MyPluginLog.Debug("Removing instance from asteroid ring provider");
             if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
-            if (!m_loadedRings.ContainsKey(systemInstance.DisplayName)) return false;
+            if (!m_loadedRings.ContainsKey(systemInstance.Id)) return false;
 
-            m_loadedRings.Remove(systemInstance.DisplayName);
+            m_loadedRings.Remove(systemInstance.Id);
 
             MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidRingProvider));
 
