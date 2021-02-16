@@ -82,6 +82,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                         }
                     }
 
+                    voxelMap.IsSeedOpen = false;
+
                     voxelMap.Close();
                     seed.UserData = null;
                 }
@@ -101,6 +103,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     {
                         m_tmpAsteroids.Remove(map);
                         map.Close();
+                        map.IsSeedOpen = false;
                         break;
                     }
                 }
@@ -173,10 +176,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                         voxel.RangeChanged -= del;
                     };
                     voxelMap.RangeChanged += del;
-                    
+
+                    voxelMap.IsSeedOpen = true;
+
                     seed.UserData = voxelMap;
                     m_tmpAsteroids.Add(voxelMap);
-                    MyPluginLog.Debug("Generated Voxel map with user data " + seed.UserData.GetType(), LogLevel.INFO);
                 }
             }
         }

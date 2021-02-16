@@ -1,4 +1,5 @@
 ﻿using Sandbox.Game.World.Generator;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using VRage.Collections;
@@ -88,7 +89,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         public abstract void UpdateGpsForPlayer(MyEntityTracker entity);
 
         /// <summary>
-        /// Marks cells to load inside the bounds
+        /// Marks cells to load or keep loaded inside the bounds
         /// </summary>
         /// <param name="bounds">Spherical bounds</param>
         public void MarkToLoadCellsInBounds(BoundingSphereD bounds)
@@ -99,6 +100,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             for (var it = GetCellsIterator(box); it.IsValid(); it.GetNext(out cellId))
             {
                 if (m_toLoadCells.Contains(cellId)) continue;
+
+                //MyPluginLog.Debug("Mark Loading cell " + cellId);
 
                 BoundingBoxD cellBounds = new BoundingBoxD(cellId * m_cellSize, (cellId + 1) * m_cellSize);
                 if (bounds.Contains(cellBounds) == ContainmentType.Disjoint) continue;
@@ -147,44 +150,27 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         }
 
         /// <summary>
-        /// Marks all cells inside the bounds to be unloaded.
-        /// </summary>
-        /// <param name="bounds">Spherical bounds</param>
-        public void MarkForUnloadCellsInBounds(BoundingSphereD bounds, BoundingSphereD? exclude = null)
-        {
-            Vector3I cellId = Vector3I.Floor((bounds.Center - bounds.Radius) / m_cellSize);
-            for (var iter = GetCellsIterator(BoundingBoxD.CreateFromSphere(bounds)); iter.IsValid(); iter.GetNext(out cellId))
-            {
-                if (m_toLoadCells.Contains(cellId)) continue;
-
-                MyProceduralCell cell;
-                if (m_loadedCells.TryGetValue(cellId, out cell))
-                {
-                    if(exclude == null || !exclude.HasValue || exclude.Value.Contains(cell.BoundingVolume) == ContainmentType.Disjoint)
-                    {
-                        m_toUnloadCells.Add(cell);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Unloads all marked cells, except those, that are also marked to be loaded, due 
         /// to overlapping bounds when marking.
         /// </summary>
         public void UnloadCells()
         {
-            m_toUnloadCells.ApplyAdditions();
-
-            if (m_toUnloadCells.Count == 0) return;
-
-            foreach(var cell in m_toUnloadCells)
+            List<Vector3I> unloadCells = new List<Vector3I>();
+            foreach(var cell in m_loadedCells)
             {
+                if (m_toLoadCells.Contains(cell.Key)) continue;
+                unloadCells.Add(cell.Key);
+            }
+
+            foreach(var cellid in unloadCells)
+            {
+                var cell = m_loadedCells[cellid];
+
                 List<MyObjectSeed> seeds = new List<MyObjectSeed>();
 
                 cell.GetAll(seeds);
 
-                foreach(var seed in seeds)
+                foreach (var seed in seeds)
                 {
                     if (seed.Params.Generated)
                     {
@@ -192,15 +178,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     }
                 }
                 seeds.Clear();
-            }
 
-            foreach (var cell in m_toUnloadCells)
-            {
-                m_loadedCells.Remove(cell.CellId);
+                m_loadedCells.Remove(cellid);
                 m_cellsTree.RemoveProxy(cell.proxyId);
             }
 
-            m_toUnloadCells.Clear();
+            return;
         }
 
         /// <summary>
