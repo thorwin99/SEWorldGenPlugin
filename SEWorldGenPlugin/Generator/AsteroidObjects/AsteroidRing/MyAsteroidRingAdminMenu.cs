@@ -111,11 +111,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableSeparator();
 
-            var data = (MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject) as MyAsteroidRingData);
+            var data  =MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject);
+            var ring = data as MyAsteroidRingData;
 
-            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)data.Radius * 2f);
+            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)ring.Radius * 2f);
 
-            UpdateRingVisual(data);
+            UpdateRingVisual(ring);
 
             return true;
         }

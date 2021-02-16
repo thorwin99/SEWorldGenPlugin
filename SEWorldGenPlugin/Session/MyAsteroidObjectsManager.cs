@@ -1,8 +1,10 @@
+using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using VRage.Game;
 using VRage.Game.Components;
 
 namespace SEWorldGenPlugin.Session
@@ -29,6 +31,18 @@ namespace SEWorldGenPlugin.Session
             Static = this;
             AsteroidObjectProviders = new Dictionary<string, MyAbstractAsteroidObjectProvider>();
             LoadAllAsteroidTypes();
+        }
+
+        public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
+        {
+            base.Init(sessionComponent);
+
+            if (Sync.IsServer) return;
+
+            foreach(var provider in AsteroidObjectProviders)
+            {
+                provider.Value.FetchDataFromServer();
+            }
         }
 
         public override void SaveData()

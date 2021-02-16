@@ -39,11 +39,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             if(Static == null)
             {
                 m_loadedSpheres = new Dictionary<Guid, MyAsteroidSphereData>();
+
                 Static = this;
             }
             else
             {
                 m_loadedSpheres = Static.m_loadedSpheres;
+
                 Static = this;
             }
         }
@@ -100,11 +102,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
-            if (!Sync.IsServer)
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataServer, asteroid, Sync.MyId);
-            }
-
             if (m_loadedSpheres.ContainsKey(asteroid.Id)) return false;
 
             if (!MyFileUtils.FileExistsInWorldStorage(GetFileName(asteroid.DisplayName), typeof(MyAsteroidSphereProvider))) return false;
@@ -151,47 +148,85 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override object GetInstanceData(MySystemAsteroids instance)
         {
-            if (instance.AsteroidTypeName == GetTypeName())
+            if (m_loadedSpheres.ContainsKey(instance.Id))
             {
                 return m_loadedSpheres[instance.Id];
             }
+
             return null;
         }
 
+        public override void FetchDataFromServer()
+        {
+            PluginEventHandler.Static.RaiseStaticEvent(GetDataServer, Sync.MyId);
+        }
+
+        /// <summary>
+        /// Server event: Adds instance
+        /// </summary>
+        /// <param name="instance">Instance of system object</param>
+        /// <param name="data">Instance data</param>
         [Event(3001)]
         [Server]
         private static void AddInstanceServer(MySystemAsteroids instance, MyAsteroidSphereData data)
         {
+            MyPluginLog.Log("Adding asteroid sphere instance on server");
+
             Static?.m_loadedSpheres.Add(instance.Id, data);
+            PluginEventHandler.Static.RaiseStaticEvent(NotifyAddInstance, instance.Id, data);
         }
 
         /// <summary>
-        /// Server event: Requests an instance from the server
+        /// Server event: Get all data saved in this provider for the requester client
         /// </summary>
-        /// <param name="instance">The asteroid instance</param>
-        /// <param name="clientId">Client id of the requester</param>
+        /// <param name="requesterId">Client that requested data</param>
         [Event(3002)]
         [Server]
-        private static void RequestInstanceDataServer(MySystemAsteroids instance, ulong clientId)
+        private static void GetDataServer(ulong requesterId)
         {
-            if (!Static.m_loadedSpheres.ContainsKey(instance.Id)) return;
+            MyPluginLog.Log("Retreiving all asteroid sphere data for client " + requesterId);
 
-            PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataClient, instance, Static.m_loadedSpheres[instance.Id], clientId);
+            PluginEventHandler.Static.RaiseStaticEvent(GetDataClient, Static.m_loadedSpheres, requesterId);
         }
 
         /// <summary>
-        /// Client event: Retreives an instance data from the server
+        /// Client event: Called, when data retreived from server
         /// </summary>
-        /// <param name="instance">Asteroid instance</param>
-        /// <param name="data">Asteroid data</param>
+        /// <param name="data">Data of this provider from server</param>
         [Event(3003)]
         [Client]
-        private static void RequestInstanceDataClient(MySystemAsteroids instance, MyAsteroidSphereData data)
+        private static void GetDataClient(Dictionary<Guid, MyAsteroidSphereData> data)
         {
-            if (data != null && Static.m_loadedSpheres.ContainsKey(instance.Id))
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Received data from server for asteroid sphere provider with length " + data.Count);
+
+            foreach (var pair in data)
             {
-                Static.m_loadedSpheres.Add(instance.Id, data);
+                if (Static.m_loadedSpheres.ContainsKey(pair.Key)) continue;
+
+                MyPluginLog.Debug("Adding sphere to provider fetched from server " + pair.Key.ToString());
+
+                Static.m_loadedSpheres.Add(pair.Key, pair.Value);
             }
+        }
+
+        /// <summary>
+        /// Broadcast: Called, when instance got added on server
+        /// </summary>
+        /// <param name="id">Id of instance</param>
+        /// <param name="data">Data of instance</param>
+        [Event(3004)]
+        [Broadcast]
+        private static void NotifyAddInstance(Guid id, MyAsteroidSphereData data)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Got notified about a new Asteroid sphere instance");
+
+            if (Static.m_loadedSpheres.ContainsKey(id)) return;
+
+            Static.m_loadedSpheres.Add(id, data);
         }
     }
 

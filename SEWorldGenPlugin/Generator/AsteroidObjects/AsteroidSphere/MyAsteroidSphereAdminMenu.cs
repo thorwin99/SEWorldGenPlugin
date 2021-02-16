@@ -71,11 +71,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
         {
-            var data = (MyAsteroidSphereProvider.Static.GetInstanceData(asteroidObject) as MyAsteroidSphereData);
+            m_parentScreen = adminScreen;
 
-            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)data.OuterRadius * 2f);
-            RenderSpherePreview(data);
+            var data = MyAsteroidSphereProvider.Static.GetInstanceData(asteroidObject);
+            var sphere = data as MyAsteroidSphereData;
 
+            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)sphere.OuterRadius * 2f);
+            RenderSpherePreview(sphere);
             return false;
         }
 

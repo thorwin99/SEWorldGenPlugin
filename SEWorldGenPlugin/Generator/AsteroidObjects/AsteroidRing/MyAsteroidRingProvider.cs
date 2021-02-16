@@ -44,11 +44,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             if(Static == null)
             {
                 m_loadedRings = new Dictionary<Guid, MyAsteroidRingData>();
+
                 Static = this;
             }
             else
             {
                 m_loadedRings = Static.m_loadedRings;
+
                 Static = this;
             }
         }
@@ -124,14 +126,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override bool TryLoadObject(MySystemAsteroids asteroid)
         {
-            if (!Sync.IsServer)
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataServer, asteroid, Sync.MyId);
-                return true;
-            }
-
             if (m_loadedRings.ContainsKey(asteroid.Id)) return false;
+
             var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidRingProvider));
+
+            if (ring == null) return false;
 
             m_loadedRings.Add(asteroid.Id, ring);
 
@@ -185,11 +184,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override object GetInstanceData(MySystemAsteroids instance)
         {
-            if (instance.AsteroidTypeName == GetTypeName())
-            {
-                return m_loadedRings[instance.Id];
-            }
-            return null;
+            if (!m_loadedRings.ContainsKey(instance.Id)) return null;
+
+            return m_loadedRings[instance.Id];
         }
 
         public override bool RemoveInstance(MySystemAsteroids systemInstance)
@@ -207,6 +204,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return true;
         }
 
+        public override void FetchDataFromServer()
+        {
+            PluginEventHandler.Static.RaiseStaticEvent(GetDataServer, Sync.MyId);
+        }
+
         /// <summary>
         /// Server event: Adds a new Asteroid ring on the server, if the provider is loaded on the server
         /// </summary>
@@ -217,35 +219,59 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private static void AddRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
         {
             Static?.m_loadedRings.Add(systemInstance.Id, ringData);
+            PluginEventHandler.Static.RaiseStaticEvent(NotifyAddInstance, systemInstance.Id, ringData);
         }
 
         /// <summary>
-        /// Server event: Requests an instance from the server
+        /// Server event: Get all data saved in this provider for the requester client
         /// </summary>
-        /// <param name="instance">The asteroid instance</param>
-        /// <param name="clientId">Client id of the requester</param>
+        /// <param name="requesterId">Client that requested data</param>
         [Event(100002)]
         [Server]
-        private static void RequestInstanceDataServer(MySystemAsteroids instance, ulong clientId)
+        private static void GetDataServer(ulong requesterId)
         {
-            if (!Static.m_loadedRings.ContainsKey(instance.Id)) return;
+            MyPluginLog.Log("Retreiving all asteroid ring data for client " + requesterId);
 
-            PluginEventHandler.Static.RaiseStaticEvent(RequestInstanceDataClient, instance, Static.m_loadedRings[instance.Id], clientId);
+            PluginEventHandler.Static.RaiseStaticEvent(GetDataClient, Static.m_loadedRings, requesterId);
         }
 
         /// <summary>
-        /// Client event: Retreives an instance data from the server
+        /// Client event: Called, when data retreived from server
         /// </summary>
-        /// <param name="instance">Asteroid instance</param>
-        /// <param name="data">Asteroid data</param>
+        /// <param name="data">Data of this provider from server</param>
         [Event(100003)]
         [Client]
-        private static void RequestInstanceDataClient(MySystemAsteroids instance, MyAsteroidRingData data)
+        private static void GetDataClient(Dictionary<Guid, MyAsteroidRingData> data)
         {
-            if(data != null && Static.m_loadedRings.ContainsKey(instance.Id))
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Received data from server for asteroid ring provider with length " + data.Count);
+
+            foreach (var pair in data)
             {
-                Static.m_loadedRings.Add(instance.Id, data);
+                if (Static.m_loadedRings.ContainsKey(pair.Key)) continue;
+
+                MyPluginLog.Debug("Adding ring to provider fetched from server");
+                Static.m_loadedRings.Add(pair.Key, pair.Value);
             }
+        }
+
+        /// <summary>
+        /// Broadcast: Called, when instance got added on server
+        /// </summary>
+        /// <param name="id">Id of instance</param>
+        /// <param name="data">Data of instance</param>
+        [Event(100004)]
+        [Broadcast]
+        private static void NotifyAddInstance(Guid id, MyAsteroidRingData data)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Got notified about a new Asteroid ring instance");
+
+            if (Static.m_loadedRings.ContainsKey(id)) return;
+
+            Static.m_loadedRings.Add(id, data);
         }
 
         /// <summary>

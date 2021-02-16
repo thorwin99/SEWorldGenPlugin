@@ -1,6 +1,8 @@
-﻿using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
+﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.ObjectBuilders;
+using System;
 using System.IO;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects
@@ -14,6 +16,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// The private instance of the admin menu creator, so that only one ever exists.
         /// </summary>
         private IMyAsteroidAdminMenuCreator m_adminMenuCreator;
+
+        /// <summary>
+        /// Loads all known data for this provider from the server,
+        /// if necessary.
+        /// </summary>
+        public abstract void FetchDataFromServer();
 
         /// <summary>
         /// Returns the name of the asteroid type provided by this
