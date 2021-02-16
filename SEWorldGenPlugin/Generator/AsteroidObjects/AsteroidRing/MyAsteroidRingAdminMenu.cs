@@ -96,7 +96,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         private MyPluginAdminMenu m_parentScreen;
 
-        public bool CreateEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
+        public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
         {
             m_parentScreen = adminScreen;
             m_currentSelectedAsteroid = asteroidObject;
@@ -110,6 +110,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             parentTable.AddTableRow(deleteRingButton);
 
             parentTable.AddTableSeparator();
+
+            var data = (MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject) as MyAsteroidRingData);
+
+            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)data.Radius * 2f);
+
+            UpdateRingVisual(data);
 
             return true;
         }
@@ -175,7 +181,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_radiusSlider.Enabled = false;
             m_radiusSlider.ValueChanged += delegate
             {
-                UpdateRingVisual();
+                UpdateRingVisual(GenerateAsteroidRing());
             };
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Radius"));
@@ -185,7 +191,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_widthSlider.Enabled = false;
             m_widthSlider.ValueChanged += delegate
             {
-                UpdateRingVisual();
+                UpdateRingVisual(GenerateAsteroidRing());
             };
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Width"));
@@ -201,21 +207,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_angleXSlider.Enabled = false;
             m_angleXSlider.ValueChanged += delegate
             {
-                UpdateRingVisual();
+                UpdateRingVisual(GenerateAsteroidRing());
             };
 
             m_angleYSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
             m_angleYSlider.Enabled = false;
             m_angleYSlider.ValueChanged += delegate
             {
-                UpdateRingVisual();
+                UpdateRingVisual(GenerateAsteroidRing());
             };
 
             m_angleZSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
             m_angleZSlider.Enabled = false;
             m_angleZSlider.ValueChanged += delegate
             {
-                UpdateRingVisual();
+                UpdateRingVisual(GenerateAsteroidRing());
             };
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle X Axis"));
@@ -282,9 +288,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// <summary>
         /// Updates the visual representaion of the current ring edited in the spawn menu
         /// </summary>
-        private void UpdateRingVisual()
+        private void UpdateRingVisual(MyAsteroidRingData ring)
         {
-            MyAsteroidRingData ring = GenerateAsteroidRing();
             if (ring == null) return;
 
             var shape = MyAsteroidObjectShapeRing.CreateFromRingItem(ring);
@@ -428,8 +433,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                     m_angleZSlider.Value = 0;
 
                     if(m_snapToParent)
-                        CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
-                    UpdateRingVisual();
+                        m_parentScreen.CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
+                    UpdateRingVisual(GenerateAsteroidRing());
                     return;
                 }
 
@@ -459,8 +464,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 m_nameBox.SetText(new StringBuilder(""));
 
                 if (m_snapToParent)
-                    CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
-                UpdateRingVisual();
+                    m_parentScreen.CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
+                UpdateRingVisual(GenerateAsteroidRing());
             }
             else
             {
@@ -472,30 +477,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 m_angleZSlider.Enabled = false;
                 m_spawnRingButton.Enabled = false;
             }
-        }
-
-        /// <summary>
-        /// Makes the spectator cam look at the specific point from the given distance
-        /// </summary>
-        /// <param name="center">Point to look at</param>
-        /// <param name="distance">Distance to look from</param>
-        private void CameraLookAt(Vector3D center, float distance)
-        {
-            MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
-            MySpectatorCameraController.Static.Position = center + distance;
-            MySpectatorCameraController.Static.Target = center;
-        }
-
-        /// <summary>
-        /// Makes the spectator cam look at the specific point from the given distance
-        /// </summary>
-        /// <param name="center">Point to look at</param>
-        /// <param name="distance">Distance to look from</param>
-        private void CameraLookAt(Vector3D center, Vector3D distance)
-        {
-            MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
-            MySpectatorCameraController.Static.Position = center + distance;
-            MySpectatorCameraController.Static.Target = center;
         }
     }
 }

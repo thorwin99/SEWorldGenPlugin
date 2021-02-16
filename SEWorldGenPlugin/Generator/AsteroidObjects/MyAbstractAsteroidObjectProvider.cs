@@ -85,6 +85,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         public abstract void OnSave();
 
         /// <summary>
+        /// Returns the associated asteroid data provided by this class for the given asteroid object instance,
+        /// if the instance is of type of this provider
+        /// </summary>
+        /// <param name="instance">Instance to get data for</param>
+        /// <returns>The data associated or null</returns>
+        public abstract object GetInstanceData(MySystemAsteroids instance);
+
+        /// <summary>
         /// Converts an asteroid object name to a file name.
         /// </summary>
         /// <param name="objectName">The asteroid object name</param>

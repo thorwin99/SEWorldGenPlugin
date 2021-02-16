@@ -20,7 +20,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         bool CreateSpawnMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen);
 
         /// <summary>
-        /// Creates the gui elements nessecary to create a menu to edit a asteroid object instance.
+        /// Creates the gui elements nessecary to create a menu to edit the given asteroid object instance.
         /// The elements should be added to the table and the table, the admin screen only used for elements
         /// that dont fit in the table.
         /// </summary>
@@ -29,7 +29,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// <param name="adminScreen">The admin menu screen.</param>
         /// <param name="asteroidObject">The asteroid object this menu gets generated for</param>
         /// <returns>True, if a menu was created</returns>
-        bool CreateEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject);
+        bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject);
 
         /// <summary>
         /// Called, when the admin menu gets closed.

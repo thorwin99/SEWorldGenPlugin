@@ -175,6 +175,30 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             });
         }
 
+        public override object GetInstanceData(MySystemAsteroids instance)
+        {
+            if (instance.AsteroidTypeName == GetTypeName())
+            {
+                return m_loadedRings[instance.Id];
+            }
+            return null;
+        }
+
+        public override bool RemoveInstance(MySystemAsteroids systemInstance)
+        {
+            MyPluginLog.Debug("Removing instance from asteroid ring provider");
+            if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
+            if (!m_loadedRings.ContainsKey(systemInstance.Id)) return false;
+
+            m_loadedRings.Remove(systemInstance.Id);
+
+            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidRingProvider));
+
+            MyPluginLog.Debug("Successfully removed instance");
+
+            return true;
+        }
+
         /// <summary>
         /// Server event: Adds a new Asteroid ring on the server, if the provider is loaded on the server
         /// </summary>
@@ -214,21 +238,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private string GetRingName(string parentPlanetName)
         {
             return parentPlanetName + " Ring";
-        }
-
-        public override bool RemoveInstance(MySystemAsteroids systemInstance)
-        {
-            MyPluginLog.Debug("Removing instance from asteroid ring provider");
-            if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
-            if (!m_loadedRings.ContainsKey(systemInstance.Id)) return false;
-
-            m_loadedRings.Remove(systemInstance.Id);
-
-            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidRingProvider));
-
-            MyPluginLog.Debug("Successfully removed instance");
-
-            return true;
         }
     }
 

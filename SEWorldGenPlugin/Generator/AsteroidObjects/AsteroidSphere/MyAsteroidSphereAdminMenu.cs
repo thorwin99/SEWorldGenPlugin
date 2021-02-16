@@ -69,8 +69,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// </summary>
         private MyPluginAdminMenu m_parentScreen;
 
-        public bool CreateEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
+        public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
         {
+            var data = (MyAsteroidSphereProvider.Static.GetInstanceData(asteroidObject) as MyAsteroidSphereData);
+
+            m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)data.OuterRadius * 2f);
+            RenderSpherePreview(data);
+
             return false;
         }
 
@@ -120,7 +125,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             m_radiusSlider.Enabled = false;
             m_radiusSlider.ValueChanged += delegate
             {
-                RenderSpherePreview();
+                RenderSpherePreview(GetDataFromGui());
             };
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Radius"));
@@ -130,7 +135,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             m_widthSlider.Enabled = false;
             m_widthSlider.ValueChanged += delegate
             {
-                RenderSpherePreview();
+                RenderSpherePreview(GetDataFromGui());
             };
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Width"));
@@ -251,7 +256,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
                     CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
 
-                    RenderSpherePreview();
+                    RenderSpherePreview(GetDataFromGui());
                     return;
                 }
                 else
@@ -284,7 +289,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
                             CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
 
-                            RenderSpherePreview();
+                            RenderSpherePreview(GetDataFromGui());
                             return;
                         }
                     }
@@ -317,10 +322,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// <summary>
         /// Renders a preview of the hollow sphere currently edited
         /// </summary>
-        private void RenderSpherePreview()
+        private void RenderSpherePreview(MyAsteroidSphereData data)
         {
-            var data = GetDataFromGui();
-
             MyPluginDrawSession.Static.RemoveRenderObject(PREVIEW_RENDER_ID);
 
             if (data != null)

@@ -141,6 +141,15 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             });
         }
 
+        public override object GetInstanceData(MySystemAsteroids instance)
+        {
+            if (instance.AsteroidTypeName == GetTypeName())
+            {
+                return m_loadedSpheres[instance.Id];
+            }
+            return null;
+        }
+
         [Event(3001)]
         [Server]
         private static void AddInstanceServer(MySystemAsteroids instance, MyAsteroidSphereData data)
