@@ -141,7 +141,7 @@ namespace SEWorldGenPlugin.GUI
 
             parent.AddTableRow(asteroidCountLabel, m_asteroidCountSlider);
 
-            m_orbitDistancesSlider = new MyGuiControlRangedSlider(100, 10000000, 40000, 1000000, width: 0.25f);
+            m_orbitDistancesSlider = new MyGuiControlRangedSlider(100, 10000000, 40000, 1000000, width: 0.25f, useLogScale: true);
             m_orbitDistancesSlider.SetToolTip(MyPluginTexts.TOOLTIPS.ORBIT_DISTANCE_SLIDER);
 
             parent.AddTableRow(oribtDistanceLabel, m_orbitDistancesSlider);

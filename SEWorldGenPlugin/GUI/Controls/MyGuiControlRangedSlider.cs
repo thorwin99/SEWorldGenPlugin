@@ -202,6 +202,11 @@ namespace SEWorldGenPlugin.GUI.Controls
         private bool m_intMode;
 
         /// <summary>
+        /// Whether logarithmic scaling is used instead of linear, to allow for very large ranges to set lower values.
+        /// </summary>
+        private bool m_logScale;
+
+        /// <summary>
         /// Creates a new instance of a MyGuiControlRanged slider with given parameters
         /// </summary>
         /// <param name="position">The position of the slider in screenspace</param>
@@ -214,7 +219,11 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <param name="labelFont">The font of the label</param>
         /// <param name="toolTip">The tooltip for the slider</param>
         /// <param name="originAlign">The alignment of the slider</param>
-        public MyGuiControlRangedSlider(double minValue, double maxValue, double defaultMin, double defaultMax, bool intMode = false, Vector2? position = null, float width = 0.29f, bool showLabel = true, float labelSpaceWidth = 0f, float labelScale = 0.8f, string labelFont = "White", string toolTip = null, MyGuiDrawAlignEnum originAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER) :
+        /// <param name="useLogScale">Whether to use logarithmic scaling of values on the slider to allow for wider ranges</param>
+        /// <param name="defaultMax">Default max value</param>
+        /// <param name="defaultMin">Default min value</param>
+        /// <param name="intMode">If the slider should work in int mode</param>
+        public MyGuiControlRangedSlider(double minValue, double maxValue, double defaultMin, double defaultMax, bool intMode = false, Vector2? position = null, float width = 0.29f, bool showLabel = true, float labelSpaceWidth = 0f, float labelScale = 0.8f, string labelFont = "White", string toolTip = null, MyGuiDrawAlignEnum originAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, bool useLogScale = false) :
             base(position, null, null, toolTip, null, true, true, MyGuiControlHighlightType.WHEN_CURSOR_OVER_OR_FOCUS, originAlign)
         {
             m_showLabel = showLabel;
@@ -227,6 +236,8 @@ namespace SEWorldGenPlugin.GUI.Controls
             m_maxThumb = new MyGuiSliderThumb(defaultMax);
 
             m_intMode = intMode;
+
+            m_logScale = useLogScale;
 
             m_minLabel = new MyGuiControlLabel(null, null, "", null, labelScale, labelFont, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
             m_maxLabel = new MyGuiControlLabel(null, null, "", null, labelScale, labelFont, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP);
@@ -290,6 +301,12 @@ namespace SEWorldGenPlugin.GUI.Controls
                     if (m_currentFocusThumb != null)
                     {
                         float mouseRatio = (mousePos.X - GetPositionAbsoluteTopLeft().X) / (GetPositionAbsoluteTopRight().X - GetPositionAbsoluteTopLeft().X);
+
+                        if (m_logScale)
+                        {
+                            mouseRatio = (float)Math.Pow(mouseRatio, 3);
+                        }
+
                         double mouseVal = (m_maxValue - m_minValue) * mouseRatio + m_minValue;
 
                         if(m_currentFocusThumb == m_minThumb)
@@ -306,6 +323,12 @@ namespace SEWorldGenPlugin.GUI.Controls
                         }
 
                         float currentRatio = (float)((m_currentFocusThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue));
+
+                        if (m_logScale)
+                        {
+                            currentRatio = (float)Math.Pow(currentRatio, 1f / 3f);
+                        }
+
                         m_currentFocusThumb.CurrentPosition = new Vector2(startX + (endX - startX) * currentRatio, centerY);
                     }
                 }
@@ -422,6 +445,12 @@ namespace SEWorldGenPlugin.GUI.Controls
             float centerY = Size.Y / 2;
             float minRatio = (float)((m_minThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue));
             float maxRatio = (float)((m_maxThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue));
+
+            if (m_logScale)
+            {
+                minRatio = (float)Math.Pow(minRatio, 1f / 3f);
+                maxRatio = (float)Math.Pow(maxRatio, 1f / 3f);
+            }
 
             m_minThumb.CurrentPosition = new Vector2(MathHelper.Lerp(startX, endX, minRatio), centerY);
             m_maxThumb.CurrentPosition = new Vector2(MathHelper.Lerp(startX, endX, maxRatio), centerY);
