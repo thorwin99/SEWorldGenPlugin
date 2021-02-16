@@ -10,7 +10,7 @@ namespace SEWorldGenPlugin.Session
     /// <summary>
     /// This class handles loading and storing of all asteroid object types.
     /// </summary>
-    [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, priority: 1005)]
+    [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 1005)]
     public class MyAsteroidObjectsManager : MySessionComponentBase
     {
         /// <summary>
@@ -33,7 +33,9 @@ namespace SEWorldGenPlugin.Session
 
         public override void SaveData()
         {
-            foreach(var provider in AsteroidObjectProviders.Values)
+            if (!MySettingsSession.Static.IsEnabled()) return;
+
+            foreach (var provider in AsteroidObjectProviders.Values)
             {
                 provider.OnSave();
             }
@@ -42,6 +44,7 @@ namespace SEWorldGenPlugin.Session
         protected override void UnloadData()
         {
             base.UnloadData();
+
             AsteroidObjectProviders.Clear();
             Static = null;
         }

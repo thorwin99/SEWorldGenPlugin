@@ -248,6 +248,8 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void SaveData()
         {
+            if (!MySettingsSession.Static.IsEnabled()) return;
+
             MyObjectBuilder_WorldGpsData ob = new MyObjectBuilder_WorldGpsData();
             foreach(var entry in m_globalGpss.Keys)
             {

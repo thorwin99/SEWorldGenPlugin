@@ -73,6 +73,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             foreach(var sphere in m_loadedSpheres)
             {
+                if (MyStarSystemGenerator.Static.StarSystem == null) return;
+
                 var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(sphere.Key);
                 if (instance == null) continue;
                 MyFileUtils.WriteXmlFileToWorld(sphere.Value, GetFileName(instance.DisplayName), typeof(MyAsteroidSphereProvider));

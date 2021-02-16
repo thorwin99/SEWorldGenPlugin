@@ -141,7 +141,7 @@ namespace SEWorldGenPlugin.GUI
 
             parent.AddTableRow(asteroidCountLabel, m_asteroidCountSlider);
 
-            m_orbitDistancesSlider = new MyGuiControlRangedSlider(100, 100000, 4000, 10000, width: 0.25f);
+            m_orbitDistancesSlider = new MyGuiControlRangedSlider(100, 10000000, 40000, 1000000, width: 0.25f);
             m_orbitDistancesSlider.SetToolTip(MyPluginTexts.TOOLTIPS.ORBIT_DISTANCE_SLIDER);
 
             parent.AddTableRow(oribtDistanceLabel, m_orbitDistancesSlider);
@@ -151,7 +151,7 @@ namespace SEWorldGenPlugin.GUI
 
             parent.AddTableRow(asteroidDensityLabel, m_asteroidDensitySlider);
 
-            m_worldSizeSlider = new MyGuiControlClickableSlider(minValue: -1, maxValue: 1000000, defaultValue: -1, width: 0.25f, showLabel: true, labelSuffix: " Km");
+            m_worldSizeSlider = new MyGuiControlClickableSlider(minValue: -1, maxValue: 1000000000, defaultValue: -1, width: 0.25f, showLabel: true, labelSuffix: " Km");
             m_worldSizeSlider.SetToolTip(MyPluginTexts.TOOLTIPS.WORLD_SIZE_SLIDER);
             m_worldSizeSlider.OnLabelUpdate += delegate (MyGuiControlLabel l)
             {
@@ -268,9 +268,9 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.SystemGenerator = (SystemGenerationMethod)m_systemGeneratorCombo.GetSelectedKey();
             settings.GeneratorSettings.AsteroidGenerator = (AsteroidGenerationMethod)m_asteroidGeneratorCombo.GetSelectedKey();
             settings.GeneratorSettings.AllowVanillaPlanets = m_enableVanillaPlanetsCheckbox.IsChecked;
-            settings.GeneratorSettings.MinMaxPlanets = new MySerializableMinMax((int)m_planetCountSlider.CurrentMin, (int)m_planetCountSlider.CurrentMax);
-            settings.GeneratorSettings.MinMaxAsteroidObjects = new MySerializableMinMax((int)m_asteroidCountSlider.CurrentMin, (int)m_asteroidCountSlider.CurrentMax);
-            settings.GeneratorSettings.MinMaxOrbitDistance = new MySerializableMinMax((int)(m_orbitDistancesSlider.CurrentMin * 1000), (int)(m_orbitDistancesSlider.CurrentMax * 1000));
+            settings.GeneratorSettings.MinMaxPlanets = new MySerializableMinMax((long)m_planetCountSlider.CurrentMin, (long)m_planetCountSlider.CurrentMax);
+            settings.GeneratorSettings.MinMaxAsteroidObjects = new MySerializableMinMax((long)m_asteroidCountSlider.CurrentMin, (long)m_asteroidCountSlider.CurrentMax);
+            settings.GeneratorSettings.MinMaxOrbitDistance = new MySerializableMinMax((long)(m_orbitDistancesSlider.CurrentMin * 1000), (long)(m_orbitDistancesSlider.CurrentMax * 1000));
             settings.GeneratorSettings.AsteroidDensity = m_asteroidDensitySlider.Value;
             settings.GeneratorSettings.WorldSize = m_worldSizeSlider.Value >= 0 ? (long)(m_worldSizeSlider.Value * 1000) : -1;
 
@@ -280,7 +280,6 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.GPSSettings.PlanetGPSMode = (MyGPSGenerationMode)m_planetGPSModeCombo.GetSelectedKey();
             settings.GeneratorSettings.GPSSettings.MoonGPSMode = (MyGPSGenerationMode)m_moonGPSModeCombo.GetSelectedKey();
             settings.GeneratorSettings.GPSSettings.AsteroidGPSMode = (MyGPSGenerationMode)m_asteroidGPSModeCombo.GetSelectedKey();
-
 
             return settings;
         }

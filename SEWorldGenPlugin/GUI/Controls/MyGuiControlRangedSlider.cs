@@ -26,12 +26,12 @@ namespace SEWorldGenPlugin.GUI.Controls
             /// <summary>
             /// The current value of this thumb
             /// </summary>
-            private float m_currentValue;
+            private double m_currentValue;
 
             /// <summary>
             /// The current value of this thumb
             /// </summary>
-            public float CurrentValue
+            public double CurrentValue
             { 
                 get 
                 { 
@@ -52,7 +52,7 @@ namespace SEWorldGenPlugin.GUI.Controls
             /// Creates a new slider thumb with the given start value
             /// </summary>
             /// <param name="defaultValue">The value to set the slider to in the beginning</param>
-            public MyGuiSliderThumb(float defaultValue)
+            public MyGuiSliderThumb(double defaultValue)
             {
                 m_currentTexture = MyGuiConstants.TEXTURE_SLIDER_THUMB_DEFAULT.Normal;
                 m_currentValue = defaultValue;
@@ -139,12 +139,12 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <summary>
         /// The current minimum range value
         /// </summary>
-        public float CurrentMin => m_minThumb.CurrentValue;
+        public double CurrentMin => m_minThumb.CurrentValue;
 
         /// <summary>
         /// THe current maximum range value
         /// </summary>
-        public float CurrentMax => m_maxThumb.CurrentValue;
+        public double CurrentMax => m_maxThumb.CurrentValue;
 
         /// <summary>
         /// Label that shows the min value of this slider
@@ -169,12 +169,12 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <summary>
         /// The min value of this slider
         /// </summary>
-        private float m_minValue;
+        private double m_minValue;
 
         /// <summary>
         /// The max value of this slider
         /// </summary>
-        private float m_maxValue;
+        private double m_maxValue;
 
         /// <summary>
         /// The current texture for the rail
@@ -214,7 +214,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <param name="labelFont">The font of the label</param>
         /// <param name="toolTip">The tooltip for the slider</param>
         /// <param name="originAlign">The alignment of the slider</param>
-        public MyGuiControlRangedSlider(float minValue, float maxValue, float defaultMin, float defaultMax, bool intMode = false, Vector2? position = null, float width = 0.29f, bool showLabel = true, float labelSpaceWidth = 0f, float labelScale = 0.8f, string labelFont = "White", string toolTip = null, MyGuiDrawAlignEnum originAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER) :
+        public MyGuiControlRangedSlider(double minValue, double maxValue, double defaultMin, double defaultMax, bool intMode = false, Vector2? position = null, float width = 0.29f, bool showLabel = true, float labelSpaceWidth = 0f, float labelScale = 0.8f, string labelFont = "White", string toolTip = null, MyGuiDrawAlignEnum originAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER) :
             base(position, null, null, toolTip, null, true, true, MyGuiControlHighlightType.WHEN_CURSOR_OVER_OR_FOCUS, originAlign)
         {
             m_showLabel = showLabel;
@@ -290,7 +290,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                     if (m_currentFocusThumb != null)
                     {
                         float mouseRatio = (mousePos.X - GetPositionAbsoluteTopLeft().X) / (GetPositionAbsoluteTopRight().X - GetPositionAbsoluteTopLeft().X);
-                        float mouseVal = (m_maxValue - m_minValue) * mouseRatio + m_minValue;
+                        double mouseVal = (m_maxValue - m_minValue) * mouseRatio + m_minValue;
 
                         if(m_currentFocusThumb == m_minThumb)
                         {
@@ -305,7 +305,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                                 m_currentFocusThumb.CurrentValue = (int)m_currentFocusThumb.CurrentValue;
                         }
 
-                        float currentRatio = (m_currentFocusThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue);
+                        float currentRatio = (float)((m_currentFocusThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue));
                         m_currentFocusThumb.CurrentPosition = new Vector2(startX + (endX - startX) * currentRatio, centerY);
                     }
                 }
@@ -326,9 +326,9 @@ namespace SEWorldGenPlugin.GUI.Controls
         {
             if (!MyInput.Static.IsAnyCtrlKeyPressed() || !MyInput.Static.IsNewPrimaryButtonPressed()) return false;
 
-            float min = 0;
-            float max = 0;
-            float current = 0;
+            double min = 0;
+            double max = 0;
+            double current = 0;
             MyGuiSliderThumb clickedThumb = null;
 
             if (m_minThumb.IsHighlighted() || m_minThumb.IsFocused())
@@ -347,7 +347,7 @@ namespace SEWorldGenPlugin.GUI.Controls
             }
             if (clickedThumb == null) return false;
 
-            MyGuiScreenDialogAmount dialog = new MyGuiScreenDialogAmount(min, max, MyCommonTexts.DialogAmount_SetValueCaption, parseAsInteger: m_intMode, defaultAmount: current, backgroundTransition: MySandboxGame.Config.UIBkOpacity, guiTransition: MySandboxGame.Config.UIOpacity);
+            MyGuiScreenDialogAmount dialog = new MyGuiScreenDialogAmount((float)min, (float)max, MyCommonTexts.DialogAmount_SetValueCaption, parseAsInteger: m_intMode, defaultAmount: (float)current, backgroundTransition: MySandboxGame.Config.UIBkOpacity, guiTransition: MySandboxGame.Config.UIOpacity);
             dialog.OnConfirmed += delegate (float value)
             {
                 clickedThumb.CurrentValue = value;
@@ -420,8 +420,8 @@ namespace SEWorldGenPlugin.GUI.Controls
             float startX = MyGuiConstants.SLIDER_INSIDE_OFFSET_X;
             float endX = Size.X - MyGuiConstants.SLIDER_INSIDE_OFFSET_X;
             float centerY = Size.Y / 2;
-            float minRatio = (m_minThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue);
-            float maxRatio = (m_maxThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue);
+            float minRatio = (float)((m_minThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue));
+            float maxRatio = (float)((m_maxThumb.CurrentValue - m_minValue) / (m_maxValue - m_minValue));
 
             m_minThumb.CurrentPosition = new Vector2(MathHelper.Lerp(startX, endX, minRatio), centerY);
             m_maxThumb.CurrentPosition = new Vector2(MathHelper.Lerp(startX, endX, maxRatio), centerY);
@@ -432,7 +432,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// </summary>
         /// <param name="v1">First value</param>
         /// <param name="v2">Second value</param>
-        public void SetValues(float v1, float v2)
+        public void SetValues(double v1, double v2)
         {
             m_minThumb.CurrentValue = Math.Max(Math.Min(v1, v2), m_minValue);
             m_maxThumb.CurrentValue = Math.Min(Math.Max(v1, v2), m_maxValue);
@@ -446,7 +446,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// </summary>
         /// <param name="v1"></param>
         /// <param name="v2"></param>
-        public void SetRange(float v1, float v2)
+        public void SetRange(double v1, double v2)
         {
             m_minValue = Math.Min(v1, v2);
             m_maxValue = Math.Max(v1, v2);

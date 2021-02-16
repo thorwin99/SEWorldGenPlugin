@@ -41,7 +41,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             if (system == null || system.CenterObject == null) return;
 
             var objs = system.GetAllObjects();
-            var gpsSettings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
 
             foreach(var obj in objs)
             {

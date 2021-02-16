@@ -83,9 +83,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     }
 
                     voxelMap.IsSeedOpen = false;
+                    seed.UserData = null;
 
                     voxelMap.Close();
-                    seed.UserData = null;
                 }
             }
             else
@@ -102,8 +102,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     if (map.StorageName == storageName)
                     {
                         m_tmpAsteroids.Remove(map);
-                        map.Close();
                         map.IsSeedOpen = false;
+                        map.Close();
                         break;
                     }
                 }

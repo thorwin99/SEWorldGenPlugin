@@ -78,6 +78,7 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             base.LoadData();
+
             Static = this;
             m_entityTrackers = new List<IMyEntityTracker>();
             m_trackedEntities = new List<MyEntity>();
@@ -91,7 +92,7 @@ namespace SEWorldGenPlugin.Session
         /// <param name="entity">Entity to register</param>
         public void TrackEntity(MyEntity entity)
         {
-            if(m_trackedEntities != null && m_newTrackedEntities != null && !m_trackedEntities.Contains(entity))
+            if (m_trackedEntities != null && m_newTrackedEntities != null && !m_trackedEntities.Contains(entity))
             {
                 m_newTrackedEntities.Add(entity);
                 entity.OnMarkForClose += (e) =>

@@ -16,13 +16,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Minimum value
         /// </summary>
         [ProtoMember(1)]
-        public int Min;
+        public long Min;
 
         /// <summary>
         /// Maximum value
         /// </summary>
         [ProtoMember(2)]
-        public int Max;
+        public long Max;
 
         /// <summary>
         /// Parameterless constructor used for serialization
@@ -37,7 +37,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Initializes a new instance, where min and max are equal
         /// </summary>
         /// <param name="value">Value of both min and max</param>
-        public MySerializableMinMax(int value)
+        public MySerializableMinMax(long value)
         {
             Min = value;
             Max = value;
@@ -48,7 +48,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         /// <param name="v1">Value 1</param>
         /// <param name="v2">Value 2</param>
-        public MySerializableMinMax(int v1, int v2)
+        public MySerializableMinMax(long v1, long v2)
         {
             Min = Math.Min(v1, v2);
             Max = Math.Max(v1, v2);
@@ -59,7 +59,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// maximum one, it will instead be a new maximum.
         /// </summary>
         /// <param name="value">Value to set the minimum to</param>
-        public void SetMinimum(int value)
+        public void SetMinimum(long value)
         {
             Min = Math.Min(value, Max);
             Max = Math.Max(value, Max);
@@ -69,7 +69,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Returns the average of min and max
         /// </summary>
         /// <returns>The median</returns>
-        public int GetAverage()
+        public long GetAverage()
         {
             return (Min + Max) / 2;
         }
@@ -79,7 +79,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// minimum one, it will instead be a new minimum and the old minimum the maximum.
         /// </summary>
         /// <param name="value">Value to set the maximum to</param>
-        public void SetMaximum(int value)
+        public void SetMaximum(long value)
         {
             Min = Math.Min(Min, value);
             Max = Math.Max(Min, value);
@@ -94,7 +94,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             if (Min > Max)
             {
-                int t = Max;
+                long t = Max;
                 Max = Min;
                 Min = t;
             }

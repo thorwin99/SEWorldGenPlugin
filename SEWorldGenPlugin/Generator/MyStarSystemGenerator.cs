@@ -214,9 +214,9 @@ namespace SEWorldGenPlugin.Generator
 
             using (MyRandom.Instance.PushSeed(seed))
             {
-                int planetCount = MyRandom.Instance.Next(planetsAmount.Min, planetsAmount.Max + 1);
-                int asteroidObjectCount = MyRandom.Instance.Next(asteroidObjectAmount.Min, asteroidObjectAmount.Max + 1);
-                int systemSize = planetCount + asteroidObjectCount;
+                long planetCount = MyRandom.Instance.Next(planetsAmount.Min, planetsAmount.Max + 1);
+                long asteroidObjectCount = MyRandom.Instance.Next(asteroidObjectAmount.Min, asteroidObjectAmount.Max + 1);
+                long systemSize = planetCount + asteroidObjectCount;
                 int currentPlanetIndex = 0;
                 int currentAsteroidIndex = 0;
                 long currentOrbitDistance = 0;
@@ -229,14 +229,14 @@ namespace SEWorldGenPlugin.Generator
                     MySystemPlanet sun = new MySystemPlanet();
                     sun.CenterPosition = Vector3D.Zero;
                     sun.SubtypeId = sunDef.Id.SubtypeId.String;
-                    sun.DisplayName = sunDef.DisplayNameText;
+                    sun.DisplayName = sunDef.Id.SubtypeId.String;
                     sun.Diameter = CalculatePlanetDiameter(sunDef) * 2;
                     sun.ChildObjects = new HashSet<MySystemObject>();
                     sun.Generated = false;
                     sun.Type = MySystemObjectType.PLANET;
 
                     system.CenterObject = sun;
-                    currentOrbitDistance += (long)sun.Diameter;
+                    currentOrbitDistance += (long)sun.Diameter * 2 + (long)sunDef.AtmosphereHeight;
                 }
                 else
                 {
@@ -350,19 +350,22 @@ namespace SEWorldGenPlugin.Generator
             MyPluginLog.Debug("Generating moons for planet " + parentPlanet.DisplayName);
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
-            int maxMoons = (int)Math.Ceiling(parentPlanet.Diameter / 120000 * 2);
-            int numMoons = MyRandom.Instance.Next(1, maxMoons + 1);
+            uint maxMoons = (uint)Math.Ceiling(parentPlanet.Diameter / 120000 * 2);
+            uint numMoons = (uint)MyRandom.Instance.Next(1, (int) maxMoons + 1);
+            numMoons = Math.Min(numMoons, 25);
 
             if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE)
             {
-                numMoons = Math.Min(numMoons, m_moons.Count);
+                numMoons = Math.Min(numMoons, (uint)m_moons.Count);
             }
 
             MySystemPlanetMoon[] moons = new MySystemPlanetMoon[numMoons];
 
             for(int i = 0; i < numMoons; i++)
             {
-                double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(0.5f, 1.5f);
+                MyPluginLog.Debug("Generating moon " + i);
+
+                double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(1f, 1.5f);
                 var definition = FindMoonDefinitinon(parentPlanet.Diameter);
                 if (definition == null) return moons;
 
@@ -378,7 +381,7 @@ namespace SEWorldGenPlugin.Generator
                     position = new Vector3D(distance * Math.Sin(angle), distance * Math.Cos(angle), distance * Math.Sin(MyRandom.Instance.GetRandomFloat((float)-Math.PI / 2, (float)Math.PI / 2)));
                     position = Vector3D.Add(position, parentPlanet.CenterPosition);
 
-                } while (IsMoonPositionObstructed(position, diameter, parentPlanet, moons) && tries2 < MAX_DEF_FIND_ROUNDS);
+                } while (IsMoonPositionObstructed(position, diameter, parentPlanet, moons) && ++tries2 < MAX_DEF_FIND_ROUNDS);
 
                 MySystemPlanetMoon moon = new MySystemPlanetMoon();
                 moon.CenterPosition = position;

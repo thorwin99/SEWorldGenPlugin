@@ -70,7 +70,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                 MyAsteroidRingData ring = new MyAsteroidRingData();
                 ring.AngleDegrees = new Vector3D(MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20), MyRandom.Instance.Next(-20, 20));
-                ring.Width = MyRandom.Instance.Next((int)planet.Diameter / 10, (int)planet.Diameter / 5);
+                ring.Width = MyRandom.Instance.NextDouble() * (planet.Diameter / 10 - planet.Diameter / 5) + planet.Diameter / 5;
                 ring.Height = MyRandom.Instance.NextDouble() * (ring.Width / 10 - ring.Width / 20) + ring.Width / 20;
                 ring.Radius = MyRandom.Instance.NextDouble() * (planet.Diameter * 2 - planet.Diameter * 0.75) + planet.Diameter * 0.75;
                 ring.CenterPosition = asteroidObject.CenterPosition;
@@ -136,6 +136,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             foreach(var ringId in m_loadedRings.Keys)
             {
+                if (MyStarSystemGenerator.Static.StarSystem == null) return;
+
                 var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(ringId);
                 if (instance == null) continue;
                 MyFileUtils.WriteXmlFileToWorld(m_loadedRings[ringId], GetFileName(instance.DisplayName), typeof(MyAsteroidRingProvider));
