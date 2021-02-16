@@ -172,7 +172,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                 {
                     if (!success)
                     {
-                        MyPluginGuiHelper.DisplayError("Sphere could not be added. An object with that name already exists.", "Error");
+                        MyPluginGuiHelper.DisplayError("Sphere could not be added, because an object with the same id already exists. This error should not occour, so please try again.", "Error");
                     }
                     else
                     {
@@ -212,7 +212,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             instance.AsteroidTypeName = MyAsteroidSphereProvider.TYPE_NAME;
             instance.CenterPosition = parentItem.CenterPosition;
             instance.AsteroidSize = new MySerializableMinMax((int)m_asteroidSizesSlider.CurrentMin, (int)m_asteroidSizesSlider.CurrentMax);
-            instance.ParentName = parentItem.DisplayName;
+            instance.ParentId = parentItem.Id;
             instance.DisplayName = name.ToString();
 
             data = GetDataFromGui();

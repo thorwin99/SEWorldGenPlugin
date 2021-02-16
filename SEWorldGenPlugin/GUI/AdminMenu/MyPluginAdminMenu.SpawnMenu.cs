@@ -292,7 +292,7 @@ namespace SEWorldGenPlugin.GUI
                 {
                     if (!success)
                     {
-                        MyPluginGuiHelper.DisplayError("Planet could not be spawned, because an object with the name already exists", "Error");
+                        MyPluginGuiHelper.DisplayError("Planet could not be spawned, because an object with the same id already exists. This error should not occour, so please try again.", "Error");
                     }
                 });
             }

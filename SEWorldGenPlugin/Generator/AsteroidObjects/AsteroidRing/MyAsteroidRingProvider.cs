@@ -64,7 +64,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 MySystemAsteroids asteroidObject = new MySystemAsteroids();
                 asteroidObject.AsteroidTypeName = GetTypeName();
                 asteroidObject.DisplayName = GetRingName(parent.DisplayName);
-                asteroidObject.ParentName = parent.DisplayName;
+                asteroidObject.ParentId = parent.Id;
                 asteroidObject.CenterPosition = parent.CenterPosition;
                 asteroidObject.AsteroidSize = new MySerializableMinMax(64, 1024);
 
@@ -157,7 +157,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             {
                 successCallback?.Invoke(false);
             }
-            MyStarSystemGenerator.Static.AddObjectToSystem(systemInstance, systemInstance.ParentName, delegate (bool success)
+            MyStarSystemGenerator.Static.AddObjectToSystem(systemInstance, systemInstance.ParentId, delegate (bool success)
             {
                 if (success)
                 {

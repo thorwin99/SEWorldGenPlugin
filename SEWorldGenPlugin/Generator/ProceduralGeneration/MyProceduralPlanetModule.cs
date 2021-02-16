@@ -66,6 +66,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     generatedPlanet.AsteroidName = planet.DisplayName;
 
                     planet.Generated = true;
+                    planet.EntityId = generatedPlanet.EntityId;
                 }
             }
         }

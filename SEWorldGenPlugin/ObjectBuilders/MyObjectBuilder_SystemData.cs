@@ -2,7 +2,6 @@
 using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Xml.Serialization;
 using VRage;
 using VRage.Serialization;
@@ -52,29 +51,29 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
-        /// Finds a system object by name
+        /// Searches the system for an object with the given
+        /// id and returns it if found, else null
         /// </summary>
-        /// <param name="name">Name of the object</param>
-        /// <returns>The object or null if not present</returns>
-        public MySystemObject FindObjectByName(string name)
+        /// <param name="id">Id of the object</param>
+        /// <returns>The object or null if not found</returns>
+        public MySystemObject GetObjectById(Guid id)
         {
-            if (name == null) return null;
+            if (id == Guid.Empty) return null;
             foreach(var child in GetAllObjects())
             {
-                if (child.DisplayName.ToLower() == name.ToLower()) return child;
+                if (child.Id == id) return child;
             }
-
             return null;
         }
 
         /// <summary>
-        /// Checks if an object with given name exists
+        /// Checks if an object with given id exists
         /// </summary>
-        /// <param name="name">Name of object</param>
+        /// <param name="id">Id of the object</param>
         /// <returns>true if it exists</returns>
-        public bool ObjectExists(string name)
+        public bool ObjectExists(Guid id)
         {
-            return FindObjectByName(name) != null;
+            return GetObjectById(id) != null;
         }
     }
 
@@ -102,22 +101,28 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public string DisplayName;
 
         /// <summary>
-        /// The position of the objects center
+        /// Id of the system object for unique identification.
+        /// Is generated automatically on creation of the object
         /// </summary>
         [ProtoMember(3)]
+        public Guid Id;
+
+        /// <summary>
+        /// The position of the objects center
+        /// </summary>
+        [ProtoMember(4)]
         public SerializableVector3D CenterPosition;
 
         /// <summary>
         /// The name of this objects parent
         /// </summary>
-        [ProtoMember(4)]
-        [Serialize(MyObjectFlags.Nullable)]
-        public string ParentName;
+        [ProtoMember(5)]
+        public Guid ParentId;
 
         /// <summary>
         /// All Child objects, such as moons.
         /// </summary>
-        [ProtoMember(5)]
+        [ProtoMember(6)]
         [Serialize(MyObjectFlags.Nullable)]
         public HashSet<MySystemObject> ChildObjects;
 
@@ -130,6 +135,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             DisplayName = "";
             CenterPosition = Vector3D.Zero;
             ChildObjects = new HashSet<MySystemObject>();
+            Id = Guid.NewGuid();
+            ParentId = Guid.Empty;
         }
 
         /// <summary>
@@ -200,6 +207,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(6)]
         public bool Generated;
 
+        /// <summary>
+        /// Entity id of the generated planet
+        /// </summary>
+        [ProtoMember(7)]
+        public long EntityId;
+
         public MySystemPlanet()
         {
             Type = MySystemObjectType.PLANET;
@@ -208,6 +221,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             SubtypeId = "";
             Diameter = 0;
             Generated = false;
+            EntityId = 0;
         }
 
         /// <summary>

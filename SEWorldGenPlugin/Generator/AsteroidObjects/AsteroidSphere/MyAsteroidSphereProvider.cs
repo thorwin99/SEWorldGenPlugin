@@ -123,7 +123,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             {
                 callback?.Invoke(false);
             }
-            MyStarSystemGenerator.Static.AddObjectToSystem(instance, instance.ParentName, delegate (bool success)
+            MyStarSystemGenerator.Static.AddObjectToSystem(instance, instance.ParentId, delegate (bool success)
             {
                 if (success)
                 {

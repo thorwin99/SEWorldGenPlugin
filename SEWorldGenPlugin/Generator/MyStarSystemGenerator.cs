@@ -285,7 +285,7 @@ namespace SEWorldGenPlugin.Generator
                     }
                     if (obj == null) continue;
 
-                    obj.ParentName = system.CenterObject.DisplayName;
+                    obj.ParentId = system.CenterObject.Id;
                     system.CenterObject.ChildObjects.Add(obj);
                 }
             }
@@ -385,7 +385,7 @@ namespace SEWorldGenPlugin.Generator
                 moon.Diameter = diameter;
                 moon.DisplayName = GetMoonName(i, definition.Id.SubtypeId.String, parentPlanet.DisplayName);
                 moon.SubtypeId = definition.Id.SubtypeId.String;
-                moon.ParentName = parentPlanet.DisplayName;
+                moon.ParentId = parentPlanet.Id;
 
                 moons[i] = moon;
             }
@@ -617,13 +617,25 @@ namespace SEWorldGenPlugin.Generator
             foreach (var p in planets)
             {
                 var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
-                if (!StarSystem.ObjectExists(GetPlanetNameForPlanetStorageName(e.StorageName)))
+                bool exists = false;
+
+                foreach(var obj in StarSystem.GetAllObjects())
+                {
+                    if(obj is MySystemPlanet)
+                    {
+                        if((obj as MySystemPlanet).EntityId == p.EntityId){
+                            exists = true;
+                        }
+                    }
+                }
+                if (!exists)
                 {
                     MySystemPlanet vanillaPlanet = new MySystemPlanet();
                     vanillaPlanet.CenterPosition = e.PositionComp.GetPosition();
                     vanillaPlanet.Diameter = e.MaximumRadius * 2;
                     vanillaPlanet.DisplayName = GetPlanetNameForPlanetStorageName(e.StorageName);
                     vanillaPlanet.Generated = true;
+                    vanillaPlanet.EntityId = p.EntityId;
 
                     StarSystem.CenterObject.ChildObjects.Add(vanillaPlanet);
                 }

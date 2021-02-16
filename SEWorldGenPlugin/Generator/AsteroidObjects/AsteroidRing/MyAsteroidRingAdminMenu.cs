@@ -257,7 +257,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 {
                     if (!success)
                     {
-                        MyPluginGuiHelper.DisplayError("Ring could not be added. An object with that name already exists.", "Error");
+                        MyPluginGuiHelper.DisplayError("Ring could not be added, because an object with the same id already exists. This error should not occour, so please try again.", "Error");
                     }
                     else
                     {
@@ -302,7 +302,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             MyPluginLog.Debug("Removing ring " + m_currentSelectedAsteroid.DisplayName);
 
-            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.DisplayName, delegate (bool success)
+            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.Id, delegate (bool success)
             {
                 if (success)
                 {
@@ -368,7 +368,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             systemObject.CenterPosition = parentItem.CenterPosition;
             systemObject.AsteroidSize = new MySerializableMinMax((int)m_asteroidSizesSlider.CurrentMin, (int)m_asteroidSizesSlider.CurrentMax);
             systemObject.DisplayName = name.ToString();
-            systemObject.ParentName = parentItem.DisplayName;
+            systemObject.ParentId = parentItem.Id;
 
             ringData = GenerateAsteroidRing();
         }
