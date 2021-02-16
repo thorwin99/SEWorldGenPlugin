@@ -335,6 +335,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 IMyAsteroidObjectShape shape = prov.GetAsteroidObjectShape(asteroids);
 
+                if (shape == null) return null;
+
                 if (shape.Contains(position) == ContainmentType.Contains) return obj as MySystemAsteroids;
             }
 
