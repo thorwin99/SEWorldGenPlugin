@@ -99,6 +99,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
         {
             m_parentScreen = adminScreen;
+
             m_currentSelectedAsteroid = asteroidObject;
 
             MyGuiControlButton teleportToRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Teleport to ring", OnTeleportToRing);
@@ -111,7 +112,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableSeparator();
 
-            var data  =MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject);
+            var data = MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject);
             var ring = data as MyAsteroidRingData;
 
             m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)ring.Radius * 1.5f);

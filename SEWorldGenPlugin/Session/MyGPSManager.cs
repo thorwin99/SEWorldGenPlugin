@@ -95,7 +95,7 @@ namespace SEWorldGenPlugin.Session
         /// <returns>False, if the gps is already added, else true</returns>
         public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId)
         {
-            MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
+            MyGpsId id = new MyGpsId(name, color, pos);
             Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key)) return false;
@@ -127,7 +127,7 @@ namespace SEWorldGenPlugin.Session
         /// <returns></returns>
         public bool ModifyDynamicGps(string name, Color color, Vector3D pos, long playerId)
         {
-            MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
+            MyGpsId id = new MyGpsId(name, color, pos);
             Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))

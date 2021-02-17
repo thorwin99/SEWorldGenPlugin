@@ -95,6 +95,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
             MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidSphereProvider));
 
+            PluginEventHandler.Static.RaiseStaticEvent(NotifyRemoveInstance, systemInstance.Id);
+
             MyPluginLog.Debug("Successfully removed instance");
 
             return true;
@@ -227,6 +229,23 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             if (Static.m_loadedSpheres.ContainsKey(id)) return;
 
             Static.m_loadedSpheres.Add(id, data);
+        }
+
+        /// <summary>
+        /// Broadcasts: Notifies clients, that instance was removed
+        /// </summary>
+        /// <param name="id">Id of the instance</param>
+        [Event(3005)]
+        [Broadcast]
+        private static void NotifyRemoveInstance(Guid id)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Got notified about the removal of an Asteroid sphere instance");
+
+            if (!Static.m_loadedSpheres.ContainsKey(id)) return;
+
+            Static.m_loadedSpheres.Remove(id);
         }
     }
 

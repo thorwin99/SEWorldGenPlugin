@@ -199,6 +199,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidRingProvider));
 
+            PluginEventHandler.Static.RaiseStaticEvent(NotifyRemoveInstance, systemInstance.Id);
+
             MyPluginLog.Debug("Successfully removed instance");
 
             return true;
@@ -272,6 +274,23 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             if (Static.m_loadedRings.ContainsKey(id)) return;
 
             Static.m_loadedRings.Add(id, data);
+        }
+
+        /// <summary>
+        /// Broadcasts: Notifies clients, that instance was removed
+        /// </summary>
+        /// <param name="id">Id of the instance</param>
+        [Event(100005)]
+        [Broadcast]
+        private static void NotifyRemoveInstance(Guid id)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Got notified about the removal of an Asteroid ring instance " + id);
+
+            if (!Static.m_loadedRings.ContainsKey(id)) return;
+
+            Static.m_loadedRings.Remove(id);
         }
 
         /// <summary>

@@ -109,12 +109,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 objectModule.GenerateObjects();
             }
 
-            MyPluginLog.Debug("Checking trackers");
-
             foreach(var tracker in m_trackedEntities)
             {
-                MyPluginLog.Debug("Tracker: " + tracker.Key.Name);
-
                 foreach (var module in m_cellModules)
                 {
                     var oldBounds = tracker.Value.BoundingVolume;
@@ -124,6 +120,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if(tracker.Key is MyCharacter)
                         module.UpdateGpsForPlayer(tracker.Value);
+                }
+
+                foreach(var module in m_objectModules)
+                {
+                    module.UpdateGpsForPlayer(tracker.Value);
                 }
             }
 

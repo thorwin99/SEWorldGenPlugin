@@ -1,9 +1,6 @@
-﻿using Sandbox.Game.Multiplayer;
-using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
+﻿using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.ObjectBuilders;
-using System;
-using System.IO;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects
 {

@@ -207,7 +207,7 @@ namespace SEWorldGenPlugin.Generator
             MySystemObject o = Static.StarSystem.GetObjectById(objectId);
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
-                MySystemObject parent = Static.StarSystem.GetObjectById(o.Id);
+                MySystemObject parent = Static.StarSystem.GetObjectById(o.ParentId);
                 if (parent != null)
                 {
                     if(o.Type == MySystemObjectType.ASTEROIDS)
