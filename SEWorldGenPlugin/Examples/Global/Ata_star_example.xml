@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-16"?>
+<MyObjectBuilder_GlobalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MoonDefinitions>
+    <string>Moon</string>
+    <string>Titan</string>
+    <string>Europa</string>
+    <string>Triton</string>
+  </MoonDefinitions>
+  <GasGiantDefinitions />
+  <SunDefinitions>
+    <string>S 147Kº X SaguitariusA - Black</string>
+    <string>S 022Kº B Bellatrix - Cyan</string>
+    <string>S 029Kº O Alnitak - Blue</string>
+    <string>S 010Kº A Vega - White</string>
+    <string>S 057Kº W Velorum - Magenta</string>
+    <string>S 003Kº K Lacaille - Orange</string>
+    <string>S 002Kº M DXCancri - Red</string>
+    <string>S 005Kº G TauCeti - Yellow</string>
+    <string>S 007Kº F Draconis - Green</string>
+  </SunDefinitions>
+  <BlacklistedPlanetDefinitions>
+    <string>EarthLikeTutorial</string>
+    <string>MarsTutorial</string>
+    <string>MoonTutorial</string>
+    <string>SystemTestMap</string>
+    <string>EarthLikeModExample</string>
+    <string>S Test</string>
+  </BlacklistedPlanetDefinitions>
+  <MandatoryPlanetDefinitions />
+  <PlanetNameFormat>Planet [ObjectNumber]</PlanetNameFormat>
+  <MoonNameFormat>Moon [ObjectNumber]</MoonNameFormat>
+  <BeltNameFormat>Belt [ObjectNumberGreek]</BeltNameFormat>
+</MyObjectBuilder_GlobalSettings>

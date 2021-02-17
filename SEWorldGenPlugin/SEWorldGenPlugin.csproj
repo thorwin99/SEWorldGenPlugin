@@ -238,12 +238,15 @@
     <None Include="app.config" />
     <Compile Include="Generator\MyStarSystemGenerator.Networking.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.SpawnMenu.cs" />
+    <None Include="Examples\Readme.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Examples\Global\Ata_star_example.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
