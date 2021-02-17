@@ -80,29 +80,26 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
             if (settings.PlanetGPSMode != MyGPSGenerationMode.DISCOVERY && settings.MoonGPSMode != MyGPSGenerationMode.DISCOVERY) return;
 
-            if(systemObjects.Count > 0)
+            foreach(var obj in systemObjects)
             {
-                foreach(var obj in systemObjects)
+                if((obj.Type == MySystemObjectType.MOON && settings.MoonGPSMode == MyGPSGenerationMode.DISCOVERY) || (obj.Type == MySystemObjectType.PLANET && settings.PlanetGPSMode == MyGPSGenerationMode.DISCOVERY))
                 {
-                    if(obj.Type == MySystemObjectType.MOON || obj.Type == MySystemObjectType.PLANET)
+                    var distance = Vector3D.Distance(tracker.CurrentPosition, obj.CenterPosition);
+
+                    if(distance <= 50000000)
                     {
-                        var distance = Vector3D.Distance(tracker.CurrentPosition, obj.CenterPosition);
-
-                        if(distance <= 50000000)
+                        if (MyGPSManager.Static.DynamicGpsExists(obj.Id, entity.GetPlayerIdentityId()))
                         {
-                            if (MyGPSManager.Static.DynamicGpsExists(obj.DisplayName, GPS_COLOR, entity.GetPlayerIdentityId()))
-                            {
-                                MyGPSManager.Static.ModifyDynamicGps(obj.DisplayName, GPS_COLOR, obj.CenterPosition, entity.GetPlayerIdentityId());
-                            }
-                            else
-                            {
-                                MyGPSManager.Static.AddDynamicGps(obj.DisplayName, GPS_COLOR, obj.CenterPosition, entity.GetPlayerIdentityId());
-                            }
-                            return;
+                            MyGPSManager.Static.ModifyDynamicGps(obj.DisplayName, GPS_COLOR, obj.CenterPosition, entity.GetPlayerIdentityId(), obj.Id);
                         }
-
-                        MyGPSManager.Static.RemoveDynamicGps(obj.DisplayName, GPS_COLOR, entity.GetPlayerIdentityId());
+                        else
+                        {
+                            MyGPSManager.Static.AddDynamicGps(obj.DisplayName, GPS_COLOR, obj.CenterPosition, entity.GetPlayerIdentityId(), obj.Id);
+                        }
+                        continue;
                     }
+
+                    MyGPSManager.Static.RemoveDynamicGps(entity.GetPlayerIdentityId(), obj.Id);
                 }
             }
         }

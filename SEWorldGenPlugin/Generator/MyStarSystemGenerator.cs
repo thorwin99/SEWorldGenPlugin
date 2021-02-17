@@ -171,13 +171,13 @@ namespace SEWorldGenPlugin.Generator
                     case MySystemObjectType.MOON:
                         if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT)
                         {
-                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition);
+                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition, item.Id);
                         }
                         break;
                     case MySystemObjectType.PLANET:
                         if (settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT)
                         {
-                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition);
+                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition, item.Id);
                         }
                         break;
                     case MySystemObjectType.ASTEROIDS:
@@ -187,7 +187,7 @@ namespace SEWorldGenPlugin.Generator
                             MyAbstractAsteroidObjectProvider provider = null;
                             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out provider))
                             {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, provider.GetAsteroidObjectShape(asteroid).GetPointInShape());
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, provider.GetAsteroidObjectShape(asteroid).GetPointInShape(), item.Id);
                             }
                         }
                         break;

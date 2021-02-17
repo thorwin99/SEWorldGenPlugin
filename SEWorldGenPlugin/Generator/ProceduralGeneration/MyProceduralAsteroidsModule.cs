@@ -209,27 +209,27 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 if(shape.Contains(entityPosition) != ContainmentType.Disjoint)
                 {
-                    MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
+                    MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
                 }
 
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
                 double distance = Vector3D.Subtract(entityPosition, closestPos).Length();
                 if (distance > 5000000)
                 {
-                    MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
+                    MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
                 }
                 else if(distance > 5)
                 {
-                    if(MyGPSManager.Static.DynamicGpsExists(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId()))
+                    if(MyGPSManager.Static.DynamicGpsExists(asteroid.Id, player.GetPlayerIdentityId()))
                     {
-                        MyGPSManager.Static.ModifyDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
+                        MyGPSManager.Static.ModifyDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId(), asteroid.Id);
                         continue;
                     }
-                    MyGPSManager.Static.AddDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId());
+                    MyGPSManager.Static.AddDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId(), asteroid.Id);
                 }
                 else
                 {
-                    MyGPSManager.Static.RemoveDynamicGps(asteroid.DisplayName, Color.Yellow, player.GetPlayerIdentityId());
+                    MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
                 }
             }
         }
@@ -263,8 +263,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     if (!MyEntities.IsInsideWorld(position) || (settings.WorldSize >= 0 && position.Length() > settings.WorldSize)) continue;
 
                     var ring = GetAsteroidObjectAt(position);
-
-                    MyPluginLog.Debug("Asteroid object is there " + ring);
 
                     if (ring == null) continue;
 

@@ -18,7 +18,7 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Struct that identifies a gps
         /// </summary>
-        struct MyGpsId
+        struct MyGpsData
         {
             public string Name;
 
@@ -26,13 +26,29 @@ namespace SEWorldGenPlugin.Session
 
             public Vector3D Position;
 
-            public MyGpsId(string name, Vector3 color, Vector3D position)
+            public Guid Id;
+
+            public HashSet<long> Players;
+
+            public MyGpsData(string name, Vector3 color, Vector3D position, Guid id)
             {
                 Name = name;
                 Color = color;
                 Position = position;
+                Id = id;
+                Players = new HashSet<long>();
+            }
+
+            public MyGpsData(string name, Vector3 color, Vector3D position, Guid id, HashSet<long> players)
+            {
+                Name = name;
+                Color = color;
+                Position = position;
+                Id = id;
+                Players = players;
             }
         }
+
 
         /// <summary>
         /// File name for the save file containing the gps data
@@ -45,15 +61,15 @@ namespace SEWorldGenPlugin.Session
         public static MyGPSManager Static;
 
         /// <summary>
-        /// A map of all global gpss and the players that gps is known to
+        /// A map of all global gps ids and data
         /// </summary>
-        private Dictionary<MyGpsId, HashSet<long>> m_globalGpss;
+        private Dictionary<Guid, MyGpsData> m_globalGpss;
 
         /// <summary>
         /// A map of all dynamic gpss and their corresponding player ids to the hash of the gps,
         /// to allow modification of it.
         /// </summary>
-        private Dictionary<Tuple<MyGpsId, long>, int> m_dynamicGpss;
+        private Dictionary<Tuple<Guid, long>, int> m_dynamicGpss;
 
         /// <summary>
         /// Adds a new gps persistent gps to all players
@@ -61,27 +77,32 @@ namespace SEWorldGenPlugin.Session
         /// <param name="name">Name of the gps</param>
         /// <param name="color">Color of the gps</param>
         /// <param name="pos">Position of the gps</param>
-        public void AddPersistentGps(string name, Color color, Vector3D pos)
+        /// <param name="id">The id of the gps</param>
+        public void AddPersistentGps(string name, Color color, Vector3D pos, Guid id)
         {
-            MyGpsId id = new MyGpsId(name, color, pos);
+            MyGpsData data = new MyGpsData()
+            {
+                Name = name,
+                Color = color,
+                Position = pos,
+                Id = id,
+                Players = new HashSet<long>()
+            };
 
             if (!m_globalGpss.ContainsKey(id))
             {
                 MyPluginLog.Debug("Adding new persistent gps " + name);
-                m_globalGpss[id] = new HashSet<long>();
+                m_globalGpss[id] = data;
             }
         }
 
         /// <summary>
         /// Checks if a given persistent gps already exists
         /// </summary>
-        /// <param name="name">Name of the gps</param>
-        /// <param name="color">Color of the gps</param>
-        /// <param name="pos">Position of the gps</param>
+        /// <param name="id">The id of the gps</param>
         /// <returns>True if the persistent gps exists</returns>
-        public bool PersistenGpsExists(string name, Color color, Vector3D pos)
+        public bool PersistenGpsExists(Guid id)
         {
-            MyGpsId id = new MyGpsId(name, color, pos);
             return m_globalGpss.ContainsKey(id);
         }
 
@@ -91,12 +112,12 @@ namespace SEWorldGenPlugin.Session
         /// <param name="name">Name of the gps</param>
         /// <param name="color">Color of the gps</param>
         /// <param name="pos">Position of the gps</param>
-        /// <param name="player">Player, the gps belongs to</param>
+        /// <param name="playerId">Player, the gps belongs to</param>
+        /// <param name="id">The id of the gps</param>
         /// <returns>False, if the gps is already added, else true</returns>
-        public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId)
+        public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId, Guid id)
         {
-            MyGpsId id = new MyGpsId(name, color, pos);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
+            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key)) return false;
             MyGps gps = new MyGps
@@ -123,12 +144,12 @@ namespace SEWorldGenPlugin.Session
         /// <param name="name">Name of the existing gps</param>
         /// <param name="color">Color of the gps, needs to be the same as the old one</param>
         /// <param name="pos">New Position of the gps</param>
-        /// <param name="player"></param>
+        /// <param name="playerId"></param>
+        /// <param name="id">The id of the gps</param>
         /// <returns></returns>
-        public bool ModifyDynamicGps(string name, Color color, Vector3D pos, long playerId)
+        public bool ModifyDynamicGps(string name, Color color, Vector3D pos, long playerId, Guid id)
         {
-            MyGpsId id = new MyGpsId(name, color, pos);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
+            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
@@ -138,6 +159,8 @@ namespace SEWorldGenPlugin.Session
                 if (gps == null) return false;
 
                 gps.Coords = pos;
+                gps.Name = name;
+                gps.GPSColor = color;
 
                 MySession.Static.Gpss.SendModifyGps(playerId, gps);
 
@@ -153,14 +176,12 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Tries to remove a dynamic gps marker from the player
         /// </summary>
-        /// <param name="name">Name of the gps</param>
-        /// <param name="color">Color of the gps</param>
-        /// <param name="player">Player, the gps belongs to</param>
+        /// <param name="id">The gps id</param>
+        /// <param name="playerId">The player id of the player this gps belongs to</param>
         /// <returns></returns>
-        public bool RemoveDynamicGps(string name, Color color, long playerId)
+        public bool RemoveDynamicGps(long playerId, Guid id)
         {
-            MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
+            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
@@ -174,14 +195,12 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Checks, whether or not the gps already exists.
         /// </summary>
-        /// <param name="name">Name of the gps</param>
-        /// <param name="color">Color of the gps</param>
-        /// <param name="player">Player, the gps belongs to</param>
+        /// <param name="id">The gps id</param>
+        /// <param name="playerId">The player id of the player this gps belongs to</param>
         /// <returns></returns>
-        public bool DynamicGpsExists(string name, Color color, long playerId)
+        public bool DynamicGpsExists(Guid id, long playerId)
         {
-            MyGpsId id = new MyGpsId(name, color, Vector3D.Zero);
-            Tuple<MyGpsId, long> key = new Tuple<MyGpsId, long>(id, playerId);
+            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             return m_dynamicGpss.ContainsKey(key);
         }
@@ -198,19 +217,19 @@ namespace SEWorldGenPlugin.Session
                 {
                     foreach (var p in MySession.Static.Players.GetOnlinePlayers())
                     {
-                        if (m_globalGpss[entry].Contains(p.Identity.IdentityId)) continue;
+                        if (m_globalGpss[entry].Players.Contains(p.Identity.IdentityId)) continue;
 
                         MyGps gps = new MyGps
                         {
-                            Name = entry.Name,
-                            Coords = entry.Position,
-                            GPSColor = entry.Color,
+                            Name = m_globalGpss[entry].Name,
+                            Coords = m_globalGpss[entry].Position,
+                            GPSColor = m_globalGpss[entry].Color,
                             ShowOnHud = true,
                             AlwaysVisible = false,
                             DiscardAt = null
                         };
                         MySession.Static.Gpss.SendAddGps(p.Identity.IdentityId, ref gps, playSoundOnCreation: false);
-                        m_globalGpss[entry].Add(p.Identity.IdentityId);
+                        m_globalGpss[entry].Players.Add(p.Identity.IdentityId);
                     }
                 }
             }
@@ -234,13 +253,13 @@ namespace SEWorldGenPlugin.Session
                 ob = new MyObjectBuilder_WorldGpsData();
             }
 
-            m_globalGpss = new Dictionary<MyGpsId, HashSet<long>>();
-            m_dynamicGpss = new Dictionary<Tuple<MyGpsId, long>, int>();
+            m_globalGpss = new Dictionary<Guid, MyGpsData>();
+            m_dynamicGpss = new Dictionary<Tuple<Guid, long>, int>();
 
             foreach(var item in ob.PersistentGpss)
             {
-                var id = new MyGpsId(item.Name, item.Color, item.Position);
-                m_globalGpss[id] = item.PlayerIds;
+                var data = new MyGpsData(item.Name, item.Color, item.Position, item.Id, item.PlayerIds);
+                m_globalGpss[item.Id] = data;
             }
 
             MyPluginLog.Log("Loading GPS manager data completed");
@@ -256,13 +275,14 @@ namespace SEWorldGenPlugin.Session
             MyPluginLog.Log("Saving GPS manager data");
 
             MyObjectBuilder_WorldGpsData ob = new MyObjectBuilder_WorldGpsData();
-            foreach(var entry in m_globalGpss.Keys)
+            foreach(var entry in m_globalGpss)
             {
                 PersistentGpsData item = new PersistentGpsData();
-                item.Name = entry.Name;
-                item.Color = entry.Color;
-                item.Position = entry.Position;
-                item.PlayerIds = m_globalGpss[entry];
+                item.Name = entry.Value.Name;
+                item.Color = entry.Value.Color;
+                item.Position = entry.Value.Position;
+                item.PlayerIds = entry.Value.Players;
+                item.Id = entry.Key;
 
                 ob.PersistentGpss.Add(item);
             }

@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using VRage;
 using VRageMath;
@@ -37,9 +38,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public SerializableVector3D Position = Vector3D.Zero;
 
         /// <summary>
-        /// A set of all players, that already know of this gps.
+        /// The Id of the gps object
         /// </summary>
         [ProtoMember(4)]
+        public Guid Id = Guid.Empty;
+
+        /// <summary>
+        /// A set of all players, that already know of this gps.
+        /// </summary>
+        [ProtoMember(5)]
         public HashSet<long> PlayerIds = new HashSet<long>();
     }
 }
