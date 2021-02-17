@@ -77,9 +77,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                             if (m_tmpAsteroids[i].StorageName.Equals(voxelMap.StorageName))
                             {
                                 m_tmpAsteroids.RemoveAt(i);
+                                voxelMap.Save = false;
                                 break;
                             }
                         }
+                    }
+                    else
+                    {
+                        voxelMap.Save = false;
                     }
 
                     voxelMap.IsSeedOpen = false;
@@ -101,6 +106,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 {
                     if (map.StorageName == storageName)
                     {
+                        if (m_tmpAsteroids.Contains(map))
+                            map.Save = false;
+
                         m_tmpAsteroids.Remove(map);
                         map.IsSeedOpen = false;
                         map.Close();

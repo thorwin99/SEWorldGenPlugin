@@ -270,6 +270,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                     else
                     {
                         MyPluginGuiHelper.DisplayMessage("Ring was created successfully.", "Success");
+                        m_parentScreen.ForceFetchStarSystem = true;
+                        m_parentScreen.ShouldRecreate = true;
                     }
                 });
             });
