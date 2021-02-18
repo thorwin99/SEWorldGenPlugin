@@ -330,7 +330,7 @@ namespace SEWorldGenPlugin.Generator
                 SubtypeId = def.Id.SubtypeId.String,
             };
 
-            if(MyRandom.Instance.NextFloat() > settings.BaseRingProbability * def.SurfaceGravity)
+            if(MyRandom.Instance.NextFloat() < settings.BaseRingProbability * def.SurfaceGravity)
             {
                 planet.ChildObjects.Add(GenrateRing(planet));
             }

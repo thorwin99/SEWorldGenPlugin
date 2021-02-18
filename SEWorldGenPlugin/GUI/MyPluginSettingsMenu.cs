@@ -273,6 +273,9 @@ namespace SEWorldGenPlugin.GUI
 
             m_planetSizeCapSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
             m_planetSizeMultSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier;
+            m_planetMoonBasePropSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.BaseMoonProbability;
+            m_planetRingBasePropSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.BaseRingProbability;
+            m_planetMoonMinMaxSlider.SetValues(worldSettings.GeneratorSettings.PlanetSettings.MinMaxMoons.Min, worldSettings.GeneratorSettings.PlanetSettings.MinMaxMoons.Max);
 
             m_planetGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.PlanetGPSMode);
             m_asteroidGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.AsteroidGPSMode);
@@ -297,6 +300,9 @@ namespace SEWorldGenPlugin.GUI
 
             settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_planetSizeCapSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier = m_planetSizeMultSlider.Value;
+            settings.GeneratorSettings.PlanetSettings.BaseMoonProbability = m_planetMoonBasePropSlider.Value;
+            settings.GeneratorSettings.PlanetSettings.BaseRingProbability = m_planetRingBasePropSlider.Value;
+            settings.GeneratorSettings.PlanetSettings.MinMaxMoons = new MySerializableMinMax((long)m_planetMoonMinMaxSlider.CurrentMin, (long)m_planetMoonMinMaxSlider.CurrentMax);
 
             settings.GeneratorSettings.GPSSettings.PlanetGPSMode = (MyGPSGenerationMode)m_planetGPSModeCombo.GetSelectedKey();
             settings.GeneratorSettings.GPSSettings.MoonGPSMode = (MyGPSGenerationMode)m_moonGPSModeCombo.GetSelectedKey();
