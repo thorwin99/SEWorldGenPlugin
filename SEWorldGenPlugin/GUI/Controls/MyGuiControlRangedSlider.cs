@@ -366,7 +366,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                 min = m_minThumb.CurrentValue;
                 max = m_maxValue;
                 current = m_maxThumb.CurrentValue;
-                clickedThumb = m_minThumb;
+                clickedThumb = m_maxThumb;
             }
             if (clickedThumb == null) return false;
 
