@@ -127,7 +127,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <returns>The storage name of the planet</returns>
         private string GetPlanetStorageName(MySystemPlanet planet)
         {
-            return (planet.DisplayName).Replace(" ", "_");
+            return (planet.DisplayName + "-" + planet.SubtypeId).Replace(" ", "_");
         }
     }
 }
