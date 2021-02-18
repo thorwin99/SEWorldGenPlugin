@@ -23,6 +23,9 @@
         public readonly string WORLD_SIZE_SLIDER = "The max size of the system. After that nothing will be generated. In KM";
         public readonly string PLANET_SIZE_CAP_SLIDER = "The max size a planet can have in this system. In metres";
         public readonly string PLANET_SIZE_MULT = "The multiplier for the planets size. 1G planet equals to 120km * this value. A gas giant will be double the size.";
+        public readonly string PLANET_MOON_PROP = "The base probability for a planet to generate moons. Scales with gravity, so higher gravity means higher probability.";
+        public readonly string PLANET_RING_PROP = "The base probability for a planet to generate a ring. Scales with gravity, so higher gravity means higher probability.";
+        public readonly string PLANET_MOON_COUNT = "The minimum and maximum limits for the amount of moons around a planet.";
         public readonly string PLANET_GPS_COMBO = "The generation mode for planet gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.";
         public readonly string MOON_GPS_COMBO = "The generation mode for moons gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.";
         public readonly string ASTEROID_GPS_COMBO = "The generation mode for asteroid gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.";

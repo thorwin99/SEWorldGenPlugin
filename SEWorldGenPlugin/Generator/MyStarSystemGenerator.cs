@@ -309,6 +309,9 @@ namespace SEWorldGenPlugin.Generator
         private MySystemPlanet GeneratePlanet(int planetIndex, double maxDiameter, long orbitDistance)
         {
             MyPluginLog.Debug("Generating new planet");
+
+            var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
+
             var def = FindPlanetDefinitionForSize(maxDiameter);
             var diameter = CalculatePlanetDiameter(def);
 
@@ -327,12 +330,12 @@ namespace SEWorldGenPlugin.Generator
                 SubtypeId = def.Id.SubtypeId.String,
             };
 
-            if(MyRandom.Instance.NextFloat() > 0.25f * def.SurfaceGravity)
+            if(MyRandom.Instance.NextFloat() > settings.BaseRingProbability * def.SurfaceGravity)
             {
                 planet.ChildObjects.Add(GenrateRing(planet));
             }
 
-            if (MyRandom.Instance.NextFloat() > 0.3f * def.SurfaceGravity)
+            if (MyRandom.Instance.NextFloat() < settings.BaseMoonProbability * def.SurfaceGravity)
             {
                 foreach(var moon in GeneratePlanetMoons(planet))
                 {
@@ -355,7 +358,9 @@ namespace SEWorldGenPlugin.Generator
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
             uint maxMoons = (uint)Math.Ceiling(parentPlanet.Diameter / 120000 * 2);
-            uint numMoons = (uint)MyRandom.Instance.Next(1, (int) maxMoons + 1);
+            maxMoons = (uint)Math.Min(maxMoons, settings.PlanetSettings.MinMaxMoons.Max);
+
+            uint numMoons = (uint)MyRandom.Instance.Next(settings.PlanetSettings.MinMaxMoons.Min, (int) maxMoons + 1);
             numMoons = Math.Min(numMoons, 25);
 
             if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE)

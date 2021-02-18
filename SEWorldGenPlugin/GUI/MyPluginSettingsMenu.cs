@@ -53,6 +53,9 @@ namespace SEWorldGenPlugin.GUI
 
         private MyGuiControlClickableSlider m_planetSizeCapSlider;
         private MyGuiControlClickableSlider m_planetSizeMultSlider;
+        private MyGuiControlClickableSlider m_planetMoonBasePropSlider;
+        private MyGuiControlClickableSlider m_planetRingBasePropSlider;
+        private MyGuiControlRangedSlider m_planetMoonMinMaxSlider;
 
         private MyGuiControlCombobox m_planetGPSModeCombo;
         private MyGuiControlCombobox m_moonGPSModeCombo;
@@ -96,6 +99,9 @@ namespace SEWorldGenPlugin.GUI
             var worldSizeLabel = new MyGuiControlLabel(null, null, "World size");
             var planetSizeCapLabel = new MyGuiControlLabel(null, null, "Planet size cap");
             var planetSizeMultLabel = new MyGuiControlLabel(null, null, "Planet size multiplier");
+            var planetMoonPropLabel = new MyGuiControlLabel(null, null, "Planet moon probability");
+            var planetRingPropLabel = new MyGuiControlLabel(null, null, "Planet ring probability");
+            var planetMoonCountLabel = new MyGuiControlLabel(null, null, "Planet moon count");
             var planetGpsModeLabel = new MyGuiControlLabel(null, null, "Planet gps mode");
             var moonGpsModeLabel = new MyGuiControlLabel(null, null, "Moon gps mode");
             var asteroidGpsModeLabel = new MyGuiControlLabel(null, null, "Asteroid gps mode");
@@ -172,6 +178,21 @@ namespace SEWorldGenPlugin.GUI
             m_planetSizeMultSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_SIZE_MULT);
 
             parent.AddTableRow(planetSizeMultLabel, m_planetSizeMultSlider);
+
+            m_planetMoonBasePropSlider = new MyGuiControlClickableSlider(minValue: 0f, maxValue: 1f, defaultValue: 0.5f, width: 0.25f, showLabel: true);
+            m_planetMoonBasePropSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_MOON_PROP);
+
+            parent.AddTableRow(planetMoonPropLabel, m_planetMoonBasePropSlider);
+
+            m_planetRingBasePropSlider = new MyGuiControlClickableSlider(minValue: 0f, maxValue: 1f, defaultValue: 0.5f, width: 0.25f, showLabel: true);
+            m_planetRingBasePropSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_RING_PROP);
+
+            parent.AddTableRow(planetRingPropLabel, m_planetRingBasePropSlider);
+
+            m_planetMoonMinMaxSlider = new MyGuiControlRangedSlider(1, 50, 1, 25, true, showLabel: true);
+            m_planetMoonMinMaxSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_MOON_COUNT);
+
+            parent.AddTableRow(planetMoonCountLabel, m_planetMoonMinMaxSlider);
 
             m_planetGPSModeCombo = new MyGuiControlCombobox();
             m_planetGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_GPS_COMBO);

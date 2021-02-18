@@ -153,6 +153,29 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(2)]
         public int PlanetSizeCap = 1200000;
 
+        /// <summary>
+        /// The basic probability for a planet with 1G to have one or more moons.
+        /// Will scale with gravity, essentially base probability * gravity.
+        /// </summary>
+        [ProtoMember(3)]
+        public float BaseMoonProbability = 0.3f;
+
+        /// <summary>
+        /// The basic probability for a planet with 1G to have a ring generated.
+        /// Will scale with gravity, essentially base probability * gravity.
+        /// </summary>
+        [ProtoMember(4)]
+        public float BaseRingProbability = 0.25f;
+
+        /// <summary>
+        /// The minimum and maximum amount of moons generated, IF a planet
+        /// gets moons based on the BaseMoonProbability. A Planet will always have more than the
+        /// minimum amount, but can also have less than the max amount, if the calculated max amount based on
+        /// gravity is lower than that, but no Planet can have more moons.
+        /// </summary>
+        [ProtoMember(5)]
+        public MySerializableMinMax MinMaxMoons = new MySerializableMinMax(1, 25);
+
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_PlanetGenerationSettings();
