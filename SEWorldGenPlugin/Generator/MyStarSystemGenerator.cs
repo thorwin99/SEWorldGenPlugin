@@ -314,7 +314,12 @@ namespace SEWorldGenPlugin.Generator
 
             var def = FindPlanetDefinitionForSize(maxDiameter);
 
-            if (def == null) return null;
+            if (def == null) 
+            {
+                MyPluginLog.Debug("Could not load a planet definition for this planet.", LogLevel.WARNING);
+                return null; 
+            }
+
 
             var diameter = CalculatePlanetDiameter(def);
 
@@ -511,7 +516,7 @@ namespace SEWorldGenPlugin.Generator
 
             if(m_planets.Count <= 0)
             {
-                MyPluginLog.Debug("No planet definitions found.");
+                MyPluginLog.Log("No planet definitions found. Trying again", LogLevel.WARNING);
                 LoadPlanetDefinitions();
                 if (m_planets.Count <= 0) return null;
             }

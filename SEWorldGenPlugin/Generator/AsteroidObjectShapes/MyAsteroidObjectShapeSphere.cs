@@ -48,7 +48,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
 
         public Vector3D GetClosestPoint(Vector3D point)
         {
-            Vector3D direction = (Center - point);
+            Vector3D direction = point - Center;
             double lenght = direction.Length();
             direction.Normalize();
 
@@ -70,7 +70,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
 
         public Vector3D GetPointInShape()
         {
-            return Center + InnerRadius + (OuterRadius - InnerRadius) / 2;
+            return Center + new Vector3D(InnerRadius + ((OuterRadius - InnerRadius) / 2), 0, 0);
         }
     }
 }

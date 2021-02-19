@@ -1,9 +1,12 @@
 using Sandbox.Definitions;
+using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
+using Sandbox.Game.Gui;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Draw;
+using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.Controls;
@@ -69,16 +72,33 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// </summary>
         private MyPluginAdminMenu m_parentScreen;
 
+        /// <summary>
+        /// The currently selected asteroid
+        /// </summary>
+        private MySystemAsteroids m_currentSelectedAsteroid;
+
         public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
         {
             m_parentScreen = adminScreen;
+
+            m_currentSelectedAsteroid = asteroidObject;
+
+            MyGuiControlButton teleportToRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Teleport to sphere", OnTeleportToSphere);
+
+            parentTable.AddTableRow(teleportToRingButton);
+
+            MyGuiControlButton deleteRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Remove sphere", OnRemoveSphere);
+
+            parentTable.AddTableRow(deleteRingButton);
+
+            parentTable.AddTableSeparator();
 
             var data = MyAsteroidSphereProvider.Static.GetInstanceData(asteroidObject);
             var sphere = data as MyAsteroidSphereData;
 
             m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)sphere.OuterRadius * 2f);
             RenderSpherePreview(sphere);
-            return false;
+            return true;
         }
 
         public bool CreateSpawnMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen)
@@ -356,6 +376,59 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
             MySpectatorCameraController.Static.Position = center + distance;
             MySpectatorCameraController.Static.Target = center;
+        }
+
+        /// <summary>
+        /// Action to remove the sphere for the remove sphere button
+        /// </summary>
+        /// <param name="button">Button that called this action</param>
+        private void OnRemoveSphere(MyGuiControlButton button)
+        {
+            MyPluginLog.Debug("Removing sphere " + m_currentSelectedAsteroid.DisplayName);
+
+            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.Id, delegate (bool success)
+            {
+                if (success)
+                {
+                    m_parentScreen.ForceFetchStarSystem = true;
+                    m_parentScreen.ShouldRecreate = true;
+
+                    RenderSpherePreview(null);
+
+                    MyPluginLog.Debug("Refreshing admin menu");
+                }
+                else
+                {
+                    MyPluginGuiHelper.DisplayError(m_currentSelectedAsteroid.DisplayName + " could not be deleted", "Error");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Teleports the player to the selected ring
+        /// </summary>
+        /// <param name="button">Button to call</param>
+        private void OnTeleportToSphere(MyGuiControlButton button)
+        {
+            MyPluginLog.Debug("Teleporting player to " + m_currentSelectedAsteroid.DisplayName);
+
+            if (MySession.Static.CameraController != MySession.Static.LocalCharacter || true)
+            {
+                if (m_currentSelectedAsteroid != null)
+                {
+                    IMyAsteroidObjectShape shape = MyAsteroidSphereProvider.Static.GetAsteroidObjectShape(m_currentSelectedAsteroid);
+                    if (shape == null)
+                    {
+                        MyPluginGuiHelper.DisplayError("Cant teleport to asteroid sphere. It does not exist", "Error");
+                        return;
+                    }
+
+                    m_parentScreen.CloseScreenNow();
+
+                    MyMultiplayer.TeleportControlledEntity(shape.GetPointInShape());
+                    MyGuiScreenGamePlay.SetCameraController();
+                }
+            }
         }
     }
 }
