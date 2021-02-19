@@ -313,6 +313,9 @@ namespace SEWorldGenPlugin.Generator
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
 
             var def = FindPlanetDefinitionForSize(maxDiameter);
+
+            if (def == null) return null;
+
             var diameter = CalculatePlanetDiameter(def);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
