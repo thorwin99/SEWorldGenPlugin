@@ -119,7 +119,10 @@ namespace SEWorldGenPlugin.Session
         {
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
-            if (m_dynamicGpss.ContainsKey(key)) return false;
+            if (m_dynamicGpss.ContainsKey(key))
+            {
+                RemoveDynamicGps(playerId, id);
+            }
             MyGps gps = new MyGps
             {
                 Name = name,
@@ -202,7 +205,12 @@ namespace SEWorldGenPlugin.Session
         {
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
-            return m_dynamicGpss.ContainsKey(key);
+            if (m_dynamicGpss.ContainsKey(key))
+            {
+                return MySession.Static.Gpss[playerId].ContainsKey(m_dynamicGpss[key]);
+            }
+
+            return false;
         }
 
         /// <summary>
