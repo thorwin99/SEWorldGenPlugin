@@ -262,6 +262,15 @@ namespace SEWorldGenPlugin.Session
                 m_globalGpss[item.Id] = data;
             }
 
+            MySession.Static.OnSavingCheckpoint += delegate
+            {
+                foreach (var key in m_dynamicGpss.Keys)
+                {
+                    MySession.Static.Gpss.SendDelete(key.Item2, m_dynamicGpss[key]);
+                };
+                m_dynamicGpss.Clear();
+            };
+
             MyPluginLog.Log("Loading GPS manager data completed");
         }
 
@@ -305,11 +314,6 @@ namespace SEWorldGenPlugin.Session
             Static = null;
             m_globalGpss.Clear();
             m_globalGpss = null;
-
-            foreach(var key in m_dynamicGpss.Keys)
-            {
-                MySession.Static.Gpss.SendDelete(key.Item2, m_dynamicGpss[key]);
-            }
 
             m_dynamicGpss.Clear();
             m_dynamicGpss = null;
