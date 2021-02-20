@@ -165,7 +165,7 @@ namespace SEWorldGenPlugin.Networking
                     }
                 }catch(ReflectionTypeLoadException)
                 {
-                    MyPluginLog.Log("Couldnt register Types for assembly " + assembly.FullName, LogLevel.ERROR);
+                    MyPluginLog.Log("Couldnt register Types for assembly " + assembly.FullName, LogLevel.WARNING);
                 }                
             }
         }

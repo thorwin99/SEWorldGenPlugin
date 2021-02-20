@@ -86,7 +86,7 @@ namespace SEWorldGenPlugin.Session
                 }
                 catch (ReflectionTypeLoadException)
                 {
-                    MyPluginLog.Log("Couldnt register asteroid object providers for assembly " + assembly.FullName, LogLevel.ERROR);
+                    MyPluginLog.Log("Couldnt register asteroid object providers for assembly " + assembly.FullName, LogLevel.WARNING);
                 }
             }
         }
