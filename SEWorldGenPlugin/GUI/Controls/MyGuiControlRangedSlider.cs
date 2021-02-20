@@ -285,7 +285,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                     float endX = Size.X - MyGuiConstants.SLIDER_INSIDE_OFFSET_X;
                     float centerY = Size.Y / 2;
 
-                    if(m_currentFocusThumb == null && m_maxThumb.GetBounds(GetPositionAbsoluteTopLeft()).Contains(mousePos) != ContainmentType.Disjoint)
+                    if(m_currentFocusThumb == null && m_maxThumb.GetBounds(GetPositionAbsoluteTopLeft()).Contains(mousePos) != ContainmentType.Disjoint && !(m_minThumb.CurrentValue == m_maxValue))
                     {
                         m_currentFocusThumb = m_maxThumb;
                         m_maxThumb.ForcusThumb();
