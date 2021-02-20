@@ -142,7 +142,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_planetSizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSettings.PlanetSizeCap, m_usableWidth - 0.1f, intValue: true, showLabel: true, labelSuffix: " m");
             m_planetSizeSlider.DefaultValue = Math.Min(120000, settings.PlanetSettings.PlanetSizeCap);
-            m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue;
+            m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue.Value;
 
             table.AddTableRow(m_planetSizeSlider);
 
