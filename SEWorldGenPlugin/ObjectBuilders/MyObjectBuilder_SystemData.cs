@@ -75,6 +75,31 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             return GetObjectById(id) != null;
         }
+
+        /// <summary>
+        /// Removes the object with the given id. Cant be the center object
+        /// </summary>
+        /// <param name="id">Id of the object</param>
+        /// <returns>True, if object was successfully removed.</returns>
+        public bool RemoveObject(Guid id)
+        {
+            if (id == CenterObject.Id) return false;
+            if (!ObjectExists(id)) return false;
+
+            var obj = GetObjectById(id);
+            var parent = GetObjectById(obj.ParentId);
+
+            if (parent == null) return false;
+
+            foreach(var child in obj.GetAllChildren())
+            {
+                parent.ChildObjects.Add(child);
+                obj.ChildObjects.Remove(child);
+            }
+            parent.ChildObjects.Remove(obj);
+
+            return true;
+        }
     }
 
     /// <summary>

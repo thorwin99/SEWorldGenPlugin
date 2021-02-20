@@ -102,6 +102,8 @@ namespace SEWorldGenPlugin.Generator
 
             StarSystem = data;
 
+            MyPluginLog.Log("Loaded system data. Checking Asteroid objects");
+
             if(StarSystem != null && StarSystem.CenterObject != null)
             {
                 foreach (var obj in StarSystem.GetAllObjects())
@@ -111,10 +113,16 @@ namespace SEWorldGenPlugin.Generator
                         var asteroid = obj as MySystemAsteroids;
 
                         var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
-                        provider.TryLoadObject(asteroid);
+                        if (!provider.TryLoadObject(asteroid))
+                        {
+                            MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
+                            StarSystem.RemoveObject(asteroid.Id);
+                        }
                     }
                 }
             }
+
+            MyPluginLog.Log("All asteroid objects checked");
 
             m_planets = new List<MyPlanetGeneratorDefinition>();
             m_moons = new List<MyPlanetGeneratorDefinition>();

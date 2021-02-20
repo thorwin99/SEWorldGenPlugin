@@ -207,29 +207,23 @@ namespace SEWorldGenPlugin.Generator
             MySystemObject o = Static.StarSystem.GetObjectById(objectId);
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
-                MySystemObject parent = Static.StarSystem.GetObjectById(o.ParentId);
-                if (parent != null)
+                if(o.Type == MySystemObjectType.ASTEROIDS)
                 {
-                    if(o.Type == MySystemObjectType.ASTEROIDS)
+                    var asteroids = o as MySystemAsteroids;
+                    if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroids.AsteroidTypeName))
                     {
-                        var asteroids = o as MySystemAsteroids;
-                        if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroids.AsteroidTypeName))
+                        bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids);
+                        if (removed)
                         {
-                            bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids);
-                            if (removed)
-                            {
-                                parent.ChildObjects.Remove(o);
-                                PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
-                                return;
-                            }
+                            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, Static.StarSystem.RemoveObject(objectId), callbackId, clientId);
+                            return;
                         }
                     }
-                    else
-                    {
-                        parent.ChildObjects.Remove(o);
-                        PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
-                        return;
-                    }
+                }
+                else
+                {
+                    PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, Static.StarSystem.RemoveObject(objectId), callbackId, clientId);
+                    return;
                 }
             }
             PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, callbackId, clientId);
