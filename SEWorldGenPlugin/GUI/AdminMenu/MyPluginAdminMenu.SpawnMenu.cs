@@ -5,6 +5,7 @@ using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
+using System;
 using System.Text;
 using VRage.Utils;
 using VRageMath;
@@ -140,6 +141,8 @@ namespace SEWorldGenPlugin.GUI
             table.AddTableRow(sizeLabel);
 
             m_planetSizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSettings.PlanetSizeCap, m_usableWidth - 0.1f, intValue: true, showLabel: true, labelSuffix: " m");
+            m_planetSizeSlider.DefaultValue = Math.Min(120000, settings.PlanetSettings.PlanetSizeCap);
+            m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue;
 
             table.AddTableRow(m_planetSizeSlider);
 
