@@ -187,7 +187,11 @@ namespace SEWorldGenPlugin.Generator
                             MyAbstractAsteroidObjectProvider provider = null;
                             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out provider))
                             {
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, provider.GetAsteroidObjectShape(asteroid).GetPointInShape(), item.Id);
+                                var shape = provider.GetAsteroidObjectShape(asteroid);
+
+                                if (shape == null) break;
+
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.GetPointInShape(), item.Id);
                             }
                         }
                         break;
