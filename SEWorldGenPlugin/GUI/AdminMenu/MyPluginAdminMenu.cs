@@ -140,6 +140,11 @@ namespace SEWorldGenPlugin.GUI
 
             newCombo.ItemSelected += delegate
             {
+                if(newCombo.GetSelectedIndex() != m_selectedMenuIndex)
+                {
+                    ForceFetchStarSystem = true;
+                }
+
                 m_selectedMenuIndex = newCombo.GetSelectedIndex(); 
                 
                 foreach (var provider in m_asteroidProviders)
@@ -166,7 +171,6 @@ namespace SEWorldGenPlugin.GUI
             if (m_selectedMenuIndex == oldCount + 1)
             {
                 ClearControls();
-                ForceFetchStarSystem = true;
                 BuildEditMenu();
             }
             m_isRecreating = false;
