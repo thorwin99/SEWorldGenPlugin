@@ -83,6 +83,7 @@ namespace SEWorldGenPlugin.Generator
                 StarSystem = GenerateNewStarSystem();
             }
 
+            CheckIntegrityOfSystem();
             AddPlanetDeleteAction();
         }
 
@@ -656,6 +657,41 @@ namespace SEWorldGenPlugin.Generator
         }
 
         /// <summary>
+        /// Checks all planets of the star system, and whether they are still existent as objects
+        /// in the world. Just to clear up deleted objects from the system at world loading
+        /// </summary>
+        private void CheckIntegrityOfSystem()
+        {
+            MyPluginLog.Debug("Checking system integrity");
+            foreach(var obj in StarSystem.GetAllObjects())
+            {
+                if(obj is MySystemPlanet)
+                {
+                    if(!MyEntities.EntityExists((obj as MySystemPlanet).EntityId) && (obj as MySystemPlanet).Generated)
+                    {
+                        MyPluginLog.Debug("Planet " + obj.Id + " does not exist anymore, deleting it", LogLevel.WARNING);
+                        StarSystem.RemoveObject(obj.Id);
+                    }
+                }
+                else if(obj is MySystemAsteroids)
+                {
+                    var instance = obj as MySystemAsteroids;
+
+                    if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(instance.AsteroidTypeName))
+                    {
+                        var data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].GetInstanceData(instance);
+                        if(data == null)
+                        {
+                            MyPluginLog.Debug("Asteroid instance " + obj.Id + " has no data attached, deleting it", LogLevel.WARNING);
+                            MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].RemoveInstance(instance);
+                        }
+                    }
+                }
+            }
+            MyPluginLog.Debug("Integrity check complete");
+        }
+
+        /// <summary>
         /// Action for planet close
         /// </summary>
         /// <param name="entity">Entity that gets closed</param>
@@ -679,7 +715,7 @@ namespace SEWorldGenPlugin.Generator
                     {
                         if (Static.StarSystem.RemoveObject(planet.Id))
                         {
-                            MyPluginLog.Log("Star system instance of planet " + e.StorageName + "was removed");
+                            MyPluginLog.Log("Star system instance of planet " + e.StorageName + " was removed");
                         }
                         break;
                     }
