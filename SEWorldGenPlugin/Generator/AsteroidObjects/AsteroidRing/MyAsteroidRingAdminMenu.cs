@@ -1,5 +1,4 @@
 using Sandbox.Engine.Multiplayer;
-using Sandbox.Engine.Utils;
 using Sandbox.Game.Gui;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
@@ -12,7 +11,6 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System.Text;
-using VRage.Game;
 using VRage.Utils;
 using VRageMath;
 
@@ -86,6 +84,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private MySystemAsteroids m_currentSelectedAsteroid;
 
         /// <summary>
+        /// Open the offset dialog in spawn menu
+        /// </summary>
+        private MyGuiControlButton m_offsetToCoordButton;
+
+        /// <summary>
+        /// Button to zoom onto the ring
+        /// </summary>
+        private MyGuiControlButton m_zoomInButton;
+
+        /// <summary>
+        /// The offset of the center when spawning a ring
+        /// </summary>
+        private Vector3D m_offset = Vector3D.Zero;
+
+        /// <summary>
         /// If the camera should snap to the parent object in the spawn
         /// menu
         /// </summary>
@@ -125,6 +138,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public bool CreateSpawnMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen)
         {
             m_parentScreen = adminScreen;
+            m_offset = Vector3D.Zero;
 
             if (m_fetchedStarSytem == null)
             {
@@ -169,6 +183,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_snapToParentCheck.IsCheckedChanged += delegate
             {
                 m_snapToParent = m_snapToParentCheck.IsChecked;
+                m_zoomInButton.Enabled = m_snapToParent;
             };
 
             row.AddTableRow(m_snapToParentCheck, new MyGuiControlLabel(null, null, "Snap camera to parent"));
@@ -240,6 +255,27 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Name"));
             parentTable.AddTableRow(m_nameBox);
+
+            m_zoomInButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Zoom to ring", delegate 
+            {
+                if (m_snapToParent)
+                    m_parentScreen.CameraLookAt(GenerateAsteroidRing().CenterPosition, new Vector3D(0, 0, (m_radiusSlider.Value + m_widthSlider.Value) * 2000));
+            });
+
+            parentTable.AddTableRow(m_zoomInButton);
+
+            m_offsetToCoordButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Offset to coordinate", delegate
+            {
+                var coordMessage = new MyGuiScreenDialogCoordinate("Enter coordinate to offset the center of the ring from its parent");
+                coordMessage.OnConfirmed += delegate (Vector3D coord)
+                {
+                    m_offset = coord;
+                    UpdateRingVisual(GenerateAsteroidRing());
+                };
+                MyGuiSandbox.AddScreen(coordMessage);
+            });
+
+            parentTable.AddTableRow(m_offsetToCoordButton);
 
             m_spawnRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Add ring", delegate
             {
@@ -374,7 +410,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             systemObject = new MySystemAsteroids();
             systemObject.AsteroidTypeName = MyAsteroidRingProvider.Static.GetTypeName();
-            systemObject.CenterPosition = parentItem.CenterPosition;
+            systemObject.CenterPosition = parentItem.CenterPosition + m_offset;
             systemObject.AsteroidSize = new MySerializableMinMax((int)m_asteroidSizesSlider.CurrentMin, (int)m_asteroidSizesSlider.CurrentMax);
             systemObject.DisplayName = name.ToString();
             systemObject.ParentId = parentItem.Id;
@@ -393,7 +429,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             MySystemObject parent = selected.UserData as MySystemObject;
 
             MyAsteroidRingData ring = new MyAsteroidRingData();
-            ring.CenterPosition = parent.CenterPosition;
+            ring.CenterPosition = parent.CenterPosition + m_offset;
             ring.Width = m_widthSlider.Value * 1000;
             ring.Height = ring.Width / 10;
             ring.Radius = m_radiusSlider.Value * 1000;
@@ -410,6 +446,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             if(box.SelectedItems.Count > 0)
             {
                 m_spawnRingButton.Enabled = true;
+                m_zoomInButton.Enabled = m_snapToParent;
+                m_offsetToCoordButton.Enabled = false;
+                m_offset = Vector3D.Zero;
 
                 var parent = box.SelectedItems[box.SelectedItems.Count - 1].UserData as MySystemObject;
                 var settings = MySettingsSession.Static.Settings.GeneratorSettings;
@@ -436,7 +475,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                     m_angleZSlider.Enabled = true;
                     m_angleZSlider.Value = 0;
 
-                    if(m_snapToParent)
+                    m_offsetToCoordButton.Enabled = true;
+
+                    if (m_snapToParent)
                         m_parentScreen.CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
                     UpdateRingVisual(GenerateAsteroidRing());
                     return;

@@ -276,7 +276,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
                     m_asteroidSizesSlider.SetValues(32, 1024);
 
-                    m_parentScreenCameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
+                    m_parentScreen.CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
 
                     RenderSpherePreview(GetDataFromGui());
                     return;
