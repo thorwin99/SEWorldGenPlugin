@@ -109,6 +109,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                 if (double.TryParse(xb.ToString(), out x) && double.TryParse(yb.ToString(), out y) && double.TryParse(zb.ToString(), out z))
                 {
                     OnConfirmed?.Invoke(new Vector3D(x, y, z));
+                    CloseScreen();
                 }
                 else
                 {
@@ -131,7 +132,7 @@ namespace SEWorldGenPlugin.GUI.Controls
 
             m_errorLabel = new MyGuiControlLabel(null, null, "Those are not valid coordinates.", font: "Red");
             m_errorLabel.OriginAlign = VRage.Utils.MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
-            m_errorLabel.Position = new Vector2(Size.Value.X / -2 + PADDING.X, m_xBox.Position.Y + m_xBox.Size.Y + PADDING.Y);
+            m_errorLabel.Position = new Vector2(Size.Value.X / -2 + PADDING.X, m_xBox.Position.Y + m_xBox.Size.Y);
             m_errorLabel.Visible = false;
 
             Controls.Add(m_errorLabel);
