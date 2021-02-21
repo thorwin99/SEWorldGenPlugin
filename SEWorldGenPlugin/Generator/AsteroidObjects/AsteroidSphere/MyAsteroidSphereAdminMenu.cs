@@ -276,7 +276,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
                     m_asteroidSizesSlider.SetValues(32, 1024);
 
-                    CameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
+                    m_parentScreenCameraLookAt(Vector3D.Zero, new Vector3D(0, 0, m_radiusSlider.Value * 2000));
 
                     RenderSpherePreview(GetDataFromGui());
                     return;
@@ -309,7 +309,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
                             m_asteroidSizesSlider.SetValues(32, 1024);
 
-                            CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
+                            m_parentScreen.CameraLookAt(planet.CenterPosition, (float)planet.Diameter * 2f);
 
                             RenderSpherePreview(GetDataFromGui());
                             return;
@@ -352,30 +352,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             {
                 MyPluginDrawSession.Static.AddRenderObject(PREVIEW_RENDER_ID, new RenderHollowSphere(data.Center, (float)data.OuterRadius, (float)data.OuterRadius, Color.LightGreen.ToVector4(), (float)data.OuterRadius / 500f));
             }
-        }
-
-        /// <summary>
-        /// Makes the spectator cam look at the specific point from the given distance
-        /// </summary>
-        /// <param name="center">Point to look at</param>
-        /// <param name="distance">Distance to look from</param>
-        private void CameraLookAt(Vector3D center, float distance)
-        {
-            MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
-            MySpectatorCameraController.Static.Position = center + distance;
-            MySpectatorCameraController.Static.Target = center;
-        }
-
-        /// <summary>
-        /// Makes the spectator cam look at the specific point from the given distance
-        /// </summary>
-        /// <param name="center">Point to look at</param>
-        /// <param name="distance">Distance to look from</param>
-        private void CameraLookAt(Vector3D center, Vector3D distance)
-        {
-            MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
-            MySpectatorCameraController.Static.Position = center + distance;
-            MySpectatorCameraController.Static.Target = center;
         }
 
         /// <summary>

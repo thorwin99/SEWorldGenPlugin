@@ -166,6 +166,7 @@ namespace SEWorldGenPlugin.GUI
             if (m_selectedMenuIndex == oldCount + 1)
             {
                 ClearControls();
+                ForceFetchStarSystem = true;
                 BuildEditMenu();
             }
             m_isRecreating = false;
