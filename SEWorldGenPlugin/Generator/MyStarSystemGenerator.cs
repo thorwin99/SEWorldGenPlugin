@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
+using VRage.Game.Entity;
 using VRage.Library.Utils;
 using VRageMath;
 
@@ -81,6 +82,8 @@ namespace SEWorldGenPlugin.Generator
             {
                 StarSystem = GenerateNewStarSystem();
             }
+
+            AddPlanetDeleteAction();
         }
 
         /// <summary>
@@ -627,6 +630,60 @@ namespace SEWorldGenPlugin.Generator
                 MyPluginLog.Log("Definition added " + subtypeId);
 
                 m_planets.Add(planet);
+            }
+        }
+
+        /// <summary>
+        /// Adds the action called, when planets are deleted
+        /// </summary>
+        private void AddPlanetDeleteAction()
+        {
+            List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
+            foreach(var p in planets)
+            {
+                var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
+                e.OnClose += OnPlanetClose;
+            }
+
+            MyEntities.OnEntityAdd += delegate (MyEntity entity)
+            {
+                if(entity is MyPlanet)
+                {
+                    MyPluginLog.Debug("Planet created, adding close action");
+                    entity.OnClose += OnPlanetClose;
+                }
+            };
+        }
+
+        /// <summary>
+        /// Action for planet close
+        /// </summary>
+        /// <param name="entity">Entity that gets closed</param>
+        public static void OnPlanetClose(MyEntity entity)
+        {
+            MyPlanet e = null;
+            if (entity is MyPlanet)
+            {
+                e = entity as MyPlanet;
+            }
+            else return;
+
+            MyPluginLog.Log("Planet " + e.StorageName + " is getting removed. Removing its star system instance");
+            foreach (var obj in Static.StarSystem.GetAllObjects())
+            {
+                if (obj is MySystemPlanet)
+                {
+                    var planet = obj as MySystemPlanet;
+
+                    if (planet.EntityId == e.EntityId)
+                    {
+                        if (Static.StarSystem.RemoveObject(planet.Id))
+                        {
+                            MyPluginLog.Log("Star system instance of planet " + e.StorageName + "was removed");
+                        }
+                        break;
+                    }
+                }
             }
         }
 
