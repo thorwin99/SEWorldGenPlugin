@@ -57,15 +57,45 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public MyObjectBuilder_SystemData StarSystem;
 
+        /// <summary>
+        /// Planets loaded with the world, that are not blacklisted, suns or moons
+        /// </summary>
         private List<MyPlanetGeneratorDefinition> m_planets;
 
+        /// <summary>
+        /// List of planets used for definition finding in unique mode.
+        /// </summary>
+        private List<MyPlanetGeneratorDefinition> m_uniquePlanets;
+
+        /// <summary>
+        /// All planets defined as suns, loaded with the world
+        /// </summary>
         private List<MyPlanetGeneratorDefinition> m_suns;
 
+        /// <summary>
+        /// All planets defined as Gas giants loaded with the world
+        /// </summary>
         private List<MyPlanetGeneratorDefinition> m_gasGiants;
 
+        /// <summary>
+        /// All planets set as moons loaded with the world
+        /// </summary>
         private List<MyPlanetGeneratorDefinition> m_moons;
 
+        /// <summary>
+        /// List of moons used for definition finding in unique mode.
+        /// </summary>
+        private List<MyPlanetGeneratorDefinition> m_uniqueMoons;
+
+        /// <summary>
+        /// All planets specified as mandatory
+        /// </summary>
         private List<MyPlanetGeneratorDefinition> m_mandatoryPlanets;
+
+        /// <summary>
+        /// All moons specified as mandatory
+        /// </summary>
+        private List<MyPlanetGeneratorDefinition> m_mandatoryMoons;
 
         /// <summary>
         /// Initializes the system generator and generates a new system if enabled and no system was
@@ -133,6 +163,7 @@ namespace SEWorldGenPlugin.Generator
             m_suns = new List<MyPlanetGeneratorDefinition>();
             m_gasGiants = new List<MyPlanetGeneratorDefinition>();
             m_mandatoryPlanets = new List<MyPlanetGeneratorDefinition>();
+            m_mandatoryMoons = new List<MyPlanetGeneratorDefinition>();
 
             MyPluginLog.Log("Load Star system generator component completed");
         }
@@ -164,6 +195,9 @@ namespace SEWorldGenPlugin.Generator
             m_gasGiants?.Clear();
             m_moons?.Clear();
             m_mandatoryPlanets?.Clear();
+            m_mandatoryMoons?.Clear();
+            m_uniqueMoons?.Clear();
+            m_uniquePlanets?.Clear();
 
             UnloadNetworking();
 
@@ -399,7 +433,7 @@ namespace SEWorldGenPlugin.Generator
                 MyPluginLog.Debug("Generating moon " + i);
 
                 double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(1f, 1.5f);
-                var definition = FindMoonDefinitinon(parentPlanet.Diameter);
+                var definition = FindPlanetDefinitionForSize(parentPlanet.Diameter * 0.75f, true);
                 if (definition == null) return moons;
 
                 double diameter = CalculatePlanetDiameter(definition);
@@ -485,61 +519,43 @@ namespace SEWorldGenPlugin.Generator
         }
 
         /// <summary>
-        /// Tries to find a planet defintion for a moon, that orbits a 
-        /// planet with diameter parentPlanetDiameter.
-        /// </summary>
-        /// <param name="parentPlanetDiameter">Diameter of the parent planet</param>
-        /// <returns>The definition found for the moon</returns>
-        private MyPlanetGeneratorDefinition FindMoonDefinitinon(double parentPlanetDiameter)
-        {
-            if (m_moons.Count <= 0) return null;
-
-            var settings = MySettingsSession.Static.Settings.GeneratorSettings;
-
-            int tries = 0;
-            double diameter;
-
-            MyPlanetGeneratorDefinition def;
-
-            do
-            {
-                def = m_moons[MyRandom.Instance.Next(0, m_moons.Count)];
-                diameter = CalculatePlanetDiameter(def);
-
-            } while (diameter >= parentPlanetDiameter * 0.75f && ++tries <= MAX_DEF_FIND_ROUNDS);
-
-            if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE)
-            {
-                m_moons.Remove(def);
-            }
-
-            return def;
-        }
-
-        /// <summary>
         /// Finds a fit planet definition for a planet with a diameter less than maxDiameter.
         /// If none can be found, a random one will be returned.
         /// </summary>
         /// <param name="maxDiameter">Max diameter of the planet in meters</param>
         /// <returns>A definition of a planet that tries to be smaller than maxDiameter</returns>
-        private MyPlanetGeneratorDefinition FindPlanetDefinitionForSize(double maxDiameter)
+        private MyPlanetGeneratorDefinition FindPlanetDefinitionForSize(double maxDiameter, bool isMoon = false)
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
-            var planets = m_planets;
+            var planets = isMoon ? m_uniqueMoons : m_uniquePlanets;
+            var mandatory = isMoon ? m_mandatoryMoons : m_mandatoryPlanets;
             MyPlanetGeneratorDefinition def;
             double diameter = 0;
             int tries = 0;
 
-            if(m_planets.Count <= 0)
+            if(planets == null || planets.Count <= 0)
             {
-                MyPluginLog.Log("No planet definitions found. Trying again", LogLevel.WARNING);
-                LoadPlanetDefinitions();
-                if (m_planets.Count <= 0) return null;
+                if (isMoon)
+                {
+                    m_uniqueMoons = new List<MyPlanetGeneratorDefinition>(m_moons);
+                    planets = m_uniqueMoons;
+                }
+                else
+                {
+                    m_uniquePlanets = new List<MyPlanetGeneratorDefinition>(m_planets);
+                    planets = m_uniquePlanets;
+                }
             }
 
-            if(settings.SystemGenerator >= SystemGenerationMethod.MANDATORY_FIRST && m_mandatoryPlanets.Count > 0)
+            if(planets.Count <= 0)
             {
-                planets = m_mandatoryPlanets;
+                MyPluginLog.Log("Cant find planet definition", LogLevel.WARNING);
+                return null;
+            }
+
+            if(settings.SystemGenerator >= SystemGenerationMethod.MANDATORY_FIRST && mandatory.Count > 0)
+            {
+                planets = mandatory;
             }
 
             do
@@ -551,12 +567,12 @@ namespace SEWorldGenPlugin.Generator
 
             if(settings.SystemGenerator == SystemGenerationMethod.MANDATORY_FIRST)
             {
-                m_mandatoryPlanets.Remove(def);
+                mandatory.Remove(def);
             }
 
             if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE)
             {
-                m_planets.Remove(def);
+                planets.Remove(def);
             }
             return def;
         }
@@ -604,6 +620,12 @@ namespace SEWorldGenPlugin.Generator
                     MyPluginLog.Log("Adding moon " + subtypeId);
 
                     m_moons.Add(planet);
+
+                    if (settings.MandatoryPlanetDefinitions.Contains(subtypeId))
+                    {
+                        m_mandatoryMoons.Add(planet);
+                    }
+
                     continue;
                 }
                 else if (settings.SunDefinitions.Contains(subtypeId))
