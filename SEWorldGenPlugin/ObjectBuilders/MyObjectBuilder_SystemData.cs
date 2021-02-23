@@ -95,6 +95,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             {
                 parent.ChildObjects.Add(child);
                 obj.ChildObjects.Remove(child);
+                child.ParentId = parent.Id;
             }
             parent.ChildObjects.Remove(obj);
 
