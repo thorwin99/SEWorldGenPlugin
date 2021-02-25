@@ -215,6 +215,7 @@ namespace SEWorldGenPlugin.Generator
                         bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids);
                         if (removed)
                         {
+                            MyGPSManager.Static.RemovePersistentGps(objectId);
                             PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, Static.StarSystem.RemoveObject(objectId), callbackId, clientId);
                             return;
                         }
@@ -222,6 +223,7 @@ namespace SEWorldGenPlugin.Generator
                 }
                 else
                 {
+                    MyGPSManager.Static.RemovePersistentGps(objectId);
                     PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, Static.StarSystem.RemoveObject(objectId), callbackId, clientId);
                     return;
                 }
