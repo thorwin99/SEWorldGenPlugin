@@ -107,6 +107,34 @@ namespace SEWorldGenPlugin.Session
         }
 
         /// <summary>
+        /// Removes the given persistent gps if it exists
+        /// </summary>
+        /// <param name="id">Id of persistent gps</param>
+        public void RemovePersistentGps(Guid id)
+        {
+            if (PersistenGpsExists(id))
+            {
+                
+                MyGps gps = new MyGps
+                {
+                    Name = m_globalGpss[id].Name,
+                    Coords = m_globalGpss[id].Position,
+                    GPSColor = m_globalGpss[id].Color,
+                    ShowOnHud = true,
+                    AlwaysVisible = false,
+                    DiscardAt = null
+                };
+
+                foreach (var playerId in m_globalGpss[id].Players)
+                {
+                    MySession.Static.Gpss.SendDelete(playerId, gps.CalculateHash());
+                }
+
+                m_globalGpss.Remove(id);
+            }
+        }
+
+        /// <summary>
         /// Adds a new Dynamic gps to the player
         /// </summary>
         /// <param name="name">Name of the gps</param>
@@ -236,6 +264,9 @@ namespace SEWorldGenPlugin.Session
                             AlwaysVisible = false,
                             DiscardAt = null
                         };
+
+                        gps.CalculateHash();
+
                         MySession.Static.Gpss.SendAddGps(p.Identity.IdentityId, ref gps, playSoundOnCreation: false);
                         m_globalGpss[entry].Players.Add(p.Identity.IdentityId);
                     }

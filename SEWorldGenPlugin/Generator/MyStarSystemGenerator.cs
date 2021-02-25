@@ -114,7 +114,6 @@ namespace SEWorldGenPlugin.Generator
             }
 
             CheckIntegrityOfSystem();
-            AddPlanetDeleteAction();
         }
 
         /// <summary>
@@ -657,28 +656,6 @@ namespace SEWorldGenPlugin.Generator
         }
 
         /// <summary>
-        /// Adds the action called, when planets are deleted
-        /// </summary>
-        private void AddPlanetDeleteAction()
-        {
-            List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
-            foreach(var p in planets)
-            {
-                var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
-                e.OnClose += OnPlanetClose;
-            }
-
-            MyEntities.OnEntityAdd += delegate (MyEntity entity)
-            {
-                if(entity is MyPlanet)
-                {
-                    MyPluginLog.Debug("Planet created, adding close action");
-                    entity.OnClose += OnPlanetClose;
-                }
-            };
-        }
-
-        /// <summary>
         /// Checks all planets of the star system, and whether they are still existent as objects
         /// in the world. Just to clear up deleted objects from the system at world loading
         /// </summary>
@@ -693,6 +670,7 @@ namespace SEWorldGenPlugin.Generator
                     {
                         MyPluginLog.Debug("Planet " + obj.Id + " does not exist anymore, deleting it", LogLevel.WARNING);
                         StarSystem.RemoveObject(obj.Id);
+                        MyGPSManager.Static.RemovePersistentGps(obj.Id);
                     }
                 }
                 else if(obj is MySystemAsteroids)
@@ -706,43 +684,12 @@ namespace SEWorldGenPlugin.Generator
                         {
                             MyPluginLog.Debug("Asteroid instance " + obj.Id + " has no data attached, deleting it", LogLevel.WARNING);
                             MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].RemoveInstance(instance);
+                            MyGPSManager.Static.RemovePersistentGps(obj.Id);
                         }
                     }
                 }
             }
             MyPluginLog.Debug("Integrity check complete");
-        }
-
-        /// <summary>
-        /// Action for planet close
-        /// </summary>
-        /// <param name="entity">Entity that gets closed</param>
-        public static void OnPlanetClose(MyEntity entity)
-        {
-            MyPlanet e = null;
-            if (entity is MyPlanet)
-            {
-                e = entity as MyPlanet;
-            }
-            else return;
-
-            MyPluginLog.Log("Planet " + e.StorageName + " is getting removed. Removing its star system instance");
-            foreach (var obj in Static.StarSystem.GetAllObjects())
-            {
-                if (obj is MySystemPlanet)
-                {
-                    var planet = obj as MySystemPlanet;
-
-                    if (planet.EntityId == e.EntityId)
-                    {
-                        if (Static.StarSystem.RemoveObject(planet.Id))
-                        {
-                            MyPluginLog.Log("Star system instance of planet " + e.StorageName + " was removed");
-                        }
-                        break;
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -771,6 +718,8 @@ namespace SEWorldGenPlugin.Generator
             base.UpdateBeforeSimulation();
 
             if (!MySettingsSession.Static.IsEnabled()) return;
+
+            CheckIntegrityOfSystem();
 
             List<MyEntityList.MyEntityListInfoItem> planets = MyEntityList.GetEntityList(MyEntityList.MyEntityTypeEnum.Planets);
             foreach (var p in planets)
