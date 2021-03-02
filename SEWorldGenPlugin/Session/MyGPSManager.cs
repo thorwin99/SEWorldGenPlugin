@@ -247,7 +247,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
-            if (MySettingsSession.Static.Settings.Enabled)
+            if (MySettingsSession.Static.IsEnabled())
             {
                 foreach (var entry in m_globalGpss.Keys)
                 {
