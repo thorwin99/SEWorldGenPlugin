@@ -113,6 +113,8 @@ namespace SEWorldGenPlugin.Session
             if (Sync.IsServer)
                 MyFileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
             Settings = null;
+
+            MySettings.Static.SessionSettings = null;
         }
 
         /// <summary>
