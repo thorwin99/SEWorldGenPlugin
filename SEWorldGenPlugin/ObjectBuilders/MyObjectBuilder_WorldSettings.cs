@@ -143,7 +143,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// For gas giants, it is 240km equals 1g.
         /// </summary>
         [ProtoMember(1)]
-        public float PlanetSizeMultiplier = 2.0f;
+        public float PlanetSizeMultiplier = 1.0f;
 
         /// <summary>
         /// The maximum diameter a planet can have in meters. No planet will be larger than
