@@ -245,7 +245,9 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Examples\Global\Ata_star_example.xml" />
+    <Content Include="Examples\Global\full_config_example.xml" />
+    <Content Include="Examples\Global\mandatory_planets_moons_example.xml" />
+    <Content Include="Examples\Global\suns_example_for_ata_stars_mod.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

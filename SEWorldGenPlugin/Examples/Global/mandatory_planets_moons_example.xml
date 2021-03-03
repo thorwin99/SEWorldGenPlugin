@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-16"?>
+<MyObjectBuilder_GlobalSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MoonDefinitions>
+    <string>Moon</string>
+    <string>Titan</string>
+    <string>Europa</string>
+    <string>Triton</string>
+  </MoonDefinitions>
+  <GasGiantDefinitions />
+  <SunDefinitions />
+  <BlacklistedPlanetDefinitions>
+    <string>EarthLikeTutorial</string>
+    <string>MarsTutorial</string>
+    <string>MoonTutorial</string>
+    <string>SystemTestMap</string>
+    <string>EarthLikeModExample</string>
+  </BlacklistedPlanetDefinitions>
+  <MandatoryPlanetDefinitions>
+    <string>Moon</string>
+    <string>EarthLike</string>
+  </MandatoryPlanetDefinitions>
+  <PlanetNameFormat>Planet [ObjectNumber]</PlanetNameFormat>
+  <MoonNameFormat>Moon [ObjectNumber]</MoonNameFormat>
+  <BeltNameFormat>Belt [ObjectNumberGreek]</BeltNameFormat>
+</MyObjectBuilder_GlobalSettings>
