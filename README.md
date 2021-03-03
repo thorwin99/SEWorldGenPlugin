@@ -1,7 +1,7 @@
 # SEWorldGenPlugin
 
-This is a plugin for Space Engineers, which adds a random star system generator to all worlds. It generates star systems using all planets loaded
-with the world, including modded planets. It also generates asteroid belts and asteroid rings.
+This is a plugin for the game Space Engineers, which adds random star system
+generation to worlds aswell as some other neat features. More info in the [wiki](https://github.com/thorwin99/SEWorldGenPlugin/wiki)
 
 ## Installation
 
