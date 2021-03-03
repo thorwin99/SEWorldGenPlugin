@@ -146,8 +146,6 @@ namespace SEWorldGenPlugin.Session
         /// <returns>False, if the gps is already added, else true</returns>
         public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId, Guid id)
         {
-            MyPluginLog.Log("Adding new dynamic gps " + name + " for player " + playerId);
-
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
