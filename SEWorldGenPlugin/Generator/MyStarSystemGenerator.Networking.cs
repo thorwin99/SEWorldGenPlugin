@@ -105,6 +105,8 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         private static void SendGetObjectServer(ulong clientId, Guid id, ulong callbackId)
         {
+            MyPluginLog.Log("Server: Client requests object. Client ID: " + clientId);
+
             bool success = true;
             if (Static != null)
             {
@@ -132,6 +134,8 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         private static void SendGetObjectClient(bool success, MySystemObject obj, ulong callbackId)
         {
+            MyPluginLog.Log("Client: Received get object message from server with success " + success);
+
             if (Static.m_getActionCallbacks.ContainsKey(callbackId))
             {
                 Static.m_getActionCallbacks[callbackId](success, obj);
