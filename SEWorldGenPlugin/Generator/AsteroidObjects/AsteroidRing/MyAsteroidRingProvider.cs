@@ -128,7 +128,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             if (m_loadedRings.ContainsKey(asteroid.Id)) return false;
 
-            var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidRingProvider));
+            var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid), typeof(MyAsteroidRingProvider));
 
             if (ring == null) return false;
 
@@ -145,7 +145,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                 var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(ringId);
                 if (instance == null) continue;
-                MyFileUtils.WriteXmlFileToWorld(m_loadedRings[ringId], GetFileName(instance.DisplayName), typeof(MyAsteroidRingProvider));
+                MyFileUtils.WriteXmlFileToWorld(m_loadedRings[ringId], GetFileName(instance as MySystemAsteroids), typeof(MyAsteroidRingProvider));
             }
         }
 
@@ -197,7 +197,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             m_loadedRings.Remove(systemInstance.Id);
 
-            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidRingProvider));
+            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance), typeof(MyAsteroidRingProvider));
 
             PluginEventHandler.Static.RaiseStaticEvent(NotifyRemoveInstance, systemInstance.Id);
 

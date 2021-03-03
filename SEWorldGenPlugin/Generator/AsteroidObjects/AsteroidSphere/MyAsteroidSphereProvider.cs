@@ -80,7 +80,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
                 var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(sphere.Key);
                 if (instance == null) continue;
-                MyFileUtils.WriteXmlFileToWorld(sphere.Value, GetFileName(instance.DisplayName), typeof(MyAsteroidSphereProvider));
+                MyFileUtils.WriteXmlFileToWorld(sphere.Value, GetFileName(instance as MySystemAsteroids), typeof(MyAsteroidSphereProvider));
             }
         }
 
@@ -93,7 +93,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
             m_loadedSpheres.Remove(systemInstance.Id);
 
-            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance.DisplayName), typeof(MyAsteroidSphereProvider));
+            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance), typeof(MyAsteroidSphereProvider));
 
             PluginEventHandler.Static.RaiseStaticEvent(NotifyRemoveInstance, systemInstance.Id);
 
@@ -106,9 +106,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             if (m_loadedSpheres.ContainsKey(asteroid.Id)) return false;
 
-            if (!MyFileUtils.FileExistsInWorldStorage(GetFileName(asteroid.DisplayName), typeof(MyAsteroidSphereProvider))) return false;
+            if (!MyFileUtils.FileExistsInWorldStorage(GetFileName(asteroid), typeof(MyAsteroidSphereProvider))) return false;
 
-            var data = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidSphereData>(GetFileName(asteroid.DisplayName), typeof(MyAsteroidSphereProvider));
+            var data = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidSphereData>(GetFileName(asteroid), typeof(MyAsteroidSphereProvider));
 
             m_loadedSpheres.Add(asteroid.Id, data);
 

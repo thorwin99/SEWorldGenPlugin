@@ -100,11 +100,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <summary>
         /// Converts an asteroid object name to a file name.
         /// </summary>
-        /// <param name="objectName">The asteroid object name</param>
+        /// <param name="obj">The asteroid object</param>
         /// <returns>The file name for the asteroid object</returns>
-        protected string GetFileName(string objectName)
+        protected string GetFileName(MySystemAsteroids obj)
         {
-            return objectName.Replace(" ", "_") + ".roid";
+            return (obj.DisplayName + obj.Id.ToString()).Replace(" ", "_") + ".roid";
         }
     }
 }
