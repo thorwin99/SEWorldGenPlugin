@@ -41,18 +41,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         public MyAsteroidRingProvider()
         {
-            if(Static == null)
-            {
-                m_loadedRings = new Dictionary<Guid, MyAsteroidRingData>();
+            m_loadedRings = new Dictionary<Guid, MyAsteroidRingData>();
 
-                Static = this;
-            }
-            else
-            {
-                m_loadedRings = Static.m_loadedRings;
-
-                Static = this;
-            }
+            Static = this;
         }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject parent, double objectOrbitRadius)

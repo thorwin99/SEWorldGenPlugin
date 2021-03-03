@@ -36,18 +36,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public MyAsteroidSphereProvider()
         {
-            if(Static == null)
-            {
-                m_loadedSpheres = new Dictionary<Guid, MyAsteroidSphereData>();
+            m_loadedSpheres = new Dictionary<Guid, MyAsteroidSphereData>();
 
-                Static = this;
-            }
-            else
-            {
-                m_loadedSpheres = Static.m_loadedSpheres;
-
-                Static = this;
-            }
+            Static = this;
         }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject systemParent, double objectOrbitRadius)
