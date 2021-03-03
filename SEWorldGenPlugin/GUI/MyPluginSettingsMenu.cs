@@ -189,7 +189,7 @@ namespace SEWorldGenPlugin.GUI
 
             parent.AddTableRow(planetRingPropLabel, m_planetRingBasePropSlider);
 
-            m_planetMoonMinMaxSlider = new MyGuiControlRangedSlider(1, 50, 1, 25, true, showLabel: true);
+            m_planetMoonMinMaxSlider = new MyGuiControlRangedSlider(1, 50, 1, 25, true, showLabel: true, width: 0.25f);
             m_planetMoonMinMaxSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_MOON_COUNT);
 
             parent.AddTableRow(planetMoonCountLabel, m_planetMoonMinMaxSlider);
