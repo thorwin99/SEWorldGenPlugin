@@ -213,8 +213,6 @@ namespace SEWorldGenPlugin.Session
         /// <returns></returns>
         public bool RemoveDynamicGps(long playerId, Guid id)
         {
-            MyPluginLog.Log("Removing dynamic gps " + id + " from player " + playerId);
-
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
