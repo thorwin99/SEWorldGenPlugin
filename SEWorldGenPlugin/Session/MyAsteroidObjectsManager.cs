@@ -28,39 +28,66 @@ namespace SEWorldGenPlugin.Session
         public override void LoadData()
         {
             base.LoadData();
+
+            MyPluginLog.Log("Asteroid object manager loading data");
+
             Static = this;
             AsteroidObjectProviders = new Dictionary<string, MyAbstractAsteroidObjectProvider>();
             LoadAllAsteroidTypes();
+
+            MyPluginLog.Log("Asteroid object manager loading data completed");
         }
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             base.Init(sessionComponent);
 
-            if (Sync.IsServer) return;
+            MyPluginLog.Log("Asteroid object manager initialization");
 
-            foreach(var provider in AsteroidObjectProviders)
+            if (!Sync.IsServer)
             {
-                provider.Value.FetchDataFromServer();
+                MyPluginLog.Log("Client is not the server, fetching asteroid provider data from server");
+
+                foreach (var provider in AsteroidObjectProviders)
+                {
+                    provider.Value.FetchDataFromServer();
+                }
+
+                return;
             }
+
+            MyPluginLog.Log("Asteroid object manager initialization complete");
         }
 
         public override void SaveData()
         {
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            MyPluginLog.Log("Asteroid object manager saving");
+
+            if (!MySettingsSession.Static.IsEnabled())
+            {
+                MyPluginLog.Log("Plugin not enabled or client is not server, aborting");
+                return;
+            }
 
             foreach (var provider in AsteroidObjectProviders.Values)
             {
+                MyPluginLog.Log("Saving asteroid provider " + provider.GetTypeName());
                 provider.OnSave();
             }
+
+            MyPluginLog.Log("Asteroid object manager saving complete");
         }
 
         protected override void UnloadData()
         {
+            MyPluginLog.Log("Asteroid object manager unloading data");
+
             base.UnloadData();
 
             AsteroidObjectProviders.Clear();
             Static = null;
+
+            MyPluginLog.Log("Asteroid object manager unloading data completed");
         }
 
         /// <summary>

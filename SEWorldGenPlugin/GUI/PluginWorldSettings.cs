@@ -23,7 +23,6 @@ namespace SEWorldGenPlugin.GUI
     /// </summary>
     public class PluginWorldSettings : MyGuiScreenWorldSettings
     {
-
         public static MyGuiScreenWorldSettings Static;
         public MyObjectBuilder_WorldSettings PluginSettings;
 

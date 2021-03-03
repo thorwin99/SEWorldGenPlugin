@@ -104,7 +104,13 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="sessionComponent"></param>
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            MyPluginLog.Log("Initializing Star system generator");
+
+            if (!MySettingsSession.Static.IsEnabled())
+            {
+                MyPluginLog.Log("Plugin is not enabled or client is not the server, aborting");
+                return;
+            }
 
             LoadPlanetDefinitions();
 
@@ -114,6 +120,8 @@ namespace SEWorldGenPlugin.Generator
             }
 
             CheckIntegrityOfSystem();
+
+            MyPluginLog.Log("Initializing Star system generator completed");
         }
 
         /// <summary>
@@ -201,6 +209,8 @@ namespace SEWorldGenPlugin.Generator
             UnloadNetworking();
 
             Static = null;
+
+            MyPluginLog.Log("Unloading star system generation data completed");
         }
 
         /// <summary>
@@ -357,7 +367,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns>A new MySystemPlanet</returns>
         private MySystemPlanet GeneratePlanet(int planetIndex, double maxDiameter, long orbitDistance)
         {
-            MyPluginLog.Debug("Generating new planet");
+            MyPluginLog.Log("Generating new planet");
 
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
 
@@ -365,7 +375,7 @@ namespace SEWorldGenPlugin.Generator
 
             if (def == null) 
             {
-                MyPluginLog.Debug("Could not load a planet definition for this planet.", LogLevel.WARNING);
+                MyPluginLog.Log("Could not load a planet definition for this planet.", LogLevel.WARNING);
                 return null; 
             }
 
@@ -400,7 +410,7 @@ namespace SEWorldGenPlugin.Generator
                     planet.ChildObjects.Add(moon);
                 }
             }
-            MyPluginLog.Debug("Planet generated");
+            MyPluginLog.Log("Planet generated");
             return planet;
         }
 
@@ -411,7 +421,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns></returns>
         private MySystemPlanetMoon[] GeneratePlanetMoons(MySystemPlanet parentPlanet)
         {
-            MyPluginLog.Debug("Generating moons for planet " + parentPlanet.DisplayName);
+            MyPluginLog.Log("Generating moons for planet " + parentPlanet.DisplayName);
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
             uint maxMoons = (uint)Math.Ceiling(parentPlanet.Diameter / 120000 * 2);
@@ -429,7 +439,7 @@ namespace SEWorldGenPlugin.Generator
 
             for(int i = 0; i < numMoons; i++)
             {
-                MyPluginLog.Debug("Generating moon " + i);
+                MyPluginLog.Log("Generating moon " + i);
 
                 double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(1f, 1.5f);
                 var definition = FindPlanetDefinitionForSize(parentPlanet.Diameter * 0.75f, true);
@@ -459,6 +469,8 @@ namespace SEWorldGenPlugin.Generator
                 moons[i] = moon;
             }
 
+            MyPluginLog.Log("Generating moons for planet " + parentPlanet.DisplayName + " completed");
+
             return moons;
         }
 
@@ -469,7 +481,7 @@ namespace SEWorldGenPlugin.Generator
         /// <returns>The ring for the planet</returns>
         private MySystemAsteroids GenrateRing(MySystemPlanet parentPlanet)
         {
-            MyPluginLog.Debug("Generating ring for planet " + parentPlanet.DisplayName);
+            MyPluginLog.Log("Generating ring for planet " + parentPlanet.DisplayName);
 
             var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[MyAsteroidRingProvider.TYPE_NAME];
             var ring = provider.GenerateInstance(0, parentPlanet, 0);

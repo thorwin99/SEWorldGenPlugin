@@ -78,7 +78,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         {
             if (!MySettingsSession.Static.IsEnabled()) return;
 
-            MyPluginLog.Debug("Loading Procedural Generator Component");
+            MyPluginLog.Log("Loading Procedural Generator Component");
 
             Static = this;
 
@@ -95,6 +95,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             //Add default impl of registering of standard generator components
             RegisterModule(new MyProceduralPlanetModule(m_seed));
             RegisterModule(new MyProceduralAsteroidsModule(m_seed));
+
+            MyPluginLog.Log("Loading Procedural Generator Component completed");
         }
 
         /// <summary>
@@ -142,9 +144,13 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         protected override void UnloadData()
         {
+            MyPluginLog.Log("Unloading Procedural Generator Component");
+
             m_trackedEntities.Clear();
             m_cellModules.Clear();
             m_objectModules.Clear();
+
+            MyPluginLog.Log("Unloading Procedural Generator Component completed");
         }
 
         /// <summary>
@@ -153,6 +159,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <param name="module"></param>
         public void RegisterModule(MyAbstractProceduralCellModule module)
         {
+            MyPluginLog.Log("Registering new Procedural generation module " + module.GetType());
+
             if (!m_cellModules.Contains(module))
             {
                 m_cellModules.Add(module);

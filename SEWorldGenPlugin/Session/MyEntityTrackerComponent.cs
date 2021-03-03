@@ -1,5 +1,6 @@
 ﻿using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
+using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
 using VRage.Game.Components;
 using VRage.Game.Entity;
@@ -93,6 +94,8 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void LoadData()
         {
+            MyPluginLog.Log("Entity tracker loading data");
+
             base.LoadData();
 
             Static = this;
@@ -100,6 +103,8 @@ namespace SEWorldGenPlugin.Session
             m_trackedEntities = new List<MyEntity>();
             m_newTrackedEntities = new List<MyEntity>();
             m_toUntrackEntities = new List<MyEntity>();
+
+            MyPluginLog.Log("Entity tracker loading data completed");
         }
 
         /// <summary>

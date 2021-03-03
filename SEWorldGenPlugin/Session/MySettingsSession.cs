@@ -110,11 +110,15 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         protected override void UnloadData()
         {
+            MyPluginLog.Log("Unloading Session settings data");
+
             if (Sync.IsServer)
                 MyFileUtils.WriteXmlFileToWorld(Settings, FILE_NAME, typeof(MySettingsSession));
             Settings = null;
 
             MySettings.Static.SessionSettings = null;
+
+            MyPluginLog.Log("Unloading Session settings data completed");
         }
 
         /// <summary>

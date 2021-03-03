@@ -91,7 +91,7 @@ namespace SEWorldGenPlugin.Session
 
             if (!m_globalGpss.ContainsKey(id))
             {
-                MyPluginLog.Debug("Adding new persistent gps " + name);
+                MyPluginLog.Log("Adding new persistent gps " + name);
                 m_globalGpss[id] = data;
             }
         }
@@ -114,7 +114,8 @@ namespace SEWorldGenPlugin.Session
         {
             if (PersistenGpsExists(id))
             {
-                
+                MyPluginLog.Log("Removing persistent gps " + id);
+
                 MyGps gps = new MyGps
                 {
                     Name = m_globalGpss[id].Name,
@@ -145,6 +146,8 @@ namespace SEWorldGenPlugin.Session
         /// <returns>False, if the gps is already added, else true</returns>
         public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId, Guid id)
         {
+            MyPluginLog.Log("Adding new dynamic gps " + name + " for player " + playerId);
+
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
@@ -212,6 +215,8 @@ namespace SEWorldGenPlugin.Session
         /// <returns></returns>
         public bool RemoveDynamicGps(long playerId, Guid id)
         {
+            MyPluginLog.Log("Removing dynamic gps " + id + " from player " + playerId);
+
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
