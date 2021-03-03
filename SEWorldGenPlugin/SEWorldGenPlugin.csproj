@@ -245,6 +245,7 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Examples\DefaultWorldSettings.xml" />
     <Content Include="Examples\Global\full_config_example.xml" />
     <Content Include="Examples\Global\mandatory_planets_moons_example.xml" />
     <Content Include="Examples\Global\suns_example_for_ata_stars_mod.xml" />

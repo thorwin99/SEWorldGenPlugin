@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-16"?>
+<MyObjectBuilder_WorldSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Enabled>true</Enabled>
+  <GeneratorSettings>
+    <SystemGenerator>FULL_RANDOM</SystemGenerator>
+    <AsteroidGenerator>PLUGIN</AsteroidGenerator>
+    <AllowVanillaPlanets>true</AllowVanillaPlanets>
+    <MinMaxPlanets>
+      <Min>5</Min>
+      <Max>15</Max>
+    </MinMaxPlanets>
+    <MinMaxAsteroidObjects>
+      <Min>5</Min>
+      <Max>15</Max>
+    </MinMaxAsteroidObjects>
+    <MinMaxOrbitDistance>
+      <Min>4000000</Min>
+      <Max>100000000</Max>
+    </MinMaxOrbitDistance>
+    <AsteroidDensity>0.6</AsteroidDensity>
+    <WorldSize>-1</WorldSize>
+    <PlanetSettings>
+      <PlanetSizeMultiplier>1</PlanetSizeMultiplier>
+      <PlanetSizeCap>1200000</PlanetSizeCap>
+      <BaseMoonProbability>0.3</BaseMoonProbability>
+      <BaseRingProbability>0.25</BaseRingProbability>
+      <MinMaxMoons>
+        <Min>1</Min>
+        <Max>25</Max>
+      </MinMaxMoons>
+    </PlanetSettings>
+    <GPSSettings>
+      <PlanetGPSMode>PERSISTENT</PlanetGPSMode>
+      <MoonGPSMode>NONE</MoonGPSMode>
+      <AsteroidGPSMode>DISCOVERY</AsteroidGPSMode>
+    </GPSSettings>
+  </GeneratorSettings>
+</MyObjectBuilder_WorldSettings>
