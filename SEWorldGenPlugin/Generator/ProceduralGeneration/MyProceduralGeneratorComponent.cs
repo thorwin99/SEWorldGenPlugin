@@ -186,9 +186,17 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             {
                 TrackEntityWithRange(entity, MySession.Static.Settings.ViewDistance);
             }
-            if(entity is MyCubeGrid)
+            if(entity is MyCubeGrid grid && !grid.IsStatic)
             {
-                TrackEntityWithRange(entity, MySession.Static.Settings.ViewDistance);
+
+                if(grid.PlayerPresenceTier == VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
+                {
+                    TrackEntityWithRange(entity, MySession.Static.Settings.ViewDistance);
+                }
+                else
+                {
+                    TrackEntityWithRange(entity, entity.PositionComp.WorldAABB.HalfExtents.Length());
+                }
             }
             
         }
