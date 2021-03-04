@@ -188,7 +188,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             }
             if(entity is MyCubeGrid)
             {
-                TrackEntityWithRange(entity, entity.PositionComp.WorldAABB.HalfExtents.Length());
+                TrackEntityWithRange(entity, MySession.Static.Settings.ViewDistance);
             }
             
         }

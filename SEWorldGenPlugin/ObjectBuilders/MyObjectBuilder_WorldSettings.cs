@@ -121,7 +121,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MinMaxAsteroidObjects.Verify();
             MinMaxOrbitDistance.Verify();
 
-            MyValueVerifier.VerifyFloat(0f, 1f, 0.6f, "AsteroidDensity", ref AsteroidDensity);
+            MyValueVerifier.VerifyFloat(0f, 2f, 0.6f, "AsteroidDensity", ref AsteroidDensity);
             MyValueVerifier.VerifyLong(-1, long.MaxValue, -1, "WorldSize", ref WorldSize);
 
             PlanetSettings.Verify();
