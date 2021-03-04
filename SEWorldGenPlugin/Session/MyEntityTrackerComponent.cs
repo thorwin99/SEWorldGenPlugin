@@ -55,9 +55,13 @@ namespace SEWorldGenPlugin.Session
                 {
                     TrackEntity(entity);
                 }
-                if(entity is MyCubeGrid)
+                if(entity is MyCubeGrid grid)
                 {
-                    TrackEntity(entity);
+                    if(grid.PlayerPresenceTier == VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
+                    {
+                        TrackEntity(entity);
+                        grid.PlayerPresenceTierChanged += OnGridPlayerPresenceUpdate;
+                    }
                 }
             }
 
@@ -147,6 +151,14 @@ namespace SEWorldGenPlugin.Session
         public void UnregisterTracker(IMyEntityTracker tracker)
         {
             m_entityTrackers.Remove(tracker);
+        }
+
+        private void OnGridPlayerPresenceUpdate(MyCubeGrid grid)
+        {
+            if(grid.PlayerPresenceTier != VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
+            {
+                m_toUntrackEntities.Add(grid);
+            }
         }
     }
 }
