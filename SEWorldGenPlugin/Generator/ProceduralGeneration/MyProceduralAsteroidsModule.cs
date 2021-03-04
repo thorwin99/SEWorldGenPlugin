@@ -263,7 +263,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 for (var it = new Vector3I_RangeIterator(ref Vector3I.Zero, ref max); it.IsValid(); it.GetNext(out subcellId))
                 {
-                    Vector3D position = new Vector3D(MyRandom.Instance.NextDouble() / 2, MyRandom.Instance.NextDouble() / 2, MyRandom.Instance.NextDouble() / 2);
+                    Vector3D position = new Vector3D(MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble());
                     position += (Vector3D)subcellId;
                     position *= subCellSize;
                     position += cellId * CELL_SIZE;
