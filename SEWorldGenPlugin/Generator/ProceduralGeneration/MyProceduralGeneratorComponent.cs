@@ -159,7 +159,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <param name="module"></param>
         public void RegisterModule(MyAbstractProceduralCellModule module)
         {
-            MyPluginLog.Log("Registering new Procedural generation module " + module.GetType());
+            MyPluginLog.Log("Registering new Procedural generation cell module " + module.GetType());
 
             if (!m_cellModules.Contains(module))
             {
@@ -173,6 +173,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <param name="module"></param>
         public void RegisterModule(MyAbstractProceduralObjectModul module)
         {
+            MyPluginLog.Log("Registering new Procedural generation module " + module.GetType());
+
             if (!m_objectModules.Contains(module))
             {
                 m_objectModules.Add(module);
