@@ -80,6 +80,7 @@ namespace SEWorldGenPlugin.GUI
             m_spawnTypeCombo.SelectItemByKey(m_spawnType);
             m_spawnTypeCombo.ItemSelected += OnSpawnTypeChange;
             m_spawnTypeCombo.Size = new Vector2(m_usableWidth * 0.9f, m_spawnTypeCombo.Size.Y);
+            m_spawnTypeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.ADMIN_SPAWN_TYPE);
 
             table.AddTableRow(m_spawnTypeCombo);
 
@@ -143,6 +144,7 @@ namespace SEWorldGenPlugin.GUI
             m_planetSizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSettings.PlanetSizeCap, m_usableWidth - 0.1f, intValue: true, showLabel: true, labelSuffix: " m");
             m_planetSizeSlider.DefaultValue = Math.Min(120000, settings.PlanetSettings.PlanetSizeCap);
             m_planetSizeSlider.Value = m_planetSizeSlider.DefaultValue.Value;
+            m_planetSizeSlider.SetToolTip(MyPluginTexts.TOOLTIPS.ADMIN_PLANET_DIAM);
 
             table.AddTableRow(m_planetSizeSlider);
 
@@ -154,6 +156,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_nameBox = new MyGuiControlTextbox();
             m_nameBox.Size = new Vector2(m_usableWidth, m_nameBox.Size.Y);
+            m_nameBox.SetToolTip(MyPluginTexts.TOOLTIPS.ADMIN_NAME);
 
             table.AddTableRow(m_nameBox);
 
@@ -164,6 +167,7 @@ namespace SEWorldGenPlugin.GUI
                 OnSpawnPlanet();
             });
             m_spawnPlanetButton.Enabled = false;
+            m_spawnPlanetButton.SetToolTip(MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SPAWN);
 
             table.AddTableRow(m_spawnPlanetButton);
 
@@ -172,6 +176,7 @@ namespace SEWorldGenPlugin.GUI
                 OnSpawnPlanet(true);
             });
             m_spawnPlanetCoordsButton.Enabled = false;
+            m_spawnPlanetCoordsButton.SetToolTip(MyPluginTexts.TOOLTIPS.ADMIN_PLANET_SPAWN_COORD);
 
             table.AddTableRow(m_spawnPlanetCoordsButton);
 
@@ -217,6 +222,7 @@ namespace SEWorldGenPlugin.GUI
                 RecreateControls(false);
             };
             m_asteroidTypeCombo.Size = new Vector2(m_usableWidth * 0.9f, m_asteroidTypeCombo.Size.Y);
+            m_asteroidTypeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.ADMIN_ROID_TYPE);
 
             table.AddTableRow(m_asteroidTypeCombo);
 
