@@ -1,4 +1,5 @@
-﻿using Sandbox.Engine.Voxels;
+﻿using Sandbox.Definitions;
+using Sandbox.Engine.Voxels;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
@@ -41,11 +42,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         private List<MyVoxelBase> m_tmpAsteroids;
         private bool m_isSaving = false;
 
+        private MyAsteroidGeneratorDefinition m_definition;
+
         public MyProceduralAsteroidsModule(int seed) : base(seed, CELL_SIZE)
         {
             m_tmpAsteroids = new List<MyVoxelBase>();
             m_providerType = typeof(MyProceduralWorldGenerator).Assembly.GetType("Sandbox.Game.World.Generator.MyCompositeShapeProvider");
             m_createRoid = m_providerType.GetMethod("CreateAsteroidShape");
+            m_definition = GetData();
 
             MySession.Static.OnSavingCheckpoint += delegate
             {
@@ -168,7 +172,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if (exists) continue;
 
-                    var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, 3);
+                    var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
 
                     MyVoxelMap voxelMap;
@@ -278,6 +282,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     cellObjectSeed.Params.Type = VRage.Game.MyObjectSeedType.Asteroid;
                     cellObjectSeed.Params.Seed = MyRandom.Instance.Next();
                     cellObjectSeed.Params.Index = index++;
+                    cellObjectSeed.Params.GeneratorSeed = m_definition.UseGeneratorSeed ? MyRandom.Instance.Next() : 0;
 
                     cell.AddObject(cellObjectSeed);
                 }
@@ -375,6 +380,40 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 }
                 m_isSaving = false;
             }
+        }
+
+        /// <summary>
+        /// Retreives the data for the vanilla asteroid generator to
+        /// correctly generate asteroids.
+        /// </summary>
+        /// <returns>The asteroid generator definition</returns>
+        private MyAsteroidGeneratorDefinition GetData()
+        {
+            MyAsteroidGeneratorDefinition myAsteroidGeneratorDefinition = null;
+            int voxelGeneratorVersion = MySession.Static.Settings.VoxelGeneratorVersion;
+            foreach (MyAsteroidGeneratorDefinition value in MyDefinitionManager.Static.GetAsteroidGeneratorDefinitions().Values)
+            {
+                if (value.Version == voxelGeneratorVersion)
+                {
+                    myAsteroidGeneratorDefinition = value;
+                    break;
+                }
+            }
+            if (myAsteroidGeneratorDefinition == null)
+            {
+                MyPluginLog.Log("Generator of version " + voxelGeneratorVersion + "not found!");
+                {
+                    foreach (MyAsteroidGeneratorDefinition value2 in MyDefinitionManager.Static.GetAsteroidGeneratorDefinitions().Values)
+                    {
+                        if (myAsteroidGeneratorDefinition == null || (value2.Version > voxelGeneratorVersion && (myAsteroidGeneratorDefinition.Version < voxelGeneratorVersion || value2.Version < myAsteroidGeneratorDefinition.Version)))
+                        {
+                            myAsteroidGeneratorDefinition = value2;
+                        }
+                    }
+                    return myAsteroidGeneratorDefinition;
+                }
+            }
+            return myAsteroidGeneratorDefinition;
         }
     }
 }
