@@ -673,7 +673,6 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void CheckIntegrityOfSystem()
         {
-            MyPluginLog.Debug("Checking system integrity");
             foreach(var obj in StarSystem.GetAllObjects())
             {
                 if(obj is MySystemPlanet)
@@ -701,7 +700,6 @@ namespace SEWorldGenPlugin.Generator
                     }
                 }
             }
-            MyPluginLog.Debug("Integrity check complete");
         }
 
         /// <summary>

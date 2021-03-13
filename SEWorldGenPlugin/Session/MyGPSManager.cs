@@ -91,7 +91,6 @@ namespace SEWorldGenPlugin.Session
 
             if (!m_globalGpss.ContainsKey(id))
             {
-                MyPluginLog.Log("Adding new persistent gps " + name);
                 m_globalGpss[id] = data;
             }
         }
@@ -114,8 +113,6 @@ namespace SEWorldGenPlugin.Session
         {
             if (PersistenGpsExists(id))
             {
-                MyPluginLog.Log("Removing persistent gps " + id);
-
                 MyGps gps = new MyGps
                 {
                     Name = m_globalGpss[id].Name,
