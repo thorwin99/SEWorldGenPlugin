@@ -120,6 +120,10 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             m_currentSelectedAsteroid = asteroidObject;
 
+            m_offset = Vector3D.Zero;
+
+            GenerateRingSettingElements(usableWidth, parentTable);
+
             MyGuiControlButton teleportToRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Teleport to ring", OnTeleportToRing);
 
             parentTable.AddTableRow(teleportToRingButton);
@@ -148,6 +152,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             m_parentScreen = adminScreen;
             m_offset = Vector3D.Zero;
+            m_currentSelectedAsteroid = null;
 
             if (m_fetchedStarSytem == null)
             {
@@ -175,9 +180,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_parentObjectListBox.SelectAllVisible();
             m_parentObjectListBox.ItemsSelected += OnParentItemClicked;
 
-            foreach(var obj in m_fetchedStarSytem.CenterObject.GetAllChildren())
+            foreach (var obj in m_fetchedStarSytem.CenterObject.GetAllChildren())
             {
-                if(obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
+                if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
                 {
                     m_parentObjectListBox.Add(new MyGuiControlListbox.Item(new System.Text.StringBuilder(obj.DisplayName), userData: obj));
                 }
@@ -203,71 +208,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableSeparator();
 
-            m_radiusSlider = new MyGuiControlClickableSlider(width: usableWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
-            m_radiusSlider.Enabled = false;
-            m_radiusSlider.ValueChanged += delegate
-            {
-                UpdateRingVisual(GenerateAsteroidRing());
-            };
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Radius"));
-            parentTable.AddTableRow(m_radiusSlider);
-
-            m_widthSlider = new MyGuiControlClickableSlider(null, 0, 1, usableWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
-            m_widthSlider.Enabled = false;
-            m_widthSlider.ValueChanged += delegate
-            {
-                UpdateRingVisual(GenerateAsteroidRing());
-            };
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Width"));
-            parentTable.AddTableRow(m_widthSlider);
-
-            m_heightSlider = new MyGuiControlClickableSlider(null, 0, 1, usableWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
-            m_heightSlider.Enabled = false;
-            m_heightSlider.ValueChanged += delegate
-            {
-                UpdateRingVisual(GenerateAsteroidRing());
-            };
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Height"));
-            parentTable.AddTableRow(m_heightSlider);
-
-            m_asteroidSizesSlider = new MyGuiControlRangedSlider(32, 1024, 32, 1024, true, width: usableWidth - 0.1f, showLabel: true);
-            m_asteroidSizesSlider.Enabled = false;
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Asteroid size range"));
-            parentTable.AddTableRow(m_asteroidSizesSlider);
-
-            m_angleXSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
-            m_angleXSlider.Enabled = false;
-            m_angleXSlider.ValueChanged += delegate
-            {
-                UpdateRingVisual(GenerateAsteroidRing());
-            };
-
-            m_angleYSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
-            m_angleYSlider.Enabled = false;
-            m_angleYSlider.ValueChanged += delegate
-            {
-                UpdateRingVisual(GenerateAsteroidRing());
-            };
-
-            m_angleZSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
-            m_angleZSlider.Enabled = false;
-            m_angleZSlider.ValueChanged += delegate
-            {
-                UpdateRingVisual(GenerateAsteroidRing());
-            };
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle X Axis"));
-            parentTable.AddTableRow(m_angleXSlider);
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle Y Axis"));
-            parentTable.AddTableRow(m_angleYSlider);
-
-            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle Z Axis"));
-            parentTable.AddTableRow(m_angleZSlider);
+            GenerateRingSettingElements(usableWidth, parentTable);
 
             m_nameBox = new MyGuiControlTextbox();
             m_nameBox.Size = new Vector2(usableWidth, m_nameBox.Size.Y);
@@ -275,7 +216,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Name"));
             parentTable.AddTableRow(m_nameBox);
 
-            m_zoomInButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Zoom to ring", delegate 
+            m_zoomInButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Zoom to ring", delegate
             {
                 if (m_snapToParent)
                     m_parentScreen.CameraLookAt(GenerateAsteroidRing().CenterPosition, new Vector3D(0, 0, (m_radiusSlider.Value + m_widthSlider.Value) * 2000));
@@ -300,7 +241,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             {
                 StringBuilder name = new StringBuilder();
                 m_nameBox.GetText(name);
-                if(name.Length < 4)
+                if (name.Length < 4)
                 {
                     MyPluginGuiHelper.DisplayError("Name must be at least 4 letters long", "Error");
                     return;
@@ -310,7 +251,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 MyAsteroidRingData ring;
                 GenerateAsteroidData(out ring, out instance);
 
-                if(ring == null || instance == null)
+                if (ring == null || instance == null)
                 {
                     MyPluginGuiHelper.DisplayError("Could not generate asteroid ring. No data found.", "Error");
                     return;
@@ -334,6 +275,75 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             parentTable.AddTableRow(m_spawnRingButton);
 
             return true;
+        }
+
+        private void GenerateRingSettingElements(float usableWidth, MyGuiControlParentTableLayout parentTable)
+        {
+            m_radiusSlider = new MyGuiControlClickableSlider(width: usableWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
+            m_radiusSlider.Enabled = false;
+            m_radiusSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GetAsteroidDataFromGui());
+            };
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Radius"));
+            parentTable.AddTableRow(m_radiusSlider);
+
+            m_widthSlider = new MyGuiControlClickableSlider(null, 0, 1, usableWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
+            m_widthSlider.Enabled = false;
+            m_widthSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GetAsteroidDataFromGui());
+            };
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Width"));
+            parentTable.AddTableRow(m_widthSlider);
+
+            m_heightSlider = new MyGuiControlClickableSlider(null, 0, 1, usableWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
+            m_heightSlider.Enabled = false;
+            m_heightSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GetAsteroidDataFromGui());
+            };
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Height"));
+            parentTable.AddTableRow(m_heightSlider);
+
+            m_asteroidSizesSlider = new MyGuiControlRangedSlider(32, 1024, 32, 1024, true, width: usableWidth - 0.1f, showLabel: true);
+            m_asteroidSizesSlider.Enabled = false;
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Asteroid size range"));
+            parentTable.AddTableRow(m_asteroidSizesSlider);
+
+            m_angleXSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
+            m_angleXSlider.Enabled = false;
+            m_angleXSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GetAsteroidDataFromGui());
+            };
+
+            m_angleYSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
+            m_angleYSlider.Enabled = false;
+            m_angleYSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GetAsteroidDataFromGui());
+            };
+
+            m_angleZSlider = new MyGuiControlClickableSlider(null, -90, 90, usableWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
+            m_angleZSlider.Enabled = false;
+            m_angleZSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GetAsteroidDataFromGui());
+            };
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle X Axis"));
+            parentTable.AddTableRow(m_angleXSlider);
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle Y Axis"));
+            parentTable.AddTableRow(m_angleYSlider);
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Angle Z Axis"));
+            parentTable.AddTableRow(m_angleZSlider);
         }
 
         public void Close()
@@ -435,6 +445,35 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             systemObject.ParentId = parentItem.Id;
 
             ringData = GenerateAsteroidRing();
+        }
+
+        /// <summary>
+        /// Returns the Asteroid data generated from the gui elements.
+        /// </summary>
+        /// <returns>The asteroid ring data generated</returns>
+        private MyAsteroidRingData GetAsteroidDataFromGui()
+        {
+            Vector3D center;
+
+            if(m_currentSelectedAsteroid == null)
+            {
+                if (m_parentObjectListBox.SelectedItems.Count <= 0) return null;
+                var selected = m_parentObjectListBox.SelectedItems[m_parentObjectListBox.SelectedItems.Count - 1];
+                center = (selected.UserData as MySystemObject).CenterPosition + m_offset;
+            }
+            else
+            {
+                center = m_currentSelectedAsteroid.CenterPosition;
+            }
+
+            MyAsteroidRingData ring = new MyAsteroidRingData();
+            ring.CenterPosition = center;
+            ring.Width = m_widthSlider.Value * 1000;
+            ring.Height = m_heightSlider.Value * 1000;
+            ring.Radius = m_radiusSlider.Value * 1000;
+            ring.AngleDegrees = new Vector3D(m_angleXSlider.Value, m_angleYSlider.Value, m_angleZSlider.Value);
+            return ring;
+
         }
 
         /// <summary>
