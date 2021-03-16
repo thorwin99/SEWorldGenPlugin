@@ -44,6 +44,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private MyGuiControlClickableSlider m_widthSlider;
 
         /// <summary>
+        /// The slider for the asteroid ring height in the spawn menu
+        /// </summary>
+        private MyGuiControlClickableSlider m_heightSlider;
+
+        /// <summary>
         /// The slider for the asteroid ring asteroid size range in the spawn menu
         /// </summary>
         private MyGuiControlRangedSlider m_asteroidSizesSlider;
@@ -122,6 +127,10 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             MyGuiControlButton deleteRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Remove ring", OnRemoveRing);
 
             parentTable.AddTableRow(deleteRingButton);
+
+            MyGuiControlButton editRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Edit ring", OnRemoveRing);
+
+            parentTable.AddTableRow(editRingButton);
 
             parentTable.AddTableSeparator();
 
@@ -213,6 +222,16 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Width"));
             parentTable.AddTableRow(m_widthSlider);
+
+            m_heightSlider = new MyGuiControlClickableSlider(null, 0, 1, usableWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
+            m_heightSlider.Enabled = false;
+            m_heightSlider.ValueChanged += delegate
+            {
+                UpdateRingVisual(GenerateAsteroidRing());
+            };
+
+            parentTable.AddTableRow(new MyGuiControlLabel(null, null, "Height"));
+            parentTable.AddTableRow(m_heightSlider);
 
             m_asteroidSizesSlider = new MyGuiControlRangedSlider(32, 1024, 32, 1024, true, width: usableWidth - 0.1f, showLabel: true);
             m_asteroidSizesSlider.Enabled = false;
@@ -431,7 +450,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             MyAsteroidRingData ring = new MyAsteroidRingData();
             ring.CenterPosition = parent.CenterPosition + m_offset;
             ring.Width = m_widthSlider.Value * 1000;
-            ring.Height = ring.Width / 10;
+            ring.Height = m_heightSlider.Value * 1000;
             ring.Radius = m_radiusSlider.Value * 1000;
             ring.AngleDegrees = new Vector3D(m_angleXSlider.Value, m_angleYSlider.Value, m_angleZSlider.Value);
             return ring;
@@ -465,6 +484,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                     m_widthSlider.Value = m_widthSlider.MinValue + (m_widthSlider.MaxValue - m_widthSlider.MinValue) / 2;
                     m_widthSlider.Enabled = true;
 
+                    m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
+                    m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
+                    m_heightSlider.Value = m_heightSlider.MinValue + (m_heightSlider.MaxValue - m_heightSlider.MinValue) / 2;
+                    m_heightSlider.Enabled = true;
+
                     m_asteroidSizesSlider.Enabled = true;
                     m_asteroidSizesSlider.SetValues(32, 1024);
 
@@ -496,6 +520,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 m_widthSlider.Value = m_widthSlider.MinValue + (m_widthSlider.MaxValue - m_widthSlider.MinValue) / 2;
                 m_widthSlider.Enabled = true;
 
+                m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
+                m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
+                m_heightSlider.Value = m_heightSlider.MinValue + (m_heightSlider.MaxValue - m_heightSlider.MinValue) / 2;
+                m_heightSlider.Enabled = true;
+
                 m_asteroidSizesSlider.Enabled = true;
                 m_asteroidSizesSlider.SetValues(32, 1024);
 
@@ -516,6 +545,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             {
                 m_radiusSlider.Enabled = false;
                 m_widthSlider.Enabled = false;
+                m_heightSlider.Enabled = false;
                 m_asteroidSizesSlider.Enabled = false;
                 m_angleXSlider.Enabled = false;
                 m_angleYSlider.Enabled = false;
