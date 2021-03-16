@@ -173,6 +173,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             });
         }
 
+        /// <summary>
+        /// Edits an instance of an asteroid ring
+        /// </summary>
+        /// <param name="systemInstance">The ring instance</param>
+        /// <param name="ringData">The new ring data</param>
+        public void EditInstance(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
+        {
+            if (ringData == null || systemInstance == null)
+            {
+                return;
+            }
+            PluginEventHandler.Static.RaiseStaticEvent(EditRingServer, systemInstance, ringData);
+        }
+
         public override object GetInstanceData(MySystemAsteroids instance)
         {
             if (!m_loadedRings.ContainsKey(instance.Id)) return null;
@@ -213,6 +227,19 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             Static?.m_loadedRings.Add(systemInstance.Id, ringData);
             PluginEventHandler.Static.RaiseStaticEvent(NotifyAddInstance, systemInstance.Id, ringData);
+        }
+
+        /// <summary>
+        /// Server event: Edits an Asteroid ring on the server, if the provider is loaded on the server
+        /// </summary>
+        /// <param name="systemInstance">The instance of the object as an SystemAsteroids object</param>
+        /// <param name="ringData">The custom data for the asteroid ring</param>
+        [Event(100007)]
+        [Server]
+        private static void EditRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
+        {
+            Static?.m_loadedRings.Add(systemInstance.Id, ringData);
+            PluginEventHandler.Static.RaiseStaticEvent(NotifyEditInstance, systemInstance.Id, ringData);
         }
 
         /// <summary>
@@ -282,6 +309,24 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             if (!Static.m_loadedRings.ContainsKey(id)) return;
 
             Static.m_loadedRings.Remove(id);
+        }
+
+        /// <summary>
+        /// Broadcasts: Notifies clients, that instance was edited
+        /// </summary>
+        /// <param name="id">Id of the instance</param>
+        /// <param name="data">Data of the edited instance</param>
+        [Event(100006)]
+        [Broadcast]
+        private static void NotifyEditInstance(Guid id, MyAsteroidRingData data)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Got notified about the edit of an Asteroid ring instance " + id);
+
+            if (!Static.m_loadedRings.ContainsKey(id)) return;
+
+            Static.m_loadedRings[id] = data;
         }
 
         /// <summary>
