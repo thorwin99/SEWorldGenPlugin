@@ -136,7 +136,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             parentTable.AddTableRow(deleteRingButton);
 
             MyGuiControlButton editRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Edit ring", OnEditRing);
-
             parentTable.AddTableRow(editRingButton);
 
             parentTable.AddTableSeparator();
@@ -280,13 +279,24 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return true;
         }
 
+        /// <summary>
+        /// Callback when edit ring button is pressed
+        /// </summary>
+        /// <param name="button">Button to press</param>
         private void OnEditRing(MyGuiControlButton button)
         {
             var data = GetAsteroidDataFromGui();
 
             MyAsteroidRingProvider.Static.EditInstance(m_currentSelectedAsteroid, data);
+
+            MyPluginGuiHelper.DisplayMessage("The ring was updated", "Message");
         }
 
+        /// <summary>
+        /// Generates the specific gui elements to set ring data and puts them into the parent table
+        /// </summary>
+        /// <param name="usableWidth">Usable width for gui elements</param>
+        /// <param name="parentTable">Parent table</param>
         private void GenerateRingSettingElements(float usableWidth, MyGuiControlParentTableLayout parentTable)
         {
             m_radiusSlider = new MyGuiControlClickableSlider(width: usableWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
@@ -515,21 +525,51 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             MyAsteroidRingData data = MyAsteroidRingProvider.Static.GetInstanceData(instance) as MyAsteroidRingData;
             var planet  = m_fetchedStarSytem.GetObjectById(instance.ParentId) as MySystemPlanet;
 
-            if (planet == null) return;
+            if (planet == null)
+            {
+                var settings = MySettingsSession.Static.Settings.GeneratorSettings;
+
+                m_radiusSlider.MinValue = settings.MinMaxOrbitDistance.Min / 1000;
+                m_radiusSlider.MaxValue = settings.WorldSize < 0 ? int.MaxValue / 1000 : settings.WorldSize / 1000;
+                m_radiusSlider.Value = m_radiusSlider.MinValue + (m_radiusSlider.MaxValue - m_radiusSlider.MinValue) / 2;
+                m_radiusSlider.Enabled = true;
+
+                m_widthSlider.MinValue = settings.MinMaxOrbitDistance.Min / 2000;
+                m_widthSlider.MaxValue = settings.MinMaxOrbitDistance.Max / 1000;
+                m_widthSlider.Value = m_widthSlider.MinValue + (m_widthSlider.MaxValue - m_widthSlider.MinValue) / 2;
+                m_widthSlider.Enabled = true;
+
+                m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
+                m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
+                m_heightSlider.Value = m_heightSlider.MinValue + (m_heightSlider.MaxValue - m_heightSlider.MinValue) / 2;
+                m_heightSlider.Enabled = true;
+
+                m_asteroidSizesSlider.Enabled = true;
+                m_asteroidSizesSlider.SetValues(32, 1024);
+
+                m_angleXSlider.Enabled = true;
+                m_angleXSlider.Value = 0;
+                m_angleYSlider.Enabled = true;
+                m_angleYSlider.Value = 0;
+                m_angleZSlider.Enabled = true;
+                m_angleZSlider.Value = 0;
+
+                return;
+            }
 
             m_radiusSlider.MinValue = (int)planet.Diameter / 1000 * 0.75f;
             m_radiusSlider.MaxValue = (int)planet.Diameter / 1000 * 2f;
-            m_radiusSlider.Value = (float)data.Radius;
+            m_radiusSlider.Value = (float)data.Radius / 1000;
             m_radiusSlider.Enabled = true;
 
             m_widthSlider.MinValue = (int)planet.Diameter / 1000 / 20f;
             m_widthSlider.MaxValue = (int)planet.Diameter / 1000 / 1.25f;
-            m_widthSlider.Value = (float)data.Width;
+            m_widthSlider.Value = (float)data.Width / 1000;
             m_widthSlider.Enabled = true;
 
             m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
             m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
-            m_heightSlider.Value = (float)data.Height;
+            m_heightSlider.Value = (float)data.Height / 1000;
             m_heightSlider.Enabled = true;
 
             m_asteroidSizesSlider.Enabled = true;

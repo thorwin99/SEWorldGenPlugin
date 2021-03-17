@@ -183,7 +183,7 @@ namespace SEWorldGenPlugin.GUI
 
             var topCombo = GetCombo();
             Vector2 start = m_systemObjectsBox.Position + new Vector2(-0.001f, MARGIN_VERT * 2 + m_systemObjectsBox.Size.Y);
-            Vector2 end = start + new Vector2(topCombo.Size.X, 0.8f - MARGIN_VERT);
+            Vector2 end = new Vector2(topCombo.Size.X, 0.5f - MARGIN_VERT);
 
             m_scrollPane = new MyGuiControlScrollablePanel(m_scrollTable);
             m_scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;

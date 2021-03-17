@@ -238,7 +238,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         [Server]
         private static void EditRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
         {
-            Static?.m_loadedRings.Add(systemInstance.Id, ringData);
+            if (Static == null) return;
+            if (!Static.m_loadedRings.ContainsKey(systemInstance.Id)) return;
+
+            Static.m_loadedRings[systemInstance.Id] = ringData;
+
             PluginEventHandler.Static.RaiseStaticEvent(NotifyEditInstance, systemInstance.Id, ringData);
         }
 
