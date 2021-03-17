@@ -119,8 +119,6 @@ namespace SEWorldGenPlugin.Generator
                 StarSystem = GenerateNewStarSystem();
             }
 
-            CheckIntegrityOfSystem();
-
             MyPluginLog.Log("Initializing Star system generator completed");
         }
 
@@ -712,7 +710,6 @@ namespace SEWorldGenPlugin.Generator
             if (MyFileUtils.FileExistsInWorldStorage(STORAGE_FILE, typeof(MyStarSystemGenerator)))
             {
                 var data = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_SystemData>(STORAGE_FILE, typeof(MyStarSystemGenerator));
-
                 if(data == null)
                 {
                     data = new MyObjectBuilder_SystemData();
