@@ -29,7 +29,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// <param name="adminScreen">The admin menu screen.</param>
         /// <param name="asteroidObject">The asteroid object this menu gets generated for</param>
         /// <returns>True, if a menu was created</returns>
-        bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject);
+        bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject, MyObjectBuilder_SystemData starSystem);
 
         /// <summary>
         /// Called, when menus created by this get closed

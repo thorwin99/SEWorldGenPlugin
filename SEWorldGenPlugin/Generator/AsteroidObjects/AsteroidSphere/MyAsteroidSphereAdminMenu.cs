@@ -77,7 +77,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// </summary>
         private MySystemAsteroids m_currentSelectedAsteroid;
 
-        public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
+        public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject, MyObjectBuilder_SystemData starSystem)
         {
             m_parentScreen = adminScreen;
 

@@ -114,7 +114,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         private MyPluginAdminMenu m_parentScreen;
 
-        public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject)
+        public bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject, MyObjectBuilder_SystemData starSystem)
         {
             m_parentScreen = adminScreen;
 
@@ -122,7 +122,10 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             m_offset = Vector3D.Zero;
 
+            m_fetchedStarSytem = starSystem;
+
             GenerateRingSettingElements(usableWidth, parentTable);
+            SetSliderValues(m_currentSelectedAsteroid);
 
             MyGuiControlButton teleportToRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Teleport to ring", OnTeleportToRing);
 
@@ -132,7 +135,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableRow(deleteRingButton);
 
-            MyGuiControlButton editRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Edit ring", OnRemoveRing);
+            MyGuiControlButton editRingButton = MyPluginGuiHelper.CreateDebugButton(usableWidth, "Edit ring", OnEditRing);
 
             parentTable.AddTableRow(editRingButton);
 
@@ -275,6 +278,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             parentTable.AddTableRow(m_spawnRingButton);
 
             return true;
+        }
+
+        private void OnEditRing(MyGuiControlButton button)
+        {
+            var data = GetAsteroidDataFromGui();
+
+            MyAsteroidRingProvider.Static.EditInstance(m_currentSelectedAsteroid, data);
         }
 
         private void GenerateRingSettingElements(float usableWidth, MyGuiControlParentTableLayout parentTable)
@@ -493,6 +503,44 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             ring.Radius = m_radiusSlider.Value * 1000;
             ring.AngleDegrees = new Vector3D(m_angleXSlider.Value, m_angleYSlider.Value, m_angleZSlider.Value);
             return ring;
+        }
+
+        /// <summary>
+        /// Sets all slider values to reflect the instance asteroid object
+        /// </summary>
+        /// <param name="instance">The instance of the asteroid object</param>
+        private void SetSliderValues(MySystemAsteroids instance)
+        {
+            if (instance.AsteroidTypeName != MyAsteroidRingProvider.TYPE_NAME) return;
+            MyAsteroidRingData data = MyAsteroidRingProvider.Static.GetInstanceData(instance) as MyAsteroidRingData;
+            var planet  = m_fetchedStarSytem.GetObjectById(instance.ParentId) as MySystemPlanet;
+
+            if (planet == null) return;
+
+            m_radiusSlider.MinValue = (int)planet.Diameter / 1000 * 0.75f;
+            m_radiusSlider.MaxValue = (int)planet.Diameter / 1000 * 2f;
+            m_radiusSlider.Value = (float)data.Radius;
+            m_radiusSlider.Enabled = true;
+
+            m_widthSlider.MinValue = (int)planet.Diameter / 1000 / 20f;
+            m_widthSlider.MaxValue = (int)planet.Diameter / 1000 / 1.25f;
+            m_widthSlider.Value = (float)data.Width;
+            m_widthSlider.Enabled = true;
+
+            m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
+            m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
+            m_heightSlider.Value = (float)data.Height;
+            m_heightSlider.Enabled = true;
+
+            m_asteroidSizesSlider.Enabled = true;
+            m_asteroidSizesSlider.SetValues(instance.AsteroidSize.Min, instance.AsteroidSize.Max);
+
+            m_angleXSlider.Enabled = true;
+            m_angleXSlider.Value = (float)data.AngleDegrees.x;
+            m_angleYSlider.Enabled = true;
+            m_angleYSlider.Value = (float)data.AngleDegrees.y;
+            m_angleZSlider.Enabled = true;
+            m_angleZSlider.Value = (float)data.AngleDegrees.z;
         }
 
         /// <summary>

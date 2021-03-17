@@ -167,7 +167,7 @@ namespace SEWorldGenPlugin.GUI
 
                     if (creator != null)
                     {
-                        if (!creator.OnEditMenuSelectItem(m_usableWidth, m_scrollTable, this, asteroidObject))
+                        if (!creator.OnEditMenuSelectItem(m_usableWidth, m_scrollTable, this, asteroidObject, m_fetchedStarSytem))
                         {
                             m_scrollTable.AddTableRow(new MyGuiControlLabel(null, null, "This object cant be edited.", font: "Red"));
 
