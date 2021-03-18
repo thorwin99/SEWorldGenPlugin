@@ -101,8 +101,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             {
                 if (m_toLoadCells.Contains(cellId)) continue;
 
-                //MyPluginLog.Debug("Mark Loading cell " + cellId);
-
                 BoundingBoxD cellBounds = new BoundingBoxD(cellId * m_cellSize, (cellId + 1) * m_cellSize);
                 if (bounds.Contains(cellBounds) == ContainmentType.Disjoint) continue;
 

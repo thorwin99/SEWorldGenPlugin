@@ -27,8 +27,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <summary>
         /// Cell size parameters
         /// </summary>
-        private const int OBJECT_SIZE_MAX = 1024;
-        private const int CELL_SIZE = OBJECT_SIZE_MAX * 10;
+        private const double OBJECT_SIZE_MAX = 1024;
+        private const double CELL_SIZE = OBJECT_SIZE_MAX * 10;
 
         /// <summary>
         /// Reflexion of asteroid creation method of SE
@@ -257,8 +257,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             MyProceduralCell cell = new MyProceduralCell(cellId, CELL_SIZE);
             int cellSeed = CalculateCellSeed(cellId);
             int index = 0;
-            int subCellSize = (int)(OBJECT_SIZE_MAX * 1.5f / settings.AsteroidDensity);
-            int subcells = CELL_SIZE / subCellSize;
+            double subCellSize = OBJECT_SIZE_MAX * 1.5f / settings.AsteroidDensity;
+            int subcells = (int)(CELL_SIZE / subCellSize);
 
             using (MyRandom.Instance.PushSeed(cellSeed))
             {
@@ -270,7 +270,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     Vector3D position = new Vector3D(MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble(), MyRandom.Instance.NextDouble());
                     position += (Vector3D)subcellId;
                     position *= subCellSize;
-                    position += cellId * CELL_SIZE;
+                    position += ((Vector3D)cellId) * CELL_SIZE;
 
                     if (!MyEntities.IsInsideWorld(position) || (settings.WorldSize >= 0 && position.Length() > settings.WorldSize)) continue;
 
@@ -285,6 +285,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     cellObjectSeed.Params.GeneratorSeed = m_definition.UseGeneratorSeed ? MyRandom.Instance.Next() : 0;
 
                     cell.AddObject(cellObjectSeed);
+
+                    MyPluginLog.Debug("Adding seed");
                 }
             }
 
