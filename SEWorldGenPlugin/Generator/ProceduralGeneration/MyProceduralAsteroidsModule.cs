@@ -257,7 +257,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             MyProceduralCell cell = new MyProceduralCell(cellId, CELL_SIZE);
             int cellSeed = CalculateCellSeed(cellId);
             int index = 0;
-            double subCellSize = OBJECT_SIZE_MAX * 1.5f / settings.AsteroidDensity;
+            double subCellSize = OBJECT_SIZE_MAX * 1f / settings.AsteroidDensity;
             int subcells = (int)(CELL_SIZE / subCellSize);
 
             using (MyRandom.Instance.PushSeed(cellSeed))
