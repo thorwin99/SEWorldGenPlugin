@@ -75,7 +75,7 @@ namespace SEWorldGenPlugin.GUI
             }
 
             MyGuiControlLabel pluginVersionLabel = new MyGuiControlLabel();
-            pluginVersionLabel.Text = PLUGIN_LOADED + VersionCheck.Static.GetVersion();
+            pluginVersionLabel.Text = string.Format(PLUGIN_LOADED.ToString(), VersionCheck.Static.GetVersion());
             pluginVersionLabel.Position = MyGuiManager.ComputeFullscreenGuiCoordinate(MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM, 8, 8);
             pluginVersionLabel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
             pluginVersionLabel.PositionY -= pluginVersionLabel.Size.Y / 2;
