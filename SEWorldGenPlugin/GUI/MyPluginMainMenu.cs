@@ -73,6 +73,20 @@ namespace SEWorldGenPlugin.GUI
                 OPENED_VERSION_NOTIFICATION = true;
                 MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_BOX), new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_TITLE), null, null, null, null, OnUpdateNotifiactionMessageClose));
             }
+
+            MyGuiControlLabel pluginVersionLabel = new MyGuiControlLabel();
+            pluginVersionLabel.Text = PLUGIN_LOADED + VersionCheck.Static.GetVersion();
+            pluginVersionLabel.Position = MyGuiManager.ComputeFullscreenGuiCoordinate(MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM, 8, 8);
+            pluginVersionLabel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+            pluginVersionLabel.PositionY -= pluginVersionLabel.Size.Y / 2;
+
+            MyGuiControlButton pluginSettingsBtn = MyPluginGuiHelper.CreateDebugButton("Settings", OnPluginSettingsClick);
+            pluginSettingsBtn.Position = pluginVersionLabel.Position;
+            pluginSettingsBtn.PositionX += pluginVersionLabel.Size.X + (8 / MyGuiConstants.GUI_OPTIMAL_SIZE.X);
+            pluginSettingsBtn.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+
+            Controls.Add(pluginVersionLabel);
+            Controls.Add(pluginSettingsBtn);
         }
 
         /// <summary>
@@ -133,32 +147,12 @@ namespace SEWorldGenPlugin.GUI
         }
 
         /// <summary>
-        /// OnDraw to draw on the screen
+        /// Runs when the settings button for the plugin is clicked.
         /// </summary>
-        /// <returns></returns>
-        public override bool Draw()
+        /// <param name="btn">The button that called this event</param>
+        private void OnPluginSettingsClick(MyGuiControlButton btn)
         {
-            DrawPluginLoaded();
-            return base.Draw();
-        }
-
-        /// <summary>
-        /// Draws the plugins version and loaded message on the screen
-        /// </summary>
-        private void DrawPluginLoaded()
-        {
-            Vector2 size;
-            Vector2 textLeftBottomPosition = MyGuiManager.ComputeFullscreenGuiCoordinate(MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM, 8, 8);
-            textLeftBottomPosition.Y -= 0 * TEXT_LINE_HEIGHT;
-
-            StringBuilder pluginWithVersion = new StringBuilder();
-            pluginWithVersion.AppendFormat(PLUGIN_LOADED.ToString(), VersionCheck.Static.GetVersion());
-
-            MyGuiManager.DrawString(MyFontEnum.BuildInfo, pluginWithVersion.ToString(), textLeftBottomPosition, 0.5f, new Color(MyGuiConstants.LABEL_TEXT_COLOR * m_transitionAlpha, 1), MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM);
-
-            size = MyGuiManager.MeasureString(MyFontEnum.BuildInfo, pluginWithVersion, 1);
-
-            textLeftBottomPosition.X += size.X;
+            MyGuiSandbox.AddScreen(new MyPluginGlobalSettings());
         }
     }
 }

@@ -37,6 +37,27 @@ namespace SEWorldGenPlugin.GUI
         }
 
         /// <summary>
+        /// Creates a debug style button. It is smaller than a nornmal button.
+        /// </summary>
+        /// <param name="text">Text of the button</param>
+        /// <param name="onClick">On click event of the button</param>
+        /// <param name="enabled">If it is enabled</param>
+        /// <param name="tooltip">Tooltip for the button</param>
+        /// <returns>The created button</returns>
+        public static MyGuiControlButton CreateDebugButton(string text, Action<MyGuiControlButton> onClick, bool enabled = true, string tooltip = null)
+        {
+            MyGuiControlButton myGuiControlButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Debug, onButtonClick: onClick);
+            myGuiControlButton.VisualStyle = MyGuiControlButtonStyleEnum.Rectangular;
+            myGuiControlButton.Enabled = enabled;
+            myGuiControlButton.Text = text;
+            if (tooltip == null)
+            {
+                myGuiControlButton.SetToolTip(tooltip);
+            }
+            return myGuiControlButton;
+        }
+
+        /// <summary>
         /// Displays an error message box to the user and calls the given callback, when it is closed.
         /// </summary>
         /// <param name="error">The error message</param>

@@ -194,6 +194,7 @@
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.cs" />
     <Compile Include="GUI\Controls\MyGuiScreenDialogCoordinate.cs" />
+    <Compile Include="GUI\MyPluginGlobalSettings.cs" />
     <Compile Include="GUI\MyPluginGuiHelper.cs" />
     <Compile Include="GUI\MyPluginSettingsMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
