@@ -44,34 +44,36 @@ namespace SEWorldGenPlugin.GUI
         public override void RecreateControls(bool constructor)
         {
             base.RecreateControls(constructor);
-            if (m_pauseGame) return;
-            m_elemtents = new MyGuiControlElementGroup();
-            m_elemtents.HighlightChanged += OnHighlightChange;
-            MyGuiControlButton button = null;
-            foreach (var c in Controls)
+            if (!m_pauseGame)
             {
-                if(c is MyGuiControlButton)
+                m_elemtents = new MyGuiControlElementGroup();
+                m_elemtents.HighlightChanged += OnHighlightChange;
+                MyGuiControlButton button = null;
+                foreach (var c in Controls)
                 {
-                    m_elemtents.Add(c);
-                    if (((MyGuiControlButton)c).Text == MyTexts.GetString(MyCommonTexts.ScreenMenuButtonCampaign))
-                        button = (MyGuiControlButton)c;
+                    if (c is MyGuiControlButton)
+                    {
+                        m_elemtents.Add(c);
+                        if (((MyGuiControlButton)c).Text == MyTexts.GetString(MyCommonTexts.ScreenMenuButtonCampaign))
+                            button = (MyGuiControlButton)c;
+                    }
                 }
-            }
-            if(button != null)
-            {
-                int index = Controls.IndexOf(button);
-                MyGuiControlButton newGameButton = MakeButton(button.Position, MyCommonTexts.ScreenMenuButtonCampaign, OnNewGameClick);
-                Controls.Add(newGameButton);
-                m_elemtents.Add(newGameButton);
-                newGameButton.Name = button.Name;
-                Controls[index] = newGameButton;
-                newGameButton.SetToolTip(button.Tooltips);
-            }
+                if (button != null)
+                {
+                    int index = Controls.IndexOf(button);
+                    MyGuiControlButton newGameButton = MakeButton(button.Position, MyCommonTexts.ScreenMenuButtonCampaign, OnNewGameClick);
+                    Controls.Add(newGameButton);
+                    m_elemtents.Add(newGameButton);
+                    newGameButton.Name = button.Name;
+                    Controls[index] = newGameButton;
+                    newGameButton.SetToolTip(button.Tooltips);
+                }
 
-            if (!VersionCheck.Static.IsNewest() && !OPENED_VERSION_NOTIFICATION)
-            {
-                OPENED_VERSION_NOTIFICATION = true;
-                MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_BOX), new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_TITLE), null, null, null, null, OnUpdateNotifiactionMessageClose));
+                if (!VersionCheck.Static.IsNewest() && !OPENED_VERSION_NOTIFICATION)
+                {
+                    OPENED_VERSION_NOTIFICATION = true;
+                    MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_BOX), new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_TITLE), null, null, null, null, OnUpdateNotifiactionMessageClose));
+                }
             }
 
             MyGuiControlLabel pluginVersionLabel = new MyGuiControlLabel();
