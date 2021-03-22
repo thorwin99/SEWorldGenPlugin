@@ -343,11 +343,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             string namingScheme = MySettings.Static.Settings.BeltNameFormat;
 
-            string name = namingScheme.SetProperty("ObjectNumber", beltIndex + 1)
-                                      .SetProperty("ObjectNumberGreek", MyNamingUtils.GREEK_LETTERS[beltIndex % MyNamingUtils.GREEK_LETTERS.Length])
-                                      .SetProperty("ObjectNumberRoman", MyNamingUtils.ConvertNumberToRoman(beltIndex + 1))
-                                      .SetProperty("ObjectLetterLower", (char)('a' + (beltIndex % 26)))
-                                      .SetProperty("ObjectLetterUpper", (char)('A' + (beltIndex % 26)));
+            string name = namingScheme.SetProperty(MyNamingUtils.PROP_OBJ_NUMBER, beltIndex + 1)
+                                      .SetProperty(MyNamingUtils.PROP_OBJ_NUMBER_GREEK, MyNamingUtils.GREEK_LETTERS[beltIndex % MyNamingUtils.GREEK_LETTERS.Length])
+                                      .SetProperty(MyNamingUtils.PROP_OBJ_NUMBER_ROMAN, MyNamingUtils.ConvertNumberToRoman(beltIndex + 1))
+                                      .SetProperty(MyNamingUtils.PROP_OBJ_LETTER_LOWER, (char)('a' + (beltIndex % 26)))
+                                      .SetProperty(MyNamingUtils.PROP_OBJ_LETTER_UPPER, (char)('A' + (beltIndex % 26)));
 
             return name;
         }

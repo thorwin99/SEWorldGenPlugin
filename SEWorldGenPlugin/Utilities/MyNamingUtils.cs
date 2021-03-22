@@ -10,6 +10,15 @@ namespace SEWorldGenPlugin.Utilities
         /// </summary>
         public static readonly string[] GREEK_LETTERS = new string[] { "Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "My", "Ny", "Xi", "Omikron", "Pi", "Rho", "Sigma", "Tau", "Ypsilon", "Phi", "Chi", "Psi", "Omega" };
 
+        //Property names for naming
+        public static readonly string PROP_OBJ_NUMBER = "ObjectNumber";
+        public static readonly string PROP_OBJ_NUMBER_GREEK = "ObjectNumberGreek";
+        public static readonly string PROP_OBJ_NUMBER_ROMAN = "ObjectNumberRoman";
+        public static readonly string PROP_OBJ_LETTER_LOWER = "ObjectLetterLower";
+        public static readonly string PROP_OBJ_LETTER_UPPER = "ObjectLetterUpper";
+        public static readonly string PROP_OBJ_ID = "ObjectId";
+        public static readonly string PROP_OBJ_PARENT = "ParentName";
+
         /// <summary>
         /// Converts an integer to roman numerals
         /// </summary>
