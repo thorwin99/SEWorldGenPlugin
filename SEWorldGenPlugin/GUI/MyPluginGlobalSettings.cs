@@ -2,7 +2,9 @@ using Sandbox;
 using Sandbox.Game.Screens;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.GUI.Controls;
+using SEWorldGenPlugin.Utilities;
 using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using VRage.Utils;
 using VRageMath;
@@ -49,6 +51,9 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlTable m_sunDefsTable;
         private MyGuiControlTable m_mandatoryDefsTable;
         private MyGuiControlTable m_blacklistDefsTable;
+        private MyGuiControlTextbox m_planetNameBox;
+        private MyGuiControlTextbox m_moonNameBox;
+        private MyGuiControlTextbox m_beltNameBox;
 
         public MyPluginGlobalSettings() : base(new Vector2(0.5f, 0.5f), MyGuiConstants.SCREEN_BACKGROUND_COLOR, SIZE, false, null, MySandboxGame.Config.UIBkOpacity, MySandboxGame.Config.UIOpacity)
         {
@@ -82,8 +87,11 @@ namespace SEWorldGenPlugin.GUI
             var sunLabel = new MyGuiControlLabel(null, null, "Suns");
             var mandatoryLabel = new MyGuiControlLabel(null, null, "Mandatory planets and moons");
             var blacklistLabel = new MyGuiControlLabel(null, null, "Blacklisted planets and moons");
+            var planetNameLabel = new MyGuiControlLabel(null, null, "Planet name format");
+            var moonNameLabel = new MyGuiControlLabel(null, null, "Moon name format");
+            var beltNameLabel = new MyGuiControlLabel(null, null, "Belt name format");
 
-#region Tables
+            #region Tables
 
             ///Moons table
             m_moonDefsTable = new MyGuiControlTable();
@@ -100,7 +108,7 @@ namespace SEWorldGenPlugin.GUI
                     MySettings.Static.Settings.MoonDefinitions.Add(name);
                 });
             });
-            var remMoonBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Remove Moon", delegate 
+            var remMoonBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Remove Moon", delegate
             {
                 MySettings.Static.Settings.MoonDefinitions.Remove(m_moonDefsTable.SelectedRow.UserData as string);
                 m_moonDefsTable.RemoveSelectedRow();
@@ -208,12 +216,12 @@ namespace SEWorldGenPlugin.GUI
             m_mandatoryDefsTable.SetCustomColumnWidths(new float[] { WIDTH });
             m_mandatoryDefsTable.SetColumnName(0, new System.Text.StringBuilder("Subtype ID"));
 
-            var addMandatoryBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Mandatory", delegate 
-            { 
-                OpenEnterIdDialog(m_mandatoryDefsTable, delegate(string name) 
+            var addMandatoryBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Mandatory", delegate
+            {
+                OpenEnterIdDialog(m_mandatoryDefsTable, delegate (string name)
                 {
                     MySettings.Static.Settings.MandatoryPlanetDefinitions.Add(name);
-                }); 
+                });
             });
             var remMandatoryBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Remove Mandatory", delegate
             {
@@ -274,8 +282,179 @@ namespace SEWorldGenPlugin.GUI
             parent.AddTableRow(m_blacklistDefsTable);
             parent.AddTableRow(addBlacklistBtn, remBlacklistBtn);
 
-#endregion
+            #endregion
 
+            parent.AddTableSeparator();
+
+            #region NameFormats
+
+            ///Planet name box
+            m_planetNameBox = new MyGuiControlTextbox();
+            m_planetNameBox.Size = new Vector2(WIDTH, m_planetNameBox.Size.Y);
+            m_planetNameBox.TextChanged += delegate
+            {
+                StringBuilder s = new StringBuilder();
+                m_planetNameBox.GetText(s);
+                MySettings.Static.Settings.PlanetNameFormat = s.ToString();
+            };
+
+            MyGuiControlParentTableLayout formatButtons = new MyGuiControlParentTableLayout(3, padding: new Vector2(0));
+            var planetNameButtons1 = new MyGuiControlButton[3];
+            var planetNameButtons2 = new MyGuiControlButton[3];
+            planetNameButtons1[0] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Object Number", delegate 
+            { 
+                MySettings.Static.Settings.PlanetNameFormat = AddNameProperty(m_planetNameBox, MyNamingUtils.PROP_OBJ_NUMBER); 
+            });
+            planetNameButtons1[1] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Roman number", delegate
+            {
+                MySettings.Static.Settings.PlanetNameFormat = AddNameProperty(m_planetNameBox, MyNamingUtils.PROP_OBJ_NUMBER_ROMAN);
+            });
+            planetNameButtons1[2] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Greek number", delegate
+            {
+                MySettings.Static.Settings.PlanetNameFormat = AddNameProperty(m_planetNameBox, MyNamingUtils.PROP_OBJ_NUMBER_GREEK);
+            });
+            planetNameButtons2[0] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add lower letter", delegate
+            {
+                MySettings.Static.Settings.PlanetNameFormat = AddNameProperty(m_planetNameBox, MyNamingUtils.PROP_OBJ_LETTER_LOWER);
+            });
+            planetNameButtons2[1] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add upper letter", delegate
+            {
+                MySettings.Static.Settings.PlanetNameFormat = AddNameProperty(m_planetNameBox, MyNamingUtils.PROP_OBJ_LETTER_UPPER);
+            });
+            planetNameButtons2[2] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add id", delegate
+            {
+                MySettings.Static.Settings.PlanetNameFormat = AddNameProperty(m_planetNameBox, MyNamingUtils.PROP_OBJ_ID);
+            });
+
+            m_planetNameBox.TextChanged += delegate(MyGuiControlTextbox t)
+            {
+                var sb = new StringBuilder();
+                t.GetText(sb);
+
+                MySettings.Static.Settings.PlanetNameFormat = sb.ToString();
+            };
+
+            formatButtons.AddTableRow(planetNameButtons1);
+            formatButtons.AddTableRow(planetNameButtons2);
+            formatButtons.ApplyRows();
+
+            parent.AddTableRow(planetNameLabel);
+            parent.AddTableRow(m_planetNameBox);
+            parent.AddTableRow(formatButtons);
+
+            parent.AddTableSeparator();
+
+            ///Moon name box
+            m_moonNameBox = new MyGuiControlTextbox();
+            m_moonNameBox.Size = new Vector2(WIDTH, m_moonNameBox.Size.Y);
+            m_moonNameBox.TextChanged += delegate
+            {
+                StringBuilder s = new StringBuilder();
+                m_moonNameBox.GetText(s);
+                MySettings.Static.Settings.MoonNameFormat = s.ToString();
+            };
+
+            MyGuiControlParentTableLayout formatButtonsMoon = new MyGuiControlParentTableLayout(3, padding: new Vector2(0));
+            var moonNameButtons1 = new MyGuiControlButton[3];
+            var moonNameButtons2 = new MyGuiControlButton[3];
+            moonNameButtons1[0] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Object Number", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_NUMBER);
+            });
+            moonNameButtons1[1] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Roman number", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_NUMBER_ROMAN);
+            });
+            moonNameButtons1[2] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Greek number", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_NUMBER_GREEK);
+            });
+            moonNameButtons2[0] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add lower letter", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_LETTER_LOWER);
+            });
+            moonNameButtons2[1] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add upper letter", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_LETTER_UPPER);
+            });
+            moonNameButtons2[2] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add id", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_ID);
+            });
+            var btnExtra = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add parent name", delegate
+            {
+                MySettings.Static.Settings.MoonNameFormat = AddNameProperty(m_moonNameBox, MyNamingUtils.PROP_OBJ_PARENT);
+            });
+
+            m_moonNameBox.TextChanged += delegate (MyGuiControlTextbox t)
+            {
+                var sb = new StringBuilder();
+                t.GetText(sb);
+
+                MySettings.Static.Settings.MoonNameFormat = sb.ToString();
+            };
+
+            formatButtonsMoon.AddTableRow(moonNameButtons1);
+            formatButtonsMoon.AddTableRow(moonNameButtons2);
+            formatButtonsMoon.AddTableRow(btnExtra);
+            formatButtonsMoon.ApplyRows();
+
+            parent.AddTableRow(moonNameLabel);
+            parent.AddTableRow(m_moonNameBox);
+            parent.AddTableRow(formatButtonsMoon);
+
+            parent.AddTableSeparator();
+
+            ///Belt name box
+            m_beltNameBox = new MyGuiControlTextbox();
+            m_beltNameBox.Size = new Vector2(WIDTH, m_beltNameBox.Size.Y);
+            m_beltNameBox.TextChanged += delegate
+            {
+                StringBuilder s = new StringBuilder();
+                m_beltNameBox.GetText(s);
+                MySettings.Static.Settings.BeltNameFormat = s.ToString();
+            };
+
+            MyGuiControlParentTableLayout formatButtonsBelt = new MyGuiControlParentTableLayout(3, padding: new Vector2(0));
+            var beltNameButtons1 = new MyGuiControlButton[3];
+            var beltNameButtons2 = new MyGuiControlButton[2];
+            beltNameButtons1[0] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Object Number", delegate
+            {
+                MySettings.Static.Settings.BeltNameFormat = AddNameProperty(m_beltNameBox, MyNamingUtils.PROP_OBJ_NUMBER);
+            });
+            beltNameButtons1[1] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Roman number", delegate
+            {
+                MySettings.Static.Settings.BeltNameFormat = AddNameProperty(m_beltNameBox, MyNamingUtils.PROP_OBJ_NUMBER_ROMAN);
+            });
+            beltNameButtons1[2] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add Greek number", delegate
+            {
+                MySettings.Static.Settings.BeltNameFormat = AddNameProperty(m_beltNameBox, MyNamingUtils.PROP_OBJ_NUMBER_GREEK);
+            });
+            beltNameButtons2[0] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add lower letter", delegate
+            {
+                MySettings.Static.Settings.BeltNameFormat = AddNameProperty(m_beltNameBox, MyNamingUtils.PROP_OBJ_LETTER_LOWER);
+            });
+            beltNameButtons2[1] = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add upper letter", delegate
+            {
+                MySettings.Static.Settings.BeltNameFormat = AddNameProperty(m_beltNameBox, MyNamingUtils.PROP_OBJ_LETTER_UPPER);
+            });
+
+            m_beltNameBox.TextChanged += delegate (MyGuiControlTextbox t)
+            {
+                var sb = new StringBuilder();
+                t.GetText(sb);
+
+                MySettings.Static.Settings.BeltNameFormat = sb.ToString();
+            };
+
+            formatButtonsBelt.AddTableRow(beltNameButtons1);
+            formatButtonsBelt.AddTableRow(beltNameButtons2);
+            formatButtonsBelt.ApplyRows();
+
+            parent.AddTableRow(beltNameLabel);
+            parent.AddTableRow(m_beltNameBox);
+            parent.AddTableRow(formatButtonsBelt);
+            #endregion
             parent.ApplyRows();
 
             Vector2 start = SIZE / -2 + PADDING + new Vector2(0, caption.Size.Y) + CHILD_MARGINS_VERT * 2;
@@ -313,6 +492,22 @@ namespace SEWorldGenPlugin.GUI
                 addAction(text);
             };
             MyGuiSandbox.AddScreen(inputBox);
+        }
+
+        /// <summary>
+        /// Adds the property for naming formats to the textBox
+        /// </summary>
+        /// <param name="textBox">TextBox</param>
+        /// <param name="property">Property</param>
+        /// <returns>The resulting text in the text box</returns>
+        private string AddNameProperty(MyGuiControlTextbox textBox, string property)
+        {
+            var sb = new StringBuilder();
+            textBox.GetText(sb);
+            sb.Append("[" + property + "]");
+            textBox.SetText(sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -365,6 +560,9 @@ namespace SEWorldGenPlugin.GUI
 
                 m_blacklistDefsTable.Add(row);
             }
+            m_planetNameBox.SetText(new StringBuilder(MySettings.Static.Settings.PlanetNameFormat));
+            m_moonNameBox.SetText(new StringBuilder(MySettings.Static.Settings.MoonNameFormat));
+            m_beltNameBox.SetText(new StringBuilder(MySettings.Static.Settings.BeltNameFormat));
         }
 
         public override string GetFriendlyName()
