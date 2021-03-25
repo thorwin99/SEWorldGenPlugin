@@ -1,5 +1,6 @@
 ﻿using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using System;
+using VRage.Library.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
@@ -131,12 +132,18 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
             return ClosestPointAtRingCenter(point);
         }
 
-        public Vector3D GetPointInShape()
+        public Vector3D GetPointInShape(bool random = false)
         {
+            float angle = 0;
+            if (random)
+            {
+                angle = MyRandom.Instance.Next(0, 360);
+            }
+
             Vector3D pos = Vector3D.Zero;
-            pos.X = (radius + width / 2) * Math.Cos(MathHelper.ToRadians(0));
+            pos.X = (radius + width / 2) * Math.Cos(MathHelper.ToRadians(angle));
             pos.Y = 0;
-            pos.Z = (radius + width / 2) * Math.Sin(MathHelper.ToRadians(0));
+            pos.Z = (radius + width / 2) * Math.Sin(MathHelper.ToRadians(angle));
             return Vector3D.Transform(pos, worldMatrix);
         }
     }

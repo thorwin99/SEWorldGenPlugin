@@ -22,6 +22,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
         /// Returns a point inside of the shape area
         /// </summary>
         /// <returns>A random point in the shape</returns>
-        Vector3D GetPointInShape();
+        Vector3D GetPointInShape(bool random = false);
     }
 }

@@ -68,7 +68,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjectShapes
 
         }
 
-        public Vector3D GetPointInShape()
+        public Vector3D GetPointInShape(bool random = false)
         {
             return Center + new Vector3D(InnerRadius + ((OuterRadius - InnerRadius) / 2), 0, 0);
         }

@@ -244,7 +244,7 @@ namespace SEWorldGenPlugin.Generator
 
                                 if (shape == null) break;
 
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.GetPointInShape(), item.Id);
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.GetPointInShape(true), item.Id);
                             }
                         }
                         break;
