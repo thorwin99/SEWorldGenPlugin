@@ -231,7 +231,7 @@ namespace SEWorldGenPlugin.Session
         {
             Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
 
-            if (m_dynamicGpss.ContainsKey(key))
+            if (m_dynamicGpss.ContainsKey(key) && MySession.Static.Gpss.ExistsForPlayer(playerId))
             {
                 return MySession.Static.Gpss[playerId].ContainsKey(m_dynamicGpss[key]);
             }
