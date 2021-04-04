@@ -122,7 +122,8 @@ namespace SEWorldGenPlugin.Session
                 m_newTrackedEntities.Add(entity);
                 entity.OnMarkForClose += (e) =>
                 {
-                    m_toUntrackEntities.Add(e);
+                    lock(m_toUntrackEntities)
+                        m_toUntrackEntities.Add(e);
                 };
             }
         }
@@ -157,7 +158,8 @@ namespace SEWorldGenPlugin.Session
         {
             if(grid.PlayerPresenceTier != VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
             {
-                m_toUntrackEntities.Add(grid);
+                lock(m_toUntrackEntities)
+                    m_toUntrackEntities.Add(grid);
             }
         }
     }
