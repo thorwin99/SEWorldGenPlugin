@@ -72,8 +72,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 {
                     voxelMap = seed.UserData as MyVoxelBase;
 
-                    //If the reference cant be found, search the array by comparing storage names.
-                    //Only a failsafe, if somehow the voxelmap references differs, should not happen normally.
+                    if (!m_tmpAsteroids.Contains(voxelMap)) return;
+
                     if (!m_tmpAsteroids.Remove(voxelMap))
                     {
                         for (int i = 0; i < m_tmpAsteroids.Count; i++)
@@ -111,12 +111,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     if (map.StorageName == storageName)
                     {
                         if (m_tmpAsteroids.Contains(map))
+                        {
                             map.Save = false;
 
-                        m_tmpAsteroids.Remove(map);
-                        map.IsSeedOpen = false;
-                        map.Close();
-                        break;
+                            m_tmpAsteroids.Remove(map);
+                            map.IsSeedOpen = false;
+                            map.Close();
+                            break;
+                        }   
                     }
                 }
 
