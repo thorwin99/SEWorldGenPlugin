@@ -70,6 +70,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(8)]
         public string BeltNameFormat = "Belt [ObjectNumberGreek]";
 
+        public bool EnablePatching = false;
+
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_GlobalSettings();
@@ -81,6 +83,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             copy.PlanetNameFormat = PlanetNameFormat;
             copy.MoonNameFormat = MoonNameFormat;
             copy.BeltNameFormat = BeltNameFormat;
+            copy.EnablePatching = EnablePatching;
 
             return copy;
         }

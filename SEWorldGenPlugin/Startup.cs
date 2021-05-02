@@ -1,8 +1,11 @@
-﻿using Sandbox.Game;
+﻿using HarmonyLib;
+using Sandbox.Game;
 using SEWorldGenPlugin.Generator.ProceduralGenerator;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Utilities;
+using System;
+using System.IO;
 using VRage.Game.Entity;
 using VRage.Plugins;
 
@@ -54,6 +57,8 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyPluginAdminMenu);
 
+            TryEnablePatches();
+
             MyPluginLog.Log("Init completed");
         }
 
@@ -62,6 +67,37 @@ namespace SEWorldGenPlugin
         /// </summary>
         public void Update()
         {
+        }
+
+        /// <summary>
+        /// Tries to apply the harmony patches to fix more complicated bugs.
+        /// Will only actually patch, if 0harmony.dll is found AND patching is enabled in the global settings.
+        /// </summary>
+        private void TryEnablePatches()
+        {
+            if (settings.Settings.EnablePatching)
+            {
+                try
+                {
+                    Patch();
+                }catch(FileNotFoundException)
+                {
+                    MyPluginLog.Log("0harmony.dll not found, skipping patching.", LogLevel.WARNING);
+                }
+            }
+            else
+            {
+                MyPluginLog.Log("Patching is disabled, skipping patches.");
+            }
+        }
+
+        /// <summary>
+        /// Applies all harmony patches
+        /// </summary>
+        private void Patch()
+        {
+            Harmony harmony = new Harmony("thorwin99.SEWorldGenPlugin");
+            harmony.PatchAll();
         }
     }
 }
