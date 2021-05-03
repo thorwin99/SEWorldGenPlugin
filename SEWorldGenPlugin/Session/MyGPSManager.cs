@@ -28,23 +28,27 @@ namespace SEWorldGenPlugin.Session
 
             public Guid Id;
 
+            public bool Hidden;
+
             public HashSet<long> Players;
 
-            public MyGpsData(string name, Vector3 color, Vector3D position, Guid id)
+            public MyGpsData(string name, Vector3 color, Vector3D position, Guid id, bool hidden = false)
             {
                 Name = name;
                 Color = color;
                 Position = position;
                 Id = id;
+                Hidden = hidden;
                 Players = new HashSet<long>();
             }
 
-            public MyGpsData(string name, Vector3 color, Vector3D position, Guid id, HashSet<long> players)
+            public MyGpsData(string name, Vector3 color, Vector3D position, Guid id, HashSet<long> players, bool hidden)
             {
                 Name = name;
                 Color = color;
                 Position = position;
                 Id = id;
+                Hidden = hidden;
                 Players = players;
             }
         }
@@ -78,7 +82,8 @@ namespace SEWorldGenPlugin.Session
         /// <param name="color">Color of the gps</param>
         /// <param name="pos">Position of the gps</param>
         /// <param name="id">The id of the gps</param>
-        public void AddPersistentGps(string name, Color color, Vector3D pos, Guid id)
+        /// <param name="hidden">If the gps is hidden</param>
+        public void AddPersistentGps(string name, Color color, Vector3D pos, Guid id, bool hidden)
         {
             MyGpsData data = new MyGpsData()
             {
@@ -86,6 +91,7 @@ namespace SEWorldGenPlugin.Session
                 Color = color,
                 Position = pos,
                 Id = id,
+                Hidden = hidden,
                 Players = new HashSet<long>()
             };
 
@@ -258,7 +264,7 @@ namespace SEWorldGenPlugin.Session
                             Name = m_globalGpss[entry].Name,
                             Coords = m_globalGpss[entry].Position,
                             GPSColor = m_globalGpss[entry].Color,
-                            ShowOnHud = true,
+                            ShowOnHud = !m_globalGpss[entry].Hidden,
                             AlwaysVisible = false,
                             DiscardAt = null
                         };
@@ -295,7 +301,7 @@ namespace SEWorldGenPlugin.Session
 
             foreach(var item in ob.PersistentGpss)
             {
-                var data = new MyGpsData(item.Name, item.Color, item.Position, item.Id, item.PlayerIds);
+                var data = new MyGpsData(item.Name, item.Color, item.Position, item.Id, item.PlayerIds, item.Hidden);
                 m_globalGpss[item.Id] = data;
             }
 
@@ -329,6 +335,7 @@ namespace SEWorldGenPlugin.Session
                 item.Position = entry.Value.Position;
                 item.PlayerIds = entry.Value.Players;
                 item.Id = entry.Key;
+                item.Hidden = entry.Value.Hidden;
 
                 ob.PersistentGpss.Add(item);
             }

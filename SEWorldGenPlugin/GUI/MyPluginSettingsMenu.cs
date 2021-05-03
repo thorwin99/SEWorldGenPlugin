@@ -198,6 +198,7 @@ namespace SEWorldGenPlugin.GUI
             m_planetGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_GPS_COMBO);
             m_planetGPSModeCombo.AddItem((long)MyGPSGenerationMode.DISCOVERY, "Discovery");
             m_planetGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT, "Persistent");
+            m_planetGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT_HIDDEN, "Persistent hidden");
             m_planetGPSModeCombo.AddItem((long)MyGPSGenerationMode.NONE, "None");
 
             m_planetGPSModeCombo.Size = new Vector2(0.25f, m_planetGPSModeCombo.Size.Y);
@@ -208,6 +209,7 @@ namespace SEWorldGenPlugin.GUI
             m_moonGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.MOON_GPS_COMBO);
             m_moonGPSModeCombo.AddItem((long)MyGPSGenerationMode.DISCOVERY, "Discovery");
             m_moonGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT, "Persistent");
+            m_moonGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT_HIDDEN, "Persistent hidden");
             m_moonGPSModeCombo.AddItem((long)MyGPSGenerationMode.NONE, "None");
 
             m_moonGPSModeCombo.Size = new Vector2(0.25f, m_moonGPSModeCombo.Size.Y);
@@ -218,6 +220,7 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidGPSModeCombo.SetToolTip(MyPluginTexts.TOOLTIPS.ASTEROID_GPS_COMBO);
             m_asteroidGPSModeCombo.AddItem((long)MyGPSGenerationMode.DISCOVERY, "Discovery");
             m_asteroidGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT, "Persistent");
+            m_asteroidGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT_HIDDEN, "Persistent hidden");
             m_asteroidGPSModeCombo.AddItem((long)MyGPSGenerationMode.NONE, "None");
 
             m_asteroidGPSModeCombo.Size = new Vector2(0.25f, m_asteroidGPSModeCombo.Size.Y);

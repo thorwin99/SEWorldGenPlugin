@@ -44,9 +44,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public Guid Id = Guid.Empty;
 
         /// <summary>
-        /// A set of all players, that already know of this gps.
+        /// If the gps is hidden by default
         /// </summary>
         [ProtoMember(5)]
+        public bool Hidden = false;
+
+        /// <summary>
+        /// A set of all players, that already know of this gps.
+        /// </summary>
+        [ProtoMember(6)]
         public HashSet<long> PlayerIds = new HashSet<long>();
     }
 }

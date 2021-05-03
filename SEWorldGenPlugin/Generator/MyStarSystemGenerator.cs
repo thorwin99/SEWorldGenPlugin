@@ -221,19 +221,19 @@ namespace SEWorldGenPlugin.Generator
                 switch (item.Type)
                 {
                     case MySystemObjectType.MOON:
-                        if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        if (settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT || settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT_HIDDEN)
                         {
-                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition, item.Id);
+                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, MOON_GPS_COLOR, item.CenterPosition, item.Id, settings.MoonGPSMode == MyGPSGenerationMode.PERSISTENT_HIDDEN);
                         }
                         break;
                     case MySystemObjectType.PLANET:
-                        if (settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        if (settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT || settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT_HIDDEN)
                         {
-                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition, item.Id);
+                            MyGPSManager.Static.AddPersistentGps(item.DisplayName, PLANET_GPS_COLOR, item.CenterPosition, item.Id, settings.PlanetGPSMode == MyGPSGenerationMode.PERSISTENT_HIDDEN);
                         }
                         break;
                     case MySystemObjectType.ASTEROIDS:
-                        if (settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT)
+                        if (settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT || settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT_HIDDEN)
                         {
                             MySystemAsteroids asteroid = item as MySystemAsteroids;
                             MyAbstractAsteroidObjectProvider provider = null;
@@ -243,7 +243,7 @@ namespace SEWorldGenPlugin.Generator
 
                                 if (shape == null) break;
 
-                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.GetPointInShape(true), item.Id);
+                                MyGPSManager.Static.AddPersistentGps(item.DisplayName, RING_GPS_COLOR, shape.GetPointInShape(true), item.Id, settings.AsteroidGPSMode == MyGPSGenerationMode.PERSISTENT_HIDDEN);
                             }
                         }
                         break;

@@ -267,6 +267,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     {
         DISCOVERY,
         PERSISTENT,
+        PERSISTENT_HIDDEN,
         NONE
     }
 }
