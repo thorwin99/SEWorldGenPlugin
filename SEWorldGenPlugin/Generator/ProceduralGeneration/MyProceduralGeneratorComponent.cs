@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
+using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 {
@@ -221,10 +222,27 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             }
         }
 
+        /// <summary>
+        /// Untracks entity
+        /// </summary>
+        /// <param name="entity"></param>
         public void UntrackEntity(MyEntity entity)
         {
             m_trackedEntities.Remove(entity);
             //TODO: Unload all objects loaded by this entity
+        }
+
+        /// <summary>
+        /// Gets all seeds of cell modules in bounds
+        /// </summary>
+        /// <param name="bounds">Bounds to get seeds</param>
+        /// <param name="list">List for the seeds to be put in</param>
+        public void GetCellSeedsInBounds(BoundingSphereD bounds, List<MyObjectSeed> list)
+        {
+            foreach(var module in m_cellModules)
+            {
+                module.GetSeedsInBounds(bounds, list);
+            }
         }
     }
 }

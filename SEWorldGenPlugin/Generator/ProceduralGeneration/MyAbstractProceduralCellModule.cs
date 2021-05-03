@@ -111,6 +111,30 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         }
 
         /// <summary>
+        /// Gets all seeds within said bounds.
+        /// If a cell inside the bounds is not loaded, it will generate the seed but wont load the cell.
+        /// </summary>
+        /// <param name="bounds">Bounds to get seeds from</param>
+        /// <param name="list">List to put seeds into.</param>
+        public void GetSeedsInBounds(BoundingSphereD bounds, List<MyObjectSeed> list)
+        {
+            BoundingBoxD box = BoundingBoxD.CreateFromSphere(bounds);
+            Vector3I cellId = Vector3I.Floor(box.Min / m_cellSize);
+            for (var it = GetCellsIterator(box); it.IsValid(); it.GetNext(out cellId))
+            {
+                if (m_loadedCells.ContainsKey(cellId))
+                {
+                    m_loadedCells[cellId].GetAll(list, false);
+                }
+                else
+                {
+                    MyProceduralCell cell = GenerateCellSeeds(cellId);
+                    cell.GetAll(list);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets an iterator for all Vector3I within the bounding box bbox
         /// </summary>
         /// <param name="bbox">Bounding box</param>

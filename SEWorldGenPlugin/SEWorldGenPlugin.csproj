@@ -220,6 +220,7 @@
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldGpsData.cs" />
     <Compile Include="ObjectBuilders\MyObjectBuilder_WorldSettings.cs" />
     <Compile Include="ObjectBuilders\MySerializableMinMax.cs" />
+    <Compile Include="Patches\Patch_OverlapAllAsteroidSeedsInSphere.cs" />
     <Compile Include="Session\IMyEntityTracker.cs" />
     <Compile Include="Session\MyAsteroidObjectsManager.cs" />
     <Compile Include="Session\MyEntityTrackerComponent.cs" />
