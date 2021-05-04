@@ -366,6 +366,7 @@ namespace SEWorldGenPlugin.Generator
         {
             MyPluginLog.Log("Generating new planet");
 
+            var genSettings = MySettingsSession.Static.Settings.GeneratorSettings;
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
 
             var def = FindPlanetDefinitionForSize(maxDiameter);
@@ -380,8 +381,8 @@ namespace SEWorldGenPlugin.Generator
             var diameter = CalculatePlanetDiameter(def);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
-            var elevation = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180 * -5, (float)Math.PI / 180 * 5);
-            Vector3D pos = new Vector3D(orbitDistance * Math.Sin(angle), orbitDistance * Math.Cos(angle), orbitDistance * Math.Sin(elevation));
+            var elevation = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180f * -genSettings.SystemPlaneDeviation, (float)Math.PI / 180f * genSettings.SystemPlaneDeviation);
+            Vector3D pos = new Vector3D(orbitDistance * Math.Sin(angle) * Math.Cos(elevation), orbitDistance * Math.Cos(angle) * Math.Cos(elevation), orbitDistance * Math.Sin(elevation));
 
             string name = GetPlanetName(planetIndex, def.Id.SubtypeId.String);
 

@@ -20,6 +20,7 @@
         public readonly string ASTEROID_COUNT_SLIDER = "The minimum and maximum amount of asteroid objects, such as asteroid belts, in the system. This does not include asteroid rings around planets currently. " +
                                                        "The generator will choose a random number in this range. To specify an exact amount, set min and max equal.";
         public readonly string ORBIT_DISTANCE_SLIDER = "The range for orbit distances between the system objects. In KM";
+        public readonly string SYSTEM_PLANE_DEV_SLIDER = "The angle the orbits of planets can deviate from the system plane.";
         public readonly string ASTEROID_DENS_SLIDER = "The density for asteroid generation. 1 is the densest.";
         public readonly string WORLD_SIZE_SLIDER = "The max size of the system. After that nothing will be generated. In KM";
         public readonly string PLANET_SIZE_CAP_SLIDER = "The max size a planet can have in this system. In metres";

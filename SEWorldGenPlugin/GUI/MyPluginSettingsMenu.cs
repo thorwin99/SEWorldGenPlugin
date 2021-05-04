@@ -48,6 +48,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlRangedSlider m_planetCountSlider;
         private MyGuiControlRangedSlider m_asteroidCountSlider;
         private MyGuiControlRangedSlider m_orbitDistancesSlider;
+        private MyGuiControlClickableSlider m_systemPlaneDeviationSlider;
         private MyGuiControlClickableSlider m_asteroidDensitySlider;
         private MyGuiControlClickableSlider m_worldSizeSlider;
 
@@ -95,6 +96,7 @@ namespace SEWorldGenPlugin.GUI
             var planetCountLabel = new MyGuiControlLabel(null, null, "Planet count");
             var asteroidCountLabel = new MyGuiControlLabel(null, null, "Asteroid object count");
             var oribtDistanceLabel = new MyGuiControlLabel(null, null, "Orbit distances");
+            var planeDeviationLabel = new MyGuiControlLabel(null, null, "System plane deviation");
             var asteroidDensityLabel = new MyGuiControlLabel(null, null, "Asteroid density");
             var worldSizeLabel = new MyGuiControlLabel(null, null, "World size");
             var planetSizeCapLabel = new MyGuiControlLabel(null, null, "Planet size cap");
@@ -151,6 +153,11 @@ namespace SEWorldGenPlugin.GUI
             m_orbitDistancesSlider.SetToolTip(MyPluginTexts.TOOLTIPS.ORBIT_DISTANCE_SLIDER);
 
             parent.AddTableRow(oribtDistanceLabel, m_orbitDistancesSlider);
+
+            m_systemPlaneDeviationSlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 90f, defaultValue: 5f, width: 0.25f, showLabel: true);
+            m_systemPlaneDeviationSlider.SetToolTip(MyPluginTexts.TOOLTIPS.SYSTEM_PLANE_DEV_SLIDER);
+
+            parent.AddTableRow(planeDeviationLabel, m_systemPlaneDeviationSlider);
 
             m_asteroidDensitySlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 1, defaultValue: 0.6f, width: 0.25f, showLabel: true);
             m_asteroidDensitySlider.SetToolTip(MyPluginTexts.TOOLTIPS.ASTEROID_DENS_SLIDER);
@@ -263,6 +270,7 @@ namespace SEWorldGenPlugin.GUI
             m_planetCountSlider.SetValues(worldSettings.GeneratorSettings.MinMaxPlanets.Min, worldSettings.GeneratorSettings.MinMaxPlanets.Max);
             m_asteroidCountSlider.SetValues(worldSettings.GeneratorSettings.MinMaxAsteroidObjects.Min, worldSettings.GeneratorSettings.MinMaxAsteroidObjects.Max);
             m_orbitDistancesSlider.SetValues(worldSettings.GeneratorSettings.MinMaxOrbitDistance.Min / 1000, worldSettings.GeneratorSettings.MinMaxOrbitDistance.Max / 1000);
+            m_systemPlaneDeviationSlider.Value = worldSettings.GeneratorSettings.SystemPlaneDeviation;
             m_asteroidDensitySlider.Value = worldSettings.GeneratorSettings.AsteroidDensity;
 
             if(worldSettings.GeneratorSettings.WorldSize >= 0)
@@ -298,6 +306,7 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.MinMaxPlanets = new MySerializableMinMax((long)m_planetCountSlider.CurrentMin, (long)m_planetCountSlider.CurrentMax);
             settings.GeneratorSettings.MinMaxAsteroidObjects = new MySerializableMinMax((long)m_asteroidCountSlider.CurrentMin, (long)m_asteroidCountSlider.CurrentMax);
             settings.GeneratorSettings.MinMaxOrbitDistance = new MySerializableMinMax((long)(m_orbitDistancesSlider.CurrentMin * 1000), (long)(m_orbitDistancesSlider.CurrentMax * 1000));
+            settings.GeneratorSettings.SystemPlaneDeviation = m_systemPlaneDeviationSlider.Value;
             settings.GeneratorSettings.AsteroidDensity = m_asteroidDensitySlider.Value;
             settings.GeneratorSettings.WorldSize = m_worldSizeSlider.Value >= 0 ? (long)(m_worldSizeSlider.Value * 1000) : -1;
 
