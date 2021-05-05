@@ -597,7 +597,7 @@ namespace SEWorldGenPlugin.Generator
             float modifier = m_gasGiants.Contains(planet) ? 2 * settings.PlanetSizeMultiplier: settings.PlanetSizeMultiplier;
             float deviation = (MyRandom.Instance.NextFloat() - 0.5f) * 2f * settings.PlanetSizeDeviation + 1;
 
-            return Math.Min(Math.Sqrt(planet.SurfaceGravity * 120000 * 120000 * modifier * modifier) * deviation, settings.PlanetSizeCap);
+            return Math.Min(planet.SurfaceGravity * 120000 * modifier * deviation, settings.PlanetSizeCap);
         }
 
         /// <summary>
