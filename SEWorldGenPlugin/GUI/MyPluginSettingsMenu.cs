@@ -54,6 +54,7 @@ namespace SEWorldGenPlugin.GUI
 
         private MyGuiControlClickableSlider m_planetSizeCapSlider;
         private MyGuiControlClickableSlider m_planetSizeMultSlider;
+        private MyGuiControlClickableSlider m_planetSizeDeviationSlider;
         private MyGuiControlClickableSlider m_planetMoonBasePropSlider;
         private MyGuiControlClickableSlider m_planetRingBasePropSlider;
         private MyGuiControlRangedSlider m_planetMoonMinMaxSlider;
@@ -101,6 +102,7 @@ namespace SEWorldGenPlugin.GUI
             var worldSizeLabel = new MyGuiControlLabel(null, null, "World size");
             var planetSizeCapLabel = new MyGuiControlLabel(null, null, "Planet size cap");
             var planetSizeMultLabel = new MyGuiControlLabel(null, null, "Planet size multiplier");
+            var planetSizeDeviationLabel = new MyGuiControlLabel(null, null, "Planet size deviation");
             var planetMoonPropLabel = new MyGuiControlLabel(null, null, "Planet moon probability");
             var planetRingPropLabel = new MyGuiControlLabel(null, null, "Planet ring probability");
             var planetMoonCountLabel = new MyGuiControlLabel(null, null, "Planet moon count");
@@ -185,6 +187,11 @@ namespace SEWorldGenPlugin.GUI
             m_planetSizeMultSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_SIZE_MULT);
 
             parent.AddTableRow(planetSizeMultLabel, m_planetSizeMultSlider);
+
+            m_planetSizeDeviationSlider = new MyGuiControlClickableSlider(minValue: 0f, maxValue: 0.5f, defaultValue: 0f, width: 0.25f, showLabel: true);
+            m_planetSizeDeviationSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_SIZE_DEV);
+
+            parent.AddTableRow(planetSizeDeviationLabel, m_planetSizeDeviationSlider);
 
             m_planetMoonBasePropSlider = new MyGuiControlClickableSlider(minValue: 0f, maxValue: 1f, defaultValue: 0.5f, width: 0.25f, showLabel: true);
             m_planetMoonBasePropSlider.SetToolTip(MyPluginTexts.TOOLTIPS.PLANET_MOON_PROP);
@@ -284,6 +291,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_planetSizeCapSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
             m_planetSizeMultSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier;
+            m_planetSizeDeviationSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeDeviation;
             m_planetMoonBasePropSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.BaseMoonProbability;
             m_planetRingBasePropSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.BaseRingProbability;
             m_planetMoonMinMaxSlider.SetValues(worldSettings.GeneratorSettings.PlanetSettings.MinMaxMoons.Min, worldSettings.GeneratorSettings.PlanetSettings.MinMaxMoons.Max);
@@ -312,6 +320,7 @@ namespace SEWorldGenPlugin.GUI
 
             settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_planetSizeCapSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier = m_planetSizeMultSlider.Value;
+            settings.GeneratorSettings.PlanetSettings.PlanetSizeDeviation = m_planetSizeDeviationSlider.Value;
             settings.GeneratorSettings.PlanetSettings.BaseMoonProbability = m_planetMoonBasePropSlider.Value;
             settings.GeneratorSettings.PlanetSettings.BaseRingProbability = m_planetRingBasePropSlider.Value;
             settings.GeneratorSettings.PlanetSettings.MinMaxMoons = new MySerializableMinMax((long)m_planetMoonMinMaxSlider.CurrentMin, (long)m_planetMoonMinMaxSlider.CurrentMax);

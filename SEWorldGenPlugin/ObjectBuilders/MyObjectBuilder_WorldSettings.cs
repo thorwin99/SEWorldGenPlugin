@@ -161,17 +161,25 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public int PlanetSizeCap = 1200000;
 
         /// <summary>
+        /// The percentage a planet can deviate from the calculated diameter of surfaceGravity * 120km * PlanetSizeMultiplier.
+        /// This allows 2 planets of the same type to have a different diameter by said percentage.
+        /// 1 is not advisable, as a planet could then have a diameter of 0.
+        /// </summary>
+        [ProtoMember(3)]
+        public float PlanetSizeDeviation = 0;
+
+        /// <summary>
         /// The basic probability for a planet with 1G to have one or more moons.
         /// Will scale with gravity, essentially base probability * gravity.
         /// </summary>
-        [ProtoMember(3)]
+        [ProtoMember(4)]
         public float BaseMoonProbability = 0.3f;
 
         /// <summary>
         /// The basic probability for a planet with 1G to have a ring generated.
         /// Will scale with gravity, essentially base probability * gravity.
         /// </summary>
-        [ProtoMember(4)]
+        [ProtoMember(5)]
         public float BaseRingProbability = 0.25f;
 
         /// <summary>
@@ -180,7 +188,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// minimum amount, but can also have less than the max amount, if the calculated max amount based on
         /// gravity is lower than that, but no Planet can have more moons.
         /// </summary>
-        [ProtoMember(5)]
+        [ProtoMember(6)]
         public MySerializableMinMax MinMaxMoons = new MySerializableMinMax(1, 25);
 
         public override MyAbstractConfigObjectBuilder copy()
@@ -188,6 +196,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
             var copy = new MyObjectBuilder_PlanetGenerationSettings();
             copy.PlanetSizeCap = PlanetSizeCap;
             copy.PlanetSizeMultiplier = PlanetSizeMultiplier;
+            copy.PlanetSizeDeviation = PlanetSizeDeviation;
+            copy.BaseMoonProbability = BaseMoonProbability;
+            copy.BaseRingProbability = BaseRingProbability;
             return copy;
         }
 
@@ -195,6 +206,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             MyValueVerifier.VerifyFloat(0.1f, 100f, 2.0f, "PlanetSizeMultiplier", ref PlanetSizeMultiplier);
             MyValueVerifier.VerifyInt(1, int.MaxValue, 1200000, "PlanetSizeCap", ref PlanetSizeCap);
+            MyValueVerifier.VerifyFloat(0, 1, 0f, "PlanetSizeDeviation", ref PlanetSizeDeviation);
+            MyValueVerifier.VerifyFloat(0, 1, 0.3f, "BaseMoonProbability", ref BaseMoonProbability);
+            MyValueVerifier.VerifyFloat(0, 1, 0.25f, "BaseRingProbability", ref BaseRingProbability);
         }
     }
 

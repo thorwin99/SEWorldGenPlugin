@@ -369,16 +369,14 @@ namespace SEWorldGenPlugin.Generator
             var genSettings = MySettingsSession.Static.Settings.GeneratorSettings;
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
 
-            var def = FindPlanetDefinitionForSize(maxDiameter);
+            double diameter;
+            var def = FindPlanetDefinitionForSize(maxDiameter, out diameter);
 
             if (def == null) 
             {
                 MyPluginLog.Log("Could not load a planet definition for this planet.", LogLevel.WARNING);
                 return null; 
             }
-
-
-            var diameter = CalculatePlanetDiameter(def);
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var elevation = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180f * -genSettings.SystemPlaneDeviation, (float)Math.PI / 180f * genSettings.SystemPlaneDeviation);
@@ -440,10 +438,10 @@ namespace SEWorldGenPlugin.Generator
                 MyPluginLog.Log("Generating moon " + i);
 
                 double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(1f, 1.5f);
-                var definition = FindPlanetDefinitionForSize(parentPlanet.Diameter * 0.75f, true);
-                if (definition == null) return moons;
+                double diameter;
 
-                double diameter = CalculatePlanetDiameter(definition);
+                var definition = FindPlanetDefinitionForSize(parentPlanet.Diameter * 0.75f, out diameter, true);
+                if (definition == null) return moons;
 
                 Vector3D position;
 
@@ -532,14 +530,15 @@ namespace SEWorldGenPlugin.Generator
         /// If none can be found, a random one will be returned.
         /// </summary>
         /// <param name="maxDiameter">Max diameter of the planet in meters</param>
+        /// <param name="diameter">The diameter of the planet for the returned definition</param>
+        /// <param name="isMoon">If it should use moon definitions</param>
         /// <returns>A definition of a planet that tries to be smaller than maxDiameter</returns>
-        private MyPlanetGeneratorDefinition FindPlanetDefinitionForSize(double maxDiameter, bool isMoon = false)
+        private MyPlanetGeneratorDefinition FindPlanetDefinitionForSize(double maxDiameter, out double diameter, bool isMoon = false)
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
             var planets = isMoon ? m_uniqueMoons : m_uniquePlanets;
             var mandatory = isMoon ? m_mandatoryMoons : m_mandatoryPlanets;
             MyPlanetGeneratorDefinition def;
-            double diameter = 0;
             int tries = 0;
 
             if(planets == null || planets.Count <= 0)
@@ -559,6 +558,7 @@ namespace SEWorldGenPlugin.Generator
             if(planets.Count <= 0)
             {
                 MyPluginLog.Log("Cant find planet definition", LogLevel.WARNING);
+                diameter = 0;
                 return null;
             }
 
@@ -595,8 +595,9 @@ namespace SEWorldGenPlugin.Generator
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
             float modifier = m_gasGiants.Contains(planet) ? 2 * settings.PlanetSizeMultiplier: settings.PlanetSizeMultiplier;
+            float deviation = (MyRandom.Instance.NextFloat() - 0.5f) * 2f * settings.PlanetSizeDeviation + 1;
 
-            return Math.Min(Math.Sqrt(planet.SurfaceGravity * 120000 * 120000 * modifier * modifier), settings.PlanetSizeCap);
+            return Math.Min(Math.Sqrt(planet.SurfaceGravity * 120000 * 120000 * modifier * modifier) * deviation, settings.PlanetSizeCap);
         }
 
         /// <summary>

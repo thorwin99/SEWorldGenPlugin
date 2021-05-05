@@ -25,6 +25,7 @@
         public readonly string WORLD_SIZE_SLIDER = "The max size of the system. After that nothing will be generated. In KM";
         public readonly string PLANET_SIZE_CAP_SLIDER = "The max size a planet can have in this system. In metres";
         public readonly string PLANET_SIZE_MULT = "The multiplier for the planets size. 1G planet equals to 120km * this value. Gravity is fixed for each planet, only Diameter will be affected. A gas giant will be double the size.";
+        public readonly string PLANET_SIZE_DEV = "The percentage the planets diameter can deviate from the calculated planet size (surfaceGravity * 120km * SizeMultiplier). The deviation is random but wont exceed this value.";
         public readonly string PLANET_MOON_PROP = "The base probability for a planet to generate moons. Scales with gravity, so higher gravity means higher probability.";
         public readonly string PLANET_RING_PROP = "The base probability for a planet to generate a ring. Scales with gravity, so higher gravity means higher probability.";
         public readonly string PLANET_MOON_COUNT = "The minimum and maximum limits for the amount of moons around a planet.";
