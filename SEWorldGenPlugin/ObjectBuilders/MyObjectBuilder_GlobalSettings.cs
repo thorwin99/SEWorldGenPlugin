@@ -70,6 +70,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(8)]
         public string BeltNameFormat = "Belt [ObjectNumberGreek]";
 
+        /// <summary>
+        /// Wether or not patches are enabled.
+        /// </summary>
+        [ProtoMember(9)]
         public bool EnablePatching = false;
 
         public override MyAbstractConfigObjectBuilder copy()
