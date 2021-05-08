@@ -82,9 +82,15 @@ namespace SEWorldGenPlugin
                     MyPluginLog.Log("Patching...");
                     Patch();
                     MyPluginLog.Log("Patches applied");
-                }catch(FileNotFoundException)
+                }
+                catch (FileNotFoundException)
                 {
                     MyPluginLog.Log("0harmony.dll not found, skipping patching.", LogLevel.WARNING);
+                }
+                catch (Exception e)
+                {
+                    MyPluginLog.Log("Something went wrong while patching: ", LogLevel.ERROR);
+                    MyPluginLog.Log(e.StackTrace, LogLevel.ERROR);
                 }
             }
             else
