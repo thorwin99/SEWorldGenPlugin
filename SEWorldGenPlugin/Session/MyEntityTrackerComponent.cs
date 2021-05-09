@@ -120,11 +120,7 @@ namespace SEWorldGenPlugin.Session
             if (m_trackedEntities != null && m_newTrackedEntities != null && !m_trackedEntities.Contains(entity))
             {
                 m_newTrackedEntities.Add(entity);
-                entity.OnMarkForClose += (e) =>
-                {
-                    lock(m_toUntrackEntities)
-                        m_toUntrackEntities.Add(e);
-                };
+                entity.OnMarkForClose += OnEntityClose;
             }
         }
 
@@ -154,12 +150,33 @@ namespace SEWorldGenPlugin.Session
             m_entityTrackers.Remove(tracker);
         }
 
+        /// <summary>
+        /// Delegate used entity tracking for grids according to Player presence
+        /// </summary>
+        /// <param name="grid">The grid</param>
         private void OnGridPlayerPresenceUpdate(MyCubeGrid grid)
         {
             if(grid.PlayerPresenceTier != VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
             {
                 lock(m_toUntrackEntities)
                     m_toUntrackEntities.Add(grid);
+            }
+        }
+
+        /// <summary>
+        /// Delegate used to remove closing entities
+        /// </summary>
+        /// <param name="e">The entity</param>
+        private void OnEntityClose(MyEntity e)
+        {
+            lock (m_toUntrackEntities)
+                m_toUntrackEntities.Add(e);
+
+            e.OnMarkForClose -= OnEntityClose;
+
+            if(e is MyCubeGrid grid)
+            {
+                grid.PlayerPresenceTierChanged -= OnGridPlayerPresenceUpdate;
             }
         }
     }
