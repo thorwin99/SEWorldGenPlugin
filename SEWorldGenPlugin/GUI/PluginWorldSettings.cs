@@ -129,7 +129,7 @@ namespace SEWorldGenPlugin.GUI
                             {
                                 var name = Checkpoint.SessionName;
                                 var path = Path.Combine(MyFileSystem.SavesPath, name.Replace(":", "-"));
-                                MyFileUtils.WriteXmlFileToPath(PlSettings, path, MySettingsSession.FILE_NAME, typeof(PluginWorldSettings));
+                                MyFileUtils.WriteXmlFileToPath(PlSettings, path, MySettingsSession.FILE_NAME);
                             };
                         }
                     }
@@ -166,9 +166,9 @@ namespace SEWorldGenPlugin.GUI
         private void LoadValues()
         {
             var path = Path.Combine(MyFileSystem.SavesPath, Checkpoint.SessionName.Replace(":", "-"));
-            if(MyFileUtils.FileExistsInPath(path, MySettingsSession.FILE_NAME, typeof(PluginWorldSettings)))
+            if(MyFileUtils.FileExistsInPath(path, MySettingsSession.FILE_NAME))
             {
-                PlSettings = MyFileUtils.ReadXmlFileFromPath<MyObjectBuilder_WorldSettings>(path, MySettingsSession.FILE_NAME, typeof(PluginWorldSettings));
+                PlSettings = MyFileUtils.ReadXmlFileFromPath<MyObjectBuilder_WorldSettings>(path, MySettingsSession.FILE_NAME);
             }
             else
             {

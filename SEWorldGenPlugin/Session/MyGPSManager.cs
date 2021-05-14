@@ -287,9 +287,9 @@ namespace SEWorldGenPlugin.Session
             Static = this;
 
             MyObjectBuilder_WorldGpsData ob;
-            if (MyFileUtils.FileExistsInWorldStorage(FILENAME, typeof(MyGPSManager)))
+            if (MyFileUtils.FileExistsInWorldStorage(FILENAME))
             {
-                ob = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldGpsData>(FILENAME, typeof(MyGPSManager));
+                ob = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldGpsData>(FILENAME);
             }
             else
             {
@@ -340,7 +340,7 @@ namespace SEWorldGenPlugin.Session
                 ob.PersistentGpss.Add(item);
             }
 
-            MyFileUtils.WriteXmlFileToWorld(ob, FILENAME, typeof(MyGPSManager));
+            MyFileUtils.WriteXmlFileToWorld(ob, FILENAME);
 
             MyPluginLog.Log("Saving GPS manager data completed");
         }

@@ -181,7 +181,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 MyPluginLog.Log("Saving system data");
 
-                MyFileUtils.WriteXmlFileToWorld(StarSystem, STORAGE_FILE, typeof(MyStarSystemGenerator));
+                MyFileUtils.WriteXmlFileToWorld(StarSystem, STORAGE_FILE);
             }
         }
 
@@ -708,9 +708,9 @@ namespace SEWorldGenPlugin.Generator
         /// <returns></returns>
         private MyObjectBuilder_SystemData LoadSystemData()
         {
-            if (MyFileUtils.FileExistsInWorldStorage(STORAGE_FILE, typeof(MyStarSystemGenerator)))
+            if (MyFileUtils.FileExistsInWorldStorage(STORAGE_FILE))
             {
-                var data = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_SystemData>(STORAGE_FILE, typeof(MyStarSystemGenerator));
+                var data = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_SystemData>(STORAGE_FILE);
                 if(data == null)
                 {
                     data = new MyObjectBuilder_SystemData();

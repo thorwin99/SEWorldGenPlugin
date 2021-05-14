@@ -24,55 +24,42 @@ namespace SEWorldGenPlugin.Utilities
         private const string STORAGE_FOLDER = "Storage";
 
         /// <summary>
-        /// Removes .dll from a file name if it needs to.
+        /// Name of the folder for plugin specific files
         /// </summary>
-        /// <param name="name">Name of the dll file</param>
-        /// <returns>DLL file name without extension.</returns>
-        private static string StripDllExtIfNecessary(string name)
-        {
-            string ext = ".dll";
-            if (name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return name.Substring(0, name.Length - ext.Length);
-            }
-            return name;
-        }
+        private const string PLUGIN_FOLDER = "SEWorldGenPlugin";
 
         /// <summary>
-        /// Checks if a file with the given name exists in the world folder. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Checks if a file with the given name exists in the world folder inside the plugins storage folder.
         /// </summary>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
         /// <returns></returns>
-        public static bool FileExistsInWorldStorage(string file, Type callingType)
+        public static bool FileExistsInWorldStorage(string file)
         {
             if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
             {
                 return false;
             }
 
-            var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+            var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, PLUGIN_FOLDER, file);
 
             return File.Exists(path);
         }
 
         /// <summary>
         /// Checks whether a file exists in a given paths storage folder or not. The path gets the storage folder and subfolder appended.
-        /// The calling type is used to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// The storage folder is the plugins storage folder.
         /// </summary>
         /// <param name="path">Path to the storage folder</param>
         /// <param name="file">Name of the file</param>
-        /// <param name="callingType">Calling type</param>
         /// <returns>True if it exists</returns>
-        public static bool FileExistsInPath(string path, string file, Type callingType)
+        public static bool FileExistsInPath(string path, string file)
         {
             if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
             {
                 return false;
             }
 
-            var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+            var paths = Path.Combine(path, STORAGE_FOLDER, PLUGIN_FOLDER, file);
             return File.Exists(paths);
         }
 
@@ -91,32 +78,30 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Deletes a file in the storage folder of the current world. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Deletes a file in the storage folder of the current world. The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
-        public static void DeleteFileInWorldStorage(string file, Type callingType)
+        public static void DeleteFileInWorldStorage(string file)
         {
-            if (FileExistsInWorldStorage(file, callingType))
+            if (FileExistsInWorldStorage(file))
             {
-                var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, PLUGIN_FOLDER, file);
                 File.Delete(path);
             }
         }
 
         /// <summary>
-        /// Deletes a file at the paths storage folder. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Deletes a file at the paths storage folder. The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <param name="path">Path to the storage folder</param>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
-        public static void DeleteFileInPath(string path, string file, Type callingType)
+        public static void DeleteFileInPath(string path, string file)
         {
-            if (FileExistsInPath(path, file, callingType))
+            if (FileExistsInPath(path, file))
             {
-                var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+                var paths = Path.Combine(path, STORAGE_FOLDER, PLUGIN_FOLDER, file);
                 File.Delete(paths);
             }
         }
@@ -135,19 +120,18 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Reads the file contents of a file in the current worlds storage folder. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Reads the file contents of a file in the current worlds storage folder. The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
         /// <returns>A TextReader of the opened file</returns>
-        public static TextReader ReadFileInWorldStorage(string file, Type callingType)
+        public static TextReader ReadFileInWorldStorage(string file)
         {
             if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
             {
                 throw new FileNotFoundException();
             }
-            var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+            var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, PLUGIN_FOLDER, file);
             var stream = MyFileSystem.OpenRead(path);
             if (stream != null)
             {
@@ -157,21 +141,19 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Reads a file in the storage folder at the given path. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
-        /// The calling type is used to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Reads a file in the storage folder at the given path. The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <param name="path">Path to the storage folder</param>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Dalling type</param>
         /// <returns>Returns a TextReader of the read file</returns>
-        public static TextReader ReadFileInPath(string path, string file, Type callingType)
+        public static TextReader ReadFileInPath(string path, string file)
         {
             if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
             {
                 throw new FileNotFoundException();
             }
-            var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+            var paths = Path.Combine(path, STORAGE_FOLDER, PLUGIN_FOLDER, file);
             var stream = MyFileSystem.OpenRead(paths);
             if (stream != null)
             {
@@ -201,15 +183,14 @@ namespace SEWorldGenPlugin.Utilities
 
         /// <summary>
         /// Writes to a file in the current worlds storage folder. 
-        /// If the file does not exist, it will be created. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, 
-        /// where files for the dll are stored. 
+        /// If the file does not exist, it will be created. 
+        /// The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
         /// <exception cref="FileNotFoundException">When no file cannot be created</exception>
         /// <returns>A TextWriter, to write to the file</returns>
-        public static TextWriter WriteFileInWorldStorage(string file, Type callingType)
+        public static TextWriter WriteFileInWorldStorage(string file)
         {
             if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
             {
@@ -220,7 +201,7 @@ namespace SEWorldGenPlugin.Utilities
                 return null;
             }
 
-            var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+            var path = Path.Combine(MySession.Static.CurrentPath, STORAGE_FOLDER, PLUGIN_FOLDER, file);
             var stream = MyFileSystem.OpenWrite(path);
             if (stream != null)
             {
@@ -230,21 +211,21 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Writes to a file located in the storage folder at path. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Writes to a file located in the storage folder at path. 
+        /// The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <param name="path">Path to the storage folder</param>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
         /// <returns>A TextWriter to write to the file</returns>
-        public static TextWriter WriteFileInPath(string path, string file, Type callingType)
+        public static TextWriter WriteFileInPath(string path, string file)
         {
             if (file.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
             {
                 throw new FileNotFoundException();
             }
 
-            var paths = Path.Combine(path, STORAGE_FOLDER, StripDllExtIfNecessary(callingType.Assembly.ManifestModule.ScopeName), file);
+            var paths = Path.Combine(path, STORAGE_FOLDER, PLUGIN_FOLDER, file);
             var stream = MyFileSystem.OpenWrite(paths);
             if (stream != null)
             {
@@ -311,20 +292,20 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Reads an xml file from the current worlds storage folder. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Reads an xml file from the current worlds storage folder. 
+        /// The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <typeparam name="T">Type of the object represented in the xml file</typeparam>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
         /// <returns>Deserialized object of the xml in file</returns>
-        public static T ReadXmlFileFromWorld<T>(string file, Type callingType)
+        public static T ReadXmlFileFromWorld<T>(string file)
         {
-            if (FileExistsInWorldStorage(file, callingType))
+            if (FileExistsInWorldStorage(file))
             {
                 try
                 {
-                    using (var reader = ReadFileInWorldStorage(file, callingType))
+                    using (var reader = ReadFileInWorldStorage(file))
                     {
                         T saveFile = SerializeFromXml<T>(reader.ReadToEnd());
                         return saveFile;
@@ -334,7 +315,7 @@ namespace SEWorldGenPlugin.Utilities
                 {
                     MyPluginLog.Log("Couldnt load save file.", LogLevel.ERROR);
                     MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
-                    DeleteFileInWorldStorage(file, callingType);
+                    DeleteFileInWorldStorage(file);
                     return default(T);
                 }
             }
@@ -342,18 +323,18 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Writes an object serialized to xml to the file. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Writes an object serialized to xml to the file. 
+        /// The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <typeparam name="T">Type of the object</typeparam>
         /// <param name="saveFile">Object to write to file as xml</param>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
-        public static void WriteXmlFileToWorld<T>(T saveFile, string file, Type callingType)
+        public static void WriteXmlFileToWorld<T>(T saveFile, string file)
         {
-            DeleteFileInWorldStorage(file, callingType);
+            DeleteFileInWorldStorage(file);
             string xml = SerializeToXml<T>(saveFile);
-            using (var writer = WriteFileInWorldStorage(file, callingType))
+            using (var writer = WriteFileInWorldStorage(file))
             {
                 if (writer == null) return;
                 writer.Write(xml);
@@ -362,21 +343,21 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Reads an xml file located at the storage folder at path from file. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Reads an xml file located at the storage folder at path from file. 
+        /// The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <typeparam name="T">Type of the object represented by the xml in the file</typeparam>
         /// <param name="path">Path to the storage folder</param>
         /// <param name="file">File name</param>
-        /// <param name="callingType">Calling type</param>
         /// <returns>Deserialized object of the xml in the file</returns>
-        public static T ReadXmlFileFromPath<T>(string path, string file, Type callingType)
+        public static T ReadXmlFileFromPath<T>(string path, string file)
         {
-            if (FileExistsInPath(path, file, callingType))
+            if (FileExistsInPath(path, file))
             {
                 try
                 {
-                    using (var reader = ReadFileInPath(path, file, callingType))
+                    using (var reader = ReadFileInPath(path, file))
                     {
                         T saveFile = SerializeFromXml<T>(reader.ReadToEnd());
                         return saveFile;
@@ -386,7 +367,7 @@ namespace SEWorldGenPlugin.Utilities
                 {
                     MyPluginLog.Log("Couldnt load save file.", LogLevel.ERROR);
                     MyPluginLog.Log(e.Message + "\n" + e.StackTrace, LogLevel.ERROR);
-                    DeleteFileInPath(path, file, callingType);
+                    DeleteFileInPath(path, file);
                     return default(T);
                 }
             }
@@ -394,19 +375,20 @@ namespace SEWorldGenPlugin.Utilities
         }
 
         /// <summary>
-        /// Writes a serialized object as xml to a file in the storage folder at the given path. The calling type is used
-        /// to get the assembly name to get the sub directory in the storage folder, where files for the dll are stored.
+        /// Writes a serialized object as xml to a file in the storage folder at the given path. 
+        /// The subdirectoy for the file in the storage folder
+        /// is the plugins storage folder, SEWorldGenPlugin
         /// </summary>
         /// <typeparam name="T">Type of the object to serialize</typeparam>
         /// <param name="saveFile">Object to serialize and write to the xml file</param>
         /// <param name="path">Path to the storage folder</param>
         /// <param name="file">File name</param>
         /// <param name="callingType">Calling type</param>
-        public static void WriteXmlFileToPath<T>(T saveFile, string path, string file, Type callingType)
+        public static void WriteXmlFileToPath<T>(T saveFile, string path, string file)
         {
-            DeleteFileInPath(path, file, callingType);
+            DeleteFileInPath(path, file);
             string xml = SerializeToXml<T>(saveFile);
-            using (var writer = WriteFileInPath(path, file, callingType))
+            using (var writer = WriteFileInPath(path, file))
             {
                 writer.Write(xml);
                 writer.Close();
