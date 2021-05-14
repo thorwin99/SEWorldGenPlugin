@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
 using Sandbox.Game;
+using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.ProceduralGenerator;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.http;
+using SEWorldGenPlugin.Patches;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.IO;
@@ -105,7 +107,9 @@ namespace SEWorldGenPlugin
         private void Patch()
         {
             Harmony harmony = new Harmony("thorwin99.SEWorldGenPlugin");
-            harmony.PatchAll();
+
+            var asteroidPatch = new PatchOverlapAllAsteroidSeedsInSphere();
+            asteroidPatch.ApplyPatch(harmony);
         }
     }
 }
