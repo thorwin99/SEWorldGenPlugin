@@ -5,6 +5,7 @@ using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
+using System.Threading;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
@@ -58,6 +59,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         private bool m_isEnabled;
 
+        private Timer m_gpsUpdateTimer;
+
         /// <summary>
         /// Final initialization of this component
         /// </summary>
@@ -107,6 +110,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         {
             if (!m_isEnabled) return;
 
+            if(m_gpsUpdateTimer == null)
+            {
+                m_gpsUpdateTimer = new Timer(UpdateGPS, null, 0, 1000);
+            }
+
             foreach(var objectModule in m_objectModules)
             {
                 objectModule.GenerateObjects();
@@ -120,14 +128,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     tracker.Value.UpdateLastPosition();
 
                     module.MarkToLoadCellsInBounds(tracker.Value.BoundingVolume);
-
-                    if(tracker.Key is MyCharacter)
-                        module.UpdateGpsForPlayer(tracker.Value);
-                }
-
-                foreach(var module in m_objectModules)
-                {
-                    module.UpdateGpsForPlayer(tracker.Value);
                 }
             }
 
@@ -137,6 +137,23 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 module.LoadCells();
                 module.GenerateLoadedCellObjects();
                 module.UpdateCells();
+            }
+        }
+
+        private void UpdateGPS(object stateInfo)
+        {
+            foreach(var tracker in m_trackedEntities)
+            {
+                foreach (var module in m_cellModules)
+                {
+                    if (tracker.Key is MyCharacter)
+                        module.UpdateGpsForPlayer(tracker.Value);
+                }
+
+                foreach (var module in m_objectModules)
+                {
+                    module.UpdateGpsForPlayer(tracker.Value);
+                }
             }
         }
 
@@ -150,6 +167,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             m_trackedEntities.Clear();
             m_cellModules.Clear();
             m_objectModules.Clear();
+
+            if (m_gpsUpdateTimer != null)
+            {
+                m_gpsUpdateTimer.Dispose();
+            }
 
             MyPluginLog.Log("Unloading Procedural Generator Component completed");
         }
