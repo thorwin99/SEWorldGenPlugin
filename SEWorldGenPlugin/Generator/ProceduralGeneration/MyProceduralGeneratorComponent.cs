@@ -142,7 +142,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
         private void UpdateGPS(object stateInfo)
         {
-            foreach(var tracker in m_trackedEntities)
+            Dictionary<MyEntity, MyEntityTracker> copy = new Dictionary<MyEntity, MyEntityTracker>(m_trackedEntities);
+
+            foreach(var tracker in copy)
             {
                 foreach (var module in m_cellModules)
                 {
