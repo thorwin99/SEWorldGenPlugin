@@ -126,10 +126,10 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidGeneratorCombo.AddItem((long)AsteroidGenerationMethod.PLUGIN, "Plugin");
             m_asteroidGeneratorCombo.AddItem((long)AsteroidGenerationMethod.VANILLA, "Vanilla");
             m_asteroidGeneratorCombo.AddItem((long)AsteroidGenerationMethod.BOTH, "Combined");
-            m_asteroidGeneratorCombo.ItemSelected += delegate
+            m_asteroidGeneratorCombo.ItemSelected += delegate()
             {
-                m_asteroidGPSModeCombo.Enabled = m_asteroidGPSModeCombo.GetSelectedIndex() != (long)AsteroidGenerationMethod.VANILLA;
-                m_asteroidDensitySlider.Enabled = m_asteroidGPSModeCombo.GetSelectedIndex() != (long)AsteroidGenerationMethod.VANILLA;
+                m_asteroidGPSModeCombo.Enabled = m_asteroidGeneratorCombo.GetSelectedKey() != (long)AsteroidGenerationMethod.VANILLA;
+                m_asteroidDensitySlider.Enabled = m_asteroidGeneratorCombo.GetSelectedKey() != (long)AsteroidGenerationMethod.VANILLA;
             };
 
             m_asteroidGeneratorCombo.Size = new Vector2(0.25f, m_asteroidGeneratorCombo.Size.Y);
