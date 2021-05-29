@@ -680,7 +680,8 @@ namespace SEWorldGenPlugin.Generator
 
                 m_planets.Add(planet);
             }
-            ResetUniquePlanetLists();
+            ResetUniquePlanetLists(false);
+            ResetUniquePlanetLists(true);
         }
 
         /// <summary>
