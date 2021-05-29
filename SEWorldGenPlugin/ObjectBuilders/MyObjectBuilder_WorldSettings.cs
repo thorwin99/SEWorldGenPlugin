@@ -271,13 +271,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// Mandatory first, that first, all available mandatory planets get generated,
     /// and only after that full random happens,
     /// Mandatory only means that only mandatory planets are used.
+    /// Mandatory unique combines mandatory only and the unique mode.
     /// </summary>
     public enum SystemGenerationMethod
     {
         FULL_RANDOM,
         UNIQUE,
         MANDATORY_FIRST,
-        MANDATORY_ONLY
+        MANDATORY_ONLY,
+        MANDATORY_UNIQUE
     }
 
     /// <summary>

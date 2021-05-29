@@ -537,22 +537,12 @@ namespace SEWorldGenPlugin.Generator
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
             var planets = isMoon ? m_uniqueMoons : m_uniquePlanets;
-            var mandatory = isMoon ? m_mandatoryMoons : m_mandatoryPlanets;
             MyPlanetGeneratorDefinition def;
             int tries = 0;
 
             if(planets == null || planets.Count <= 0)
             {
-                if (isMoon)
-                {
-                    m_uniqueMoons = new List<MyPlanetGeneratorDefinition>(m_moons);
-                    planets = m_uniqueMoons;
-                }
-                else
-                {
-                    m_uniquePlanets = new List<MyPlanetGeneratorDefinition>(m_planets);
-                    planets = m_uniquePlanets;
-                }
+                ResetUniquePlanetLists(isMoon, settings.SystemGenerator != SystemGenerationMethod.MANDATORY_UNIQUE);
             }
 
             if(planets.Count <= 0)
@@ -560,11 +550,6 @@ namespace SEWorldGenPlugin.Generator
                 MyPluginLog.Log("Cant find planet definition", LogLevel.WARNING);
                 diameter = 0;
                 return null;
-            }
-
-            if(settings.SystemGenerator >= SystemGenerationMethod.MANDATORY_FIRST && mandatory.Count > 0)
-            {
-                planets = mandatory;
             }
 
             do
@@ -576,14 +561,45 @@ namespace SEWorldGenPlugin.Generator
 
             if(settings.SystemGenerator == SystemGenerationMethod.MANDATORY_FIRST)
             {
-                mandatory.Remove(def);
+                planets.Remove(def);
             }
 
-            if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE)
+            if(settings.SystemGenerator == SystemGenerationMethod.UNIQUE || settings.SystemGenerator == SystemGenerationMethod.MANDATORY_UNIQUE)
             {
                 planets.Remove(def);
             }
             return def;
+        }
+
+        /// <summary>
+        /// Resets the m_UniquePlanets or m_uniqueMoons lists.
+        /// </summary>
+        /// <param name="resetMoonList">If the moon list should be reset instead of the planet list</param>
+        /// <param name="ignoreMandatory">If mandatory should be ignored.</param>
+        private void ResetUniquePlanetLists(bool resetMoonList = false, bool ignoreMandatory = false)
+        {
+            if (resetMoonList)
+            {
+                if(MySettingsSession.Static.Settings.GeneratorSettings.SystemGenerator >= SystemGenerationMethod.MANDATORY_FIRST && !ignoreMandatory)
+                {
+                    m_uniqueMoons = new List<MyPlanetGeneratorDefinition>(m_mandatoryMoons);
+                }
+                else
+                {
+                    m_uniqueMoons = new List<MyPlanetGeneratorDefinition>(m_moons);
+                }
+            }
+            else
+            {
+                if (MySettingsSession.Static.Settings.GeneratorSettings.SystemGenerator >= SystemGenerationMethod.MANDATORY_FIRST && !ignoreMandatory)
+                {
+                    m_uniquePlanets = new List<MyPlanetGeneratorDefinition>(m_mandatoryPlanets);
+                }
+                else
+                {
+                    m_uniquePlanets = new List<MyPlanetGeneratorDefinition>(m_planets);
+                }
+            }
         }
 
         /// <summary>
@@ -664,6 +680,7 @@ namespace SEWorldGenPlugin.Generator
 
                 m_planets.Add(planet);
             }
+            ResetUniquePlanetLists();
         }
 
         /// <summary>
