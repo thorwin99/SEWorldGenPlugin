@@ -184,6 +184,7 @@ namespace SEWorldGenPlugin.http
             if (Static.m_versionCheckCallbacks.ContainsKey(callbackId))
             {
                 Static.m_versionCheckCallbacks[callbackId](Static.CompareVersions(Static.m_version, versionString) == 0);
+                Static.m_versionCheckCallbacks.Remove(callbackId);
             }
         }
 
