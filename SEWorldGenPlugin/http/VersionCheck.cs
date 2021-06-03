@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace SEWorldGenPlugin.http
 {
@@ -168,6 +169,16 @@ namespace SEWorldGenPlugin.http
             //Add timeout
             m_versionCheckCallbacks.Add(++m_currentCallbackIndex, callback);
             PluginEventHandler.Static.RaiseStaticEvent(GetServerVersion, Sync.MyId, m_currentCallbackIndex);
+
+            Timer timeout = null;
+            timeout = new Timer((key) => 
+            {
+                callback(false);
+
+                m_versionCheckCallbacks.Remove((uint)key);
+
+                timeout?.Dispose();
+            }, m_currentCallbackIndex, 1000, 1000);
         }
 
         [Event(1)]
