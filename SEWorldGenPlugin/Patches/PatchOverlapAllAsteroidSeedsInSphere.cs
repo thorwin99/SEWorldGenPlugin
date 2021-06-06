@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.ProceduralGeneration;
-using SEWorldGenPlugin.Utilities;
+using SEWorldGenPlugin.Session;
 using System.Collections.Generic;
 using VRageMath;
 
@@ -18,7 +18,8 @@ namespace SEWorldGenPlugin.Patches
 
         public static void Postfix(BoundingSphereD area, List<MyObjectSeed> list)
         {
-            MyProceduralGeneratorComponent.Static.GetCellSeedsInBounds(area, list);
+            if(MySettingsSession.Static != null && MySettingsSession.Static.IsEnabled())
+                MyProceduralGeneratorComponent.Static.GetCellSeedsInBounds(area, list);
         }
 
         public override void ApplyPatch(Harmony harmony)
