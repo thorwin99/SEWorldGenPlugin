@@ -96,6 +96,18 @@ namespace SEWorldGenPlugin.Generator
         }
 
         /// <summary>
+        /// Renames an object in the star system.
+        /// </summary>
+        /// <param name="objectId">Id of the object to rename</param>
+        /// <param name="newName">New name of the object</param>
+        /// <param name="callback">Callback for result of event</param>
+        public void RenameObject(Guid objectId, string newName, Action<bool> callback = null)
+        {
+            m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
+            PluginEventHandler.Static.RaiseStaticEvent(SendRenameObjectServer, objectId, newName, m_currentSimpleIndex, Sync.MyId);
+        }
+
+        /// <summary>
         /// Server Event: Tries to get the system object with given name and send it back to client
         /// </summary>
         /// <param name="clientId">The client, that requests the object</param>
@@ -263,6 +275,27 @@ namespace SEWorldGenPlugin.Generator
                 Static.m_getSystemCallbacks[callbackId](starSystem);
                 Static.m_getSystemCallbacks.Remove(callbackId);
             }
+        }
+
+        /// <summary>
+        /// Event to rename the object with id <paramref name="callbackId"/> to have the name <paramref name="newName"/>
+        /// </summary>
+        /// <param name="objectId">Id of the object</param>
+        /// <param name="newName">New name of the object</param>
+        /// <param name="callbackId">ID of the client callback for success of this action</param>
+        /// <param name="clientId">ID of the client that called this event</param>
+        [Event(107)]
+        [Server]
+        private static void SendRenameObjectServer(Guid objectId, string newName, ulong callbackId, ulong clientId)
+        {
+            MyPluginLog.Log("Server: Renaming object " + objectId.ToString() + " to " + newName);
+            if (Static.StarSystem.ObjectExists(objectId))
+            {
+                Static.StarSystem.GetObjectById(objectId).DisplayName = newName;
+                PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, clientId);
+                return;
+            }
+            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, clientId);
         }
     }
 }
