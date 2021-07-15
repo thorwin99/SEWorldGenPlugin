@@ -173,8 +173,13 @@ namespace SEWorldGenPlugin.http
             Timer timeout = null;
             timeout = new Timer((key) => 
             {
-                callback(false);
+                if (!m_versionCheckCallbacks.ContainsKey((uint)key))
+                {
+                    timeout?.Dispose();
+                    return;
+                }
 
+                callback(false);
                 m_versionCheckCallbacks.Remove((uint)key);
 
                 timeout?.Dispose();
