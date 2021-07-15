@@ -20,7 +20,7 @@ namespace SEWorldGenPlugin.http
     {
         public static VersionCheck Static;
 
-        private string m_version;
+        private readonly string m_version;
         private string m_latestBuild;
         private string m_latestPage;
 
@@ -198,7 +198,5 @@ namespace SEWorldGenPlugin.http
                 Static.m_versionCheckCallbacks.Remove(callbackId);
             }
         }
-
-
     }
 }
