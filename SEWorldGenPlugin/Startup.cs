@@ -3,6 +3,7 @@ using Sandbox.Game;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.ProceduralGenerator;
 using SEWorldGenPlugin.GUI;
+using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Patches;
 using SEWorldGenPlugin.Utilities;
@@ -57,7 +58,7 @@ namespace SEWorldGenPlugin
 
             MyPerGameSettings.GUI.MainMenu = typeof(MyPluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
-            MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyPluginAdminMenu);
+            MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyAdminMenuExtension);
 
             TryEnablePatches();
 
