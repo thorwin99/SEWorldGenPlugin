@@ -1,6 +1,10 @@
 ﻿using Sandbox.Game.Gui;
 using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.GUI.Controls;
+using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
+using VRage.Utils;
+using VRageMath;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu
 {
@@ -8,6 +12,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
     /// Class used to extend the vanilla admin menu.
     /// Submenus can be registered to the admin menu.
     /// An instance of this class only exists, when the admin menu is open.
+    /// Registered sub menus persist for the whole lifetime of the plugin.
     /// </summary>
     public class MyAdminMenuExtension : MyGuiScreenAdminMenu
     {
@@ -47,6 +52,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         private MyGuiControlCombobox m_vanillaComboBox;
 
         /// <summary>
+        /// The plugins replacement combo box to select admin sub menu
+        /// </summary>
+        private MyGuiControlCombobox m_pluginComboBox;
+
+        /// <summary>
         /// The custom sub menus of the admin menu. This static variable is used
         /// by each instance of the MyAdminMenuExtension and is static, since a new instance
         /// is created each time the admin menu is opened, but sub menus should only need to be registered once.
@@ -54,7 +64,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         private static readonly List<MyPluginAdminMenuSubMenu> m_subMenus = new List<MyPluginAdminMenuSubMenu>();
 
         /// <summary>
-        /// Registers a new sub menu to be used with the AdminMenuExtension
+        /// Registers a new sub menu to be used with the AdminMenuExtension.
+        /// A registered sub menu persists for the whole lifetime of the plugin.
+        /// That means a sub menu should only be registered once at initialization of the plugin.
         /// </summary>
         /// <param name="subMenu">The sub menu instance</param>
         public static void RegisterSubMenu(MyPluginAdminMenuSubMenu subMenu)
@@ -62,6 +74,18 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             if (!m_subMenus.Contains(subMenu))
             {
                 m_subMenus.Add(subMenu);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters a sub menu for admin menus.
+        /// </summary>
+        /// <param name="subMenu"></param>
+        public static void UnregisterSubMenu(MyPluginAdminMenuSubMenu subMenu)
+        {
+            if (m_subMenus.Contains(subMenu))
+            {
+                m_subMenus.Remove(subMenu);
             }
         }
 
@@ -96,14 +120,40 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
 
             ReplaceComboBox(m_vanillaComboBox);
 
-            if(m_selectedMenuIndex >= m_vanillaSubMenuCount)
+            if (m_selectedMenuIndex >= m_vanillaSubMenuCount)///Build sub menu
             {
                 ClearControls();
+
+                Vector2 start = m_pluginComboBox.Position + new Vector2(0, MARGIN_VERT * 2 + GetCombo().Size.Y);
+                Vector2 end = start + new Vector2(m_pluginComboBox.Size.X, 0.8f - MARGIN_VERT);
+
+                MyGuiControlParentTableLayout table = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
+                table.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+                
                 int index = m_selectedMenuIndex - m_vanillaSubMenuCount + 1;
-                m_subMenus[index].RefreshInternals(null, m_usableWidth);//TODO: Add parent item table
+                m_subMenus[index].RefreshInternals(table, m_usableWidth, this);
+
+                table.AddTableSeparator();
+                table.ApplyRows();
+
+                MyGuiControlScrollablePanel scrollPane = new MyGuiControlScrollablePanel(table);
+                scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;
+                scrollPane.ScrollbarVEnabled = true;
+                scrollPane.Size = end - start;
+                scrollPane.Size = new Vector2(0.315f, scrollPane.Size.Y);
+                scrollPane.Position = new Vector2(0, start.Y);
+
+                Controls.Add(scrollPane);
+
+                MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
+                sep.AddHorizontal(new Vector2(scrollPane.Position.X - scrollPane.Size.X / 2, scrollPane.Position.Y + scrollPane.Size.Y), m_usableWidth);
+
+                Controls.Add(sep);
             }
 
             m_isRecreating = false;
+
+            MyPluginLog.Debug("Build admin menu");
         }
 
         /// <summary>
@@ -193,22 +243,22 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// <param name="comboBox"></param>
         private void ReplaceComboBox(MyGuiControlCombobox comboBox)
         {
-            MyGuiControlCombobox newCombo = AddCombo();
+            m_pluginComboBox = AddCombo();
 
             for (int i = 0; i < comboBox.GetItemsCount(); i++)
             {
-                newCombo.AddItem(comboBox.GetItemByIndex(i).Key, comboBox.GetItemByIndex(i).Value);
+                m_pluginComboBox.AddItem(comboBox.GetItemByIndex(i).Key, comboBox.GetItemByIndex(i).Value);
             }
 
-            newCombo.Position = comboBox.Position;
-            newCombo.Size = comboBox.Size;
-            newCombo.OriginAlign = comboBox.OriginAlign;
-            newCombo.SelectItemByIndex(m_selectedMenuIndex);
+            m_pluginComboBox.Position = comboBox.Position;
+            m_pluginComboBox.Size = comboBox.Size;
+            m_pluginComboBox.OriginAlign = comboBox.OriginAlign;
+            m_pluginComboBox.SelectItemByIndex(m_selectedMenuIndex);
 
-            Controls[Controls.IndexOf(comboBox)] = newCombo;
+            Controls[Controls.IndexOf(comboBox)] = m_pluginComboBox;
             Controls.Remove(comboBox);
 
-            newCombo.ItemSelected += OnAdminSubSelected;
+            m_pluginComboBox.ItemSelected += OnAdminSubSelected;
         }
     }
 }
