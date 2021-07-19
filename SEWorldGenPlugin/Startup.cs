@@ -4,6 +4,7 @@ using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Generator.ProceduralGenerator;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.GUI.AdminMenu;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus;
 using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Patches;
 using SEWorldGenPlugin.Utilities;
@@ -59,6 +60,8 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.MainMenu = typeof(MyPluginMainMenu);
             MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyAdminMenuExtension);
+
+            MyAdminMenuExtension.RegisterSubMenu(new MyStarSystemDesignerMenu());
 
             TryEnablePatches();
 
