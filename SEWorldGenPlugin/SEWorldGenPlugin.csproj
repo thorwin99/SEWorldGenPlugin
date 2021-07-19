@@ -231,6 +231,7 @@
     <Compile Include="Session\MyGPSManager.cs" />
     <Compile Include="Session\MyPluginDrawSession.cs" />
     <Compile Include="Session\MyPluginItemsClipboard.cs" />
+    <Compile Include="Session\MyPluginSession.cs" />
     <Compile Include="Session\MySettingsSession.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
