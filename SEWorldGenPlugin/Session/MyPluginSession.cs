@@ -12,6 +12,11 @@ namespace SEWorldGenPlugin.Session
     public class MyPluginSession : MySessionComponentBase
     {
         /// <summary>
+        /// Static instance of this session component
+        /// </summary>
+        public static MyPluginSession Static;
+
+        /// <summary>
         /// Whether the client and server version of the plugin match up.
         /// </summary>
         public bool ServerVersionMatch
@@ -23,6 +28,12 @@ namespace SEWorldGenPlugin.Session
         public MyPluginSession()
         {
             ServerVersionMatch = false;
+        }
+
+        public override void LoadData()
+        {
+            base.LoadData();
+            Static = this;
         }
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
