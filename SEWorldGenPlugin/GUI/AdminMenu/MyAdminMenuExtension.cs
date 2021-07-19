@@ -130,7 +130,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
                 MyGuiControlParentTableLayout table = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
                 table.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
                 
-                int index = m_selectedMenuIndex - m_vanillaSubMenuCount + 1;
+                int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
                 m_subMenus[index].RefreshInternals(table, m_usableWidth, this);
 
                 table.AddTableSeparator();
