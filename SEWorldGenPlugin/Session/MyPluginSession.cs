@@ -1,4 +1,5 @@
-﻿using SEWorldGenPlugin.http;
+﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Utilities;
 using VRage.Game;
 using VRage.Game.Components;
@@ -39,18 +40,25 @@ namespace SEWorldGenPlugin.Session
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
             MyPluginLog.Debug("Checking server version");
-            VersionCheck.Static.CompareVersionWithServer((res) =>
+            if (!Sync.IsServer)
             {
-                ServerVersionMatch = res;
-                if (res)
+                VersionCheck.Static.CompareVersionWithServer((res) =>
                 {
-                    MyPluginLog.Debug("Server and client version match up");
-                }
-                else
-                {
-                    MyPluginLog.Debug("Server and client version dont match up", LogLevel.WARNING);
-                }
-            });
+                    ServerVersionMatch = res;
+                    if (res)
+                    {
+                        MyPluginLog.Debug("Server and client version match up");
+                    }
+                    else
+                    {
+                        MyPluginLog.Debug("Server and client version dont match up", LogLevel.WARNING);
+                    }
+                });
+            }
+            else
+            {
+                ServerVersionMatch = true;
+            }
         }
     }
 }
