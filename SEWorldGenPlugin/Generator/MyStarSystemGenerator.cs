@@ -770,6 +770,7 @@ namespace SEWorldGenPlugin.Generator
                     vanillaPlanet.DisplayName = GetPlanetNameForPlanetStorageName(e.StorageName);
                     vanillaPlanet.Generated = true;
                     vanillaPlanet.EntityId = p.EntityId;
+                    vanillaPlanet.ParentId = StarSystem.CenterObject.Id;
 
                     StarSystem.CenterObject.ChildObjects.Add(vanillaPlanet);
                 }
