@@ -632,6 +632,7 @@ namespace SEWorldGenPlugin.Generator
             m_gasGiants.Clear();
             m_moons.Clear();
             m_mandatoryPlanets.Clear();
+            m_mandatoryMoons.Clear();
 
             foreach (var planet in planets)
             {
@@ -654,7 +655,8 @@ namespace SEWorldGenPlugin.Generator
 
                     continue;
                 }
-                else if (settings.SunDefinitions.Contains(subtypeId))
+                
+                if (settings.SunDefinitions.Contains(subtypeId))
                 {
                     MyPluginLog.Log("Adding sun " + subtypeId);
 
