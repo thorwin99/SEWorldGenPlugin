@@ -106,9 +106,15 @@ namespace SEWorldGenPlugin.Generator
         {
             MyPluginLog.Log("Initializing Star system generator");
 
+            if (!Sync.IsServer)
+            {
+                MyPluginLog.Log("Fetching Star system from server.");
+                GetStarSystem();
+            }
+
             if (!MySettingsSession.Static.IsEnabled())
             {
-                MyPluginLog.Log("Plugin is not enabled or client is not the server, aborting");
+                MyPluginLog.Log("Plugin is not enabled, aborting further initialization of star system generator component.");
                 return;
             }
 
@@ -134,7 +140,7 @@ namespace SEWorldGenPlugin.Generator
 
             LoadNetworking();
 
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || ! Sync.IsServer) return;
 
             MyPluginLog.Log("Loading definitions and network data");
             var data = LoadSystemData();

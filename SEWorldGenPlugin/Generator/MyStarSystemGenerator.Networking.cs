@@ -17,7 +17,6 @@ namespace SEWorldGenPlugin.Generator
         /// Callback dictionaries and indexes, to track callbacks
         private Dictionary<ulong, Action<bool, MySystemObject>> m_getActionCallbacks;
         private Dictionary<ulong, Action<bool>> m_simpleActionsCallbacks;
-        private Dictionary<ulong, Action<MyObjectBuilder_SystemData>> m_getSystemCallbacks;
         private ulong m_currentGetIndex;
         private ulong m_currentSimpleIndex;
         private ulong m_getSystemIndex;
@@ -29,7 +28,6 @@ namespace SEWorldGenPlugin.Generator
         {
             m_getActionCallbacks = new Dictionary<ulong, Action<bool, MySystemObject>>();
             m_simpleActionsCallbacks = new Dictionary<ulong, Action<bool>>();
-            m_getSystemCallbacks = new Dictionary<ulong, Action<MyObjectBuilder_SystemData>>();
             m_currentSimpleIndex = 0;
             m_currentGetIndex = 0;
             m_getSystemIndex = 0;
@@ -42,7 +40,6 @@ namespace SEWorldGenPlugin.Generator
         {
             m_getActionCallbacks.Clear();
             m_simpleActionsCallbacks.Clear();
-            m_getSystemCallbacks.Clear();
 
             m_currentGetIndex = 0;
             m_currentSimpleIndex = 0;
@@ -88,11 +85,10 @@ namespace SEWorldGenPlugin.Generator
         /// Gets the current star system as represented on the server
         /// </summary>
         /// <param name="callback">Callback to call, when star system was retreived</param>
-        public void GetStarSystem(Action<MyObjectBuilder_SystemData> callback)
+        private void GetStarSystem()
         {
             MyPluginLog.Debug("Get star system");
-            m_getSystemCallbacks.Add(++m_getSystemIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, m_getSystemIndex, Sync.MyId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, Sync.MyId);
         }
 
         /// <summary>
@@ -254,10 +250,10 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="clientId">Id of the client, that requested the system</param>
         [Event(105)]
         [Server]
-        private static void SendGetStarSystemServer(ulong callbackId, ulong clientId)
+        private static void SendGetStarSystemServer(ulong clientId)
         {
             MyPluginLog.Debug("Server: Get star system");
-            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemClient, Static.StarSystem, callbackId, clientId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemClient, Static.StarSystem, clientId);
         }
 
         /// <summary>
@@ -267,14 +263,10 @@ namespace SEWorldGenPlugin.Generator
         /// <param name="callbackId">Callback that will be called with the star system parameter</param>
         [Event(106)]
         [Client]
-        private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem, ulong callbackId)
+        private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem)
         {
             MyPluginLog.Debug("Client: Received star system");
-            if (Static.m_getSystemCallbacks.ContainsKey(callbackId))
-            {
-                Static.m_getSystemCallbacks[callbackId](starSystem);
-                Static.m_getSystemCallbacks.Remove(callbackId);
-            }
+            Static.StarSystem = starSystem;
         }
 
         /// <summary>
