@@ -29,6 +29,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlCheckbox m_enablePlugin;
         private MyGuiControlLabel m_enablePluginLabel;
         private MyGuiControlButton m_pluginSettingsButton;
+        private string m_path;
 
         private float MARGIN_TOP = 0.22f;
 
@@ -52,6 +53,9 @@ namespace SEWorldGenPlugin.GUI
         {
             Static = this;
             m_isNewGame = (checkpoint == null);
+            m_path = path;
+
+            RecreateControls(true);
         }
 
         /// <summary>
@@ -127,9 +131,7 @@ namespace SEWorldGenPlugin.GUI
                         {
                             b.ButtonClicked += delegate
                             {
-                                var name = Checkpoint.SessionName;
-                                var path = Path.Combine(MyFileSystem.SavesPath, name.Replace(":", "-"));
-                                MyFileUtils.WriteXmlFileToPath(PlSettings, path, MySettingsSession.FILE_NAME);
+                                MyFileUtils.WriteXmlFileToPath(PlSettings, m_path, MySettingsSession.FILE_NAME);
                             };
                         }
                     }
@@ -165,10 +167,9 @@ namespace SEWorldGenPlugin.GUI
         /// </summary>
         private void LoadValues()
         {
-            var path = Path.Combine(MyFileSystem.SavesPath, Checkpoint.SessionName.Replace(":", "-"));
-            if(MyFileUtils.FileExistsInPath(path, MySettingsSession.FILE_NAME))
+            if(m_path != null && MyFileUtils.FileExistsInPath(m_path, MySettingsSession.FILE_NAME))
             {
-                PlSettings = MyFileUtils.ReadXmlFileFromPath<MyObjectBuilder_WorldSettings>(path, MySettingsSession.FILE_NAME);
+                PlSettings = MyFileUtils.ReadXmlFileFromPath<MyObjectBuilder_WorldSettings>(m_path, MySettingsSession.FILE_NAME);
             }
             else
             {

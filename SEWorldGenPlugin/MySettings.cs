@@ -130,7 +130,5 @@ namespace SEWorldGenPlugin
                 writer.Close();
             }
         }
-
-
     }
 }
