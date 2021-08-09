@@ -36,15 +36,13 @@ namespace SEWorldGenPlugin.Session
 
         /// <summary>
         /// If the plugin is enabled in this session.
-        /// If run on a client connected to a server, with active plugin,
-        /// it will still return false.
         /// </summary>
         /// <returns>True, if the plugin is enabled in this session.</returns>
         public bool IsEnabled()
         {
-            if (Settings == null) return Sync.IsServer;
+            if (Settings == null) return false;
 
-            return (Sync.IsServer && Settings.Enabled);
+            return Settings.Enabled;
         }
 
         public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
