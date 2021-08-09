@@ -110,7 +110,7 @@ namespace SEWorldGenPlugin.Generator
             }
             else
             {
-                MyPluginLog.Debug("The starsystem is out of sync with the server. Requesting full fetch of the system");
+                MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
                 Static.GetStarSystemFromServer();
             }
         }
@@ -188,7 +188,7 @@ namespace SEWorldGenPlugin.Generator
         [Server]
         private static void SendGetStarSystemServer(ulong clientId)
         {
-            MyPluginLog.Debug("Server: Get star system");
+            MyPluginLog.Log("Server: Get star system for client " + clientId);
             PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemClient, Static.StarSystem, clientId);
         }
 
@@ -201,7 +201,7 @@ namespace SEWorldGenPlugin.Generator
         [Client]
         private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem)
         {
-            MyPluginLog.Debug("Client: Received star system");
+            MyPluginLog.Log("Client: Received star system");
             Static.StarSystem = starSystem;
         }
 
