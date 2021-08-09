@@ -17,7 +17,6 @@ namespace SEWorldGenPlugin.Generator
         /// Callback dictionaries and indexes, to track callbacks
         private Dictionary<ulong, Action<bool, MySystemObject>> m_getActionCallbacks;
         private Dictionary<ulong, Action<bool>> m_simpleActionsCallbacks;
-        private ulong m_currentGetIndex;
         private ulong m_currentSimpleIndex;
 
         /// <summary>
@@ -28,7 +27,6 @@ namespace SEWorldGenPlugin.Generator
             m_getActionCallbacks = new Dictionary<ulong, Action<bool, MySystemObject>>();
             m_simpleActionsCallbacks = new Dictionary<ulong, Action<bool>>();
             m_currentSimpleIndex = 0;
-            m_currentGetIndex = 0;
         }
 
         /// <summary>
@@ -38,20 +36,7 @@ namespace SEWorldGenPlugin.Generator
         {
             m_getActionCallbacks.Clear();
             m_simpleActionsCallbacks.Clear();
-
-            m_currentGetIndex = 0;
             m_currentSimpleIndex = 0;
-        }
-
-        /// <summary>
-        /// Retreives a system object by name from the server.
-        /// </summary>
-        /// <param name="id">Id of the object.</param>
-        /// <param name="callback">Callback to run, when object is retreived.</param>
-        public void GetSystemObjectById(Guid id, Action<bool, MySystemObject> callback)
-        {
-            m_getActionCallbacks.Add(++m_currentGetIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendGetObjectServer, Sync.MyId, id, m_currentGetIndex);
         }
 
         /// <summary>
@@ -98,54 +83,6 @@ namespace SEWorldGenPlugin.Generator
         {
             m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
             PluginEventHandler.Static.RaiseStaticEvent(SendRenameObjectServer, objectId, newName, m_currentSimpleIndex, Sync.MyId);
-        }
-
-        /// <summary>
-        /// Server Event: Tries to get the system object with given name and send it back to client
-        /// </summary>
-        /// <param name="clientId">The client, that requests the object</param>
-        /// <param name="id">The id of the object</param>
-        /// <param name="callbackId">The callback, that should get called on the client</param>
-        [Event(100)]
-        [Server]
-        private static void SendGetObjectServer(ulong clientId, Guid id, ulong callbackId)
-        {
-            MyPluginLog.Log("Server: Client requests object. Client ID: " + clientId);
-
-            bool success = true;
-            if (Static != null)
-            {
-                MySystemObject res = Static.StarSystem.GetObjectById(id);
-                if(res == null)
-                {
-                    res = new MySystemObject();
-                    success = false;
-                }
-                PluginEventHandler.Static.RaiseStaticEvent(SendGetObjectClient, success, res, callbackId, clientId);
-            }
-            else
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(SendGetObjectClient, false, new MySystemObject(), callbackId, clientId);
-            }
-        }
-
-        /// <summary>
-        /// Client Event: Sends a system object to the client
-        /// </summary>
-        /// <param name="success">If getting the object was successfult</param>
-        /// <param name="obj">The object to send</param>
-        /// <param name="callbackId">The callback to call on client</param>
-        [Event(101)]
-        [Client]
-        private static void SendGetObjectClient(bool success, MySystemObject obj, ulong callbackId)
-        {
-            MyPluginLog.Log("Client: Received get object message from server with success " + success);
-
-            if (Static.m_getActionCallbacks.ContainsKey(callbackId))
-            {
-                Static.m_getActionCallbacks[callbackId](success, obj);
-                Static.m_getActionCallbacks.Remove(callbackId);
-            }
         }
 
         /// <summary>
