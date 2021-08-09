@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.Generator
         /// Gets the current star system as represented on the server
         /// </summary>
         /// <param name="callback">Callback to call, when star system was retreived</param>
-        private void FetchStarSystem()
+        private void GetStarSystemFromServer()
         {
             MyPluginLog.Debug("Get star system");
             PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, Sync.MyId);
@@ -111,7 +111,7 @@ namespace SEWorldGenPlugin.Generator
             else
             {
                 MyPluginLog.Debug("The starsystem is out of sync with the server. Requesting full fetch of the system");
-                Static.FetchStarSystem();
+                Static.GetStarSystemFromServer();
             }
         }
 
@@ -175,7 +175,7 @@ namespace SEWorldGenPlugin.Generator
             else
             {
                 MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
-                Static.FetchStarSystem();
+                Static.GetStarSystemFromServer();
             }
         }
 
@@ -245,7 +245,7 @@ namespace SEWorldGenPlugin.Generator
             else
             {
                 MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");#
-                Static.FetchStarSystem();
+                Static.GetStarSystemFromServer();
             }
         }
     }
