@@ -109,7 +109,7 @@ namespace SEWorldGenPlugin.Generator
             if (!Sync.IsServer)
             {
                 MyPluginLog.Log("Fetching Star system from server.");
-                GetStarSystem();
+                GetStarSystemFromServer();
             }
 
             if (!MySettingsSession.Static.IsEnabled())

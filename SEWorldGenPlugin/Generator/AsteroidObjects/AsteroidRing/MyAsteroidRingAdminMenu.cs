@@ -163,7 +163,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                 adminScreen.Controls.Add(m_loadingWheel);
 
-                MyStarSystemGenerator.Static.GetStarSystem(delegate (MyObjectBuilder_SystemData starSystem)
+                MyStarSystemGenerator.Static.GetStarSystemFromServer(delegate (MyObjectBuilder_SystemData starSystem)
                 {
                     m_fetchedStarSytem = starSystem;
                     adminScreen.ShouldRecreate = true;
