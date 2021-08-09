@@ -19,7 +19,6 @@ namespace SEWorldGenPlugin.Generator
         private Dictionary<ulong, Action<bool>> m_simpleActionsCallbacks;
         private ulong m_currentGetIndex;
         private ulong m_currentSimpleIndex;
-        private ulong m_getSystemIndex;
 
         /// <summary>
         /// Initializes networking for the system generator
@@ -30,7 +29,6 @@ namespace SEWorldGenPlugin.Generator
             m_simpleActionsCallbacks = new Dictionary<ulong, Action<bool>>();
             m_currentSimpleIndex = 0;
             m_currentGetIndex = 0;
-            m_getSystemIndex = 0;
         }
 
         /// <summary>
@@ -43,7 +41,6 @@ namespace SEWorldGenPlugin.Generator
 
             m_currentGetIndex = 0;
             m_currentSimpleIndex = 0;
-            m_getSystemIndex = 0;
         }
 
         /// <summary>
