@@ -244,7 +244,7 @@ namespace SEWorldGenPlugin.Generator
             }
             else
             {
-                MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");#
+                MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
                 Static.GetStarSystemFromServer();
             }
         }

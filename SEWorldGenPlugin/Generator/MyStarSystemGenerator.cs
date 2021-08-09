@@ -138,8 +138,6 @@ namespace SEWorldGenPlugin.Generator
 
             Static = this;
 
-            LoadNetworking();
-
             if (!MySettingsSession.Static.IsEnabled() || ! Sync.IsServer) return;
 
             MyPluginLog.Log("Loading definitions and network data");
@@ -209,8 +207,6 @@ namespace SEWorldGenPlugin.Generator
             m_mandatoryMoons?.Clear();
             m_uniqueMoons?.Clear();
             m_uniquePlanets?.Clear();
-
-            UnloadNetworking();
 
             Static = null;
 
