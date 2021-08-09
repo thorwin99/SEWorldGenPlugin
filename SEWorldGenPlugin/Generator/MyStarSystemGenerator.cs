@@ -1,5 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Game.Entities;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
@@ -177,7 +178,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public override void SaveData()
         {
-            if (MySettingsSession.Static.IsEnabled())
+            if (MySettingsSession.Static.IsEnabled() && Sync.IsServer)
             {
                 MyPluginLog.Log("Saving system data");
 
@@ -725,7 +726,7 @@ namespace SEWorldGenPlugin.Generator
         {
             base.UpdateBeforeSimulation();
 
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
             CheckIntegrityOfSystem();
 

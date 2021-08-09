@@ -63,7 +63,7 @@ namespace SEWorldGenPlugin.Session
         {
             MyPluginLog.Log("Asteroid object manager saving");
 
-            if (!MySettingsSession.Static.IsEnabled())
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer)
             {
                 MyPluginLog.Log("Plugin not enabled or client is not server, aborting");
                 return;

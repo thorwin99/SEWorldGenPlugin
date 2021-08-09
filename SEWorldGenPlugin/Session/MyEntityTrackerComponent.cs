@@ -1,5 +1,6 @@
 ﻿using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
+using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
 using VRage.Game.Components;
@@ -45,7 +46,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
             var entities = MyEntities.GetEntities();
 

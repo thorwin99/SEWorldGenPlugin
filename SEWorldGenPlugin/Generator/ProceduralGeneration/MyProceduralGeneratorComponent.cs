@@ -1,5 +1,6 @@
 ﻿using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.Session;
@@ -69,7 +70,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         {
             base.Init(sessionComponent);
 
-            if (MySettingsSession.Static.IsEnabled())
+            if (MySettingsSession.Static.IsEnabled() && Sync.IsServer)
             {
                 MyEntityTrackerComponent.Static.RegisterTracker(this);
             }
@@ -80,7 +81,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// </summary>
         public override void LoadData()
         {
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
             MyPluginLog.Log("Loading Procedural Generator Component");
 
