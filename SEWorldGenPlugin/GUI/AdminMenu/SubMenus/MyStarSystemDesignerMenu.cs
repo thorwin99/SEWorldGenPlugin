@@ -4,6 +4,8 @@ using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
+using System;
+using System.Collections.Generic;
 using VRageMath;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
@@ -13,11 +15,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
     /// </summary>
     public class MyStarSystemDesignerMenu : MyPluginAdminMenuSubMenu
     {
-        /// <summary>
-        /// The current fetched star system of the server
-        /// </summary>
-        private MyObjectBuilder_SystemData m_fetchedStarSytem;
-
         /// <summary>
         /// A list box containing all system objects
         /// </summary>
@@ -32,6 +29,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// Current instance to the admin menu
         /// </summary>
         private MyAdminMenuExtension m_adminMenuInst;
+
+        /// <summary>
+        /// A dictionary that stores all currently changed system objects, that have not yet been applied
+        /// </summary>
+        private Dictionary<Guid, MySystemObject> m_changedSystemObjects;
+
+        public MyStarSystemDesignerMenu()
+        {
+            m_changedSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
+        }
 
         public override void Close()
         {
@@ -53,17 +60,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             MyPluginLog.Debug("Building Star system designer admin menu");
 
             m_adminMenuInst = instance;
-
-            if(m_fetchedStarSytem == null)
-            {
-                MyStarSystemGenerator.Static.GetStarSystem(delegate (MyObjectBuilder_SystemData starSystem)
-                {
-                    m_fetchedStarSytem = starSystem;
-                    m_adminMenuInst.RequestRecreate();
-                });
-
-                m_fetchedStarSytem = new MyObjectBuilder_SystemData();
-            }
 
             MyGuiControlLabel systemBoxLabel = new MyGuiControlLabel(null, null, "System Objects");
             parent.AddTableRow(systemBoxLabel);
@@ -88,11 +84,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="btn"></param>
         private void RefreshSystem(MyGuiControlButton btn)
         {
-            MyStarSystemGenerator.Static.GetStarSystem(delegate (MyObjectBuilder_SystemData starSystem)
-            {
-                m_fetchedStarSytem = starSystem;
-                m_adminMenuInst.RequestRecreate();
-            });
+            //Refresh GUI elements to reflect current system
         }
     }
 }
