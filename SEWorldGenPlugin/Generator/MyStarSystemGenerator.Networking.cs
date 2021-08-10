@@ -20,8 +20,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="systemObject">Object to add</param>
         /// <param name="parentId">Id of the parent object</param>
-        /// <param name="callback">Callback to run when object was added</param>
-        public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null, Action<bool> callback = null)
+        public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null)
         {
             PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentId == null ? Guid.Empty : parentId.Value);
         }
@@ -30,8 +29,7 @@ namespace SEWorldGenPlugin.Generator
         /// Removes an object from the system.
         /// </summary>
         /// <param name="objectId">Id of the object to remove</param>
-        /// <param name="callback">Callback to run, if the object was removed or not</param>
-        public void RemoveObjectFromSystem(Guid objectId, Action<bool> callback = null)
+        public void RemoveObjectFromSystem(Guid objectId)
         {
             PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectId);
         }
