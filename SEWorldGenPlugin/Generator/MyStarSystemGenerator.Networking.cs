@@ -38,7 +38,7 @@ namespace SEWorldGenPlugin.Generator
         /// Gets the current star system as represented on the server
         /// </summary>
         /// <param name="callback">Callback to call, when star system was retreived</param>
-        private void GetStarSystemFromServer()
+        public void GetStarSystemFromServer()
         {
             MyPluginLog.Debug("Get star system");
             PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, Sync.MyId);
@@ -130,7 +130,7 @@ namespace SEWorldGenPlugin.Generator
                     var asteroids = o as MySystemAsteroids;
                     if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroids.AsteroidTypeName))
                     {
-                        bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids);
+                        bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids.Id);
                         if (removed)
                         {
                             MyGPSManager.Static.RemovePersistentGps(objectId);
