@@ -95,7 +95,7 @@ namespace SEWorldGenPlugin.GUI
             m_systemObjectsBox.PositionY += systemObjsLabel.Size.Y + MARGIN_VERT;
             m_systemObjectsBox.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
 
-            foreach (var obj in m_fetchedStarSytem.GetAllObjects())
+            foreach (var obj in m_fetchedStarSytem.GetAll())
             {
                 if (obj.Type == MySystemObjectType.EMPTY) continue;
                 m_systemObjectsBox.Add(new MyGuiControlListbox.Item(new System.Text.StringBuilder(obj.DisplayName), userData: obj));

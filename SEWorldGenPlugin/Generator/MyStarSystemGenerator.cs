@@ -149,7 +149,7 @@ namespace SEWorldGenPlugin.Generator
 
             if(StarSystem != null && StarSystem.CenterObject != null)
             {
-                foreach (var obj in StarSystem.GetAllObjects())
+                foreach (var obj in StarSystem.GetAll())
                 {
                     if (obj.Type == MySystemObjectType.ASTEROIDS)
                     {
@@ -159,7 +159,7 @@ namespace SEWorldGenPlugin.Generator
                         if (!provider.TryLoadObject(asteroid))
                         {
                             MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
-                            StarSystem.RemoveObject(asteroid.Id);
+                            StarSystem.Remove(asteroid.Id);
                         }
                     }
                 }
@@ -219,7 +219,7 @@ namespace SEWorldGenPlugin.Generator
         private void AddAllPersistentGps()
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
-            foreach(var item in StarSystem.GetAllObjects())
+            foreach(var item in StarSystem.GetAll())
             {
                 switch (item.Type)
                 {
@@ -675,14 +675,14 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void CheckIntegrityOfSystem()
         {
-            foreach(var obj in StarSystem.GetAllObjects())
+            foreach(var obj in StarSystem.GetAll())
             {
                 if(obj is MySystemPlanet)
                 {
                     if(!MyEntities.EntityExists((obj as MySystemPlanet).EntityId) && (obj as MySystemPlanet).Generated)
                     {
                         MyPluginLog.Debug("Planet " + obj.Id + " does not exist anymore, deleting it", LogLevel.WARNING);
-                        StarSystem.RemoveObject(obj.Id);
+                        StarSystem.Remove(obj.Id);
                         MyGPSManager.Static.RemovePersistentGps(obj.Id);
                     }
                 }
@@ -738,7 +738,7 @@ namespace SEWorldGenPlugin.Generator
                 var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
                 bool exists = false;
 
-                foreach(var obj in StarSystem.GetAllObjects())
+                foreach(var obj in StarSystem.GetAll())
                 {
                     if(obj is MySystemPlanet)
                     {

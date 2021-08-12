@@ -66,9 +66,9 @@ namespace SEWorldGenPlugin.Generator
             MyPluginLog.Log("Server: Add object " + obj.DisplayName + " to system");
             if (obj != null)
             {
-                if (!Static.StarSystem.ObjectExists(obj.Id))
+                if (!Static.StarSystem.Contains(obj.Id))
                 {
-                    var parent = Static.StarSystem.GetObjectById(parentId);
+                    var parent = Static.StarSystem.GetById(parentId);
                     if (parent != null)
                     {
                         parent.ChildObjects.Add(obj);
@@ -100,9 +100,9 @@ namespace SEWorldGenPlugin.Generator
 
             MyPluginLog.Log("Received update for Star System, adding object " + obj.Id + " to parent " + obj.ParentId);
 
-            var parent = Static.StarSystem.GetObjectById(obj.ParentId);
+            var parent = Static.StarSystem.GetById(obj.ParentId);
 
-            if(!Static.StarSystem.ObjectExists(obj.Id) && parent != null)
+            if(!Static.StarSystem.Contains(obj.Id) && parent != null)
             {
                 parent.ChildObjects.Add(obj);
             }
@@ -122,7 +122,7 @@ namespace SEWorldGenPlugin.Generator
         private static void SendRemoveSystemObjectServer(Guid objectId)
         {
             MyPluginLog.Log("Server: Removing object " + objectId.ToString() + " from system");
-            MySystemObject o = Static.StarSystem.GetObjectById(objectId);
+            MySystemObject o = Static.StarSystem.GetById(objectId);
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
                 if(o.Type == MySystemObjectType.ASTEROIDS)
@@ -134,7 +134,7 @@ namespace SEWorldGenPlugin.Generator
                         if (removed)
                         {
                             MyGPSManager.Static.RemovePersistentGps(objectId);
-                            if (Static.StarSystem.RemoveObject(objectId))
+                            if (Static.StarSystem.Remove(objectId))
                             {
                                 PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId);
                             }
@@ -145,7 +145,7 @@ namespace SEWorldGenPlugin.Generator
                 else
                 {
                     MyGPSManager.Static.RemovePersistentGps(objectId);
-                    if (Static.StarSystem.RemoveObject(objectId))
+                    if (Static.StarSystem.Remove(objectId))
                     {
                         PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId);
                     }
@@ -166,9 +166,9 @@ namespace SEWorldGenPlugin.Generator
 
             MyPluginLog.Log("Received update for Star System, removing object " + objectId);
 
-            if (Static.StarSystem.ObjectExists(objectId))
+            if (Static.StarSystem.Contains(objectId))
             {
-                Static.StarSystem.RemoveObject(objectId);
+                Static.StarSystem.Remove(objectId);
             }
             else
             {
@@ -215,9 +215,9 @@ namespace SEWorldGenPlugin.Generator
         private static void SendRenameObjectServer(Guid objectId, string newName)
         {
             MyPluginLog.Log("Server: Renaming object " + objectId.ToString() + " to " + newName);
-            if (Static.StarSystem.ObjectExists(objectId))
+            if (Static.StarSystem.Contains(objectId))
             {
-                Static.StarSystem.GetObjectById(objectId).DisplayName = newName;
+                Static.StarSystem.GetById(objectId).DisplayName = newName;
                 PluginEventHandler.Static.RaiseStaticEvent(BroadcastRenamedObject, objectId, newName);
                 return;
             }
@@ -236,9 +236,9 @@ namespace SEWorldGenPlugin.Generator
 
             MyPluginLog.Log("Received update for Star System, renaming object " + objectId + " to " + newName);
 
-            if (Static.StarSystem.ObjectExists(objectId))
+            if (Static.StarSystem.Contains(objectId))
             {
-                Static.StarSystem.GetObjectById(objectId).DisplayName = newName;
+                Static.StarSystem.GetById(objectId).DisplayName = newName;
             }
             else
             {

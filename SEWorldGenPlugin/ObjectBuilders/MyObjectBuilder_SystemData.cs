@@ -26,7 +26,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Gets all objects currently in the system
         /// </summary>
         /// <returns>All objects</returns>
-        public HashSet<MySystemObject> GetAllObjects()
+        public HashSet<MySystemObject> GetAll()
         {
             HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
 
@@ -56,10 +56,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>The object or null if not found</returns>
-        public MySystemObject GetObjectById(Guid id)
+        public MySystemObject GetById(Guid id)
         {
             if (id == Guid.Empty) return null;
-            foreach(var child in GetAllObjects())
+            foreach(var child in GetAll())
             {
                 if (child.Id == id) return child;
             }
@@ -71,9 +71,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>true if it exists</returns>
-        public bool ObjectExists(Guid id)
+        public bool Contains(Guid id)
         {
-            return GetObjectById(id) != null;
+            return GetById(id) != null;
         }
 
         /// <summary>
@@ -81,13 +81,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>True, if object was successfully removed.</returns>
-        public bool RemoveObject(Guid id)
+        public bool Remove(Guid id)
         {
             if (id == CenterObject.Id) return false;
-            if (!ObjectExists(id)) return false;
+            if (!Contains(id)) return false;
 
-            var obj = GetObjectById(id);
-            var parent = GetObjectById(obj.ParentId);
+            var obj = GetById(id);
+            var parent = GetById(obj.ParentId);
 
             if (parent == null) return false;
 
@@ -100,6 +100,40 @@ namespace SEWorldGenPlugin.ObjectBuilders
             parent.ChildObjects.Remove(obj);
 
             return true;
+        }
+
+        /// <summary>
+        /// Tries to add the given System Object <paramref name="obj"/> as a child under <paramref name="parent"/>
+        /// The currently set parent id of the object will be ignored, instead use <paramref name="parent"/>
+        /// If the parent does not exist, the object wont be added.
+        /// </summary>
+        /// <param name="obj">The object to add to the system</param>
+        /// <param name="parent">The parent of the object</param>
+        /// <returns>False if the <paramref name="parent"/> does not exist or the system already conains an object with the same id as <paramref name="obj"/></returns>
+        public bool Add(MySystemObject obj, Guid parent)
+        {
+            if (Contains(obj.Id)) return false;
+            var p = GetById(parent);
+            if(p != null)
+            {
+                p.ChildObjects.Add(obj);
+                obj.ParentId = parent;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to add the given System Object <paramref name="obj"/> as a child under its parent.
+        /// The currently set parent id of the object is used.
+        /// If the parent does not exist, the object wont be added.
+        /// </summary>
+        /// <param name="obj">The object to add to the system</param>
+        /// <param name="parent">The parent of the object</param>
+        /// <returns>False if the parent does not exist or the system already conains an object with the same id as <paramref name="obj"/></returns>
+        public bool Add(MySystemObject obj)
+        {
+            return Add(obj, obj.ParentId);
         }
     }
 
