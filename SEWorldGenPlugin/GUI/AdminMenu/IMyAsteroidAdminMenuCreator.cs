@@ -32,6 +32,17 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         bool OnEditMenuSelectItem(float usableWidth, MyGuiControlParentTableLayout parentTable, MyPluginAdminMenu adminScreen, MySystemAsteroids asteroidObject, MyObjectBuilder_SystemData starSystem);
 
         /// <summary>
+        /// Creates the gui menu to spawn or edit an Asteroid object instance data.
+        /// The GUI elements are added to the <paramref name="parentTable"/>.
+        /// Incase a new instance is spawned, <paramref name="selectedInstance"/> is null, if an existing one is edited, it has a value.
+        /// </summary>
+        /// <param name="usableWidth">The max width of the GUI elements in the table.</param>
+        /// <param name="parentTable">The parent table the GUI elements should be put in</param>
+        /// <param name="selectedInstance">The selected instance to edit or null if a new one is spawned.</param>
+        /// <returns></returns>
+        bool CreateDataEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MySystemAsteroids selectedInstance);
+
+        /// <summary>
         /// Called, when menus created by this get closed
         /// </summary>
         void Close();
