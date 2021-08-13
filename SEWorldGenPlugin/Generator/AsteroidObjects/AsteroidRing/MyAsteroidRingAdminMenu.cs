@@ -24,11 +24,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private static int PREVIEW_RENDER_ID = 1425;
 
         /// <summary>
-        /// The current star system existend on the server used for spawning rings around planets
-        /// </summary>
-        private MyObjectBuilder_SystemData m_fetchedStarSytem;
-
-        /// <summary>
         /// The listbox containing all possible parent system objects
         /// </summary>
         private MyGuiControlListbox m_parentObjectListBox;
@@ -122,8 +117,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             m_offset = Vector3D.Zero;
 
-            m_fetchedStarSytem = starSystem;
-
             GenerateRingSettingElements(usableWidth, parentTable);
             SetSliderValues(m_currentSelectedAsteroid);
 
@@ -140,7 +133,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             parentTable.AddTableSeparator();
 
-            var data = MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject);
+            var data = MyAsteroidRingProvider.Static.GetInstanceData(asteroidObject.Id);
             var ring = data as MyAsteroidRingData;
 
             m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)ring.Radius * 1.5f);
@@ -156,33 +149,18 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_offset = Vector3D.Zero;
             m_currentSelectedAsteroid = null;
 
-            if (m_fetchedStarSytem == null)
-            {
-                MyGuiControlRotatingWheel m_loadingWheel = new MyGuiControlRotatingWheel(position: Vector2.Zero);
-                m_loadingWheel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER;
-
-                adminScreen.Controls.Add(m_loadingWheel);
-
-                MyStarSystemGenerator.Static.GetStarSystemFromServer(delegate (MyObjectBuilder_SystemData starSystem)
-                {
-                    m_fetchedStarSytem = starSystem;
-                    adminScreen.ShouldRecreate = true;
-                });
-                return true;
-            }
-
             MyGuiControlLabel label = new MyGuiControlLabel(null, null, "Parent objects");
 
             parentTable.AddTableRow(label);
 
             m_parentObjectListBox = new MyGuiControlListbox();
-            m_parentObjectListBox.Add(new MyGuiControlListbox.Item(new System.Text.StringBuilder("System center"), userData: m_fetchedStarSytem.CenterObject));
+            m_parentObjectListBox.Add(new MyGuiControlListbox.Item(new System.Text.StringBuilder("System center"), userData: MyStarSystemGenerator.Static.StarSystem.CenterObject));
             m_parentObjectListBox.VisibleRowsCount = 8;
             m_parentObjectListBox.Size = new Vector2(usableWidth, m_parentObjectListBox.Size.Y);
             m_parentObjectListBox.SelectAllVisible();
             m_parentObjectListBox.ItemsSelected += OnParentItemClicked;
 
-            foreach (var obj in m_fetchedStarSytem.CenterObject.GetAllChildren())
+            foreach (var obj in MyStarSystemGenerator.Static.StarSystem.CenterObject.GetAllChildren())
             {
                 if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
                 {
@@ -259,21 +237,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                     return;
                 }
 
-                MyAsteroidRingProvider.Static.AddInstance(instance, ring, delegate (bool success)
-                {
-                    if (!success)
-                    {
-                        MyPluginGuiHelper.DisplayError("Ring could not be added, because an object with the same id already exists. This error should not occour, so please try again.", "Error");
-                    }
-                    else
-                    {
-                        MyPluginGuiHelper.DisplayMessage("Ring was created successfully.", "Success");
-                        m_parentScreen.ForceFetchStarSystem = true;
-                        m_parentScreen.ShouldRecreate = true;
-                    }
-                });
+                MyAsteroidRingProvider.Static.AddInstance(instance, ring);
             });
-
             parentTable.AddTableRow(m_spawnRingButton);
 
             return true;
@@ -287,7 +252,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             var data = GetAsteroidDataFromGui();
 
-            MyAsteroidRingProvider.Static.EditInstance(m_currentSelectedAsteroid, data);
+            MyAsteroidRingProvider.Static.SetInstanceData(m_currentSelectedAsteroid.Id, data);
 
             MyPluginGuiHelper.DisplayMessage("The ring was updated", "Message");
         }
@@ -368,7 +333,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public void Close()
         {
-            m_fetchedStarSytem = null;
             m_parentScreen = null;
             m_currentSelectedAsteroid = null;
             MyPluginDrawSession.Static.RemoveRenderObject(PREVIEW_RENDER_ID);
@@ -396,20 +360,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         {
             MyPluginLog.Debug("Removing ring " + m_currentSelectedAsteroid.DisplayName);
 
-            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.Id, delegate (bool success)
-            {
-                if (success)
-                {
-                    m_parentScreen.ForceFetchStarSystem = true;
-                    m_parentScreen.ShouldRecreate = true;
-
-                    MyPluginLog.Debug("Refreshing admin menu");
-                }
-                else
-                {
-                    MyPluginGuiHelper.DisplayError(m_currentSelectedAsteroid.DisplayName + " could not be deleted", "Error");
-                }
-            });
+            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.Id);
         }
 
         /// <summary>
@@ -522,8 +473,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private void SetSliderValues(MySystemAsteroids instance)
         {
             if (instance.AsteroidTypeName != MyAsteroidRingProvider.TYPE_NAME) return;
-            MyAsteroidRingData data = MyAsteroidRingProvider.Static.GetInstanceData(instance) as MyAsteroidRingData;
-            var planet  = m_fetchedStarSytem.GetObjectById(instance.ParentId) as MySystemPlanet;
+            MyAsteroidRingData data = MyAsteroidRingProvider.Static.GetInstanceData(instance.Id) as MyAsteroidRingData;
+            var planet  = MyStarSystemGenerator.Static.StarSystem.GetById(instance.ParentId) as MySystemPlanet;
 
             if (planet == null)
             {
@@ -599,7 +550,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 var parent = box.SelectedItems[box.SelectedItems.Count - 1].UserData as MySystemObject;
                 var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
-                if(parent == m_fetchedStarSytem.CenterObject)
+                if(parent == MyStarSystemGenerator.Static.StarSystem.CenterObject)
                 {
                     m_radiusSlider.MinValue = settings.MinMaxOrbitDistance.Min / 1000;
                     m_radiusSlider.MaxValue = settings.WorldSize < 0 ? int.MaxValue / 1000 : settings.WorldSize / 1000;

@@ -2,13 +2,10 @@
 using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
-using SEWorldGenPlugin.Networking;
-using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
-using System.Collections.Generic;
 using VRage;
 using VRage.Library.Utils;
 using VRageMath;
@@ -18,8 +15,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
     /// <summary>
     /// The provider class for the asteroid ring object
     /// </summary>
-    [EventOwner]
-    public class MyAsteroidRingProvider : MyAbstractAsteroidObjectProvider
+    public class MyAsteroidRingProvider : MyAbstractAsteroidObjectProvider<MyAsteroidRingData>
     {
         /// <summary>
         /// The type name, for the system asteroid object, this class provides
@@ -32,22 +28,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public static MyAsteroidRingProvider Static;
 
         /// <summary>
-        /// The dictionary contains all currently loaded asteroid rings and belts
-        /// </summary>
-        private Dictionary<Guid, MyAsteroidRingData> m_loadedRings;
-
-        /// <summary>
         /// Creates new asteroid ring provider instance, replaces the old one
         /// </summary>
         public MyAsteroidRingProvider()
         {
-            m_loadedRings = new Dictionary<Guid, MyAsteroidRingData>();
-
             Static = this;
         }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject parent, double objectOrbitRadius)
         {
+            if (!Sync.IsServer)
+            {
+                MyPluginLog.Log("Tried to generate an Instance on the client, aborting...");
+                return null;
+            }
+
             if (parent != null && parent.Type == MySystemObjectType.PLANET)
             {
                 MyPluginLog.Debug("Generating ring for planet " + parent.DisplayName);
@@ -68,7 +63,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 ring.Radius = MyRandom.Instance.NextDouble() * (planet.Diameter * 2 - planet.Diameter * 0.75) + planet.Diameter * 0.75;
                 ring.CenterPosition = asteroidObject.CenterPosition;
 
-                m_loadedRings.Add(asteroidObject.Id, ring);
+                m_savedData.Add(asteroidObject.Id, ring);
 
                 return asteroidObject;
             }
@@ -91,14 +86,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 belt.Radius = objectOrbitRadius;
                 belt.CenterPosition = asteroidObject.CenterPosition;
 
-                m_loadedRings.Add(asteroidObject.Id, belt);
+                m_savedData.Add(asteroidObject.Id, belt);
 
                 return asteroidObject;
 
             }
         }
 
-        public override bool IsSystemGeneratable()
+        public override bool IsInstanceGeneratable()
         {
             return true;
         }
@@ -110,227 +105,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override IMyAsteroidObjectShape GetAsteroidObjectShape(MySystemAsteroids instance)
         {
-            if(m_loadedRings.ContainsKey(instance.Id))
-                return MyAsteroidObjectShapeRing.CreateFromRingItem(m_loadedRings[instance.Id]);
+            if(m_savedData.ContainsKey(instance.Id))
+                return MyAsteroidObjectShapeRing.CreateFromRingItem(m_savedData[instance.Id] as MyAsteroidRingData);
             return null;
-        }
-
-        public override bool TryLoadObject(MySystemAsteroids asteroid)
-        {
-            if (m_loadedRings.ContainsKey(asteroid.Id)) return false;
-
-            var ring = MyFileUtils.ReadXmlFileFromWorld<MyAsteroidRingData>(GetFileName(asteroid));
-
-            if (ring == null) return false;
-
-            m_loadedRings.Add(asteroid.Id, ring);
-
-            return true;
-        }
-
-        public override void OnSave()
-        {
-            foreach(var ringId in m_loadedRings.Keys)
-            {
-                if (MyStarSystemGenerator.Static.StarSystem == null) return;
-
-                var instance = MyStarSystemGenerator.Static.StarSystem.GetObjectById(ringId);
-                if (instance == null) continue;
-                MyFileUtils.WriteXmlFileToWorld(m_loadedRings[ringId], GetFileName(instance as MySystemAsteroids));
-            }
         }
 
         public override string GetTypeName()
         {
             return TYPE_NAME;
-        }
-
-        /// <summary>
-        /// Adds a new instance of an asteroid ring to the star system.
-        /// </summary>
-        /// <param name="systemInstance">Instance of the system asteroid object to add</param>
-        /// <param name="ringData">The asteroid ring data for the ring to add</param>
-        /// <param name="successCallback">A callback that gets called, when the action was a success or not</param>
-        public void AddInstance(MySystemAsteroids systemInstance, MyAsteroidRingData ringData, Action<bool> successCallback)
-        {
-            if (ringData == null || systemInstance == null)
-            {
-                successCallback?.Invoke(false);
-            }
-            MyStarSystemGenerator.Static.AddObjectToSystem(systemInstance, systemInstance.ParentId, delegate (bool success)
-            {
-                if (success)
-                {
-                    MyPluginLog.Debug("Successfully added asteroid object to system");
-
-                    PluginEventHandler.Static.RaiseStaticEvent(AddRingServer, systemInstance, ringData);
-                    successCallback?.Invoke(true);
-                }
-                else
-                {
-                    successCallback?.Invoke(false);
-                }
-            });
-        }
-
-        /// <summary>
-        /// Edits an instance of an asteroid ring
-        /// </summary>
-        /// <param name="systemInstance">The ring instance</param>
-        /// <param name="ringData">The new ring data</param>
-        public void EditInstance(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
-        {
-            if (ringData == null || systemInstance == null)
-            {
-                return;
-            }
-            PluginEventHandler.Static.RaiseStaticEvent(EditRingServer, systemInstance, ringData);
-        }
-
-        public override object GetInstanceData(MySystemAsteroids instance)
-        {
-            if (!m_loadedRings.ContainsKey(instance.Id)) return null;
-
-            return m_loadedRings[instance.Id];
-        }
-
-        public override bool RemoveInstance(MySystemAsteroids systemInstance)
-        {
-            MyPluginLog.Debug("Removing instance from asteroid ring provider");
-            if (systemInstance.AsteroidTypeName != GetTypeName()) return false;
-            if (!m_loadedRings.ContainsKey(systemInstance.Id)) return false;
-
-            m_loadedRings.Remove(systemInstance.Id);
-
-            MyFileUtils.DeleteFileInWorldStorage(GetFileName(systemInstance));
-
-            PluginEventHandler.Static.RaiseStaticEvent(NotifyRemoveInstance, systemInstance.Id);
-
-            MyPluginLog.Debug("Successfully removed instance");
-
-            return true;
-        }
-
-        public override void FetchDataFromServer()
-        {
-            PluginEventHandler.Static.RaiseStaticEvent(GetDataServer, Sync.MyId);
-        }
-
-        /// <summary>
-        /// Server event: Adds a new Asteroid ring on the server, if the provider is loaded on the server
-        /// </summary>
-        /// <param name="systemInstance">The instance of the object as an SystemAsteroids object</param>
-        /// <param name="ringData">The custom data for the asteroid ring</param>
-        [Event(100001)]
-        [Server]
-        private static void AddRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
-        {
-            Static?.m_loadedRings.Add(systemInstance.Id, ringData);
-            PluginEventHandler.Static.RaiseStaticEvent(NotifyAddInstance, systemInstance.Id, ringData);
-        }
-
-        /// <summary>
-        /// Server event: Edits an Asteroid ring on the server, if the provider is loaded on the server
-        /// </summary>
-        /// <param name="systemInstance">The instance of the object as an SystemAsteroids object</param>
-        /// <param name="ringData">The custom data for the asteroid ring</param>
-        [Event(100007)]
-        [Server]
-        private static void EditRingServer(MySystemAsteroids systemInstance, MyAsteroidRingData ringData)
-        {
-            if (Static == null) return;
-            if (!Static.m_loadedRings.ContainsKey(systemInstance.Id)) return;
-
-            Static.m_loadedRings[systemInstance.Id] = ringData;
-
-            PluginEventHandler.Static.RaiseStaticEvent(NotifyEditInstance, systemInstance.Id, ringData);
-        }
-
-        /// <summary>
-        /// Server event: Get all data saved in this provider for the requester client
-        /// </summary>
-        /// <param name="requesterId">Client that requested data</param>
-        [Event(100002)]
-        [Server]
-        private static void GetDataServer(ulong requesterId)
-        {
-            MyPluginLog.Log("Retreiving all asteroid ring data for client " + requesterId);
-
-            PluginEventHandler.Static.RaiseStaticEvent(GetDataClient, Static.m_loadedRings, requesterId);
-        }
-
-        /// <summary>
-        /// Client event: Called, when data retreived from server
-        /// </summary>
-        /// <param name="data">Data of this provider from server</param>
-        [Event(100003)]
-        [Client]
-        private static void GetDataClient(Dictionary<Guid, MyAsteroidRingData> data)
-        {
-            if (Sync.IsServer) return;
-
-            MyPluginLog.Log("Received data from server for asteroid ring provider with length " + data.Count);
-
-            foreach (var pair in data)
-            {
-                if (Static.m_loadedRings.ContainsKey(pair.Key)) continue;
-
-                MyPluginLog.Debug("Adding ring to provider fetched from server");
-                Static.m_loadedRings.Add(pair.Key, pair.Value);
-            }
-        }
-
-        /// <summary>
-        /// Broadcast: Called, when instance got added on server
-        /// </summary>
-        /// <param name="id">Id of instance</param>
-        /// <param name="data">Data of instance</param>
-        [Event(100004)]
-        [Broadcast]
-        private static void NotifyAddInstance(Guid id, MyAsteroidRingData data)
-        {
-            if (Sync.IsServer) return;
-
-            MyPluginLog.Log("Got notified about a new Asteroid ring instance");
-
-            if (Static.m_loadedRings.ContainsKey(id)) return;
-
-            Static.m_loadedRings.Add(id, data);
-        }
-
-        /// <summary>
-        /// Broadcasts: Notifies clients, that instance was removed
-        /// </summary>
-        /// <param name="id">Id of the instance</param>
-        [Event(100005)]
-        [Broadcast]
-        private static void NotifyRemoveInstance(Guid id)
-        {
-            if (Sync.IsServer) return;
-
-            MyPluginLog.Log("Got notified about the removal of an Asteroid ring instance " + id);
-
-            if (!Static.m_loadedRings.ContainsKey(id)) return;
-
-            Static.m_loadedRings.Remove(id);
-        }
-
-        /// <summary>
-        /// Broadcasts: Notifies clients, that instance was edited
-        /// </summary>
-        /// <param name="id">Id of the instance</param>
-        /// <param name="data">Data of the edited instance</param>
-        [Event(100006)]
-        [Broadcast]
-        private static void NotifyEditInstance(Guid id, MyAsteroidRingData data)
-        {
-            if (Sync.IsServer) return;
-
-            MyPluginLog.Log("Got notified about the edit of an Asteroid ring instance " + id);
-
-            if (!Static.m_loadedRings.ContainsKey(id)) return;
-
-            Static.m_loadedRings[id] = data;
         }
 
         /// <summary>
@@ -368,7 +150,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
     /// </summary>
     [ProtoContract]
     [Serializable]
-    public class MyAsteroidRingData
+    public class MyAsteroidRingData : IMyAsteroidData
     {
         /// <summary>
         /// The radius of the asteroid ring to the center.

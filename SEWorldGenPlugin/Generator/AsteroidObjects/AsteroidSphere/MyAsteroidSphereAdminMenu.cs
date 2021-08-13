@@ -33,11 +33,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         private static int PREVIEW_RENDER_ID = 1467;
 
         /// <summary>
-        /// The current star system existend on the server used for spawning asteroid hollow spheres around planets
-        /// </summary>
-        private MyObjectBuilder_SystemData m_fetchedStarSytem;
-
-        /// <summary>
         /// The listbox containing all possible parent system objects
         /// </summary>
         private MyGuiControlListbox m_parentObjectListBox;
@@ -93,7 +88,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
             parentTable.AddTableSeparator();
 
-            var data = MyAsteroidSphereProvider.Static.GetInstanceData(asteroidObject);
+            var data = MyAsteroidSphereProvider.Static.GetInstanceData(asteroidObject.Id);
             var sphere = data as MyAsteroidSphereData;
 
             m_parentScreen.CameraLookAt(asteroidObject.CenterPosition, (float)sphere.OuterRadius * 2f);
@@ -105,33 +100,18 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             m_parentScreen = adminScreen;
 
-            if (m_fetchedStarSytem == null)
-            {
-                MyGuiControlRotatingWheel loadingWheel = new MyGuiControlRotatingWheel(position: Vector2.Zero);
-                loadingWheel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER;
-
-                adminScreen.Controls.Add(loadingWheel);
-
-                MyStarSystemGenerator.Static.GetStarSystemFromServer(delegate (MyObjectBuilder_SystemData starSystem)
-                {
-                    m_fetchedStarSytem = starSystem;
-                    adminScreen.ShouldRecreate = true;
-                });
-                return true;
-            }
-
             MyGuiControlLabel label = new MyGuiControlLabel(null, null, "Parent objects");
 
             parentTable.AddTableRow(label);
 
             m_parentObjectListBox = new MyGuiControlListbox();
-            m_parentObjectListBox.Add(new MyGuiControlListbox.Item(new System.Text.StringBuilder("System center"), userData: m_fetchedStarSytem.CenterObject));
+            m_parentObjectListBox.Add(new MyGuiControlListbox.Item(new System.Text.StringBuilder("System center"), userData: MyStarSystemGenerator.Static.StarSystem.CenterObject));
             m_parentObjectListBox.VisibleRowsCount = 8;
             m_parentObjectListBox.Size = new Vector2(usableWidth, m_parentObjectListBox.Size.Y);
             m_parentObjectListBox.SelectAllVisible();
             m_parentObjectListBox.ItemsSelected += OnParentItemClicked;
 
-            foreach (var obj in m_fetchedStarSytem.CenterObject.GetAllChildren())
+            foreach (var obj in MyStarSystemGenerator.Static.StarSystem.CenterObject.GetAllChildren())
             {
                 if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
                 {
@@ -195,19 +175,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                     return;
                 }
 
-                MyAsteroidSphereProvider.Static.AddInstance(instance, data, delegate (bool success)
-                {
-                    if (!success)
-                    {
-                        MyPluginGuiHelper.DisplayError("Sphere could not be added, because an object with the same id already exists. This error should not occour, so please try again.", "Error");
-                    }
-                    else
-                    {
-                        MyPluginGuiHelper.DisplayMessage("Sphere was created successfully.", "Success");
-                        m_parentScreen.ForceFetchStarSystem = true;
-                        m_parentScreen.ShouldRecreate = true;
-                    }
-                });
+                MyAsteroidSphereProvider.Static.AddInstance(instance, data);
 
             });
 
@@ -220,7 +188,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public void Close()
         {
-            m_fetchedStarSytem = null;
             MyPluginDrawSession.Static.RemoveRenderObject(PREVIEW_RENDER_ID);
         }
 
@@ -264,7 +231,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                 var parent = box.SelectedItems[box.SelectedItems.Count - 1].UserData as MySystemObject;
                 var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
-                if(parent == m_fetchedStarSytem.CenterObject)
+                if(parent == MyStarSystemGenerator.Static.StarSystem.CenterObject)
                 {
                     m_radiusSlider.MinValue = settings.MinMaxOrbitDistance.Min / 1000;
                     m_radiusSlider.MaxValue = settings.WorldSize < 0 ? int.MaxValue / 1000 : settings.WorldSize / 1000;
@@ -362,22 +329,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             MyPluginLog.Debug("Removing sphere " + m_currentSelectedAsteroid.DisplayName);
 
-            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.Id, delegate (bool success)
-            {
-                if (success)
-                {
-                    m_parentScreen.ForceFetchStarSystem = true;
-                    m_parentScreen.ShouldRecreate = true;
-
-                    RenderSpherePreview(null);
-
-                    MyPluginLog.Debug("Refreshing admin menu");
-                }
-                else
-                {
-                    MyPluginGuiHelper.DisplayError(m_currentSelectedAsteroid.DisplayName + " could not be deleted", "Error");
-                }
-            });
+            MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_currentSelectedAsteroid.Id);
         }
 
         /// <summary>

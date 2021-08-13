@@ -180,6 +180,7 @@
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingProvider.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereAdminMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereProvider.cs" />
+    <Compile Include="Generator\AsteroidObjects\IMyAsteroidData.cs" />
     <Compile Include="Generator\AsteroidObjects\MyAbstractAsteroidObjectProvider.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />

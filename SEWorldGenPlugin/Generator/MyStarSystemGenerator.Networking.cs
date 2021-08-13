@@ -1,11 +1,11 @@
 ﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
-using System.Collections.Generic;
 
 namespace SEWorldGenPlugin.Generator
 {
@@ -127,20 +127,13 @@ namespace SEWorldGenPlugin.Generator
             {
                 if(o.Type == MySystemObjectType.ASTEROIDS)
                 {
-                    var asteroids = o as MySystemAsteroids;
-                    if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroids.AsteroidTypeName))
+                    MySystemAsteroids roid = o as MySystemAsteroids;
+                    MyAbstractAsteroidObjectProvider prov;
+                    if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
                     {
-                        bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids.Id);
-                        if (removed)
-                        {
-                            MyGPSManager.Static.RemovePersistentGps(objectId);
-                            if (Static.StarSystem.Remove(objectId))
-                            {
-                                PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId);
-                            }
-                            return;
-                        }
+                        prov.RemoveInstance(o.Id);
                     }
+                    return;
                 }
                 else
                 {
@@ -217,7 +210,24 @@ namespace SEWorldGenPlugin.Generator
             MyPluginLog.Log("Server: Renaming object " + objectId.ToString() + " to " + newName);
             if (Static.StarSystem.Contains(objectId))
             {
-                Static.StarSystem.GetById(objectId).DisplayName = newName;
+                MySystemObject obj = Static.StarSystem.GetById(objectId);
+                string oldName = obj.DisplayName + "";
+                obj.DisplayName = newName;
+
+                if(obj.Type == MySystemObjectType.ASTEROIDS)
+                {
+                    MySystemAsteroids roid = obj as MySystemAsteroids;
+                    MyAbstractAsteroidObjectProvider prov;
+                    if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
+                    {
+                        prov.InstanceRenamed(roid, oldName);
+                    }
+                    else
+                    {
+                        MyPluginLog.Log("Asteroid object provider " + roid.AsteroidTypeName + " does not exist. Renaming anyway...");
+                    }
+                }
+
                 PluginEventHandler.Static.RaiseStaticEvent(BroadcastRenamedObject, objectId, newName);
                 return;
             }

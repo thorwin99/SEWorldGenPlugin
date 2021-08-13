@@ -328,7 +328,7 @@ namespace SEWorldGenPlugin.Generator
                         MyAbstractAsteroidObjectProvider provider = null;
                         foreach(var prov in asteroidProviders)
                         {
-                            if (!prov.Value.IsSystemGeneratable()) continue;
+                            if (!prov.Value.IsInstanceGeneratable()) continue;
 
                             if(providerIndex-- == 0)
                             {
