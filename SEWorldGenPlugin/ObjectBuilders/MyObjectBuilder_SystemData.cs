@@ -135,6 +135,16 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             return Add(obj, obj.ParentId);
         }
+
+        /// <summary>
+        /// Executes the <paramref name="action"/> for each object in the system, where the first
+        /// parameter is the depth of the object in the system tree and the second is the object itself.
+        /// </summary>
+        /// <param name="action">Action to execute for each system object</param>
+        public void Foreach(Action<int, MySystemObject> action)
+        {
+            CenterObject.Iterate(action);
+        }
     }
 
     /// <summary>
@@ -237,6 +247,37 @@ namespace SEWorldGenPlugin.ObjectBuilders
             }
 
             return children;
+        }
+
+        /// <summary>
+        /// Starts iteration over this system objects sub tree and executes the <paramref name="iterateAction"/>
+        /// with parameters relative depth and the current iterated object.
+        /// </summary>
+        /// <param name="iterateAction">Action to execute on each object</param>
+        public void Iterate(Action<int, MySystemObject> iterateAction)
+        {
+            iterateAction(0, this);
+
+            foreach(var child in ChildObjects)
+            {
+                Iterate(1, iterateAction);
+            }
+        }
+
+        /// <summary>
+        /// Starts iteration over this system objects sub tree and executes the <paramref name="iterateAction"/>
+        /// with parameters depth and the current iterated object.
+        /// </summary>
+        /// <param name="iterateAction">Action to execute on each object</param>
+        /// <param name="depth">The current depth of this object</param>
+        private void Iterate(int depth, Action<int, MySystemObject> iterateAction)
+        {
+            iterateAction(depth, this);
+
+            foreach (var child in ChildObjects)
+            {
+                Iterate(depth + 1, iterateAction);
+            }
         }
     }
 
