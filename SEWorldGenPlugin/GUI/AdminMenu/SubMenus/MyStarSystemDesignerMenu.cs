@@ -21,7 +21,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlListbox m_systemObjectsBox;
 
         /// <summary>
-        /// Button used to refresh the fetched system and object list
+        /// Button used to refresh the gui elements to contain the current system.
         /// </summary>
         private MyGuiControlButton m_refreshSystemButton;
 
@@ -33,11 +33,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <summary>
         /// A dictionary that stores all currently changed system objects, that have not yet been applied
         /// </summary>
-        private Dictionary<Guid, MySystemObject> m_changedSystemObjects;
+        private Dictionary<Guid, MySystemObject> m_pendingSystemObjects;
 
         public MyStarSystemDesignerMenu()
         {
-            m_changedSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
+            m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
         }
 
         public override void Close()
@@ -79,12 +79,39 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         }
 
         /// <summary>
-        /// Action called to refresh the system
+        /// Action called to refresh the GUI representing the current system.
         /// </summary>
         /// <param name="btn"></param>
         private void RefreshSystem(MyGuiControlButton btn)
         {
-            //Refresh GUI elements to reflect current system
+            m_systemObjectsBox.Clear();
+            var system = MyStarSystemGenerator.Static.StarSystem;
+
+            system.Foreach((int depth, MySystemObject obj) =>
+            {
+                var text = new System.Text.StringBuilder("");
+                if(depth > 0) 
+                    text.Append('|', depth);
+
+                text.Append(obj.DisplayName);
+
+                m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj));
+
+                //Add pending system object that have this parent.
+                foreach(var pending in m_pendingSystemObjects)
+                {
+                    if(pending.Value.ParentId == obj.ParentId)
+                    {
+                        var text2 = new System.Text.StringBuilder("");
+                        if (depth + 1 > 0)
+                            text2.Append('|', depth + 1);
+
+                        text2.Append(pending.Value.DisplayName);
+                        text2.Append(" *");
+                        m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text2, userData: pending.Value));
+                    }
+                }
+            });
         }
     }
 }
