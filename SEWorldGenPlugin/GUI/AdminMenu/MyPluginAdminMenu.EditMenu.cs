@@ -13,6 +13,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.GUI
 {
+    //DEPRECATED CODE HERE
     public partial class MyPluginAdminMenu
     {
         /// <summary>
@@ -58,25 +59,6 @@ namespace SEWorldGenPlugin.GUI
         private void BuildEditMenu()
         {
             MyPluginLog.Debug("Adding edit menu");
-
-            if (m_fetchedStarSytem == null || ForceFetchStarSystem)
-            {
-                MyPluginLog.Debug("Fetching system data");
-
-                MyGuiControlRotatingWheel m_loadingWheel = new MyGuiControlRotatingWheel(position: Vector2.Zero);
-                m_loadingWheel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER;
-
-                Controls.Add(m_loadingWheel);
-
-                MyStarSystemGenerator.Static.GetStarSystemFromServer(delegate (MyObjectBuilder_SystemData starSystem)
-                {
-                    m_fetchedStarSytem = starSystem;
-                    m_selectedObject = null;
-                    ShouldRecreate = true;
-                    ForceFetchStarSystem = false;
-                });
-                return;
-            }
 
             var topCombo = GetCombo();
             Vector2 start = topCombo.Position + new Vector2(0, MARGIN_VERT * 2 + GetCombo().Size.Y);

@@ -12,6 +12,7 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.GUI
 {
+    //DEPRECATED CODE HERE
     public partial class MyPluginAdminMenu
     {
         /// <summary>
@@ -307,13 +308,7 @@ namespace SEWorldGenPlugin.GUI
                 MySystemPlanet p = planet as MySystemPlanet;
                 p.CenterPosition = position;
 
-                MyStarSystemGenerator.Static.AddObjectToSystem(p, callback: delegate (bool success)
-                {
-                    if (!success)
-                    {
-                        MyPluginGuiHelper.DisplayError("Planet could not be spawned, because an object with the same id already exists. This error should not occour, so please try again.", "Error");
-                    }
-                });
+                MyStarSystemGenerator.Static.AddObjectToSystem(p);
             }
         }
 
