@@ -47,11 +47,11 @@ namespace SEWorldGenPlugin.Session
                     ServerVersionMatch = res;
                     if (res)
                     {
-                        MyPluginLog.Debug("Server and client version match up");
+                        MyPluginLog.Log("Server and client version match up");
                     }
                     else
                     {
-                        MyPluginLog.Debug("Server and client version dont match up", LogLevel.WARNING);
+                        MyPluginLog.Log("Server and client version dont match up, some features might not work.", LogLevel.WARNING);
                     }
                 });
             }
