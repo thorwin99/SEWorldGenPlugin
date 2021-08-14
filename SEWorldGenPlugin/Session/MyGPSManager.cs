@@ -261,10 +261,14 @@ namespace SEWorldGenPlugin.Session
         {
             MyDynamicGpsId key = new MyDynamicGpsId(id, playerId);
 
-            if (m_dynamicGpss.ContainsKey(key) && MySession.Static.Gpss.ExistsForPlayer(playerId))
+            lock (m_dynamicGpss)
             {
-                return MySession.Static.Gpss[playerId].ContainsKey(m_dynamicGpss[key]);
+                if (m_dynamicGpss.ContainsKey(key) && MySession.Static.Gpss.ExistsForPlayer(playerId))
+                {
+                    return MySession.Static.Gpss[playerId].ContainsKey(m_dynamicGpss[key]);
+                }
             }
+            
 
             return false;
         }
@@ -319,7 +323,7 @@ namespace SEWorldGenPlugin.Session
                     m_newDynamicGpss.Remove(entry.Key);
                 }
 
-                lock (m_toDeleteDynamicGpss)
+                lock (m_toDeleteDynamicGpss) lock(m_dynamicGpss)
                 {
                     foreach (var entry in m_toDeleteDynamicGpss)
                     {
