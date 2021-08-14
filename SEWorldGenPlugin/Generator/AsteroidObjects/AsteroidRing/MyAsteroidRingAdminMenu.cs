@@ -634,7 +634,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public void CreateDataEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MySystemAsteroids selectedInstance)
         {
-            return false;
+            return;
         }
     }
 }

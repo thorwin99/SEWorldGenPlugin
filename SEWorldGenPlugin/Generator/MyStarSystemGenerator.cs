@@ -692,11 +692,11 @@ namespace SEWorldGenPlugin.Generator
 
                     if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(instance.AsteroidTypeName))
                     {
-                        var data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].GetInstanceData(instance);
+                        var data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].GetInstanceData(instance.Id);
                         if(data == null)
                         {
                             MyPluginLog.Debug("Asteroid instance " + obj.Id + " has no data attached, deleting it", LogLevel.WARNING);
-                            MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].RemoveInstance(instance);
+                            MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].RemoveInstance(instance.Id);
                             MyGPSManager.Static.RemovePersistentGps(obj.Id);
                         }
                     }
