@@ -358,5 +358,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                 }
             }
         }
+
+        public void CreateDataEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MySystemAsteroids selectedInstance)
+        {
+        }
     }
 }

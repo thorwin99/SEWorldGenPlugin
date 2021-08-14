@@ -39,8 +39,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// <param name="usableWidth">The max width of the GUI elements in the table.</param>
         /// <param name="parentTable">The parent table the GUI elements should be put in</param>
         /// <param name="selectedInstance">The selected instance to edit or null if a new one is spawned.</param>
-        /// <returns></returns>
-        bool CreateDataEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MySystemAsteroids selectedInstance);
+        void CreateDataEditMenu(float usableWidth, MyGuiControlParentTableLayout parentTable, MySystemAsteroids selectedInstance);
 
         /// <summary>
         /// Called, when menus created by this get closed
