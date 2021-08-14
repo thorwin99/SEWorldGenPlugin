@@ -1,5 +1,6 @@
 ﻿using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -26,7 +27,22 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlButton m_refreshSystemButton;
 
         /// <summary>
-        /// Current instance to the admin menu
+        /// Button used to add a new Object to the system.
+        /// </summary>
+        private MyGuiControlButton m_addObjectButton;
+
+        /// <summary>
+        /// Button to apply the changes done to a system object.
+        /// </summary>
+        private MyGuiControlButton m_applyChangesButton;
+
+        /// <summary>
+        /// Table that holds the controls to set object specific settings.
+        /// </summary>
+        private MyGuiControlParentTableLayout m_subMenuControlTable;
+
+        /// <summary>
+        /// Current instance of the admin menu
         /// </summary>
         private MyAdminMenuExtension m_adminMenuInst;
 
@@ -35,14 +51,26 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         private Dictionary<Guid, MySystemObject> m_pendingSystemObjects;
 
+        /// <summary>
+        /// The id of the currently selected system object
+        /// </summary>
+        private Guid m_selectedObjectId;
+
+        /// <summary>
+        /// The usable gui width
+        /// </summary>
+        private float m_usableWidth;
+
         public MyStarSystemDesignerMenu()
         {
             m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
+            m_selectedObjectId = Guid.Empty;
         }
 
         public override void Close()
         {
             m_adminMenuInst = null;
+            m_systemObjectsBox = null;
         }
 
         public override string GetTitle()
@@ -60,13 +88,18 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             MyPluginLog.Debug("Building Star system designer admin menu");
 
             m_adminMenuInst = instance;
+            m_usableWidth = maxWidth;
 
             MyGuiControlLabel systemBoxLabel = new MyGuiControlLabel(null, null, "System Objects");
             parent.AddTableRow(systemBoxLabel);
 
-            m_systemObjectsBox = new MyGuiControlListbox();
-            m_systemObjectsBox.VisibleRowsCount = 8;
-            m_systemObjectsBox.Size = new Vector2(maxWidth, m_systemObjectsBox.Size.Y);
+            if(m_systemObjectsBox == null)
+            {
+                m_systemObjectsBox = new MyGuiControlListbox();
+                m_systemObjectsBox.VisibleRowsCount = 8;
+                m_systemObjectsBox.Size = new Vector2(maxWidth, m_systemObjectsBox.Size.Y);
+                RefreshSystem(null);
+            }
 
             parent.AddTableRow(m_systemObjectsBox);
 
@@ -75,7 +108,104 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             parent.AddTableRow(m_refreshSystemButton);
 
+            m_addObjectButton = MyPluginGuiHelper.CreateDebugButton("Add new object", AddNewSystemObject, false);
+            m_addObjectButton.Size = new Vector2(maxWidth, m_addObjectButton.Size.Y);
+
+            parent.AddTableRow(m_addObjectButton);
             parent.AddTableSeparator();
+
+            m_subMenuControlTable = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
+            if(m_selectedObjectId != Guid.Empty)
+            {
+                //Fill with selected object specific controls
+                SetSubMenuControls();
+            }
+
+            parent.AddTableRow(m_subMenuControlTable);
+            parent.AddTableSeparator();
+
+            m_applyChangesButton = MyPluginGuiHelper.CreateDebugButton("Apply", AddNewSystemObject, false, "Apply settings of this object and spawn it if it isnt spawned yet.");
+            m_applyChangesButton.Size = new Vector2(maxWidth, m_applyChangesButton.Size.Y);
+
+            parent.AddTableRow(m_applyChangesButton);
+        }
+
+        /// <summary>
+        /// Creates the sub menu controls, based on the type of selected object and whether it already exists or not.
+        /// </summary>
+        private void SetSubMenuControls()
+        {
+            var StarSystem = MyStarSystemGenerator.Static.StarSystem;
+            bool exists = StarSystem.Contains(m_selectedObjectId);
+            MySystemObject obj;
+            if (m_pendingSystemObjects.ContainsKey(m_selectedObjectId))
+            {
+                obj = m_pendingSystemObjects[m_selectedObjectId];
+            }
+            else if (exists)
+            {
+                obj = StarSystem.GetById(m_selectedObjectId);
+            }
+            else return;
+
+            if(obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
+            {
+                BuildPlanetMenuControls(exists, obj as MySystemPlanet);
+            }
+            else if(obj.Type == MySystemObjectType.ASTEROIDS)
+            {
+                MySystemAsteroids asteroid = obj as MySystemAsteroids;
+                MyAbstractAsteroidObjectProvider prov;
+                if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out prov))
+                {
+                    var adminMenu = prov.GetAdminMenuCreator();
+                    if(adminMenu != null)
+                    {
+                        adminMenu.CreateDataEditMenu(m_usableWidth, m_subMenuControlTable, asteroid);
+                    }
+                }
+            }
+            
+        }
+
+        /// <summary>
+        /// Creates the controls to edit or spawn a planet.
+        /// </summary>
+        /// <param name="exists">If the planet already exists in the world.</param>
+        /// <param name="planet">The planet object itself</param>
+        private void BuildPlanetMenuControls(bool exists, MySystemPlanet planet)
+        {
+            ///Build planet controls. Disable most when exists == true
+        }
+
+        /// <summary>
+        /// When a new System object is selected, update GUI
+        /// </summary>
+        /// <param name="box"></param>
+        private void OnSystemObjectSelected(MyGuiControlListbox box)
+        {
+            Guid newId = (Guid)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
+            if (m_selectedObjectId == newId) return;
+            m_selectedObjectId = newId;
+            m_adminMenuInst.RequestRecreate();
+        }
+
+        /// <summary>
+        /// Opens window to create new System object in the system.
+        /// </summary>
+        /// <param name="btn"></param>
+        private void AddNewSystemObject(MyGuiControlButton btn)
+        {
+
+        }
+
+        /// <summary>
+        /// Applies the changes of the currently selected system object, if it has changes done to it.
+        /// </summary>
+        /// <param name="btn"></param>
+        private void ApplyChanges(MyGuiControlButton btn)
+        {
+
         }
 
         /// <summary>
@@ -95,7 +225,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                 text.Append(obj.DisplayName);
 
-                m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj));
+                m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
 
                 //Add pending system object that have this parent.
                 foreach(var pending in m_pendingSystemObjects)
@@ -108,10 +238,18 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                         text2.Append(pending.Value.DisplayName);
                         text2.Append(" *");
-                        m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text2, userData: pending.Value));
+                        m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text2, userData: pending.Value.Id));
                     }
                 }
             });
+
+            if (m_selectedObjectId != Guid.Empty)
+            {
+                if (m_systemObjectsBox.SelectByUserData(m_selectedObjectId))
+                {
+                    OnSystemObjectSelected(m_systemObjectsBox);
+                }
+            }
         }
     }
 }
