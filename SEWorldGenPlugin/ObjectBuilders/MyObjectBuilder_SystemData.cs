@@ -260,7 +260,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
             foreach(var child in ChildObjects)
             {
-                Iterate(1, iterateAction);
+                child.Iterate(1, iterateAction);
             }
         }
 
@@ -276,7 +276,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
             foreach (var child in ChildObjects)
             {
-                Iterate(depth + 1, iterateAction);
+                child.Iterate(depth + 1, iterateAction);
             }
         }
     }
