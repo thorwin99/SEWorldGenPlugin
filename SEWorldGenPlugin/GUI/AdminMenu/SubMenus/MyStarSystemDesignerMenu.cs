@@ -17,6 +17,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
     public class MyStarSystemDesignerMenu : MyPluginAdminMenuSubMenu
     {
         /// <summary>
+        /// An enum indicating which zoom level the star system designer currently is on.
+        /// </summary>
+        private enum ZoomLevel
+        {
+            ORBIT,
+            OBJECT
+        }
+
+        /// <summary>
         /// A list box containing all system objects
         /// </summary>
         private MyGuiControlListbox m_systemObjectsBox;
@@ -62,9 +71,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private Dictionary<Guid, MySystemObject> m_pendingSystemObjects;
 
         /// <summary>
-        /// The id of the currently selected system object
+        /// The id of the currently selected system object.
         /// </summary>
         private Guid m_selectedObjectId;
+
+        /// <summary>
+        /// The current zoom level of the spectator cam
+        /// </summary>
+        private ZoomLevel m_zoomLevel;
 
         /// <summary>
         /// The usable gui width
@@ -75,12 +89,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
             m_selectedObjectId = Guid.Empty;
+            m_zoomLevel = ZoomLevel.ORBIT;
         }
 
         public override void Close()
         {
+            MyPluginLog.Debug("Close");
+            m_selectedObjectId = Guid.Empty;
             m_adminMenuInst = null;
             m_systemObjectsBox = null;
+            m_zoomLevel = ZoomLevel.ORBIT;
         }
 
         public override string GetTitle()
@@ -103,13 +121,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             MyGuiControlLabel systemBoxLabel = new MyGuiControlLabel(null, null, "System Objects");
             parent.AddTableRow(systemBoxLabel);
 
-            if(m_systemObjectsBox == null)
-            {
-                m_systemObjectsBox = new MyGuiControlListbox();
-                m_systemObjectsBox.VisibleRowsCount = 8;
-                m_systemObjectsBox.Size = new Vector2(maxWidth, m_systemObjectsBox.Size.Y);
-                RefreshSystem(null);
-            }
+            m_systemObjectsBox = new MyGuiControlListbox();
+            m_systemObjectsBox.VisibleRowsCount = 8;
+            m_systemObjectsBox.Size = new Vector2(maxWidth, m_systemObjectsBox.Size.Y);
+            RefreshSystemList();
+            m_systemObjectsBox.SelectByUserData(m_selectedObjectId);
+            m_systemObjectsBox.ItemsSelected += OnSystemObjectSelected;
 
             parent.AddTableRow(m_systemObjectsBox);
 
@@ -126,8 +143,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             var row = new MyGuiControlParentTableLayout(3, false, Vector2.Zero);
 
-            m_zoomInButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Increase, onButtonClick: null, toolTip: "");
-            m_zoomOutButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Increase, onButtonClick: null, toolTip: "");
+            m_zoomInButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Increase, onButtonClick: OnZoomLevelChange, toolTip: "Zoom onto the selected object");
+            m_zoomOutButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Decrease, onButtonClick: OnZoomLevelChange, toolTip: "Zoom out of the selected object");
+
+            m_zoomInButton.Enabled = m_zoomLevel != ZoomLevel.OBJECT;
+            m_zoomOutButton.Enabled = m_zoomLevel != ZoomLevel.ORBIT;
 
             row.AddTableRow(m_zoomInButton, m_zoomOutButton, new MyGuiControlLabel(text: "Zoom in / out"));
             row.ApplyRows();
@@ -136,11 +156,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableSeparator();
 
             m_subMenuControlTable = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
+
             if(m_selectedObjectId != Guid.Empty)
             {
                 //Fill with selected object specific controls
                 SetSubMenuControls();
             }
+
+            m_subMenuControlTable.ApplyRows();
 
             parent.AddTableRow(m_subMenuControlTable);
             parent.AddTableSeparator();
@@ -156,6 +179,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         private void SetSubMenuControls()
         {
+            m_subMenuControlTable.ClearTable();
+
             var StarSystem = MyStarSystemGenerator.Static.StarSystem;
             bool exists = StarSystem.Contains(m_selectedObjectId);
             MySystemObject obj;
@@ -186,7 +211,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     }
                 }
             }
-            
+            m_subMenuControlTable.ApplyRows();
+            m_adminMenuInst.RequestResize();
         }
 
         /// <summary>
@@ -205,10 +231,30 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="box"></param>
         private void OnSystemObjectSelected(MyGuiControlListbox box)
         {
+            if (box.SelectedItems.Count < 1) return;
             Guid newId = (Guid)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
-            if (m_selectedObjectId == newId) return;
+            MyPluginLog.Debug("On selecet " + newId);
             m_selectedObjectId = newId;
-            m_adminMenuInst.RequestRecreate();
+            SetSubMenuControls();
+        }
+
+        /// <summary>
+        /// The event called when one of the zoom buttons is clicked.
+        /// </summary>
+        /// <param name="btn"></param>
+        private void OnZoomLevelChange(MyGuiControlButton btn)
+        {
+            if(btn == m_zoomInButton)
+            {
+                m_zoomLevel++;
+            }
+            else
+            {
+                m_zoomLevel--;
+            }
+
+            m_zoomInButton.Enabled = m_zoomLevel != ZoomLevel.OBJECT;
+            m_zoomOutButton.Enabled = m_zoomLevel != ZoomLevel.ORBIT;
         }
 
         /// <summary>
@@ -235,27 +281,44 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="btn"></param>
         private void RefreshSystem(MyGuiControlButton btn)
         {
-            m_systemObjectsBox.Clear();
+            RefreshSystemList();
+
+            if (m_selectedObjectId != Guid.Empty)
+            {
+                m_systemObjectsBox.SelectByUserData(m_selectedObjectId);
+            }
+        }
+
+        private void RefreshSystemList()
+        {
+            MyPluginLog.Debug("Refresh");
+            m_systemObjectsBox.ClearItems();
             var system = MyStarSystemGenerator.Static.StarSystem;
 
             system.Foreach((int depth, MySystemObject obj) =>
             {
                 var text = new System.Text.StringBuilder("");
-                if(depth > 0) 
-                    text.Append('|', depth);
+                if (depth > 0)
+                {
+                    for (int i = 0; i < depth; i++)
+                        text.Append("   ");
+                }
 
                 text.Append(obj.DisplayName);
 
                 m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
 
                 //Add pending system object that have this parent.
-                foreach(var pending in m_pendingSystemObjects)
+                foreach (var pending in m_pendingSystemObjects)
                 {
-                    if(pending.Value.ParentId == obj.ParentId)
+                    if (pending.Value.ParentId == obj.ParentId)
                     {
                         var text2 = new System.Text.StringBuilder("");
                         if (depth + 1 > 0)
-                            text2.Append('|', depth + 1);
+                        {
+                            for (int i = 0; i < depth + 1; i++)
+                                text.Append("   ");
+                        }
 
                         text2.Append(pending.Value.DisplayName);
                         text2.Append(" *");
@@ -263,14 +326,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     }
                 }
             });
-
-            if (m_selectedObjectId != Guid.Empty)
-            {
-                if (m_systemObjectsBox.SelectByUserData(m_selectedObjectId))
-                {
-                    OnSystemObjectSelected(m_systemObjectsBox);
-                }
-            }
         }
     }
 }
