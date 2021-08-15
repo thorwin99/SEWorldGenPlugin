@@ -37,6 +37,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlButton m_applyChangesButton;
 
         /// <summary>
+        /// Button used to zoom into the current selected object.
+        /// </summary>
+        private MyGuiControlButton m_zoomInButton;
+
+        /// <summary>
+        /// Button used to zoom out of the current selected object.
+        /// </summary>
+        private MyGuiControlButton m_zoomOutButton;
+
+        /// <summary>
         /// Table that holds the controls to set object specific settings.
         /// </summary>
         private MyGuiControlParentTableLayout m_subMenuControlTable;
@@ -112,6 +122,17 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_addObjectButton.Size = new Vector2(maxWidth, m_addObjectButton.Size.Y);
 
             parent.AddTableRow(m_addObjectButton);
+            parent.AddTableSeparator();
+
+            var row = new MyGuiControlParentTableLayout(3, false, Vector2.Zero);
+
+            m_zoomInButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Increase, onButtonClick: null, toolTip: "");
+            m_zoomOutButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Increase, onButtonClick: null, toolTip: "");
+
+            row.AddTableRow(m_zoomInButton, m_zoomOutButton, new MyGuiControlLabel(text: "Zoom in / out"));
+            row.ApplyRows();
+
+            parent.AddTableRow(row);
             parent.AddTableSeparator();
 
             m_subMenuControlTable = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
