@@ -287,8 +287,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     cellObjectSeed.Params.GeneratorSeed = m_definition.UseGeneratorSeed ? MyRandom.Instance.Next() : 0;
 
                     cell.AddObject(cellObjectSeed);
-
-                    MyPluginLog.Debug("Adding seed");
                 }
             }
 
