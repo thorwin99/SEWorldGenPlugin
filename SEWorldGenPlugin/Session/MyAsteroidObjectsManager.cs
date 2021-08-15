@@ -102,7 +102,7 @@ namespace SEWorldGenPlugin.Session
                 {
                     foreach (var type in assembly.GetTypes())
                     {
-                        if (type.IsSubclassOf(typeof(MyAbstractAsteroidObjectProvider)))
+                        if (type.IsSubclassOf(typeof(MyAbstractAsteroidObjectProvider)) && !type.IsGenericType)
                         {
                             MyPluginLog.Log("Registering provider " + type.Name);
 
