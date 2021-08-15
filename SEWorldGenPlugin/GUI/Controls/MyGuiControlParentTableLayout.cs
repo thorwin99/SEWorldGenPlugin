@@ -76,8 +76,9 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <param name="columns">The amount of columns</param>
         /// <param name="overflowColumns">If a column can overflow to the next, if it is the last one of a row but not the last of the table.</param>
         /// <param name="padding">The padding of the Table from the top left corner</param>
-        /// <param name="minWidth">The minimum width the table should have</param>
-        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false, Vector2? padding = null, float minWidth = 0) : base()
+        /// <param name="minWidth">The minimum width the table should have.</param>
+        /// <param name="maxWidth">The maximum width the table should have. -1 to disable</param>
+        public MyGuiControlParentTableLayout(int columns, bool overflowColumns = false, Vector2? padding = null, float minWidth = 0, float maxWidth = -1) : base()
         {
             m_tableRows = new List<MyGuiControlBase[]>();
             m_columnsMax = columns;
@@ -96,6 +97,10 @@ namespace SEWorldGenPlugin.GUI.Controls
             m_tableHeight = 0;
 
             MinSize = new Vector2(minWidth, MinSize.Y);
+            if(maxWidth >= 0)
+            {
+                MaxSize = new Vector2(maxWidth, MaxSize.Y);
+            }
         }
 
         /// <summary>
@@ -204,6 +209,36 @@ namespace SEWorldGenPlugin.GUI.Controls
 
                 currentRowTopLeft += new Vector2(0, rowHeight + MARGIN_ROWS);
             }
+        }
+
+        /// <summary>
+        /// Recalculates the table size
+        /// </summary>
+        public void RecalculateSize()
+        {
+            m_tableHeight = 0;
+
+            foreach (var row in m_tableRows)
+            {
+                float rowHeight = 0;
+                if (row != null)
+                {
+                    foreach (var col in row)
+                    {
+                        if (col.Size.Y > rowHeight)
+                            rowHeight = col.Size.Y;
+                    }
+                }
+                m_tableHeight += rowHeight + MARGIN_ROWS;
+            }
+
+            float tableWidth = 0;
+            foreach (var columnWidth in m_columnWidths)
+            {
+                tableWidth += columnWidth + MARGIN_COLUMNS;
+            }
+
+            Size = new Vector2(tableWidth, m_tableHeight - MARGIN_ROWS + m_padding.Y);
         }
 
         /// <summary>
