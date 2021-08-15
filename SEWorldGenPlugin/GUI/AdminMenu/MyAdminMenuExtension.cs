@@ -57,6 +57,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         private MyGuiControlCombobox m_pluginComboBox;
 
         /// <summary>
+        /// The scrollpane used to scroll in the admin menu
+        /// </summary>
+        MyGuiControlScrollablePanel m_scrollPane;
+
+        /// <summary>
+        /// The table used to add controls to, visible in the admin menu
+        /// </summary>
+        MyGuiControlParentTableLayout m_contentTable;
+
+        /// <summary>
         /// The custom sub menus of the admin menu. This static variable is used
         /// by each instance of the MyAdminMenuExtension and is static, since a new instance
         /// is created each time the admin menu is opened, but sub menus should only need to be registered once.
@@ -104,6 +114,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             if (m_isRecreating) return;
             m_isRecreating = true;
 
+            MyPluginLog.Debug("Build admin menu - Start");
+
             base.RecreateControls(constructor);
 
             m_usableWidth = Size.Value.X * 0.75f;
@@ -127,33 +139,33 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
                 Vector2 start = m_pluginComboBox.Position + new Vector2(0, MARGIN_VERT * 2 + GetCombo().Size.Y);
                 Vector2 end = start + new Vector2(m_pluginComboBox.Size.X, 0.8f - MARGIN_VERT);
 
-                MyGuiControlParentTableLayout table = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
-                table.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
+                m_contentTable = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
+                m_contentTable.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
                 
                 int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
-                m_subMenus[index].RefreshInternals(table, m_usableWidth, this);
+                m_subMenus[index].RefreshInternals(m_contentTable, m_usableWidth, this);
 
-                table.AddTableSeparator();
-                table.ApplyRows();
+                m_contentTable.AddTableSeparator();
+                m_contentTable.ApplyRows();
 
-                MyGuiControlScrollablePanel scrollPane = new MyGuiControlScrollablePanel(table);
-                scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;
-                scrollPane.ScrollbarVEnabled = true;
-                scrollPane.Size = end - start;
-                scrollPane.Size = new Vector2(0.315f, scrollPane.Size.Y);
-                scrollPane.Position = new Vector2(0, start.Y);
+                m_scrollPane = new MyGuiControlScrollablePanel(m_contentTable);
+                m_scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;
+                m_scrollPane.ScrollbarVEnabled = true;
+                m_scrollPane.Size = end - start;
+                m_scrollPane.Size = new Vector2(0.315f, m_scrollPane.Size.Y);
+                m_scrollPane.Position = new Vector2(0, start.Y);
 
-                Controls.Add(scrollPane);
+                Controls.Add(m_scrollPane);
 
                 MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
-                sep.AddHorizontal(new Vector2(scrollPane.Position.X - scrollPane.Size.X / 2, scrollPane.Position.Y + scrollPane.Size.Y), m_usableWidth);
+                sep.AddHorizontal(new Vector2(m_scrollPane.Position.X - m_scrollPane.Size.X / 2, m_scrollPane.Position.Y + m_scrollPane.Size.Y), m_usableWidth);
 
                 Controls.Add(sep);
             }
 
             m_isRecreating = false;
 
-            MyPluginLog.Debug("Build admin menu");
+            MyPluginLog.Debug("Build admin menu - End");
         }
 
         /// <summary>
@@ -180,6 +192,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         public void RequestRecreate()
         {
             m_requestRecreate = true;
+        }
+
+        public void RequestResize()
+        {
+            m_contentTable.RecalculateSize();
+            m_scrollPane.RefreshInternals();
         }
 
         /// <summary>
@@ -259,6 +277,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             Controls.Remove(comboBox);
 
             m_pluginComboBox.ItemSelected += OnAdminSubSelected;
+        }
+
+        protected override void OnClosed()
+        {
+            base.OnClosed();
+            foreach(var sub in m_subMenus)
+            {
+                sub.Close();
+            }
         }
     }
 }
