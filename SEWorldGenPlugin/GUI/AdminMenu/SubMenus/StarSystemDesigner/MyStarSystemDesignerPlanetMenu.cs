@@ -1,5 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -60,14 +61,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
             m_planetTypeCombobox = new MyGuiControlCombobox();
-            m_planetTypeCombobox.Size = new Vector2(maxWidth, m_planetTypeCombobox.Size.Y);
+            m_planetTypeCombobox.Size = new Vector2(maxWidth - 0.01f, m_planetTypeCombobox.Size.Y);
             m_planetTypeCombobox.SetToolTip(new MyToolTips("The type of the planet."));
             m_planetTypeCombobox.ItemSelected += OnTypeSelected;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet type"));
             controlTable.AddTableRow(m_planetTypeCombobox);
 
-            m_sizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSizeCap, maxWidth - 0.1f, intValue: true, labelSuffix: " m");
+            m_sizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSizeCap, maxWidth - 0.1f, intValue: true, labelSuffix: " m", showLabel: true);
             m_sizeSlider.SetToolTip(new MyToolTips("The size of the planet in meters."));
             m_sizeSlider.ValueChanged += OnSizeChanged;
 
@@ -95,7 +96,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet position"));
             controlTable.AddTableRow(m_orbitPosSlider);
 
-            m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f);
+            m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true);
             m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the planets orbit above the system plane."));
             m_elevationSldier.ValueChanged += (s) =>
             {
@@ -182,12 +183,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private void SetOrbitProperties()
         {
-            double radius = new Vector3D(m_object.CenterPosition).Length();
-            double elevation = Math.Asin(m_object.CenterPosition.z / radius) * (180.0 / Math.PI);
-            double orbitPos = Math.Asin(m_object.CenterPosition.x / Math.Cos(elevation) / radius) * (180.0 / Math.PI);
-            if(orbitPos < 0)
+            MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
+            Vector3D parentRel = new Vector3D(m_object.CenterPosition) - new Vector3D(parent.CenterPosition);
+
+            double radius = Vector3D.Distance(parent.CenterPosition, m_object.CenterPosition);
+
+            double elevation = Math.Asin(parentRel.Z / radius) * (180.0 / Math.PI);
+            double orbitPos = Math.Acos(parentRel.X / Math.Cos(elevation * (Math.PI / 180.0)) / radius) * (180.0 / Math.PI);
+            if (parentRel.Y < 0)
             {
-                orbitPos += 360;
+                orbitPos = 360 - orbitPos;
             }
 
             var radSB = new StringBuilder();
@@ -203,15 +208,20 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private void GetPropertiesFromOrbit()
         {
+            MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
             var radSB = new StringBuilder();
             m_orbitRadiusTextbox.GetText(radSB);
 
             if (!double.TryParse(radSB.ToString(), out double radius)) return;
 
-            double elevation = m_elevationSldier.Value;
-            double orbitPos = m_orbitPosSlider.Value;
+            MyPluginLog.Debug("RAD = " + radius);
 
-            Vector3D pos = new Vector3D(radius * Math.Sin(orbitPos) * Math.Cos(elevation), radius * Math.Cos(orbitPos) * Math.Cos(elevation), radius * Math.Sin(elevation));
+            double elevation = m_elevationSldier.Value / (180.0 / Math.PI);
+            double orbitPos = m_orbitPosSlider.Value / (180.0 / Math.PI);
+
+            Vector3D pos = new Vector3D(radius * Math.Cos(orbitPos) * Math.Cos(elevation), radius * Math.Sin(orbitPos) * Math.Cos(elevation), radius * Math.Sin(elevation));
+
+            pos += parent.CenterPosition;
 
             m_object.CenterPosition = pos;
         }
