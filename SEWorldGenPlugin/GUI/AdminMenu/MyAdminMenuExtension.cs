@@ -146,7 +146,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
                 m_subMenus[index].RefreshInternals(m_contentTable, m_usableWidth, this);
 
                 m_contentTable.AddTableSeparator();
-                m_contentTable.ApplyRows();
 
                 m_scrollPane = new MyGuiControlScrollablePanel(m_contentTable);
                 m_scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;

@@ -336,7 +336,6 @@ namespace SEWorldGenPlugin.GUI
 
             formatButtons.AddTableRow(planetNameButtons1);
             formatButtons.AddTableRow(planetNameButtons2);
-            formatButtons.ApplyRows();
 
             parent.AddTableRow(planetNameLabel);
             parent.AddTableRow(m_planetNameBox);
@@ -397,7 +396,6 @@ namespace SEWorldGenPlugin.GUI
             formatButtonsMoon.AddTableRow(moonNameButtons1);
             formatButtonsMoon.AddTableRow(moonNameButtons2);
             formatButtonsMoon.AddTableRow(btnExtra);
-            formatButtonsMoon.ApplyRows();
 
             parent.AddTableRow(moonNameLabel);
             parent.AddTableRow(m_moonNameBox);
@@ -449,13 +447,11 @@ namespace SEWorldGenPlugin.GUI
 
             formatButtonsBelt.AddTableRow(beltNameButtons1);
             formatButtonsBelt.AddTableRow(beltNameButtons2);
-            formatButtonsBelt.ApplyRows();
 
             parent.AddTableRow(beltNameLabel);
             parent.AddTableRow(m_beltNameBox);
             parent.AddTableRow(formatButtonsBelt);
             #endregion
-            parent.ApplyRows();
 
             Vector2 start = SIZE / -2 + PADDING + new Vector2(0, caption.Size.Y) + CHILD_MARGINS_VERT * 2;
             Vector2 end = new Vector2(SIZE.X / 2 - PADDING.X, SIZE.Y / 2 - PADDING.Y - OkButton.Size.Y) - CHILD_MARGINS_VERT * 2;

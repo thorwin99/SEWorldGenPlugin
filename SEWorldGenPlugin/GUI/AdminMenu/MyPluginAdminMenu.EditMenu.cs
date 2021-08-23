@@ -161,8 +161,6 @@ namespace SEWorldGenPlugin.GUI
                 }
             }
 
-            m_scrollTable.ApplyRows();
-
             var topCombo = GetCombo();
             Vector2 start = m_systemObjectsBox.Position + new Vector2(-0.001f, MARGIN_VERT * 2 + m_systemObjectsBox.Size.Y);
             Vector2 end = new Vector2(topCombo.Size.X, 0.5f - MARGIN_VERT);

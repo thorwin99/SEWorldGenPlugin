@@ -182,8 +182,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             row.AddTableRow(m_snapToParentCheck, new MyGuiControlLabel(null, null, "Snap camera to parent"));
 
-            row.ApplyRows();
-
             parentTable.AddTableRow(row);
 
             parentTable.AddTableSeparator();

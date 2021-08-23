@@ -99,8 +99,6 @@ namespace SEWorldGenPlugin.GUI
 
             table.AddTableSeparator();
 
-            table.ApplyRows();
-
             MyGuiControlScrollablePanel scrollPane = new MyGuiControlScrollablePanel(table);
             scrollPane.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;
             scrollPane.ScrollbarVEnabled = true;

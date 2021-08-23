@@ -241,8 +241,6 @@ namespace SEWorldGenPlugin.GUI
 
             parent.AddTableRow(asteroidGpsModeLabel, m_asteroidGPSModeCombo);
 
-            parent.ApplyRows();
-
             Vector2 start = SIZE / -2 + PADDING + new Vector2(0, caption.Size.Y) + CHILD_MARGINS_VERT * 2;
             Vector2 end = new Vector2(SIZE.X / 2 - PADDING.X, SIZE.Y / 2 - PADDING.Y - OkButton.Size.Y) - CHILD_MARGINS_VERT * 2;
 

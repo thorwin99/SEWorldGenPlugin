@@ -156,7 +156,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_zoomOutButton.Enabled = m_zoomLevel != ZoomLevel.ORBIT;
 
             row.AddTableRow(m_zoomInButton, m_zoomOutButton, new MyGuiControlLabel(text: "Zoom in / out"));
-            row.ApplyRows();
 
             parent.AddTableRow(row);
             parent.AddTableSeparator();
@@ -168,8 +167,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 //Fill with selected object specific controls
                 SetSubMenuControls();
             }
-
-            m_subMenuControlTable.ApplyRows();
 
             parent.AddTableRow(m_subMenuControlTable);
             parent.AddTableSeparator();
@@ -217,7 +214,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     }
                 }
             }
-            m_subMenuControlTable.ApplyRows();
             m_adminMenuInst.RequestResize();
         }
 

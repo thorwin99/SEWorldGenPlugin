@@ -133,6 +133,7 @@ namespace SEWorldGenPlugin.GUI.Controls
             m_tableHeight += rowHeight + MARGIN_ROWS;
 
             m_tableRows.Add(rowControls);
+            RefreshInternals();
             return true;
         }
 
@@ -145,17 +146,6 @@ namespace SEWorldGenPlugin.GUI.Controls
             MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
             m_tableRows.Add(new MyGuiControlBase[] { sep });
             m_tableHeight += MARGIN_ROWS;
-        }
-
-        /// <summary>
-        /// This applies all rows that are currently added and
-        /// sets the size of this parent and the positions of the children.
-        /// Only run, when all rows were added.
-        /// </summary>
-        public void ApplyRows()
-        {
-            Controls.Clear();
-            RefreshInternals();
         }
 
         /// <summary>
