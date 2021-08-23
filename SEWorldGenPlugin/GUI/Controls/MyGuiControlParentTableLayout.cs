@@ -110,7 +110,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// in the row should have already defined its sizes.
         /// </summary>
         /// <param name="rowControls"></param>
-        /// <returns>True, when the row is </returns>
+        /// <returns>True, when the row is added</returns>
         public bool AddTableRow(params MyGuiControlBase[] rowControls)
         {
             if (rowControls.Length > m_columnsMax) return false;
@@ -143,7 +143,8 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <returns></returns>
         public void AddTableSeparator()
         {
-            m_tableRows.Add(null);
+            MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
+            m_tableRows.Add(new MyGuiControlBase[] { sep });
             m_tableHeight += MARGIN_ROWS;
         }
 
@@ -155,8 +156,8 @@ namespace SEWorldGenPlugin.GUI.Controls
         public void ApplyRows()
         {
             Controls.Clear();
-
-            float tableWidth = 0;
+            RefreshInternals();
+            /**float tableWidth = 0;
 
             foreach(var columnWidth in m_columnWidths)
             {
@@ -208,7 +209,7 @@ namespace SEWorldGenPlugin.GUI.Controls
                 }
 
                 currentRowTopLeft += new Vector2(0, rowHeight + MARGIN_ROWS);
-            }
+            }**/
         }
 
         /// <summary>
@@ -225,8 +226,13 @@ namespace SEWorldGenPlugin.GUI.Controls
                 {
                     foreach (var col in row)
                     {
-                        if (col.Size.Y > rowHeight)
-                            rowHeight = col.Size.Y;
+                        if(!(col is MyGuiControlSeparatorList))
+                        {
+                            if (col.Size.Y > rowHeight)
+                            {
+                                rowHeight = col.Size.Y;
+                            }
+                        }
                     }
                 }
                 m_tableHeight += rowHeight + MARGIN_ROWS;
@@ -254,6 +260,60 @@ namespace SEWorldGenPlugin.GUI.Controls
                 m_columnWidths = new float[m_columnsMax];
 
             m_tableHeight = MARGIN_ROWS;
+        }
+
+        public void RefreshInternals()
+        {
+            RecalculateSize();
+
+            Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + m_padding.X, Size.Y / -2 + m_padding.Y);
+
+            int index = -1;
+            foreach (var row in m_tableRows)
+            {
+                index++;
+
+                if (row == null) continue;
+
+                float currentColumnOffset = 0;
+                float rowHeight = 0;
+                foreach (var col in row)
+                {
+                    if (col == null) continue;
+                    if(col is MyGuiControlSeparatorList)
+                    {
+                        rowHeight = Math.Max(rowHeight, 0);
+                    }
+                    else
+                    {
+                        rowHeight = Math.Max(rowHeight, col.Size.Y);
+                    }
+                }
+
+                for (int i = 0; i < row.Length; i++)
+                {
+                    var control = row[i];
+
+                    if(control != null && control is MyGuiControlSeparatorList)
+                    {
+                        var sep = control as MyGuiControlSeparatorList;
+                        sep.Clear();
+                        sep.AddHorizontal(currentRowTopLeft, Size.X - MARGIN_COLUMNS);
+                    }
+                    else if(control != null)
+                    {
+                        control.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+                        control.Position = currentRowTopLeft + new Vector2(currentColumnOffset, rowHeight / 2);
+                    }
+
+                    if (!Controls.Contains(control))
+                    {
+                        Controls.Add(control);
+                    }
+                    currentColumnOffset += m_columnWidths[i] + MARGIN_COLUMNS;
+                }
+                currentRowTopLeft += new Vector2(0, rowHeight + MARGIN_ROWS);
+            }
         }
     }
 }

@@ -196,7 +196,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
 
         public void RequestResize()
         {
-            m_contentTable.RecalculateSize();
+            m_contentTable.RefreshInternals();
             m_scrollPane.RefreshInternals();
         }
 
