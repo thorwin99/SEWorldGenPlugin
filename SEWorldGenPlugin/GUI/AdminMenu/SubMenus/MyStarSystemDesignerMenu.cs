@@ -1,6 +1,7 @@
 ﻿using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -84,6 +85,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// The usable gui width
         /// </summary>
         private float m_usableWidth;
+
+        /// <summary>
+        /// The menu currently used to edit the selected object
+        /// </summary>
+        private MyStarSystemDesignerObjectMenu m_currentObjectMenu;
 
         public MyStarSystemDesignerMenu()
         {
@@ -222,7 +228,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="planet">The planet object itself</param>
         private void BuildPlanetMenuControls(bool exists, MySystemPlanet planet)
         {
-            ///Build planet controls. Disable most when exists == true
+            m_currentObjectMenu = new MyStarSystemDesignerPlanetMenu(planet);
+            m_currentObjectMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
         }
 
         /// <summary>
