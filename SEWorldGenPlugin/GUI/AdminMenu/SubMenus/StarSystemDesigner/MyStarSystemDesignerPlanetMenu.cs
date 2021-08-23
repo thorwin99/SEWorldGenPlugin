@@ -48,6 +48,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public MyStarSystemDesignerPlanetMenu(MySystemObject obj) : base(obj)
         {
+            m_planetTypes = new List<MyPlanetGeneratorDefinition>();
             if(!(obj is MySystemPlanet) || obj == null)
             {
                 MyPluginLog.Log("Trying to edit a non planet with the planet editing menu.", LogLevel.ERROR);
@@ -59,23 +60,23 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
             m_planetTypeCombobox = new MyGuiControlCombobox();
-            m_planetTypeCombobox.Size = new VRageMath.Vector2(maxWidth, m_planetTypeCombobox.Size.Y);
-            m_planetTypeCombobox.Tooltips.AddToolTip("The type of the planet.");
+            m_planetTypeCombobox.Size = new Vector2(maxWidth, m_planetTypeCombobox.Size.Y);
+            m_planetTypeCombobox.SetToolTip(new MyToolTips("The type of the planet."));
             m_planetTypeCombobox.ItemSelected += OnTypeSelected;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet type"));
             controlTable.AddTableRow(m_planetTypeCombobox);
 
             m_sizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSizeCap, maxWidth - 0.1f, intValue: true, labelSuffix: " m");
-            m_sizeSlider.Tooltips.AddToolTip("The size of the planet in meters.");
+            m_sizeSlider.SetToolTip(new MyToolTips("The size of the planet in meters."));
             m_sizeSlider.ValueChanged += OnSizeChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet size"));
             controlTable.AddTableRow(m_sizeSlider);
 
             m_orbitRadiusTextbox = new MyGuiControlTextbox(type: MyGuiControlTextboxType.DigitsOnly);
-            m_orbitRadiusTextbox.Size = new VRageMath.Vector2(maxWidth - 0.1f, m_orbitRadiusTextbox.Size.Y);
-            m_orbitRadiusTextbox.Tooltips.AddToolTip("The radius of the planets orbit. Its the distance of the planets center to the system center.");
+            m_orbitRadiusTextbox.Size = new Vector2(maxWidth - 0.1f, m_orbitRadiusTextbox.Size.Y);
+            m_orbitRadiusTextbox.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
             m_orbitRadiusTextbox.TextChanged += (tb) =>
             {
                 GetPropertiesFromOrbit();
@@ -85,7 +86,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(m_orbitRadiusTextbox);
 
             m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true);
-            m_orbitPosSlider.Tooltips.AddToolTip("The position of the planet on the orbit itself. Moves the planet around on the orbit.");
+            m_orbitPosSlider.SetToolTip(new MyToolTips("The position of the planet on the orbit itself. Moves the planet around on the orbit."));
             m_orbitPosSlider.ValueChanged += (s) =>
             {
                 GetPropertiesFromOrbit();
@@ -95,7 +96,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(m_orbitPosSlider);
 
             m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f);
-            m_elevationSldier.Tooltips.AddToolTip("The elevation of the planets orbit above the system plane.");
+            m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the planets orbit above the system plane."));
             m_elevationSldier.ValueChanged += (s) =>
             {
                 GetPropertiesFromOrbit();
