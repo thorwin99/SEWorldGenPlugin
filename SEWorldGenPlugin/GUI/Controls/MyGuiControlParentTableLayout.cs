@@ -146,6 +146,8 @@ namespace SEWorldGenPlugin.GUI.Controls
             MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
             m_tableRows.Add(new MyGuiControlBase[] { sep });
             m_tableHeight += MARGIN_ROWS;
+
+            RefreshInternals();
         }
 
         /// <summary>
