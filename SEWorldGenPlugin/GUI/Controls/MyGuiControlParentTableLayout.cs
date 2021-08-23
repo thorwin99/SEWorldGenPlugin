@@ -106,8 +106,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <summary>
         /// Adds a new row of controls to the table layouts
         /// row queue. The first column of the row is the first element in the
-        /// array. Use ApplyRows to build the layout. All controls
-        /// in the row should have already defined its sizes.
+        /// array.
         /// </summary>
         /// <param name="rowControls"></param>
         /// <returns>True, when the row is added</returns>
@@ -157,59 +156,6 @@ namespace SEWorldGenPlugin.GUI.Controls
         {
             Controls.Clear();
             RefreshInternals();
-            /**float tableWidth = 0;
-
-            foreach(var columnWidth in m_columnWidths)
-            {
-                tableWidth += columnWidth + MARGIN_COLUMNS;
-            }
-
-            if(MinSize.X > tableWidth)
-            {
-                tableWidth = MinSize.X;
-            }
-
-            Size = new Vector2(tableWidth, m_tableHeight - MARGIN_ROWS + m_padding.Y);
-
-            Vector2 currentRowTopLeft = new Vector2(Size.X / -2 + m_padding.X, Size.Y / -2 + m_padding.Y);
-
-            foreach(var row in m_tableRows)
-            {
-                if(row == null)
-                {
-                    MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
-                    sep.AddHorizontal(currentRowTopLeft, tableWidth - MARGIN_COLUMNS);
-
-                    Controls.Add(sep);
-
-                    currentRowTopLeft += new Vector2(0, MARGIN_ROWS);
-
-                    continue;
-                }
-
-                float currentColumnOffset = 0;
-                float rowHeight = 0;
-                foreach(var col in row)
-                {
-                    if (col == null) continue;
-                    rowHeight = Math.Max(rowHeight, col.Size.Y);
-                }
-
-                for(int i = 0; i < row.Length; i++)
-                {
-                    var control = row[i];
-
-                    if(control != null)
-                    {
-                        control.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
-                        control.Position = currentRowTopLeft + new Vector2(currentColumnOffset, rowHeight / 2);
-                        Controls.Add(control);
-                    }
-                    currentColumnOffset += m_columnWidths[i] + MARGIN_COLUMNS;
-                }
-
-                currentRowTopLeft += new Vector2(0, rowHeight + MARGIN_ROWS);
-            }**/
         }
 
         /// <summary>
