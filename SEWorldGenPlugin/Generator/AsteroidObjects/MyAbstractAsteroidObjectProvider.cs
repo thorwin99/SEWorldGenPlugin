@@ -1,6 +1,7 @@
 ﻿using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
@@ -18,11 +19,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
     [EventOwner]
     public abstract class MyAbstractAsteroidObjectProvider
     {
-        /// <summary>
-        /// The private instance of the admin menu creator, so that only one ever exists.
-        /// </summary>
-        private IMyAsteroidAdminMenuCreator m_adminMenuCreator;
-
         /// <summary>
         /// The currently saved asteroid data
         /// </summary>
@@ -56,10 +52,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         public abstract IMyAsteroidObjectShape GetAsteroidObjectShape(MySystemAsteroids instance);
 
         /// <summary>
-        /// Creates a new instance for the admin menu creator for this type and returns it.
+        /// Returns a new Instance of the edit menu for the star system designer to edit an instance of this asteroid type for the given instance.
         /// </summary>
-        /// <returns>A new instance for an admin menu creator</returns>
-        protected abstract IMyAsteroidAdminMenuCreator CreateAdminMenuCreatorInstance();
+        /// <param name="instance">The edited or spawned instance.</param>
+        /// <returns>An instance of a <see cref="MyStarSystemDesignerObjectMenu"/></returns>
+        public abstract MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance);
 
         /// <summary>
         /// Generates an instance of the asteroid object provided by this class.
@@ -108,20 +105,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         {
             if (!m_savedData.ContainsKey(instanceId)) return null;
             return m_savedData[instanceId];
-        }
-
-
-        /// <summary>
-        /// Returns the admin menu creator for this asteroid object type.
-        /// </summary>
-        /// <returns>The admin menu creator or null, if it should not be added to the plugins admin spawn and edit menu.</returns>
-        public IMyAsteroidAdminMenuCreator GetAdminMenuCreator()
-        {
-            if (m_adminMenuCreator == null)
-            {
-                m_adminMenuCreator = CreateAdminMenuCreatorInstance();
-            }
-            return m_adminMenuCreator;
         }
 
         /// <summary>

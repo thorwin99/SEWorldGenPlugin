@@ -1,7 +1,7 @@
 ﻿using Sandbox.Game.Gui;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
-using Sandbox.Graphics.GUI;
+/*using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
@@ -75,7 +75,7 @@ namespace SEWorldGenPlugin.GUI
 
             foreach(var provider in MyAsteroidObjectsManager.Static.AsteroidObjectProviders)
             {
-                if (provider.Value.GetAdminMenuCreator() != null)
+                if (provider.Value.GetStarSystemDesignerSubMenu() != null)
                     m_asteroidProviders.Add(provider.Value);
             }
 
@@ -149,7 +149,7 @@ namespace SEWorldGenPlugin.GUI
                 
                 foreach (var provider in m_asteroidProviders)
                 {
-                    provider.GetAdminMenuCreator().Close();
+                    provider.GetStarSystemDesignerSubMenu().Close();
                 }
 
                 if (newCombo.GetSelectedIndex() >= oldCount)
@@ -182,7 +182,7 @@ namespace SEWorldGenPlugin.GUI
 
             foreach(var provider in m_asteroidProviders)
             {
-                provider.GetAdminMenuCreator().Close();
+                provider.GetStarSystemDesignerSubMenu().Close();
             }
         }
 
@@ -238,3 +238,4 @@ namespace SEWorldGenPlugin.GUI
         }
     }
 }
+*/

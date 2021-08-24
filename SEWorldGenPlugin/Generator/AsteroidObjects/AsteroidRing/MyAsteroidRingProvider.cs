@@ -2,6 +2,7 @@
 using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
@@ -98,11 +99,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return true;
         }
 
-        protected override IMyAsteroidAdminMenuCreator CreateAdminMenuCreatorInstance()
-        {
-            return new MyAsteroidRingAdminMenu();
-        }
-
         public override IMyAsteroidObjectShape GetAsteroidObjectShape(MySystemAsteroids instance)
         {
             if(m_savedData.ContainsKey(instance.Id))
@@ -142,6 +138,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         private string GetRingName(string parentPlanetName)
         {
             return parentPlanetName + " Ring";
+        }
+
+        public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
+        {
+            return new MyStarSystemDesignerAsteroidRingMenu(instance);
         }
     }
 

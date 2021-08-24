@@ -207,10 +207,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 MyAbstractAsteroidObjectProvider prov;
                 if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out prov))
                 {
-                    var adminMenu = prov.GetAdminMenuCreator();
+                    var adminMenu = prov.CreateStarSystemDesignerEditMenu(asteroid);
                     if(adminMenu != null)
                     {
-                        adminMenu.CreateDataEditMenu(m_usableWidth, m_subMenuControlTable, asteroid);
+                        if (m_currentObjectMenu != null)
+                            m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
+
+                        adminMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
+                        adminMenu.OnObjectChanged += OnObjectEdited;
+                        m_currentObjectMenu = adminMenu;
                     }
                 }
             }

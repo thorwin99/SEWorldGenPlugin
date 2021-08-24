@@ -1,4 +1,4 @@
-﻿using Sandbox.Definitions;
+﻿/*using Sandbox.Definitions;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.GUI.Controls;
@@ -214,7 +214,7 @@ namespace SEWorldGenPlugin.GUI
             {
                 if(m_asteroidType != m_asteroidTypeCombo.GetSelectedKey())
                 {
-                    m_asteroidProviders[(int)m_asteroidType].GetAdminMenuCreator().Close();
+                    m_asteroidProviders[(int)m_asteroidType].GetStarSystemDesignerSubMenu().Close();
                 }
                 m_asteroidType = m_asteroidTypeCombo.GetSelectedKey();
 
@@ -225,7 +225,7 @@ namespace SEWorldGenPlugin.GUI
 
             table.AddTableRow(m_asteroidTypeCombo);
 
-            m_asteroidProviders[(int)m_asteroidType].GetAdminMenuCreator().CreateSpawnMenu(m_usableWidth, table, this);
+            m_asteroidProviders[(int)m_asteroidType].GetStarSystemDesignerSubMenu().CreateSpawnMenu(m_usableWidth, table, this);
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace SEWorldGenPlugin.GUI
         {
             if(m_spawnTypeCombo.GetSelectedKey() != 1L && m_spawnTypeCombo.GetSelectedKey() != m_spawnType)
             {
-                m_asteroidProviders[(int)m_asteroidType].GetAdminMenuCreator().Close();
+                m_asteroidProviders[(int)m_asteroidType].GetStarSystemDesignerSubMenu().Close();
             }
 
             m_spawnType = m_spawnTypeCombo.GetSelectedKey();
@@ -326,3 +326,4 @@ namespace SEWorldGenPlugin.GUI
         }
     }
 }
+*/

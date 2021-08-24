@@ -1,4 +1,4 @@
-﻿using Sandbox.Engine.Utils;
+﻿/*using Sandbox.Engine.Utils;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Generator;
@@ -145,7 +145,7 @@ namespace SEWorldGenPlugin.GUI
                     if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroidObject.AsteroidTypeName)) return;
 
                     var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroidObject.AsteroidTypeName];
-                    var creator = provider.GetAdminMenuCreator();
+                    var creator = provider.GetStarSystemDesignerSubMenu();
 
                     if (creator != null)
                     {
@@ -225,3 +225,4 @@ namespace SEWorldGenPlugin.GUI
         }
     }
 }
+*/

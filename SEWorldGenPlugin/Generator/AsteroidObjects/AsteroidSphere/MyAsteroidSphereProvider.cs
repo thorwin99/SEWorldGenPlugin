@@ -1,6 +1,7 @@
 using ProtoBuf;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
 using VRageMath;
@@ -27,6 +28,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             Static = this;
         }
 
+        public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
+        {
+            return new MyStarSystemDesignerAsteroidSphereMenu(instance);
+        }
+
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject systemParent, double objectOrbitRadius)
         {
             return null;
@@ -47,11 +53,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         public override bool IsInstanceGeneratable()
         {
             return false;
-        }
-
-        protected override IMyAsteroidAdminMenuCreator CreateAdminMenuCreatorInstance()
-        {
-            return new MyAsteroidSphereAdminMenu();
         }
     }
 
