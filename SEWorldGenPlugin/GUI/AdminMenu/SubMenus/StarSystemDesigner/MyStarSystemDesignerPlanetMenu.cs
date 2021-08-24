@@ -87,7 +87,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
             controlTable.AddTableRow(m_orbitRadiusTextbox);
 
-            m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true);
+            m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
             m_orbitPosSlider.SetToolTip(new MyToolTips("The position of the planet on the orbit itself. Moves the planet around on the orbit."));
             m_orbitPosSlider.ValueChanged += (s) =>
             {
@@ -98,7 +98,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet position"));
             controlTable.AddTableRow(m_orbitPosSlider);
 
-            m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true);
+            m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
             m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the planets orbit above the system plane."));
             m_elevationSldier.ValueChanged += (s) =>
             {
