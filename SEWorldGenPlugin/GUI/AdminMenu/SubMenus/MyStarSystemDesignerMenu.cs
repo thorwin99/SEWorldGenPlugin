@@ -224,8 +224,21 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="planet">The planet object itself</param>
         private void BuildPlanetMenuControls(bool exists, MySystemPlanet planet)
         {
+            if(m_currentObjectMenu != null)
+                m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
+
             m_currentObjectMenu = new MyStarSystemDesignerPlanetMenu(planet);
             m_currentObjectMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
+            m_currentObjectMenu.OnObjectChanged += OnObjectEdited;
+        }
+
+        /// <summary>
+        /// Called from sub menus when object gets edited.
+        /// </summary>
+        /// <param name="obj"></param>
+        private void OnObjectEdited(MySystemObject obj)
+        {
+
         }
 
         /// <summary>

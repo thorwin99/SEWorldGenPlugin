@@ -1,5 +1,6 @@
 ﻿using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
+using System;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 {
@@ -12,6 +13,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// The system object of this menu
         /// </summary>
         protected MySystemObject m_object;
+
+        /// <summary>
+        /// Event called when properties of the edited object are changed
+        /// </summary>
+        public event Action<MySystemObject> OnObjectChanged;
 
         /// <summary>
         /// The object this menu edits or spawns
@@ -40,6 +46,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public MySystemObject GetObject()
         {
             return m_object;
+        }
+
+        /// <summary>
+        /// Subclasses should call this to notify the star system designer about a changed properties of the object.
+        /// Each time a property is changed, this should be called.
+        /// </summary>
+        protected void ChangedObject()
+        {
+            if (OnObjectChanged == null) return;
+            OnObjectChanged(m_object);
         }
     }
 }

@@ -81,6 +81,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_orbitRadiusTextbox.TextChanged += (tb) =>
             {
                 GetPropertiesFromOrbit();
+                ChangedObject();
             };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
@@ -91,6 +92,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_orbitPosSlider.ValueChanged += (s) =>
             {
                 GetPropertiesFromOrbit();
+                ChangedObject();
             };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet position"));
@@ -101,6 +103,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_elevationSldier.ValueChanged += (s) =>
             {
                 GetPropertiesFromOrbit();
+                ChangedObject();
             };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Elevation degrees"));
@@ -157,6 +160,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             int typeIndex = (int)m_planetTypeCombobox.GetSelectedKey();
             MySystemPlanet p = m_object as MySystemPlanet;
             p.SubtypeId = m_planetTypes[typeIndex].Id.SubtypeId.ToString();
+
+            ChangedObject();
         }
 
         /// <summary>
@@ -176,6 +181,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         {
             MySystemPlanet planet = m_object as MySystemPlanet;
             planet.Diameter = s.Value;
+
+            ChangedObject();
         }
 
         /// <summary>
