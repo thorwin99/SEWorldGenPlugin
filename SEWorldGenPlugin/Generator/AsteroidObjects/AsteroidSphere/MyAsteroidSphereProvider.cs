@@ -30,7 +30,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
         {
-            return new MyStarSystemDesignerAsteroidSphereMenu(instance);
+            return new MyStarSystemDesignerAsteroidSphereMenu(instance, GetInstanceData(instance.Id) as MyAsteroidSphereData);
         }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject systemParent, double objectOrbitRadius)

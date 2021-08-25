@@ -47,10 +47,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         List<MyPlanetGeneratorDefinition> m_planetTypes;
 
-        public MyStarSystemDesignerPlanetMenu(MySystemObject obj) : base(obj)
+        public MyStarSystemDesignerPlanetMenu(MySystemPlanet obj) : base(obj)
         {
             m_planetTypes = new List<MyPlanetGeneratorDefinition>();
-            if(!(obj is MySystemPlanet) || obj == null)
+            if(obj == null)
             {
                 MyPluginLog.Log("Trying to edit a non planet with the planet editing menu.", LogLevel.ERROR);
                 m_object = new MySystemPlanet();

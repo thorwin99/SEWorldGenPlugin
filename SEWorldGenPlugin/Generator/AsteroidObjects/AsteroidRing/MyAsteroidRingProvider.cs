@@ -142,7 +142,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
         {
-            return new MyStarSystemDesignerAsteroidRingMenu(instance);
+            return new MyStarSystemDesignerAsteroidRingMenu(instance, GetInstanceData(instance.Id) as MyAsteroidRingData);
         }
     }
 

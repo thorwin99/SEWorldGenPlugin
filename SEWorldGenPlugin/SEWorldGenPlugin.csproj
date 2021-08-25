@@ -198,6 +198,7 @@
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.EditMenu.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyStarSystemDesignerMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerAsteroidMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerObjectMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerPlanetMenu.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />

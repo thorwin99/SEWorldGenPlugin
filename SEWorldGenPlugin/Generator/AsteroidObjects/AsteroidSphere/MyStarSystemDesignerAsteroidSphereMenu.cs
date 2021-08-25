@@ -7,10 +7,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
     /// <summary>
     /// Star system designer edit menu for asteroid spheres
     /// </summary>
-    public class MyStarSystemDesignerAsteroidSphereMenu : MyStarSystemDesignerObjectMenu
+    public class MyStarSystemDesignerAsteroidSphereMenu : MyStarSystemDesignerAsteroidMenu
     {
-        public MyStarSystemDesignerAsteroidSphereMenu(MySystemObject obj) : base(obj)
+        public MyStarSystemDesignerAsteroidSphereMenu(MySystemAsteroids obj, MyAsteroidSphereData data) : base(obj, data)
         {
+            if (obj == null)
+            {
+                m_object = new MySystemAsteroids();
+                var roid = m_object as MySystemAsteroids;
+                roid.AsteroidTypeName = MyAsteroidSphereProvider.Static.GetTypeName();
+            }
+            if (data == null)
+            {
+                m_data = new MyAsteroidSphereData();
+            }
         }
 
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)

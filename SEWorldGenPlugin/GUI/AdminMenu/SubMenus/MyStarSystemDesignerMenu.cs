@@ -72,6 +72,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private Dictionary<Guid, MySystemObject> m_pendingSystemObjects;
 
         /// <summary>
+        /// A dictionary that stores all currently changed system asteroid objects data, that have not yet been applied
+        /// </summary>
+        private Dictionary<Guid, IMyAsteroidData> m_pendingAsteroidData;
+
+        /// <summary>
         /// The id of the currently selected system object.
         /// </summary>
         private Guid m_selectedObjectId;
@@ -94,6 +99,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         public MyStarSystemDesignerMenu()
         {
             m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
+            m_pendingAsteroidData = new Dictionary<Guid, IMyAsteroidData>();
             m_selectedObjectId = Guid.Empty;
             m_zoomLevel = ZoomLevel.ORBIT;
         }
