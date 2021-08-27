@@ -30,7 +30,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <summary>
         /// A textbox to enter the orbit radius in km
         /// </summary>
-        MyGuiControlTextbox m_orbitRadiusTextbox;
+        MyGuiControlClickableSlider m_orbitRadiusSlider;
 
         /// <summary>
         /// A slider for the position of the planet on the orbit, between 0 and 360 degrees.
@@ -75,17 +75,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet size"));
             controlTable.AddTableRow(m_sizeSlider);
 
-            m_orbitRadiusTextbox = new MyGuiControlTextbox(type: MyGuiControlTextboxType.DigitsOnly);
-            m_orbitRadiusTextbox.Size = new Vector2(maxWidth - 0.1f, m_orbitRadiusTextbox.Size.Y);
-            m_orbitRadiusTextbox.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
-            m_orbitRadiusTextbox.TextChanged += (tb) =>
+            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
+            m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
+            m_orbitRadiusSlider.ValueChanged += (s) =>
             {
                 GetPropertiesFromOrbit();
                 ChangedObject();
             };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
-            controlTable.AddTableRow(m_orbitRadiusTextbox);
+            controlTable.AddTableRow(m_orbitRadiusSlider);
 
             m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
             m_orbitPosSlider.SetToolTip(new MyToolTips("The position of the planet on the orbit itself. Moves the planet around on the orbit."));
@@ -116,7 +115,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             {
                 m_planetTypeCombobox.Enabled = false;
                 m_sizeSlider.Enabled = false;
-                m_orbitRadiusTextbox.Enabled = false;
+                m_orbitRadiusSlider.Enabled = false;
                 m_orbitPosSlider.Enabled = false;
                 m_elevationSldier.Enabled = false;
             }
@@ -202,10 +201,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 orbitPos = 360 - orbitPos;
             }
 
-            var radSB = new StringBuilder();
-            radSB.Append(radius);
-
-            m_orbitRadiusTextbox.SetText(radSB);
+            m_orbitRadiusSlider.Value = (float)radius;
             m_elevationSldier.Value = (float)elevation;
             m_orbitPosSlider.Value = (float)orbitPos;
         }
@@ -216,13 +212,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         private void GetPropertiesFromOrbit()
         {
             MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
-            var radSB = new StringBuilder();
-            m_orbitRadiusTextbox.GetText(radSB);
 
-            if (!double.TryParse(radSB.ToString(), out double radius)) return;
-
-            MyPluginLog.Debug("RAD = " + radius);
-
+            double radius = m_orbitRadiusSlider.Value * 1000f;
             double elevation = m_elevationSldier.Value / (180.0 / Math.PI);
             double orbitPos = m_orbitPosSlider.Value / (180.0 / Math.PI);
 
