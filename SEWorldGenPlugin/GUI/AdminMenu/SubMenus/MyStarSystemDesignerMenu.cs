@@ -290,7 +290,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="btn"></param>
         private void AddNewSystemObject(MyGuiControlButton btn)
         {
-
+            //Add the object to the local star system manually, sync on apply
         }
 
         /// <summary>
@@ -333,25 +333,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                 text.Append(obj.DisplayName);
 
-                m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
-
-                //Add pending system object that have this parent.
-                foreach (var pending in m_pendingSystemObjects)
+                if (m_pendingSystemObjects.ContainsKey(obj.Id))
                 {
-                    if (pending.Value.ParentId == obj.ParentId)
-                    {
-                        var text2 = new System.Text.StringBuilder("");
-                        if (depth + 1 > 0)
-                        {
-                            for (int i = 0; i < depth + 1; i++)
-                                text.Append("   ");
-                        }
-
-                        text2.Append(pending.Value.DisplayName);
-                        text2.Append(" *");
-                        m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text2, userData: pending.Value.Id));
-                    }
+                    text.Append(" *");
                 }
+
+                m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
             });
         }
 
