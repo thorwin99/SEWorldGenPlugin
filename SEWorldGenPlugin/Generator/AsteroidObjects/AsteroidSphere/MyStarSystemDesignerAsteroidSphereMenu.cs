@@ -89,7 +89,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             if (parent == MyStarSystemGenerator.Static.StarSystem.CenterObject)
             {
                 m_radiusSlider.MinValue = settings.MinMaxOrbitDistance.Min / 1000;
-                m_radiusSlider.MaxValue = settings.WorldSize < 0 ? int.MaxValue / 1000 : settings.WorldSize / 1000;
+                m_radiusSlider.MaxValue = settings.WorldSize < 0 ? float.MaxValue / 1000 : settings.WorldSize / 1000;
                 m_radiusSlider.Value = (float)(data.InnerRadius / 1000f);
 
                 m_widthSlider.MinValue = settings.MinMaxOrbitDistance.Min / 2000;
