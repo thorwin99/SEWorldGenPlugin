@@ -123,28 +123,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
                 m_radiusSlider.MinValue = settings.MinMaxOrbitDistance.Min / 1000;
                 m_radiusSlider.MaxValue = settings.WorldSize < 0 ? int.MaxValue / 1000 : settings.WorldSize / 1000;
-                m_radiusSlider.Value = m_radiusSlider.MinValue + (m_radiusSlider.MaxValue - m_radiusSlider.MinValue) / 2;
-                m_radiusSlider.Enabled = true;
+                m_radiusSlider.Value = (float)data.Radius / 1000;
 
                 m_widthSlider.MinValue = settings.MinMaxOrbitDistance.Min / 2000;
                 m_widthSlider.MaxValue = settings.MinMaxOrbitDistance.Max / 1000;
-                m_widthSlider.Value = m_widthSlider.MinValue + (m_widthSlider.MaxValue - m_widthSlider.MinValue) / 2;
-                m_widthSlider.Enabled = true;
+                m_widthSlider.Value = (float)data.Width / 1000;
 
                 m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
                 m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
-                m_heightSlider.Value = m_heightSlider.MinValue + (m_heightSlider.MaxValue - m_heightSlider.MinValue) / 2;
-                m_heightSlider.Enabled = true;
+                m_heightSlider.Value = (float)data.Height / 1000;
 
-                m_asteroidSizesSlider.Enabled = true;
-                m_asteroidSizesSlider.SetValues(32, 1024);
+                m_asteroidSizesSlider.SetValues(roid.AsteroidSize.Min, roid.AsteroidSize.Max);
 
-                m_angleXSlider.Enabled = true;
-                m_angleXSlider.Value = 0;
-                m_angleYSlider.Enabled = true;
-                m_angleYSlider.Value = 0;
-                m_angleZSlider.Enabled = true;
-                m_angleZSlider.Value = 0;
+                m_angleXSlider.Value = (float)data.AngleDegrees.x;
+                m_angleYSlider.Value = (float)data.AngleDegrees.y;
+                m_angleZSlider.Value = (float)data.AngleDegrees.z;
 
                 return;
             }
@@ -152,26 +145,19 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_radiusSlider.MinValue = (int)planet.Diameter / 1000 * 0.75f;
             m_radiusSlider.MaxValue = (int)planet.Diameter / 1000 * 2f;
             m_radiusSlider.Value = (float)data.Radius / 1000;
-            m_radiusSlider.Enabled = true;
 
             m_widthSlider.MinValue = (int)planet.Diameter / 1000 / 20f;
             m_widthSlider.MaxValue = (int)planet.Diameter / 1000 / 1.25f;
             m_widthSlider.Value = (float)data.Width / 1000;
-            m_widthSlider.Enabled = true;
 
             m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
             m_heightSlider.MaxValue = m_widthSlider.MaxValue / 10;
             m_heightSlider.Value = (float)data.Height / 1000;
-            m_heightSlider.Enabled = true;
 
-            m_asteroidSizesSlider.Enabled = true;
             m_asteroidSizesSlider.SetValues(roid.AsteroidSize.Min, roid.AsteroidSize.Max);
 
-            m_angleXSlider.Enabled = true;
             m_angleXSlider.Value = (float)data.AngleDegrees.x;
-            m_angleYSlider.Enabled = true;
             m_angleYSlider.Value = (float)data.AngleDegrees.y;
-            m_angleZSlider.Enabled = true;
             m_angleZSlider.Value = (float)data.AngleDegrees.z;
         }
 
