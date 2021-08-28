@@ -323,6 +323,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_systemObjectsBox.ClearItems();
             var system = MyStarSystemGenerator.Static.StarSystem;
 
+            if (system == null) return;//Star system is null, plugin not enabled
+
             system.Foreach((int depth, MySystemObject obj) =>
             {
                 var text = new StringBuilder("");
