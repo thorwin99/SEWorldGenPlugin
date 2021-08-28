@@ -8,6 +8,7 @@ using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using VRageMath;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
@@ -324,7 +325,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             system.Foreach((int depth, MySystemObject obj) =>
             {
-                var text = new System.Text.StringBuilder("");
+                var text = new StringBuilder("");
                 if (depth > 0)
                 {
                     for (int i = 0; i < depth; i++)
@@ -339,6 +340,23 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 }
 
                 m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
+
+                foreach(var entry in m_pendingSystemObjects)
+                {
+                    if (system.Contains(entry.Key)) continue;
+
+                    if(entry.Value.ParentId == obj.ParentId)
+                    {
+                        var newText = new StringBuilder("");
+                        for (int i = 0; i < depth + 1; i++)
+                            newText.Append("   ");
+
+                        newText.Append(entry.Value.DisplayName);
+                        newText.Append(" *");
+
+                        m_systemObjectsBox.Add(new MyGuiControlListbox.Item(newText, userData: entry.Key));
+                    }
+                }
             });
         }
 
