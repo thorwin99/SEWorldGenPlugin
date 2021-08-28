@@ -180,6 +180,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
                 m_requestRecreate = false;
                 RecreateControls(false);
             }
+
+            int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
+            m_subMenus[index].Draw();
+
             return ret;
         }
 

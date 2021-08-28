@@ -39,5 +39,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// entire game session.
         /// </summary>
         public abstract void Close();
+
+        /// <summary>
+        /// Draw method for this sub menu. Called on Draw of the game frame
+        /// </summary>
+        public abstract void Draw();
     }
 }

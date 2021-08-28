@@ -354,5 +354,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 }
             });
         }
+
+        public override void Draw()
+        {
+            MyPluginLog.Debug("Drawing StarSystemDesigner Scene");
+        }
     }
 }
