@@ -193,7 +193,6 @@
     <Compile Include="Generator\ProceduralGeneration\MyProceduralGeneratorComponent.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
-    <Compile Include="GUI\AdminMenu\IMyAsteroidAdminMenuCreator.cs" />
     <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.EditMenu.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />

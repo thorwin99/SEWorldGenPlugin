@@ -1,4 +1,4 @@
-using Sandbox.Definitions;
+/*using Sandbox.Definitions;
 using Sandbox.Engine.Multiplayer;
 using Sandbox.Engine.Utils;
 using Sandbox.Game.Entities;
@@ -364,3 +364,4 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         }
     }
 }
+*/

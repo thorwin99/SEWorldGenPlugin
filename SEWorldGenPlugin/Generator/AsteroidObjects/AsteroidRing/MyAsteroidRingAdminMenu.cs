@@ -1,4 +1,4 @@
-using Sandbox.Engine.Multiplayer;
+/*using Sandbox.Engine.Multiplayer;
 using Sandbox.Game.Gui;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
@@ -636,3 +636,4 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         }
     }
 }
+*/

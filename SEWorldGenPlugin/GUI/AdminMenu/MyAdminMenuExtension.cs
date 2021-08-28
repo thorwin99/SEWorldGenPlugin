@@ -182,7 +182,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             }
 
             int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
-            m_subMenus[index].Draw();
+
+            if(index > 0 && index < m_subMenus.Count)
+                m_subMenus[index].Draw();
 
             return ret;
         }
