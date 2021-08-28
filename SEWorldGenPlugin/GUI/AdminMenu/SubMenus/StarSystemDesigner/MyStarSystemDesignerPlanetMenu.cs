@@ -201,7 +201,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 orbitPos = 360 - orbitPos;
             }
 
-            m_orbitRadiusSlider.Value = (float)radius;
+            m_orbitRadiusSlider.Value = (float)radius / 1000f;
             m_elevationSldier.Value = (float)elevation;
             m_orbitPosSlider.Value = (float)orbitPos;
         }
