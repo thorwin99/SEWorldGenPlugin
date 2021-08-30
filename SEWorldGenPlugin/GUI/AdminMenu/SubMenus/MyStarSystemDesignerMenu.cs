@@ -97,12 +97,18 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         private MyStarSystemDesignerObjectMenu m_currentObjectMenu;
 
+        /// <summary>
+        /// The renderer used to render the star system
+        /// </summary>
+        private MyStarSystemRenderer m_renderer;
+
         public MyStarSystemDesignerMenu()
         {
             m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
             m_pendingAsteroidData = new Dictionary<Guid, IMyAsteroidData>();
             m_selectedObjectId = Guid.Empty;
             m_zoomLevel = ZoomLevel.ORBIT;
+            m_renderer = new MyStarSystemRenderer();
         }
 
         public override void Close()
@@ -112,6 +118,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_adminMenuInst = null;
             m_systemObjectsBox = null;
             m_zoomLevel = ZoomLevel.ORBIT;
+            m_renderer = null;
         }
 
         public override string GetTitle()
@@ -321,6 +328,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             MyPluginLog.Debug("Refresh");
             m_systemObjectsBox.ClearItems();
+            m_renderer.ClearRenderList();
+
             var system = MyStarSystemGenerator.Static.StarSystem;
 
             if (system == null) return;//Star system is null, plugin not enabled
@@ -342,6 +351,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 }
 
                 m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
+                //m_renderer.AddObject(obj.Id, null); need to add the appropriate render object.
 
                 foreach(var entry in m_pendingSystemObjects)
                 {
@@ -357,6 +367,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         newText.Append(" *");
 
                         m_systemObjectsBox.Add(new MyGuiControlListbox.Item(newText, userData: entry.Key));
+                        //m_renderer.AddObject(entry.Value.Id, null); need to add the appropriate render object.
                     }
                 }
             });
@@ -365,6 +376,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         public override void Draw()
         {
             MyPluginLog.Debug("Drawing StarSystemDesigner Scene");
+            m_renderer.Draw();
         }
     }
 }

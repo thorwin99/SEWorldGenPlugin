@@ -203,6 +203,7 @@
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerAsteroidMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerObjectMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerPlanetMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemRenderer.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
     <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
