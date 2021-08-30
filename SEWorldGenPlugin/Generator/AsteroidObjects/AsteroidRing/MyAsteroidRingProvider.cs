@@ -1,5 +1,6 @@
 ﻿using ProtoBuf;
 using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
@@ -143,6 +144,15 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
         {
             return new MyStarSystemDesignerAsteroidRingMenu(instance, GetInstanceData(instance.Id) as MyAsteroidRingData);
+        }
+
+        public override IRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
+        {
+            if(data is MyAsteroidRingData && instance.AsteroidTypeName == GetTypeName())
+            {
+                return new MyAsteroidRingRenderer(instance, data as MyAsteroidRingData);
+            }
+            return null;
         }
     }
 

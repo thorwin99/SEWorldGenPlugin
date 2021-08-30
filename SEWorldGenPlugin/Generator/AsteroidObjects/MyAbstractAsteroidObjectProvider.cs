@@ -1,4 +1,5 @@
 ﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
@@ -75,6 +76,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <returns>True if file was loaded sucessfully</returns>
         public abstract bool TryLoadObject(MySystemAsteroids asteroid);
+
+        /// <summary>
+        /// Returns an <see cref="IRenderObject"/> to visually represent the Asteroid object in the world.
+        /// </summary>
+        /// <param name="instance">The asteroid object instance to draw, if it is from this provider type</param>
+        /// <param name="data">The associated data of the asteroid object</param>
+        /// <returns></returns>
+        public abstract IRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data);
 
         /// <summary>
         /// Saves all the asteroid objects provided by this provider.

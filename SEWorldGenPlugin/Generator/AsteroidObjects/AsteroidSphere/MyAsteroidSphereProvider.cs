@@ -1,4 +1,5 @@
 using ProtoBuf;
+using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
@@ -42,6 +43,15 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             if (m_savedData.ContainsKey(instance.Id))
                 return MyAsteroidObjectShapeSphere.CreateFromAsteroidSphereData(m_savedData[instance.Id] as MyAsteroidSphereData);
+            return null;
+        }
+
+        public override IRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
+        {
+            if (data is MyAsteroidSphereData && instance.AsteroidTypeName == GetTypeName())
+            {
+                return new MyAsteroidSphereRenderer(instance, data as MyAsteroidSphereData);
+            }
             return null;
         }
 
