@@ -6,12 +6,12 @@ namespace SEWorldGenPlugin.Draw
 {
     public class RenderHollowSphere : IRenderObject
     {
-        private Vector3D m_position;
-        private float m_innerRadius;
-        private float m_outerRadius;
-        private Color m_color;
-        private Color m_innerColor;
-        private float m_lineThickness;
+        public Vector3D Position;
+        public float InnerRadius;
+        public float OuterRadius;
+        public Color Color;
+        public Color InnerColor;
+        public float LineThickness;
 
         /// <summary>
         /// Creates a new sphere at the given position with given radius and color.
@@ -22,12 +22,12 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="color">The sphere color</param>
         public RenderHollowSphere(Vector3D position, float innerRadius, float outerRadius, Color color, float lineThickness)
         {
-            m_position = position;
-            m_innerRadius = innerRadius;
-            m_outerRadius = outerRadius;
-            m_color = color;
-            m_innerColor = Color.Red;
-            m_lineThickness = lineThickness;
+            Position = position;
+            InnerRadius = innerRadius;
+            OuterRadius = outerRadius;
+            Color = color;
+            InnerColor = Color.Red;
+            LineThickness = lineThickness;
         }
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace SEWorldGenPlugin.Draw
         /// </summary>
         public void Draw()
         {
-            MatrixD wm = MatrixD.CreateWorld(m_position);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_innerRadius, ref m_innerColor, MySimpleObjectRasterizer.Wireframe, 50, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: m_lineThickness);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, m_outerRadius, ref m_color, MySimpleObjectRasterizer.Wireframe, 150, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: m_lineThickness);
+            MatrixD wm = MatrixD.CreateWorld(Position);
+            MySimpleObjectDraw.DrawTransparentSphere(ref wm, InnerRadius, ref InnerColor, MySimpleObjectRasterizer.Wireframe, 50, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: LineThickness);
+            MySimpleObjectDraw.DrawTransparentSphere(ref wm, OuterRadius, ref Color, MySimpleObjectRasterizer.Wireframe, 150, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: LineThickness);
         }
     }
 }

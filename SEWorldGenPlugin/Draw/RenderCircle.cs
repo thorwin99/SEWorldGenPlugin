@@ -10,10 +10,10 @@ namespace SEWorldGenPlugin.Draw
     /// </summary>
     public class RenderCircle : IRenderObject
     {
-        private MatrixD m_worldMatrix;
-        private float m_radius;
-        private float m_lineStrength;
-        private Vector4 m_color;
+        public MatrixD WorldMatrix;
+        public float Radius;
+        public float LineStrength;
+        public Vector4 Color;
 
         /// <summary>
         /// Constructs a new renderable circle from a given world matrix, with
@@ -25,10 +25,10 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="lineStrength">The line strength of the circle</param>
         public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color, float lineStrength = 1000f)
         {
-            m_worldMatrix = worldMatrix;
-            m_radius = radius;
-            m_color = color;
-            m_lineStrength = lineStrength;
+            WorldMatrix = worldMatrix;
+            Radius = radius;
+            Color = color;
+            this.LineStrength = lineStrength;
         }
 
         public void Draw()
@@ -38,8 +38,8 @@ namespace SEWorldGenPlugin.Draw
 
             for(int i = 0; i <= 360; i++)
             {
-                vertex = new Vector3D(m_radius * Math.Cos(MathHelper.ToRadians(i)), 0, m_radius * Math.Sin(MathHelper.ToRadians(i)));
-                vertex = Vector3D.Transform(vertex, m_worldMatrix);
+                vertex = new Vector3D(Radius * Math.Cos(MathHelper.ToRadians(i)), 0, Radius * Math.Sin(MathHelper.ToRadians(i)));
+                vertex = Vector3D.Transform(vertex, WorldMatrix);
 
                 if (i == 0)
                 {
@@ -47,7 +47,7 @@ namespace SEWorldGenPlugin.Draw
                     continue;
                 }
 
-                MySimpleObjectDraw.DrawLine(prevVertex, vertex, MyStringId.GetOrCompute("GizmoDrawLine"), ref m_color, m_lineStrength);
+                MySimpleObjectDraw.DrawLine(prevVertex, vertex, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineStrength);
             }
         }
     }
