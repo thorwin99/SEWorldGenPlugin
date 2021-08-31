@@ -191,6 +191,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableRow(m_applyChangesButton);
         }
 
+        public override void Draw()
+        {
+            MyPluginLog.Debug("Drawing StarSystemDesigner Scene");
+            m_renderer.Draw();
+        }
+
         /// <summary>
         /// Creates the sub menu controls, based on the type of selected object and whether it already exists or not.
         /// </summary>
@@ -324,6 +330,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             }
         }
 
+        /// <summary>
+        /// Refresh all items in the system list to represent the current system
+        /// </summary>
         private void RefreshSystemList()
         {
             MyPluginLog.Debug("Refresh");
@@ -336,47 +345,41 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             system.Foreach((int depth, MySystemObject obj) =>
             {
-                var text = new StringBuilder("");
-                if (depth > 0)
-                {
-                    for (int i = 0; i < depth; i++)
-                        text.Append("   ");
-                }
+                AddObjectToList(obj, depth);
 
-                text.Append(obj.DisplayName);
-
-                if (m_pendingSystemObjects.ContainsKey(obj.Id))
-                {
-                    text.Append(" *");
-                }
-
-                m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
-                //m_renderer.AddObject(obj.Id, null); need to add the appropriate render object.
-
+                //Add pending childs
                 foreach(var entry in m_pendingSystemObjects)
                 {
                     if (system.Contains(entry.Key)) continue;
 
                     if(entry.Value.ParentId == obj.ParentId)
                     {
-                        var newText = new StringBuilder("");
-                        for (int i = 0; i < depth + 1; i++)
-                            newText.Append("   ");
-
-                        newText.Append(entry.Value.DisplayName);
-                        newText.Append(" *");
-
-                        m_systemObjectsBox.Add(new MyGuiControlListbox.Item(newText, userData: entry.Key));
-                        //m_renderer.AddObject(entry.Value.Id, null); need to add the appropriate render object.
+                        AddObjectToList(entry.Value, depth + 1);
                     }
                 }
             });
         }
 
-        public override void Draw()
+        /// <summary>
+        /// Adds a new object to the list of system objects at a given depth and adds it to the renderer
+        /// of the system.
+        /// </summary>
+        /// <param name="obj">Object to add</param>
+        /// <param name="depth">Depth at which to add it.</param>
+        private void AddObjectToList(MySystemObject obj, int depth)
         {
-            MyPluginLog.Debug("Drawing StarSystemDesigner Scene");
-            m_renderer.Draw();
+            var text = new StringBuilder("");
+            for (int i = 0; i < depth; i++)
+                text.Append("   ");
+
+            text.Append(obj.DisplayName);
+            if (m_pendingSystemObjects.ContainsKey(obj.Id))
+            {
+                text.Append(" *");
+            }
+
+            m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
+            //m_renderer.AddObject(entry.Value.Id, null); need to add the appropriate render object.
         }
     }
 }
