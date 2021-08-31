@@ -1,4 +1,5 @@
 ﻿using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
@@ -379,7 +380,45 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             }
 
             m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
-            //m_renderer.AddObject(entry.Value.Id, null); need to add the appropriate render object.
+            AddObjectToRenderer(obj);
+        }
+
+        /// <summary>
+        /// Adds an object to the renderer of the system
+        /// </summary>
+        /// <param name="obj">Object to add</param>
+        private void AddObjectToRenderer(MySystemObject obj)
+        {
+            IRenderObject render = null;
+
+            if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
+            {
+
+            }
+            else if (obj.Type == MySystemObjectType.ASTEROIDS)
+            {
+                MySystemAsteroids roid = obj as MySystemAsteroids;
+                MyAbstractAsteroidObjectProvider prov;
+
+                if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
+                {
+
+
+                    if (m_pendingAsteroidData.ContainsKey(obj.Id))
+                    {
+                        render = prov.GetRenderObject(roid, m_pendingAsteroidData[obj.Id]);
+                    }
+                    else
+                    {
+                        render = prov.GetRenderObject(roid, prov.GetInstanceData(roid.Id));
+                    }
+                }
+            }
+
+            if (render != null)
+            {
+                m_renderer.AddObject(obj.Id, render);
+            }
         }
     }
 }
