@@ -8,7 +8,7 @@ namespace SEWorldGenPlugin.Draw
     /// <summary>
     /// Simple class that can render a cylinder into the gameworld.
     /// </summary>
-    public class RenderCylinder : IRenderObject
+    public class RenderCylinder : AbstractWireframeRenderObject
     {
         public MatrixD WorldMatrix;
         public float Radius;
@@ -23,7 +23,7 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="radius">The radius of the cylinder</param>
         /// <param name="height">The height of the cylinder</param>
         /// <param name="color">The color of the cylinder</param>
-        public RenderCylinder(MatrixD worldMatrix, float radius, float height, Vector4 color)
+        public RenderCylinder(MatrixD worldMatrix, float radius, float height, Vector4 color) : base(radius * 0.01f)
         {
             this.WorldMatrix = worldMatrix;
             this.Radius = radius;
@@ -34,9 +34,9 @@ namespace SEWorldGenPlugin.Draw
         /// <summary>
         /// Draws the cylinder into the world as a simple, transparent object.
         /// </summary>
-        public void Draw()
+        public override void Draw()
         {
-            MySimpleObjectDraw.DrawTransparentCylinder(ref WorldMatrix, Radius, Radius, Height, ref Color, false, 100, 0.01f * Radius, MyStringId.GetOrCompute("GizmoDrawLine"));
+            MySimpleObjectDraw.DrawTransparentCylinder(ref WorldMatrix, Radius, Radius, Height, ref Color, false, 100, LineThickness, MyStringId.GetOrCompute("GizmoDrawLine"));
         }
 
         /// <summary>

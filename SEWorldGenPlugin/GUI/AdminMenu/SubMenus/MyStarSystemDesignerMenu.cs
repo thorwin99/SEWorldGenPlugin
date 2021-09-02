@@ -389,7 +389,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="obj">Object to add</param>
         private void AddObjectToRenderer(MySystemObject obj)
         {
-            IRenderObject render = null;
+            IMyStarSystemDesignerRenderObject render = null;
 
             if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
             {
@@ -402,8 +402,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                 if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
                 {
-
-
                     if (m_pendingAsteroidData.ContainsKey(obj.Id))
                     {
                         render = prov.GetRenderObject(roid, m_pendingAsteroidData[obj.Id]);

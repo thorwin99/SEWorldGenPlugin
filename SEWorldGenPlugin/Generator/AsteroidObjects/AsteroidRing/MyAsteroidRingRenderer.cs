@@ -1,5 +1,6 @@
 ﻿using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.ObjectBuilders;
 using VRageMath;
 
@@ -8,7 +9,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
     /// <summary>
     /// A class to visually render an asteroid ring.
     /// </summary>
-    public class MyAsteroidRingRenderer : IRenderObject
+    public class MyAsteroidRingRenderer : IMyStarSystemDesignerRenderObject
     {
         /// <summary>
         /// The instance to render
@@ -42,6 +43,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public void Draw()
         {
             m_render.Draw();
+        }
+
+        public void Update(double CameraFocusLength)
+        {
+            
         }
     }
 }

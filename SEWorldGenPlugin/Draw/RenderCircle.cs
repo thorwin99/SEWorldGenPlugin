@@ -8,11 +8,10 @@ namespace SEWorldGenPlugin.Draw
     /// <summary>
     /// Simple class that can render a circle into the gameworld.
     /// </summary>
-    public class RenderCircle : IRenderObject
+    public class RenderCircle : AbstractWireframeRenderObject
     {
         public MatrixD WorldMatrix;
         public float Radius;
-        public float LineStrength;
         public Vector4 Color;
 
         /// <summary>
@@ -23,15 +22,14 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="radius">The radius of the cylinder</param>
         /// <param name="color">The color of the circle</param>
         /// <param name="lineStrength">The line strength of the circle</param>
-        public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color, float lineStrength = 1000f)
+        public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color, float lineStrength = 1000f) : base(lineStrength)
         {
             WorldMatrix = worldMatrix;
             Radius = radius;
             Color = color;
-            this.LineStrength = lineStrength;
         }
 
-        public void Draw()
+        public override void Draw()
         {
             Vector3D prevVertex = Vector3D.Zero;
             Vector3D vertex;
@@ -47,7 +45,7 @@ namespace SEWorldGenPlugin.Draw
                     continue;
                 }
 
-                MySimpleObjectDraw.DrawLine(prevVertex, vertex, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineStrength);
+                MySimpleObjectDraw.DrawLine(prevVertex, vertex, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
             }
         }
     }

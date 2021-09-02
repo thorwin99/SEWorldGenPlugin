@@ -146,7 +146,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return new MyStarSystemDesignerAsteroidRingMenu(instance, GetInstanceData(instance.Id) as MyAsteroidRingData);
         }
 
-        public override IRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
+        public override IMyStarSystemDesignerRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
         {
             if(data is MyAsteroidRingData && instance.AsteroidTypeName == GetTypeName())
             {

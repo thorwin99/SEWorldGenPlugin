@@ -8,14 +8,13 @@ namespace SEWorldGenPlugin.Draw
     /// <summary>
     /// Simple class that can render a hollow cylinder into the gameworld.
     /// </summary>
-    public class RenderHollowCylinder : IRenderObject
+    public class RenderHollowCylinder : AbstractWireframeRenderObject
     {
         public MatrixD WorldMatrix;
         public float Radius;
         public float Height;
         public Vector4 Color;
         public float InnerRadius;
-        public float LineThickness;
 
         /// <summary>
         /// Constructs a new renderable hollow cylinder from a given world matrix, with
@@ -26,7 +25,7 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="innerRadius">The inner radius of the cylinder, which defines the hollow part of the cylinder</param>
         /// <param name="height">The height of the cylinder</param>
         /// <param name="color">The color of the cylinder</param>
-        public RenderHollowCylinder(MatrixD worldMatrix, float radius, float innerRadius, float height, Vector4 color, float lineThickness = 1000f)
+        public RenderHollowCylinder(MatrixD worldMatrix, float radius, float innerRadius, float height, Vector4 color, float lineThickness = 1000f) : base(lineThickness)
         {
             WorldMatrix = worldMatrix;
             Radius = radius;
@@ -39,7 +38,7 @@ namespace SEWorldGenPlugin.Draw
         /// <summary>
         /// Draws the hollow cylinder into the gameworld by creating a wireframe mesh of the cylinder.
         /// </summary>
-        public void Draw()
+        public override void Draw()
         {
             Vector3D outVertexUp = Vector3D.Zero;
             Vector3D inVertexUp = Vector3D.Zero;

@@ -4,14 +4,13 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.Draw
 {
-    public class RenderHollowSphere : IRenderObject
+    public class RenderHollowSphere : AbstractWireframeRenderObject
     {
         public Vector3D Position;
         public float InnerRadius;
         public float OuterRadius;
         public Color Color;
         public Color InnerColor;
-        public float LineThickness;
 
         /// <summary>
         /// Creates a new sphere at the given position with given radius and color.
@@ -20,7 +19,7 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="innerRadius">The inner radius of the sphere</param>
         /// <param name="outerRadius">The outer radius of the sphere</param>
         /// <param name="color">The sphere color</param>
-        public RenderHollowSphere(Vector3D position, float innerRadius, float outerRadius, Color color, float lineThickness)
+        public RenderHollowSphere(Vector3D position, float innerRadius, float outerRadius, Color color, float lineThickness) : base(lineThickness)
         {
             Position = position;
             InnerRadius = innerRadius;
@@ -34,7 +33,7 @@ namespace SEWorldGenPlugin.Draw
         /// Draws the sphere in the game world as a solid mesh
         /// with a visible wireframe.
         /// </summary>
-        public void Draw()
+        public override void Draw()
         {
             MatrixD wm = MatrixD.CreateWorld(Position);
             MySimpleObjectDraw.DrawTransparentSphere(ref wm, InnerRadius, ref InnerColor, MySimpleObjectRasterizer.Wireframe, 50, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: LineThickness);

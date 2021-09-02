@@ -1,4 +1,5 @@
 ﻿using SEWorldGenPlugin.Draw;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.ObjectBuilders;
 using VRageMath;
 
@@ -7,7 +8,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
     /// <summary>
     /// A class to visually render an asteroid sphere.
     /// </summary>
-    public class MyAsteroidSphereRenderer : IRenderObject
+    public class MyAsteroidSphereRenderer : IMyStarSystemDesignerRenderObject
     {
         /// <summary>
         /// The instance of the asteroid sphere to render
@@ -34,6 +35,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         public void Draw()
         {
             m_render.Draw();
+        }
+
+        public void Update(double CameraFocusLength)
+        {
+            
         }
     }
 }

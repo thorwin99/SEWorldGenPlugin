@@ -46,7 +46,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             return null;
         }
 
-        public override IRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
+        public override IMyStarSystemDesignerRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
         {
             if (data is MyAsteroidSphereData && instance.AsteroidTypeName == GetTypeName())
             {
