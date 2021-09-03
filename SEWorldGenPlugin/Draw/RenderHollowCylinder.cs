@@ -50,7 +50,7 @@ namespace SEWorldGenPlugin.Draw
             Vector3D outPrevLow = Vector3D.Zero;
             Vector3D inPrevLow = Vector3D.Zero;
 
-            for(int i = 0; i <= 360; i++)
+            for(int i = 0; i <= 360; i += 2)
             {
                 outVertexUp.X = (float)(Radius * Math.Cos(MathHelper.ToRadians(i)));
                 outVertexUp.Y = Height;
