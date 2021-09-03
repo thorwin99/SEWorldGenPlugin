@@ -29,7 +29,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             m_instance = instance;
             m_data = data;
-            m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Green, (float)data.OuterRadius);
+            m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Green, (float)data.OuterRadius / 200f);
         }
 
         public void Draw()
