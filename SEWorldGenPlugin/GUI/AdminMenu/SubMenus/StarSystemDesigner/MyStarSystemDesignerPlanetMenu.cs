@@ -243,7 +243,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             MyPluginLog.Debug("POS:" + pos);
 
-            //m_object.CenterPosition = pos;
+            m_object.CenterPosition = pos;
         }
 
         /// <summary>
