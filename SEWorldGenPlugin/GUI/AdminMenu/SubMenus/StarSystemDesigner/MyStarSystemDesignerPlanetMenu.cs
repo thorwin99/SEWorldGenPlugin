@@ -63,53 +63,57 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_planetTypeCombobox = new MyGuiControlCombobox();
             m_planetTypeCombobox.Size = new Vector2(maxWidth - 0.01f, m_planetTypeCombobox.Size.Y);
             m_planetTypeCombobox.SetToolTip(new MyToolTips("The type of the planet."));
-            m_planetTypeCombobox.ItemSelected += OnTypeSelected;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet type"));
             controlTable.AddTableRow(m_planetTypeCombobox);
 
             m_sizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSizeCap, maxWidth - 0.1f, intValue: true, labelSuffix: " m", showLabel: true);
             m_sizeSlider.SetToolTip(new MyToolTips("The size of the planet in meters."));
-            m_sizeSlider.ValueChanged += OnSizeChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet size"));
             controlTable.AddTableRow(m_sizeSlider);
 
-            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
+            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: float.MaxValue / 1000f, labelSuffix: " km", showLabel: true);
             m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
-            m_orbitRadiusSlider.ValueChanged += (s) =>
-            {
-                GetPropertiesFromOrbit();
-                ChangedObject();
-            };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
             controlTable.AddTableRow(m_orbitRadiusSlider);
 
             m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
             m_orbitPosSlider.SetToolTip(new MyToolTips("The position of the planet on the orbit itself. Moves the planet around on the orbit."));
-            m_orbitPosSlider.ValueChanged += (s) =>
-            {
-                GetPropertiesFromOrbit();
-                ChangedObject();
-            };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet position"));
             controlTable.AddTableRow(m_orbitPosSlider);
 
             m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
             m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the planets orbit above the system plane."));
-            m_elevationSldier.ValueChanged += (s) =>
-            {
-                GetPropertiesFromOrbit();
-                ChangedObject();
-            };
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Elevation degrees"));
             controlTable.AddTableRow(m_elevationSldier);
 
             LoadPlanetList();
             LoadPlanetProperties();
+
+            m_elevationSldier.ValueChanged += (s) =>
+            {
+                GetPropertiesFromOrbit();
+                ChangedObject();
+            };
+
+            m_orbitPosSlider.ValueChanged += (s) =>
+            {
+                GetPropertiesFromOrbit();
+                ChangedObject();
+            };
+
+            m_orbitRadiusSlider.ValueChanged += (s) =>
+            {
+                GetPropertiesFromOrbit();
+                ChangedObject();
+            };
+
+            m_sizeSlider.ValueChanged += OnSizeChanged;
+            m_planetTypeCombobox.ItemSelected += OnTypeSelected;
 
             if (isEditing)
             {
@@ -190,16 +194,26 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         private void SetOrbitProperties()
         {
             MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
-            Vector3D parentRel = new Vector3D(m_object.CenterPosition) - new Vector3D(parent.CenterPosition);
+            double radius = 0;
+            Vector3D parentRel = Vector3D.Zero;
 
-            double radius = Vector3D.Distance(parent.CenterPosition, m_object.CenterPosition);
+            if (parent != null)
+            {
+                parentRel = new Vector3D(m_object.CenterPosition) - new Vector3D(parent.CenterPosition);
+                radius = parentRel.Length();
+            }
 
-            double elevation = Math.Asin(parentRel.Z / radius) * (180.0 / Math.PI);
-            double orbitPos = Math.Acos(parentRel.X / Math.Cos(elevation * (Math.PI / 180.0)) / radius) * (180.0 / Math.PI);
+            double elevation = MathHelperD.ToDegrees(Math.Asin(parentRel.Z / radius));
+            double orbitPos = MathHelperD.ToDegrees(Math.Acos(parentRel.X / Math.Cos(MathHelperD.ToRadians(elevation)) / radius));
             if (parentRel.Y < 0)
             {
                 orbitPos = 360 - orbitPos;
             }
+
+            MyPluginLog.Debug("RAD: " + radius);
+            MyPluginLog.Debug("EL: " + elevation);
+            MyPluginLog.Debug("ORB: " + orbitPos);
+            MyPluginLog.Debug("POS:" + m_object.CenterPosition);
 
             m_orbitRadiusSlider.Value = (float)radius / 1000f;
             m_elevationSldier.Value = (float)elevation;
@@ -214,14 +228,22 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
 
             double radius = m_orbitRadiusSlider.Value * 1000f;
-            double elevation = m_elevationSldier.Value / (180.0 / Math.PI);
-            double orbitPos = m_orbitPosSlider.Value / (180.0 / Math.PI);
+            double elevation = MathHelperD.ToRadians(m_elevationSldier.Value);
+            double orbitPos = MathHelperD.ToRadians(m_orbitPosSlider.Value);
 
             Vector3D pos = new Vector3D(radius * Math.Cos(orbitPos) * Math.Cos(elevation), radius * Math.Sin(orbitPos) * Math.Cos(elevation), radius * Math.Sin(elevation));
 
-            pos += parent.CenterPosition;
+            MyPluginLog.Debug("------");
+            MyPluginLog.Debug("RAD: " + radius);
+            MyPluginLog.Debug("EL: " + MathHelperD.ToDegrees(elevation));
+            MyPluginLog.Debug("ORB: " + MathHelperD.ToDegrees(orbitPos));
 
-            m_object.CenterPosition = pos;
+            if(parent != null)
+                pos += parent.CenterPosition;
+
+            MyPluginLog.Debug("POS:" + pos);
+
+            //m_object.CenterPosition = pos;
         }
 
         /// <summary>
