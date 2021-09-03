@@ -1,6 +1,11 @@
-﻿using SEWorldGenPlugin.Draw;
+﻿using Sandbox.Engine.Utils;
+using Sandbox.Game.World;
+using SEWorldGenPlugin.Draw;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
+using VRage.Game;
+using VRageMath;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 {
@@ -14,9 +19,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private Dictionary<Guid, IRenderObject> m_systemRenderObjects;
 
+        /// <summary>
+        /// The target position of the camera to look at
+        /// </summary>
+        private Vector3D m_targetPos;
+
         public MyStarSystemRenderer()
         {
             m_systemRenderObjects = new Dictionary<Guid, IRenderObject>();
+            MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
+            SetCameraTarget(Vector3D.Zero, 1);
         }
 
         /// <summary>
@@ -62,6 +74,28 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public void ClearRenderList()
         {
             m_systemRenderObjects.Clear();
+        }
+
+        /// <summary>
+        /// Sets the given object as the camera target.
+        /// </summary>
+        /// <param name="distance">Distance to the target</param>
+        /// <param name="targetPos">Target position for the camera to look at</param>
+        public void SetCameraTarget(Vector3D targetPos, float distance)
+        {
+            m_targetPos = targetPos;
+            MySpectatorCameraController.Static.Position = targetPos + distance;
+            MySpectatorCameraController.Static.Target = targetPos;
+        }
+
+        /// <summary>
+        /// Changes the camera distance to the current target.
+        /// </summary>
+        /// <param name="newDistance">The new distance to the target</param>
+        public void ChangeCameraDistance(float newDistance)
+        {
+            MySpectatorCameraController.Static.Position = m_targetPos + newDistance;
+            MySpectatorCameraController.Static.Target = m_targetPos;
         }
 
         public void Draw()
