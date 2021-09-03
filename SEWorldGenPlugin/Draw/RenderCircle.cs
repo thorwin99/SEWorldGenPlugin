@@ -1,7 +1,6 @@
 ﻿using System;
-using VRage.Game;
-using VRage.Utils;
 using VRageMath;
+using VRageRender;
 
 namespace SEWorldGenPlugin.Draw
 {
@@ -22,7 +21,7 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="radius">The radius of the cylinder</param>
         /// <param name="color">The color of the circle</param>
         /// <param name="lineStrength">The line strength of the circle</param>
-        public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color, float lineStrength = 1000f) : base(lineStrength)
+        public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color) : base(0)
         {
             WorldMatrix = worldMatrix;
             Radius = radius;
@@ -34,7 +33,7 @@ namespace SEWorldGenPlugin.Draw
             Vector3D prevVertex = Vector3D.Zero;
             Vector3D vertex;
 
-            for(int i = 0; i <= 360; i++)
+            for(int i = 0; i <= 360; i += 2)
             {
                 vertex = new Vector3D(Radius * Math.Cos(MathHelper.ToRadians(i)), 0, Radius * Math.Sin(MathHelper.ToRadians(i)));
                 vertex = Vector3D.Transform(vertex, WorldMatrix);
@@ -45,7 +44,8 @@ namespace SEWorldGenPlugin.Draw
                     continue;
                 }
 
-                MySimpleObjectDraw.DrawLine(prevVertex, vertex, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
+                MyRenderProxy.DebugDrawLine3D(prevVertex, vertex, Color, Color, true, false);
+                prevVertex = vertex;
             }
         }
     }

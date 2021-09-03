@@ -1,6 +1,5 @@
-﻿using VRage.Game;
-using VRage.Utils;
-using VRageMath;
+﻿using VRageMath;
+using VRageRender;
 
 namespace SEWorldGenPlugin.Draw
 {
@@ -32,8 +31,7 @@ namespace SEWorldGenPlugin.Draw
         /// </summary>
         public override void Draw()
         {
-            MatrixD wm = MatrixD.CreateWorld(Position);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, Radius, ref Color, MySimpleObjectRasterizer.SolidAndWireframe, 100, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: LineThickness);
+            MyRenderProxy.DebugDrawSphere(Position, Radius, Color, 1, true, true, true, false);
         }
     }
 }
