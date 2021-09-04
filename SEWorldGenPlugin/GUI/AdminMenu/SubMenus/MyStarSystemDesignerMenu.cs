@@ -433,6 +433,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     }
                 }
             }
+            else
+            {
+                m_renderer.AddObject(obj.Id, new MyEmptyObjectRenderObject(obj));
+            }
 
             if (render != null)
             {

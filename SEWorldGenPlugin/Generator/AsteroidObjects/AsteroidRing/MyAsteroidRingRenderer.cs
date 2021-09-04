@@ -41,7 +41,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override double GetObjectRenderSize(ZoomLevel level)
         {
-            return 0;
+            return m_data.Radius + m_data.Width;
         }
     }
 }

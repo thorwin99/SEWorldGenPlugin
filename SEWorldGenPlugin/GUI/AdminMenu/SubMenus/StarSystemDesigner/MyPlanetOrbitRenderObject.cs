@@ -42,7 +42,22 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override double GetObjectRenderSize(ZoomLevel level)
         {
-            return 0;
+            if(level == ZoomLevel.ORBIT)
+            {
+                double radius = (RenderObject as MySystemPlanet).Diameter;
+
+                foreach (var child in RenderObject.ChildObjects)
+                {
+                    double orbitRad = Vector3D.Distance(child.CenterPosition, RenderObject.CenterPosition);
+                    radius = Math.Max(radius, orbitRad);
+                }
+
+                return radius * 2f;
+            }
+            else
+            {
+                return (RenderObject as MySystemPlanet).Diameter;
+            }
         }
 
         /// <summary>
