@@ -63,9 +63,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_focusedObject = obj;
             var renderer = m_systemRenderObjects[obj];
             double renderSize = renderer.GetObjectRenderSize(FocusZoom);
-
-            MyPluginLog.Debug("SIZE " + renderSize);
-
             SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
         }
 
