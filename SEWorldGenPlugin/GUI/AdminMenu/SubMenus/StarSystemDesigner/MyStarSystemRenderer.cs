@@ -1,6 +1,8 @@
 ﻿using Sandbox.Engine.Utils;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Draw;
+using SEWorldGenPlugin.Generator;
+using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <summary>
         /// A dictionary of all render objects for the system objects
         /// </summary>
-        private Dictionary<Guid, IRenderObject> m_systemRenderObjects;
+        private Dictionary<Guid, MyAbstractStarSystemDesignerRenderObject> m_systemRenderObjects;
 
         /// <summary>
         /// The target position of the camera to look at
@@ -26,9 +28,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public MyStarSystemRenderer()
         {
-            m_systemRenderObjects = new Dictionary<Guid, IRenderObject>();
+            m_systemRenderObjects = new Dictionary<Guid, MyAbstractStarSystemDesignerRenderObject>();
             MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
-            SetCameraTarget(Vector3D.Zero, 1);
+            SetCameraTarget(Vector3D.Zero, 1000);
         }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         /// <param name="id">Id of the system object</param>
         /// <param name="obj">Render object to visualize the system object</param>
-        public void AddObject(Guid id, IRenderObject obj)
+        public void AddObject(Guid id, MyAbstractStarSystemDesignerRenderObject obj)
         {
             if (m_systemRenderObjects.ContainsKey(id)) return;
             m_systemRenderObjects.Add(id, obj);
@@ -62,7 +64,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         /// <param name="id">Id of the system object</param>
         /// <param name="obj">Render object to visualize the system object</param>
-        public void UpdateRenderObject(Guid id, IRenderObject obj)
+        public void UpdateRenderObject(Guid id, MyAbstractStarSystemDesignerRenderObject obj)
         {
             if (!m_systemRenderObjects.ContainsKey(id)) return;
             m_systemRenderObjects[id] = obj;
@@ -84,7 +86,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public void SetCameraTarget(Vector3D targetPos, float distance)
         {
             m_targetPos = targetPos;
-            MySpectatorCameraController.Static.Position = targetPos + distance;
+            MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.2f * distance, 0.6f * distance, 0.2f * distance));
             MySpectatorCameraController.Static.Target = targetPos;
         }
 
@@ -94,7 +96,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <param name="newDistance">The new distance to the target</param>
         public void ChangeCameraDistance(float newDistance)
         {
-            MySpectatorCameraController.Static.Position = m_targetPos + newDistance;
+            MySpectatorCameraController.Static.Position = m_targetPos + (new Vector3D(0.2f * newDistance, 0.6f * newDistance, 0.2f * newDistance));
             MySpectatorCameraController.Static.Target = m_targetPos;
         }
 

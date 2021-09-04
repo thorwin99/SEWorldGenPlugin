@@ -78,12 +78,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         public abstract bool TryLoadObject(MySystemAsteroids asteroid);
 
         /// <summary>
-        /// Returns an <see cref="IMyStarSystemDesignerRenderObject"/> to visually represent the Asteroid object in the world.
+        /// Returns an <see cref="MyAbstractStarSystemDesignerRenderObject"/> to visually represent the Asteroid object in the world.
         /// </summary>
         /// <param name="instance">The asteroid object instance to draw, if it is from this provider type</param>
         /// <param name="data">The associated data of the asteroid object</param>
         /// <returns></returns>
-        public abstract IMyStarSystemDesignerRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data);
+        public abstract MyAbstractStarSystemDesignerRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data);
 
         /// <summary>
         /// Saves all the asteroid objects provided by this provider.

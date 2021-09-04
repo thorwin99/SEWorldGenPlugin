@@ -205,7 +205,7 @@
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerAsteroidMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerObjectMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerPlanetMenu.cs" />
-    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\IMyStarSystemDesignerRenderObject.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyAbstractStarSystemDesignerRenderObject.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemRenderer.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
     <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />

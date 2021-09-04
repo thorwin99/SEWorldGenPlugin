@@ -435,7 +435,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="obj">Object to add</param>
         private void AddObjectToRenderer(MySystemObject obj)
         {
-            IMyStarSystemDesignerRenderObject render = null;
+            MyAbstractStarSystemDesignerRenderObject render = null;
 
             if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
             {

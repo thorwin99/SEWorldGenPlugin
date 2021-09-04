@@ -8,13 +8,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
     /// <summary>
     /// A class to visually render an asteroid sphere.
     /// </summary>
-    public class MyAsteroidSphereRenderer : IMyStarSystemDesignerRenderObject
+    public class MyAsteroidSphereRenderer : MyAbstractStarSystemDesignerRenderObject
     {
-        /// <summary>
-        /// The instance of the asteroid sphere to render
-        /// </summary>
-        private MySystemAsteroids m_instance;
-
         /// <summary>
         /// The data of the asteroid sphere to render
         /// </summary>
@@ -25,21 +20,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         /// </summary>
         private RenderHollowSphere m_render;
 
-        public MyAsteroidSphereRenderer(MySystemAsteroids instance, MyAsteroidSphereData data)
+        public MyAsteroidSphereRenderer(MySystemAsteroids instance, MyAsteroidSphereData data) : base(instance)
         {
-            m_instance = instance;
             m_data = data;
             m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Green, (float)data.OuterRadius / 200f);
         }
 
-        public void Draw()
+        public override void Draw()
         {
             m_render.Draw();
         }
 
-        public void Update(double CameraFocusLength)
+        public override double GetObjectRenderSize()
         {
-            
+            return 0;
         }
     }
 }

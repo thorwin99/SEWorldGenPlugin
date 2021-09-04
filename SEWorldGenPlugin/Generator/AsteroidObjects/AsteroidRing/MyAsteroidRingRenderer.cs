@@ -9,13 +9,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
     /// <summary>
     /// A class to visually render an asteroid ring.
     /// </summary>
-    public class MyAsteroidRingRenderer : IMyStarSystemDesignerRenderObject
+    public class MyAsteroidRingRenderer : MyAbstractStarSystemDesignerRenderObject
     {
-        /// <summary>
-        /// The instance to render
-        /// </summary>
-        private MySystemAsteroids m_instance;
-
         /// <summary>
         /// The data to render
         /// </summary>
@@ -26,9 +21,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         private RenderHollowCylinder m_render;
 
-        public MyAsteroidRingRenderer(MySystemAsteroids instance, MyAsteroidRingData data)
+        public MyAsteroidRingRenderer(MySystemAsteroids instance, MyAsteroidRingData data) : base(instance)
         {
-            m_instance = instance;
             m_data = data;
 
             if(data == null)
@@ -40,14 +34,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_render = new RenderHollowCylinder(shape.worldMatrix, (float)(shape.radius + shape.width), (float)shape.radius, (float)shape.height, Color.Green.ToVector4(), (float)shape.radius / 200f);
         }
 
-        public void Draw()
+        public override void Draw()
         {
             m_render.Draw();
         }
 
-        public void Update(double CameraFocusLength)
+        public override double GetObjectRenderSize()
         {
-            
+            return 0;
         }
     }
 }
