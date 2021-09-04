@@ -20,15 +20,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
     public class MyStarSystemDesignerMenu : MyPluginAdminMenuSubMenu
     {
         /// <summary>
-        /// An enum indicating which zoom level the star system designer currently is on.
-        /// </summary>
-        private enum ZoomLevel
-        {
-            ORBIT,
-            OBJECT
-        }
-
-        /// <summary>
         /// A list box containing all system objects
         /// </summary>
         private MyGuiControlListbox m_systemObjectsBox;
@@ -89,11 +80,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private Guid m_selectedObjectId;
 
         /// <summary>
-        /// The current zoom level of the spectator cam
-        /// </summary>
-        private ZoomLevel m_zoomLevel;
-
-        /// <summary>
         /// The usable gui width
         /// </summary>
         private float m_usableWidth;
@@ -113,7 +99,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
             m_pendingAsteroidData = new Dictionary<Guid, IMyAsteroidData>();
             m_selectedObjectId = Guid.Empty;
-            m_zoomLevel = ZoomLevel.ORBIT;
         }
 
         public override void Close()
@@ -122,7 +107,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_selectedObjectId = Guid.Empty;
             m_adminMenuInst = null;
             m_systemObjectsBox = null;
-            m_zoomLevel = ZoomLevel.ORBIT;
             //m_renderer = null;
         }
 
@@ -172,8 +156,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_zoomInButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Increase, onButtonClick: OnZoomLevelChange, toolTip: "Zoom onto the selected object");
             m_zoomOutButton = new MyGuiControlButton(null, VRage.Game.MyGuiControlButtonStyleEnum.Decrease, onButtonClick: OnZoomLevelChange, toolTip: "Zoom out of the selected object");
 
-            m_zoomInButton.Enabled = m_zoomLevel != ZoomLevel.OBJECT;
-            m_zoomOutButton.Enabled = m_zoomLevel != ZoomLevel.ORBIT;
+            m_zoomInButton.Enabled = m_renderer.FocusZoom != ZoomLevel.OBJECT;
+            m_zoomOutButton.Enabled = m_renderer.FocusZoom != ZoomLevel.ORBIT;
 
             row.AddTableRow(m_zoomInButton, m_zoomOutButton, new MyGuiControlLabel(text: "Zoom in / out"));
 
@@ -325,15 +309,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             if(btn == m_zoomInButton)
             {
-                m_zoomLevel++;
+                m_renderer.ZoomInOnObject();
             }
             else
             {
-                m_zoomLevel--;
+                m_renderer.ZoomOutOfObject();
             }
 
-            m_zoomInButton.Enabled = m_zoomLevel != ZoomLevel.OBJECT;
-            m_zoomOutButton.Enabled = m_zoomLevel != ZoomLevel.ORBIT;
+            m_zoomInButton.Enabled = m_renderer.FocusZoom != ZoomLevel.OBJECT;
+            m_zoomOutButton.Enabled = m_renderer.FocusZoom != ZoomLevel.ORBIT;
         }
 
         /// <summary>

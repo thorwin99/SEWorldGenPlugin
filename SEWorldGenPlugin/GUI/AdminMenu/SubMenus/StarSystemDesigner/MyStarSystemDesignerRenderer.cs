@@ -12,6 +12,15 @@ using VRageMath;
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 {
     /// <summary>
+    /// An enum indicating which zoom level the star system designer currently is on.
+    /// </summary>
+    public enum ZoomLevel
+    {
+        ORBIT,
+        OBJECT
+    }
+
+    /// <summary>
     /// This class is used to render the star system in the star system designer and controls
     /// the camera placement of the spectator camera for the star system designer
     /// </summary>
@@ -32,6 +41,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private Guid m_focusedObject;
 
+        /// <summary>
+        /// The current zoom level of the spectator cam
+        /// </summary>
+        public ZoomLevel FocusZoom
+        {
+            get;
+            private set;
+        }
+
         public MyStarSystemDesignerRenderer()
         {
             m_systemRenderObjects = new Dictionary<Guid, MyAbstractStarSystemDesignerRenderObject>();
@@ -47,6 +65,28 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             double renderSize = renderer.GetObjectRenderSize();
 
             SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
+        }
+
+        /// <summary>
+        /// Zooms onto the current selected object
+        /// </summary>
+        public void ZoomInOnObject()
+        {
+            if(FocusZoom != ZoomLevel.OBJECT)
+            {
+                FocusZoom++;
+            }
+        }
+
+        /// <summary>
+        /// Zooms out of the current selected object
+        /// </summary>
+        public void ZoomOutOfObject()
+        {
+            if (FocusZoom != ZoomLevel.ORBIT)
+            {
+                FocusZoom--;
+            }
         }
 
         /// <summary>

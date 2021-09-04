@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_planetRender.Draw();
         }
 
-        public override double GetObjectRenderSize()
+        public override double GetObjectRenderSize(ZoomLevel level)
         {
             return 0;
         }

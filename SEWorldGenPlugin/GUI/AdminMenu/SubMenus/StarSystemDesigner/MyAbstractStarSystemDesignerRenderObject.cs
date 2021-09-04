@@ -20,12 +20,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         }
 
         /// <summary>
-        /// Returns the size of the focused render object.
-        /// In case of a planet, it should return the size of the planet system, the planets and its moons.
-        /// In case of a ring or belt its the radius + width of the belt / ring.
+        /// Returns the size of the focused render object for the given zoom level in world units.
         /// </summary>
         /// <returns>The size of the object in the game world</returns>
-        public abstract double GetObjectRenderSize();
+        /// <param name="level">The zoom level the object should return its render size for.</param>
+        public abstract double GetObjectRenderSize(ZoomLevel level);
 
         public abstract void Draw();
     }
