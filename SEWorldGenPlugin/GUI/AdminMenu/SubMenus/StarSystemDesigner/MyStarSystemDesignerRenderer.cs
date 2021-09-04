@@ -63,7 +63,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_focusedObject = obj;
             var renderer = m_systemRenderObjects[obj];
             double renderSize = renderer.GetObjectRenderSize(FocusZoom);
-            SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
+            SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2f);
         }
 
         /// <summary>
@@ -143,8 +143,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         private void SetCameraTarget(Vector3D targetPos, double distance)
         {
             m_targetPos = targetPos;
-            MySpectatorCameraController.Static.Position = targetPos + Vector3D.UnitZ * distance;
-            MySpectatorCameraController.Static.SetTarget(targetPos, Vector3D.UnitX);
+            MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.4f, 0, 0.6f)) * distance;
+            MySpectatorCameraController.Static.SetTarget(targetPos, new Vector3D(-0.6f, 0, -0.4f));
         }
 
         public void Draw()
