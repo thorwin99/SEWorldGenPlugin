@@ -15,7 +15,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     /// This class is used to render the star system in the star system designer and controls
     /// the camera placement of the spectator camera for the star system designer
     /// </summary>
-    public class MyStarSystemRenderer : IRenderObject
+    public class MyStarSystemDesignerRenderer : IRenderObject
     {
         /// <summary>
         /// A dictionary of all render objects for the system objects
@@ -32,7 +32,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private Guid m_focusedObject;
 
-        public MyStarSystemRenderer()
+        public MyStarSystemDesignerRenderer()
         {
             m_systemRenderObjects = new Dictionary<Guid, MyAbstractStarSystemDesignerRenderObject>();
             MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);

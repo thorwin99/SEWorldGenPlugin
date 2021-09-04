@@ -106,7 +106,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <summary>
         /// The renderer used to render the star system
         /// </summary>
-        private MyStarSystemRenderer m_renderer;
+        private MyStarSystemDesignerRenderer m_renderer;
 
         public MyStarSystemDesignerMenu()
         {
@@ -142,7 +142,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             m_adminMenuInst = instance;
             m_usableWidth = maxWidth;
-            m_renderer = new MyStarSystemRenderer();
+            m_renderer = new MyStarSystemDesignerRenderer();
 
             MyGuiControlLabel systemBoxLabel = new MyGuiControlLabel(null, null, "System Objects");
             parent.AddTableRow(systemBoxLabel);
