@@ -32,7 +32,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_parent = MyStarSystemGenerator.Static.StarSystem.GetById(planet.ParentId);
             double rad = CalculateRadius();
             m_orbitRender = new RenderCircle(CalculateWorldMatrix(), (float)rad, Color.Orange.ToVector4());
-            m_planetRender = new RenderSphere(planet.CenterPosition, (float)planet.Diameter / 2, Color.Green.ToVector4());
+            m_planetRender = new RenderSphere(planet.CenterPosition, (float)planet.Diameter / 2, Color.DarkGreen.ToVector4());
         }
 
         public override void Draw()
