@@ -83,8 +83,8 @@ namespace SEWorldGenPlugin.Draw
 
                 MySimpleObjectDraw.DrawLine(outVertexUp, inVertexUp, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
                 MySimpleObjectDraw.DrawLine(outVertexLow, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
-                MySimpleObjectDraw.DrawLine(outVertexUp, outVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
-                MySimpleObjectDraw.DrawLine(inVertexUp, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
+                //MySimpleObjectDraw.DrawLine(outVertexUp, outVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
+                //MySimpleObjectDraw.DrawLine(inVertexUp, inVertexLow, MyStringId.GetOrCompute("GizmoDrawLine"), ref Color, LineThickness);
 
                 outPrevUp = outVertexUp;
                 outPrevLow = outVertexLow;
