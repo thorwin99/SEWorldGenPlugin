@@ -314,16 +314,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_selectedObjectId = newId;
             SetSubMenuControls();
 
-            if (m_pendingSystemObjects.ContainsKey(newId))
-            {
-                m_renderer.SetCameraTarget(m_pendingSystemObjects[newId].CenterPosition, 100000);
-            }
-            else
-            {
-                var obj = MyStarSystemGenerator.Static.StarSystem.GetById(newId);
-                if(obj != null)
-                    m_renderer.SetCameraTarget(MyStarSystemGenerator.Static.StarSystem.GetById(newId).CenterPosition, 100000);
-            }
+            m_renderer.FocusObject(newId);
         }
 
         /// <summary>

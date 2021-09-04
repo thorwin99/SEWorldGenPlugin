@@ -12,7 +12,8 @@ using VRageMath;
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 {
     /// <summary>
-    /// This class is used to render the star system in the star system designer
+    /// This class is used to render the star system in the star system designer and controls
+    /// the camera placement of the spectator camera for the star system designer
     /// </summary>
     public class MyStarSystemRenderer : IRenderObject
     {
@@ -26,11 +27,26 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private Vector3D m_targetPos;
 
+        /// <summary>
+        /// The id of the currently focused object
+        /// </summary>
+        private Guid m_focusedObject;
+
         public MyStarSystemRenderer()
         {
             m_systemRenderObjects = new Dictionary<Guid, MyAbstractStarSystemDesignerRenderObject>();
             MySession.Static.SetCameraController(MyCameraControllerEnum.Spectator);
             SetCameraTarget(Vector3D.Zero, 1000);
+        }
+
+        public void FocusObject(Guid obj)
+        {
+            if (!m_systemRenderObjects.ContainsKey(obj)) return;
+            m_focusedObject = obj;
+            var renderer = m_systemRenderObjects[obj];
+            double renderSize = renderer.GetObjectRenderSize();
+
+            SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
         }
 
         /// <summary>
@@ -83,21 +99,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         /// <param name="distance">Distance to the target</param>
         /// <param name="targetPos">Target position for the camera to look at</param>
-        public void SetCameraTarget(Vector3D targetPos, float distance)
+        private void SetCameraTarget(Vector3D targetPos, double distance)
         {
             m_targetPos = targetPos;
-            MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.2f * distance, 0.6f * distance, 0.2f * distance));
+            MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.2 * distance, 0.6 * distance, 0.2 * distance));
             MySpectatorCameraController.Static.Target = targetPos;
-        }
-
-        /// <summary>
-        /// Changes the camera distance to the current target.
-        /// </summary>
-        /// <param name="newDistance">The new distance to the target</param>
-        public void ChangeCameraDistance(float newDistance)
-        {
-            MySpectatorCameraController.Static.Position = m_targetPos + (new Vector3D(0.2f * newDistance, 0.6f * newDistance, 0.2f * newDistance));
-            MySpectatorCameraController.Static.Target = m_targetPos;
         }
 
         public void Draw()
