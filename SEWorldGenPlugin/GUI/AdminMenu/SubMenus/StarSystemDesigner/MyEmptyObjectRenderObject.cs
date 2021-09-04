@@ -20,26 +20,20 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override double GetObjectRenderSize(ZoomLevel level)
         {
-            if(level == ZoomLevel.OBJECT)
+           
+            double radius = 0;
+            foreach(var child in RenderObject.ChildObjects)
             {
-                return 10;
-            }
-            else
-            {
-                double radius = 0;
-                foreach(var child in RenderObject.ChildObjects)
+                if(child is MySystemPlanet)
                 {
-                    if(child is MySystemPlanet)
-                    {
-                        radius = Math.Max(radius, Vector3D.Distance(RenderObject.CenterPosition, child.CenterPosition));
-                    }
-                    else if(child is MySystemAsteroids)
-                    {
-                        radius = Math.Max(radius, 0); //Need to find a way to determine unknown asteroid size, possibly implement in asteroid provider
-                    }
+                    radius = Math.Max(radius, Vector3D.Distance(RenderObject.CenterPosition, child.CenterPosition));
                 }
-                return radius;
+                else if(child is MySystemAsteroids)
+                {
+                    radius = Math.Max(radius, 0); //Need to find a way to determine unknown asteroid size, possibly implement in asteroid provider
+                }
             }
+            return radius;
         }
     }
 }
