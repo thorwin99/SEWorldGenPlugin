@@ -35,7 +35,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                     }
                     else if(child is MySystemAsteroids)
                     {
-                        radius = Math.Max(radius, 0);
+                        radius = Math.Max(radius, 0); //Need to find a way to determine unknown asteroid size, possibly implement in asteroid provider
                     }
                 }
                 return radius;
