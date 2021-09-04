@@ -1,4 +1,5 @@
-﻿using SEWorldGenPlugin.Draw;
+﻿using Sandbox.Engine.Utils;
+using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
 using System;
@@ -37,6 +38,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public override void Draw()
         {
             m_orbitRender.Draw();
+            UpdatePlanetSphereSize();
             m_planetRender.Draw();
         }
 
@@ -57,6 +59,25 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             else
             {
                 return (RenderObject as MySystemPlanet).Diameter;
+            }
+        }
+
+        /// <summary>
+        /// Updates the render sphere size to be appropriatly sized
+        /// </summary>
+        private void UpdatePlanetSphereSize()
+        {
+            var specPos = MySpectatorCameraController.Static.Position;
+            double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
+            var planet = RenderObject as MySystemPlanet;
+
+            if (distance > planet.Diameter * 1000)
+            {
+                m_planetRender.Radius = (float)(planet.Diameter * 200 / 2f);
+            }
+            else
+            {
+                m_planetRender.Radius = (float)(planet.Diameter / 2f);
             }
         }
 
