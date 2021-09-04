@@ -62,7 +62,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             if (!m_systemRenderObjects.ContainsKey(obj)) return;
             m_focusedObject = obj;
             var renderer = m_systemRenderObjects[obj];
-            double renderSize = renderer.GetObjectRenderSize();
+            double renderSize = renderer.GetObjectRenderSize(FocusZoom);
 
             SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
         }
