@@ -64,6 +64,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlParentTableLayout m_subMenuControlTable;
 
         /// <summary>
+        /// Control to set the name of the edited object
+        /// </summary>
+        private MyGuiControlTextbox m_objNameBox;
+
+        /// <summary>
         /// Current instance of the admin menu
         /// </summary>
         private MyAdminMenuExtension m_adminMenuInst;
@@ -109,7 +114,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_pendingAsteroidData = new Dictionary<Guid, IMyAsteroidData>();
             m_selectedObjectId = Guid.Empty;
             m_zoomLevel = ZoomLevel.ORBIT;
-            m_renderer = new MyStarSystemRenderer();
         }
 
         public override void Close()
@@ -119,7 +123,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_adminMenuInst = null;
             m_systemObjectsBox = null;
             m_zoomLevel = ZoomLevel.ORBIT;
-            m_renderer = null;
+            //m_renderer = null;
         }
 
         public override string GetTitle()
@@ -138,6 +142,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             m_adminMenuInst = instance;
             m_usableWidth = maxWidth;
+            m_renderer = new MyStarSystemRenderer();
 
             MyGuiControlLabel systemBoxLabel = new MyGuiControlLabel(null, null, "System Objects");
             parent.AddTableRow(systemBoxLabel);
@@ -190,11 +195,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_applyChangesButton.Size = new Vector2(maxWidth, m_applyChangesButton.Size.Y);
 
             parent.AddTableRow(m_applyChangesButton);
+
+            MyPluginDrawSession.Static.AddRenderObject(15, m_renderer);
         }
 
         public override void Draw()
         {
-            MyPluginLog.Debug("Drawing StarSystemDesigner Scene");
             m_renderer.Draw();
         }
 
@@ -217,6 +223,22 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 obj = StarSystem.GetById(m_selectedObjectId);
             }
             else return;
+
+            m_objNameBox = new MyGuiControlTextbox();
+            m_objNameBox.Size = new Vector2(m_usableWidth, m_objNameBox.Size.Y);
+            m_objNameBox.SetToolTip(new MyToolTips("Sets the name of the system object"));
+            m_objNameBox.SetText(new StringBuilder(obj.DisplayName));
+            m_objNameBox.TextChanged += delegate
+            {
+                StringBuilder sb = new StringBuilder();
+                m_objNameBox.GetText(sb);
+
+                obj.DisplayName = sb.ToString();
+                OnObjectEdited(obj);
+            };
+
+            m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Name"));
+            m_subMenuControlTable.AddTableRow(m_objNameBox);
 
             if(obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
             {
@@ -264,7 +286,20 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="obj"></param>
         private void OnObjectEdited(MySystemObject obj)
         {
+            if (!m_pendingSystemObjects.ContainsKey(obj.Id))
+            {
+                m_systemObjectsBox.SelectedItems[0].Text.Append(" *");
+                m_pendingSystemObjects.Add(obj.Id, obj);
 
+                if(obj.Type == MySystemObjectType.ASTEROIDS)
+                {
+                    var roid = obj as MySystemAsteroids;
+                    if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out MyAbstractAsteroidObjectProvider prov))
+                    {
+                        m_pendingAsteroidData.Add(obj.Id, prov.GetInstanceData(obj.Id));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -278,6 +313,17 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             MyPluginLog.Debug("On selecet " + newId);
             m_selectedObjectId = newId;
             SetSubMenuControls();
+
+            if (m_pendingSystemObjects.ContainsKey(newId))
+            {
+                m_renderer.SetCameraTarget(m_pendingSystemObjects[newId].CenterPosition, 100000);
+            }
+            else
+            {
+                var obj = MyStarSystemGenerator.Static.StarSystem.GetById(newId);
+                if(obj != null)
+                    m_renderer.SetCameraTarget(MyStarSystemGenerator.Static.StarSystem.GetById(newId).CenterPosition, 100000);
+            }
         }
 
         /// <summary>
@@ -393,7 +439,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
             {
-
+                m_renderer.AddObject(obj.Id, new MyPlanetOrbitRenderObject(obj as MySystemPlanet));
             }
             else if (obj.Type == MySystemObjectType.ASTEROIDS)
             {
