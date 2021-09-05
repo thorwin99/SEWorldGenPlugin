@@ -94,10 +94,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         private MyStarSystemDesignerRenderer m_renderer;
 
+        /// <summary>
+        /// A dictionary mapping the ids of system objects to the items in the listbox
+        /// </summary>
+        private Dictionary<Guid, MyGuiControlListbox.Item> m_itemList;
+
         public MyStarSystemDesignerMenu()
         {
             m_pendingSystemObjects = new Dictionary<Guid, MySystemObject>(); //Needs to be cleaned on session close
             m_pendingAsteroidData = new Dictionary<Guid, IMyAsteroidData>();
+            m_itemList = new Dictionary<Guid, MyGuiControlListbox.Item>();
             m_selectedObjectId = Guid.Empty;
         }
 
@@ -135,7 +141,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_systemObjectsBox.VisibleRowsCount = 8;
             m_systemObjectsBox.Size = new Vector2(maxWidth, m_systemObjectsBox.Size.Y);
             RefreshSystemList();
-            m_systemObjectsBox.SelectByUserData(m_selectedObjectId);
             m_systemObjectsBox.ItemsSelected += OnSystemObjectSelected;
 
             parent.AddTableRow(m_systemObjectsBox);
@@ -145,7 +150,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             parent.AddTableRow(m_refreshSystemButton);
 
-            m_addObjectButton = MyPluginGuiHelper.CreateDebugButton("Add new object", AddNewSystemObject, false);
+            m_addObjectButton = MyPluginGuiHelper.CreateDebugButton("Add new object", AddNewSystemObject, true);
             m_addObjectButton.Size = new Vector2(maxWidth, m_addObjectButton.Size.Y);
 
             parent.AddTableRow(m_addObjectButton);
@@ -180,6 +185,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableRow(m_applyChangesButton);
 
             MyPluginDrawSession.Static.AddRenderObject(15, m_renderer);
+
+            if (MySettingsSession.Static.Settings.Enabled)
+            {
+                m_systemObjectsBox.SelectSingleItem(m_itemList[MyStarSystemGenerator.Static.StarSystem.CenterObject.Id]);
+                OnSystemObjectSelected(m_systemObjectsBox);
+            }
         }
 
         public override void Draw()
@@ -220,6 +231,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 OnObjectEdited(obj);
             };
 
+            m_addObjectButton.Enabled = true;
+
             m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Name"));
             m_subMenuControlTable.AddTableRow(m_objNameBox);
 
@@ -242,6 +255,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         adminMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
                         adminMenu.OnObjectChanged += OnObjectEdited;
                         m_currentObjectMenu = adminMenu;
+
+                        m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild;
                     }
                 }
             }
@@ -261,6 +276,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_currentObjectMenu = new MyStarSystemDesignerPlanetMenu(planet);
             m_currentObjectMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
             m_currentObjectMenu.OnObjectChanged += OnObjectEdited;
+
+            m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild;
         }
 
         /// <summary>
@@ -326,6 +343,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private void AddNewSystemObject(MyGuiControlButton btn)
         {
             //Add the object to the local star system manually, sync on apply
+            MyGuiScreenDialogCombobox typeDialog = new MyGuiScreenDialogCombobox("Select type", new List<string>(MySystemObjectType.GetNames(typeof(MySystemObjectType))), "The type of object to add");
+            MyGuiSandbox.AddScreen(typeDialog);
         }
 
         /// <summary>
@@ -359,6 +378,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             MyPluginLog.Debug("Refresh");
             m_systemObjectsBox.ClearItems();
             m_renderer.ClearRenderList();
+            m_itemList.Clear();
 
             var system = MyStarSystemGenerator.Static.StarSystem;
 
@@ -399,7 +419,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 text.Append(" *");
             }
 
-            m_systemObjectsBox.Add(new MyGuiControlListbox.Item(text, userData: obj.Id));
+            var item = new MyGuiControlListbox.Item(text, userData: obj.Id);
+            m_systemObjectsBox.Add(item);
+            m_itemList.Add(obj.Id, item);
+
             AddObjectToRenderer(obj);
         }
 

@@ -7,7 +7,6 @@ using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using VRageMath;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
@@ -49,6 +48,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public MyStarSystemDesignerPlanetMenu(MySystemPlanet obj) : base(obj)
         {
+            CanAddChild = true;
+
             m_planetTypes = new List<MyPlanetGeneratorDefinition>();
             if(obj == null)
             {

@@ -20,12 +20,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public bool IsFocused
         {
             get;
-            private set;
+            set;
         }
 
         public MyAbstractStarSystemDesignerRenderObject(MySystemObject obj)
         {
             RenderObject = obj;
+            IsFocused = false;
         }
 
         /// <summary>

@@ -141,9 +141,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
 
                 m_contentTable = new MyGuiControlParentTableLayout(1, false, Vector2.Zero);
                 m_contentTable.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_TOP;
-                
-                int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
-                m_subMenus[index].RefreshInternals(m_contentTable, m_usableWidth, this);
 
                 m_contentTable.AddTableSeparator();
 
@@ -160,6 +157,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
                 sep.AddHorizontal(new Vector2(m_scrollPane.Position.X - m_scrollPane.Size.X / 2, m_scrollPane.Position.Y + m_scrollPane.Size.Y), m_usableWidth);
 
                 Controls.Add(sep);
+
+                int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
+                m_subMenus[index].RefreshInternals(m_contentTable, m_usableWidth, this);
+
+                RequestResize();
             }
 
             m_isRecreating = false;

@@ -20,12 +20,22 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public event Action<MySystemObject> OnObjectChanged;
 
         /// <summary>
+        /// Whether a child object can be added to this object or not
+        /// </summary>
+        public bool CanAddChild
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
         /// The object this menu edits or spawns
         /// </summary>
         /// <param name="obj">The object in the system</param>
         public MyStarSystemDesignerObjectMenu(MySystemObject obj)
         {
             m_object = obj;
+            CanAddChild = false;
         }
 
         /// <summary>

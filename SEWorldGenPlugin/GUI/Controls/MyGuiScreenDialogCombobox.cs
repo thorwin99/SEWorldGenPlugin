@@ -86,6 +86,8 @@ namespace SEWorldGenPlugin.GUI.Controls
                 key++;
             }
 
+            m_comboBox.SelectItemByKey(0);
+
             table.AddTableRow(m_comboBox);
 
             table.AddTableSeparator();
