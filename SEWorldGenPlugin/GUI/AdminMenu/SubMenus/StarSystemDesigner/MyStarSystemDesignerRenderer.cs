@@ -70,7 +70,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_systemRenderObjects[obj].SetFocus(true);
 
             var renderer = m_systemRenderObjects[obj];
-            double renderSize = 0;
+            double renderSize;
 
             if (FocusZoom == ZoomLevel.ORBIT)
             {

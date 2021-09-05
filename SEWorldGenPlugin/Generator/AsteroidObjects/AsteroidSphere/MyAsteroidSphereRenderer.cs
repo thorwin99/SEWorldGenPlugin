@@ -23,11 +23,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         public MyAsteroidSphereRenderer(MySystemAsteroids instance, MyAsteroidSphereData data) : base(instance)
         {
             m_data = data;
-            m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Green, (float)data.OuterRadius / 200f);
+            m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Brown, (float)data.OuterRadius / 200f);
         }
 
         public override void Draw()
         {
+            m_render.Color = IsFocused ? Color.Green.ToVector4() : Color.Brown.ToVector4();
             m_render.Draw();
         }
 

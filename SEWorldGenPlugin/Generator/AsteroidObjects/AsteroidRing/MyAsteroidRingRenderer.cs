@@ -36,6 +36,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
         public override void Draw()
         {
+            m_render.Color = IsFocused ? Color.Green.ToVector4() : Color.Brown.ToVector4();
             m_render.Draw();
         }
 
