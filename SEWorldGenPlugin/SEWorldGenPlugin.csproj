@@ -209,6 +209,7 @@
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyAbstractStarSystemDesignerRenderObject.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerRenderer.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
+    <Compile Include="GUI\Controls\MyGuiScreenDialogCombobox.cs" />
     <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.cs" />

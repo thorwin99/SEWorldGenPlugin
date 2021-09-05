@@ -168,7 +168,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             if(m_selectedObjectId != Guid.Empty)
             {
-                //Fill with selected object specific controls
                 SetSubMenuControls();
             }
 
