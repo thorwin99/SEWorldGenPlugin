@@ -34,6 +34,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         public override double GetObjectRenderSize(ZoomLevel level)
         {
+            if(level == ZoomLevel.OBJECT_SYSTEM)
+            {
+                return m_data.OuterRadius * 2;
+            }
+
             return m_data.OuterRadius;
         }
     }
