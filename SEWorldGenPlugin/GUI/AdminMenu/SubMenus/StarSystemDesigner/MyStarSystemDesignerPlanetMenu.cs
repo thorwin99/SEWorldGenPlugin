@@ -81,9 +81,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(m_orbitRadiusSlider);
 
             m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
-            m_orbitPosSlider.SetToolTip(new MyToolTips("The position of the planet on the orbit itself. Moves the planet around on the orbit."));
+            m_orbitPosSlider.SetToolTip(new MyToolTips("The rotation of the orbit itself around the parent."));
 
-            controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet position"));
+            controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit Rotation"));
             controlTable.AddTableRow(m_orbitPosSlider);
 
             m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
