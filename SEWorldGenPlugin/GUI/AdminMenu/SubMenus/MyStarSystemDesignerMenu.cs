@@ -433,7 +433,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             if (m_selectedObjectId != Guid.Empty)
             {
-                m_systemObjectsBox.SelectByUserData(m_selectedObjectId);
+                m_systemObjectsBox.SelectSingleItem(m_itemList[m_selectedObjectId]);
             }
         }
 
