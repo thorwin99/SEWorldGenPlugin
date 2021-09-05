@@ -344,7 +344,72 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             //Add the object to the local star system manually, sync on apply
             MyGuiScreenDialogCombobox typeDialog = new MyGuiScreenDialogCombobox("Select type", new List<string>(MySystemObjectType.GetNames(typeof(MySystemObjectType))), "The type of object to add");
+
+            typeDialog.OnConfirm += OnTypeEntered;
+
             MyGuiSandbox.AddScreen(typeDialog);
+        }
+
+        /// <summary>
+        /// Callback for when a type in the type dialog is confirmed.
+        /// </summary>
+        /// <param name="typeKey"></param>
+        /// <param name="name"></param>
+        private void OnTypeEntered(long typeKey, string name)
+        {
+            MySystemObjectType type = (MySystemObjectType)typeKey;
+
+            if (type == MySystemObjectType.ASTEROIDS)
+            {
+                List<string> providers = new List<string>();
+                foreach (var prov in MyAsteroidObjectsManager.Static.AsteroidObjectProviders)
+                {
+                    providers.Add(prov.Key);
+                }
+
+                MyGuiScreenDialogCombobox asteroidDialog = new MyGuiScreenDialogCombobox("Select Asteroid type", providers, "The asteroid type to spawn");
+                asteroidDialog.OnConfirm += delegate (long key2, string typeName)
+                {
+                    MySystemAsteroids roid = new MySystemAsteroids();
+                    roid.AsteroidTypeName = typeName;
+                    roid.Type = type;
+                    roid.DisplayName = "New Asteroid";
+                    roid.ParentId = m_selectedObjectId;
+
+                    IMyAsteroidData data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[typeName].GetDefaultData();
+
+                    m_pendingSystemObjects.Add(roid.Id, roid);
+                    m_pendingAsteroidData.Add(roid.Id, data);
+
+                    m_selectedObjectId = roid.Id;
+
+                    RefreshSystemList();
+                };
+            }
+            else
+            {
+                MySystemObject newObj;
+                switch (type)
+                {
+                    case MySystemObjectType.PLANET:
+                    case MySystemObjectType.MOON:
+                        newObj = new MySystemPlanet();
+                        break;
+                    default:
+                        newObj = new MySystemObject();
+                        break;
+                }
+
+                newObj.Type = type;
+                newObj.DisplayName = "New Object";
+                newObj.ParentId = m_selectedObjectId;
+
+                m_pendingSystemObjects.Add(newObj.Id, newObj);
+
+                m_selectedObjectId = newObj.Id;
+
+                RefreshSystemList();
+            }
         }
 
         /// <summary>
@@ -393,7 +458,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 {
                     if (system.Contains(entry.Key)) continue;
 
-                    if(entry.Value.ParentId == obj.ParentId)
+                    if(entry.Value.ParentId == obj.Id)
                     {
                         AddObjectToList(entry.Value, depth + 1);
                     }
@@ -409,6 +474,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="depth">Depth at which to add it.</param>
         private void AddObjectToList(MySystemObject obj, int depth)
         {
+            MyPluginLog.Debug("ID " + obj.Id);
             var text = new StringBuilder("");
             for (int i = 0; i < depth; i++)
                 text.Append("   ");
@@ -416,6 +482,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             text.Append(obj.DisplayName);
             if (m_pendingSystemObjects.ContainsKey(obj.Id))
             {
+                MyPluginLog.Debug("PENDING");
                 text.Append(" *");
             }
 

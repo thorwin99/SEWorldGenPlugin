@@ -117,6 +117,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         }
 
         /// <summary>
+        /// Return a default instance of asteroid data for this provider.
+        /// This instance is not yet associated with ANY asteroid instance.
+        /// </summary>
+        /// <returns>A new default instance of data for this provider type.</returns>
+        public abstract IMyAsteroidData GetDefaultData();
+
+        /// <summary>
         /// Loads all known data for this provider from the server.
         /// </summary>
         public void FetchDataFromServer()

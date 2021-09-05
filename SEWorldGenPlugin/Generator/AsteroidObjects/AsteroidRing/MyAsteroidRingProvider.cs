@@ -154,6 +154,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             }
             return null;
         }
+
+        public override IMyAsteroidData GetDefaultData()
+        {
+            return new MyAsteroidRingData();
+        }
     }
 
     /// <summary>
