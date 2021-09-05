@@ -31,7 +31,7 @@ namespace SEWorldGenPlugin.Draw
         /// </summary>
         public override void Draw()
         {
-            MyRenderProxy.DebugDrawSphere(Position, Radius, Color, 0.75f, true, true, true, false);
+            MyRenderProxy.DebugDrawSphere(Position, Radius, Color, 0.5f, true, false, true, false);
         }
     }
 }

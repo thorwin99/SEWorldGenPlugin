@@ -67,7 +67,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             m_focusedObject = obj;
 
-            m_systemRenderObjects[m_focusedObject].SetFocus(true);
+            m_systemRenderObjects[obj].SetFocus(true);
 
             var renderer = m_systemRenderObjects[obj];
             double renderSize = 0;
