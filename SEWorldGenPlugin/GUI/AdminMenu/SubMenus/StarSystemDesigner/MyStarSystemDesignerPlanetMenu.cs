@@ -74,7 +74,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet size"));
             controlTable.AddTableRow(m_sizeSlider);
 
-            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: float.MaxValue / 1000f, labelSuffix: " km", showLabel: true);
+            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: (float)CalculateMaxOrbitRadius(), labelSuffix: " km", showLabel: true);
             m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
@@ -127,6 +127,27 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         }
 
         /// <summary>
+        /// Calculates the largest orbit radius possible for this planet
+        /// </summary>
+        private double CalculateMaxOrbitRadius()
+        {
+            var center = MyStarSystemGenerator.Static.StarSystem.CenterObject;
+            if (center != null && m_object.ParentId == center.Id)
+            {
+                double rad = 0;
+                foreach(var child in center.ChildObjects)
+                {
+                    rad = Math.Max(rad, Vector3D.Distance(center.CenterPosition, child.CenterPosition));
+                }
+                return rad / 1000.0;
+            }
+            else
+            {
+                return MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
+            }
+        }
+
+        /// <summary>
         /// Loads the properties from the edited object and sets the sliders accordingly.
         /// </summary>
         private void LoadPlanetProperties()
@@ -146,14 +167,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             string type = planet.SubtypeId;
 
-            foreach(var planetDef in m_planetTypes)
+            foreach (var planetDef in m_planetTypes)
             {
-                if(planetDef.Id.SubtypeId.ToString() == type)
+                if (planetDef.Id.SubtypeId.ToString() == type)
                 {
                     m_planetTypeCombobox.SelectItemByKey(m_planetTypes.IndexOf(planetDef));
                     return;
                 }
             }
+
+            m_planetTypeCombobox.SelectItemByIndex(0);
         }
 
         /// <summary>
@@ -202,6 +225,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             {
                 parentRel = new Vector3D(m_object.CenterPosition) - new Vector3D(parent.CenterPosition);
                 radius = parentRel.Length();
+
+                if(radius == 0)
+                {
+                    radius = 1;
+                }
             }
 
             double elevation = MathHelperD.ToDegrees(Math.Asin(parentRel.Z / radius));

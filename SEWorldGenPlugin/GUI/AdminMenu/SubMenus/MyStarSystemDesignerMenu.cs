@@ -385,6 +385,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                     RefreshSystemList();
                 };
+
+                MyGuiSandbox.AddScreen(asteroidDialog);
             }
             else
             {

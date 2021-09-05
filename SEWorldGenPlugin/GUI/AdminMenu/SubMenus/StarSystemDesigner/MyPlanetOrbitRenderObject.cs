@@ -37,10 +37,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override void Draw()
         {
+            m_orbitRender.Radius = (float)CalculateRadius();
+            m_orbitRender.WorldMatrix = CalculateWorldMatrix();
             m_orbitRender.Draw();
             UpdatePlanetSphereSize();
 
             m_planetRender.Color = IsFocused ? Color.LightBlue.ToVector4() : Color.DarkGreen.ToVector4();
+            m_planetRender.Position = RenderObject.CenterPosition;
             m_planetRender.Draw();
         }
 
@@ -94,9 +97,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
             var planet = RenderObject as MySystemPlanet;
 
-            if (distance > planet.Diameter * 1000)
+            if (distance > planet.Diameter * 500)
             {
-                m_planetRender.Radius = (float)(planet.Diameter * 200 / 2f);
+                m_planetRender.Radius = Math.Min((float)(planet.Diameter * 200 / 2f), 120000f * 100f);
             }
             else
             {

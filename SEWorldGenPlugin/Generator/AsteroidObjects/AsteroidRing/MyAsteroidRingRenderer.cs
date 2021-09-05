@@ -37,6 +37,14 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public override void Draw()
         {
             m_render.Color = IsFocused ? Color.Green.ToVector4() : Color.Brown.ToVector4();
+
+            var shape = MyAsteroidObjectShapeRing.CreateFromRingItem(m_data);
+
+            m_render.WorldMatrix = shape.worldMatrix;
+            m_render.Radius = (float)(shape.radius + shape.width);
+            m_render.InnerRadius = (float)shape.radius;
+            m_render.Height = (float)shape.height;
+
             m_render.Draw();
         }
 
