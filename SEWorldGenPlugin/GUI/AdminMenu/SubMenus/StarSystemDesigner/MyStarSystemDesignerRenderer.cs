@@ -167,6 +167,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_targetPos = targetPos;
             MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.4f, 0, 0.6f)) * distance;
             MySpectatorCameraController.Static.SetTarget(targetPos, new Vector3D(-0.6f, 0, -0.4f));
+
+            if(FocusZoom == ZoomLevel.ORBIT)
+                MySpectatorCameraController.Static.Position += Vector3D.UnitX * distance * 0.2f;
         }
 
         public void Draw()
