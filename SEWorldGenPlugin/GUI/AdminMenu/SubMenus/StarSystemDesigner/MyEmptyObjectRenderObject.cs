@@ -20,7 +20,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override double GetObjectRenderSize(ZoomLevel level)
         {
-           
             double radius = 0;
             foreach(var child in RenderObject.ChildObjects)
             {
@@ -33,7 +32,18 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                     radius = Math.Max(radius, 0); //Need to find a way to determine unknown asteroid size, possibly implement in asteroid provider
                 }
             }
-            return radius;
+
+            switch (level)
+            {
+                case ZoomLevel.ORBIT:
+                    return radius;
+                case ZoomLevel.OBJECT_SYSTEM:
+                    return radius * 0.5f;
+                case ZoomLevel.OBJECT:
+                    return radius * 0.25f;
+                default:
+                    return radius;
+            }
         }
     }
 }
