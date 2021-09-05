@@ -246,7 +246,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 MyAbstractAsteroidObjectProvider prov;
                 if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out prov))
                 {
-                    var adminMenu = prov.CreateStarSystemDesignerEditMenu(asteroid);
+                    IMyAsteroidData data = null;
+                    if (m_pendingAsteroidData.ContainsKey(asteroid.Id))
+                    {
+                        data = m_pendingAsteroidData[asteroid.Id];
+                    }
+
+                    var adminMenu = prov.CreateStarSystemDesignerEditMenu(asteroid, data);
                     if(adminMenu != null)
                     {
                         if (m_currentObjectMenu != null)
@@ -370,11 +376,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 MyGuiScreenDialogCombobox asteroidDialog = new MyGuiScreenDialogCombobox("Select Asteroid type", providers, "The asteroid type to spawn");
                 asteroidDialog.OnConfirm += delegate (long key2, string typeName)
                 {
+                    var parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_selectedObjectId);
+
                     MySystemAsteroids roid = new MySystemAsteroids();
                     roid.AsteroidTypeName = typeName;
                     roid.Type = type;
                     roid.DisplayName = "New Asteroid";
                     roid.ParentId = m_selectedObjectId;
+
+                    if (parent != null)
+                        roid.CenterPosition = parent.CenterPosition;
 
                     IMyAsteroidData data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[typeName].GetDefaultData();
 
@@ -390,6 +401,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             }
             else
             {
+                var parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_selectedObjectId);
+
                 MySystemObject newObj;
                 switch (type)
                 {
@@ -405,6 +418,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 newObj.Type = type;
                 newObj.DisplayName = "New Object";
                 newObj.ParentId = m_selectedObjectId;
+
+                if (parent != null)
+                    newObj.CenterPosition = parent.CenterPosition;
 
                 m_pendingSystemObjects.Add(newObj.Id, newObj);
 

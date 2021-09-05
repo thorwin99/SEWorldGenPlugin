@@ -56,8 +56,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// Returns a new Instance of the edit menu for the star system designer to edit an instance of this asteroid type for the given instance.
         /// </summary>
         /// <param name="instance">The edited or spawned instance.</param>
-        /// <returns>An instance of a <see cref="MyStarSystemDesignerObjectMenu"/></returns>
-        public abstract MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance);
+        /// <param name="data">Optional data for the instance</param>
+        /// <returns>An instance of a <see cref="MyStarSystemDesignerObjectMenu"/></return>
+        public abstract MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance, IMyAsteroidData data = null);
 
         /// <summary>
         /// Generates an instance of the asteroid object provided by this class.

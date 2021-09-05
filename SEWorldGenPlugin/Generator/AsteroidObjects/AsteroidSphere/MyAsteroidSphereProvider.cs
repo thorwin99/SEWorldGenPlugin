@@ -29,9 +29,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             Static = this;
         }
 
-        public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
+        public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance, IMyAsteroidData data = null)
         {
-            return new MyStarSystemDesignerAsteroidSphereMenu(instance, GetInstanceData(instance.Id) as MyAsteroidSphereData);
+            if(data == null)
+                return new MyStarSystemDesignerAsteroidSphereMenu(instance, GetInstanceData(instance.Id) as MyAsteroidSphereData);
+            return new MyStarSystemDesignerAsteroidSphereMenu(instance, data as MyAsteroidSphereData);
         }
 
         public override MySystemAsteroids GenerateInstance(int systemIndex, in MySystemObject systemParent, double objectOrbitRadius)

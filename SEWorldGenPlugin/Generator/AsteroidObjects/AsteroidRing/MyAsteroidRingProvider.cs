@@ -141,9 +141,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return parentPlanetName + " Ring";
         }
 
-        public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance)
+        public override MyStarSystemDesignerObjectMenu CreateStarSystemDesignerEditMenu(MySystemAsteroids instance, IMyAsteroidData data = null)
         {
-            return new MyStarSystemDesignerAsteroidRingMenu(instance, GetInstanceData(instance.Id) as MyAsteroidRingData);
+            if(data == null)
+                return new MyStarSystemDesignerAsteroidRingMenu(instance, GetInstanceData(instance.Id) as MyAsteroidRingData);
+            return new MyStarSystemDesignerAsteroidRingMenu(instance, data as MyAsteroidRingData);
         }
 
         public override MyAbstractStarSystemDesignerRenderObject GetRenderObject(MySystemAsteroids instance, IMyAsteroidData data)
