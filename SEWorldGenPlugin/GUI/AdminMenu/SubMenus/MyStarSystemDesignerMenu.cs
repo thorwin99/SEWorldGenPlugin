@@ -476,7 +476,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="depth">Depth at which to add it.</param>
         private void AddObjectToList(MySystemObject obj, int depth)
         {
-            MyPluginLog.Debug("ID " + obj.Id);
             var text = new StringBuilder("");
             for (int i = 0; i < depth; i++)
                 text.Append("   ");
@@ -484,7 +483,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             text.Append(obj.DisplayName);
             if (m_pendingSystemObjects.ContainsKey(obj.Id))
             {
-                MyPluginLog.Debug("PENDING");
                 text.Append(" *");
             }
 

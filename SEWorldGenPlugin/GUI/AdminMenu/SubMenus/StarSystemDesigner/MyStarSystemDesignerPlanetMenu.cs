@@ -239,11 +239,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 orbitPos = 360 - orbitPos;
             }
 
-            MyPluginLog.Debug("RAD: " + radius);
-            MyPluginLog.Debug("EL: " + elevation);
-            MyPluginLog.Debug("ORB: " + orbitPos);
-            MyPluginLog.Debug("POS:" + m_object.CenterPosition);
-
             m_orbitRadiusSlider.Value = (float)radius / 1000f;
             m_elevationSldier.Value = (float)elevation;
             m_orbitPosSlider.Value = (float)orbitPos;
@@ -262,15 +257,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             Vector3D pos = new Vector3D(radius * Math.Cos(orbitPos) * Math.Cos(elevation), radius * Math.Sin(orbitPos) * Math.Cos(elevation), radius * Math.Sin(elevation));
 
-            MyPluginLog.Debug("------");
-            MyPluginLog.Debug("RAD: " + radius);
-            MyPluginLog.Debug("EL: " + MathHelperD.ToDegrees(elevation));
-            MyPluginLog.Debug("ORB: " + MathHelperD.ToDegrees(orbitPos));
-
             if(parent != null)
                 pos += parent.CenterPosition;
-
-            MyPluginLog.Debug("POS:" + pos);
 
             m_object.CenterPosition = pos;
         }
