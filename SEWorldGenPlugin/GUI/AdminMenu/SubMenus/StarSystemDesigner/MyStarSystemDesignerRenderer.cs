@@ -17,6 +17,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     public enum ZoomLevel
     {
         ORBIT,
+        OBJECT_SYSTEM,
         OBJECT
     }
 
@@ -60,9 +61,30 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public void FocusObject(Guid obj)
         {
             if (!m_systemRenderObjects.ContainsKey(obj)) return;
+
+            if(m_systemRenderObjects.ContainsKey(m_focusedObject))
+                m_systemRenderObjects[m_focusedObject].SetFocus(false);
+
             m_focusedObject = obj;
+
+            m_systemRenderObjects[m_focusedObject].SetFocus(true);
+
             var renderer = m_systemRenderObjects[obj];
-            double renderSize = renderer.GetObjectRenderSize(FocusZoom);
+            double renderSize = 0;
+
+            if (FocusZoom == ZoomLevel.ORBIT)
+            {
+                MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(renderer.RenderObject.ParentId);
+
+                if(parent != null)
+                {
+                    renderSize = m_systemRenderObjects[parent.Id].GetObjectRenderSize(ZoomLevel.OBJECT_SYSTEM);
+                    SetCameraTarget(parent.CenterPosition, renderSize * 2f);
+                    return;
+                }
+            }
+            renderSize = renderer.GetObjectRenderSize(FocusZoom);
+
             SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2f);
         }
 

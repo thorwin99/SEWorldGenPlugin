@@ -14,6 +14,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             protected set;
         }
 
+        /// <summary>
+        /// Whether this object is currently in focus in the Star System designer
+        /// </summary>
+        public bool IsFocused
+        {
+            get;
+            private set;
+        }
+
         public MyAbstractStarSystemDesignerRenderObject(MySystemObject obj)
         {
             RenderObject = obj;
@@ -25,6 +34,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <returns>The size of the object in the game world</returns>
         /// <param name="level">The zoom level the object should return its render size for.</param>
         public abstract double GetObjectRenderSize(ZoomLevel level);
+
+        /// <summary>
+        /// Enables or disables focus for this object
+        /// </summary>
+        /// <param name="isFocused">Whether it is focused or not</param>
+        public void SetFocus(bool isFocused)
+        {
+            IsFocused = isFocused;
+        }
 
         public abstract void Draw();
     }

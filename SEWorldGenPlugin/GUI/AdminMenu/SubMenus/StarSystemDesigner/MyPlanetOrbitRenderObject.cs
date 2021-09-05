@@ -32,7 +32,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_parent = MyStarSystemGenerator.Static.StarSystem.GetById(planet.ParentId);
             double rad = CalculateRadius();
             m_orbitRender = new RenderCircle(CalculateWorldMatrix(), (float)rad, Color.Orange.ToVector4());
-            m_planetRender = new RenderSphere(planet.CenterPosition, (float)planet.Diameter / 2, Color.DarkGreen.ToVector4());
+            m_planetRender = new RenderSphere(planet.CenterPosition, (float)planet.Diameter / 2, IsFocused ? Color.LightBlue.ToVector4() : Color.DarkGreen.ToVector4());
         }
 
         public override void Draw()
@@ -44,22 +44,43 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override double GetObjectRenderSize(ZoomLevel level)
         {
-            if(level == ZoomLevel.ORBIT)
+            if(level == ZoomLevel.OBJECT_SYSTEM)
             {
-                double radius = (RenderObject as MySystemPlanet).Diameter;
-
-                foreach (var child in RenderObject.ChildObjects)
-                {
-                    double orbitRad = Vector3D.Distance(child.CenterPosition, RenderObject.CenterPosition);
-                    radius = Math.Max(radius, orbitRad);
-                }
-
-                return radius * 2f;
+                return CalculateMaxChildOrbit();
             }
-            else
+            else if(level == ZoomLevel.OBJECT)
             {
                 return (RenderObject as MySystemPlanet).Diameter;
             }
+            else
+            {
+                var parent = MyStarSystemGenerator.Static.StarSystem.GetById(RenderObject.ParentId);
+                if (parent != null)
+                {
+                    return Vector3D.Distance(parent.CenterPosition, RenderObject.CenterPosition);
+                }
+                else
+                {
+                    return CalculateMaxChildOrbit();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the largest orbit size of a child object
+        /// </summary>
+        /// <returns>The max orbit distance of a direct children of this object</returns>
+        private double CalculateMaxChildOrbit()
+        {
+            double radius = (RenderObject as MySystemPlanet).Diameter;
+
+            foreach (var child in RenderObject.ChildObjects)
+            {
+                double orbitRad = Vector3D.Distance(child.CenterPosition, RenderObject.CenterPosition);
+                radius = Math.Max(radius, orbitRad);
+            }
+
+            return radius * 2f;
         }
 
         /// <summary>
