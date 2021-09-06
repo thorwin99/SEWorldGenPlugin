@@ -444,6 +444,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 if (parent != null)
                     newObj.CenterPosition = parent.CenterPosition;
 
+                if(parent is MySystemPlanet)
+                {
+                    newObj.CenterPosition = new Vector3D(parent.CenterPosition) + (parent as MySystemPlanet).Diameter * 2;
+                }
+
                 m_pendingSystemObjects.Add(newObj.Id, newObj);
 
                 m_selectedObjectId = newObj.Id;
