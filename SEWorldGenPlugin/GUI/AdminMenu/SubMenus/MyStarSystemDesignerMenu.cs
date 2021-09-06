@@ -1,4 +1,6 @@
-﻿using Sandbox.Graphics.GUI;
+﻿using Sandbox.Game.Multiplayer;
+using Sandbox.Game.World;
+using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
@@ -128,7 +130,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
         public override bool IsVisible()
         {
-            return MyPluginSession.Static.ServerVersionMatch;//Star system designer is only visible, IFF server and client version match up
+            return MyPluginSession.Static.ServerVersionMatch && MySession.Static.IsUserAdmin(Sync.MyId) && MySession.Static.IsUserSpaceMaster(Sync.MyId);//Star system designer is only visible, IFF server and client version match up, the user is an admin and space master
         }
 
         public override void RefreshInternals(MyGuiControlParentTableLayout parent, float maxWidth, MyAdminMenuExtension instance)
