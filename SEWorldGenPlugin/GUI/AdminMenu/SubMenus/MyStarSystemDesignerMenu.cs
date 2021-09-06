@@ -292,9 +292,27 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="obj"></param>
         private void OnObjectEdited(MySystemObject obj)
         {
+            StringBuilder name = new StringBuilder();
+            m_objNameBox.GetText(name);
+
+            obj.DisplayName = name.ToString();
+
+            int depth = MyStarSystemGenerator.Static.StarSystem.GetDepth(obj.Id);
+            if(depth < 0)
+            {
+                depth = MyStarSystemGenerator.Static.StarSystem.GetDepth(obj.ParentId) + 1;
+            }
+            if(depth > 0)
+            {
+                name.Insert(0, "   ", depth);
+            }
+            name.Append(" *");
+
+
+            m_systemObjectsBox.SelectedItems[0].Text = name;
+
             if (!m_pendingSystemObjects.ContainsKey(obj.Id))
             {
-                m_systemObjectsBox.SelectedItems[0].Text.Append(" *");
                 m_pendingSystemObjects.Add(obj.Id, obj);
 
                 if(obj.Type == MySystemObjectType.ASTEROIDS)
