@@ -15,14 +15,14 @@ namespace SEWorldGenPlugin.Generator
     public partial class MyStarSystemGenerator
     {
         /// <summary>
-        /// Adds a new object to the system. If parentName is provided, it will be added as a child to that
+        /// Adds a new object to the system. If <paramref name="parentId"/> is provided, it will be added as a child to that
         /// object, else it will be added as a child to the sun.
         /// </summary>
         /// <param name="systemObject">Object to add</param>
         /// <param name="parentId">Id of the parent object</param>
         public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentId == null ? Guid.Empty : parentId.Value);
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentId == null ? StarSystem.CenterObject.Id : parentId.Value);
         }
 
         /// <summary>
@@ -77,9 +77,18 @@ namespace SEWorldGenPlugin.Generator
                     }
                     else
                     {
-                        Static.StarSystem.CenterObject.ChildObjects.Add(obj);
-                        obj.ParentId = Static.StarSystem.CenterObject.Id;
-                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj);
+                        if(Static.StarSystem.CenterObject != null)
+                        {
+                            Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+                            obj.ParentId = Static.StarSystem.CenterObject.Id;
+                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj);
+                        }
+                        else
+                        {
+                            Static.StarSystem.CenterObject = obj;
+                            obj.ParentId = Guid.Empty;
+                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj);
+                        }
                     }
 
                     Static.AddAllPersistentGps();
@@ -105,6 +114,10 @@ namespace SEWorldGenPlugin.Generator
             if(!Static.StarSystem.Contains(obj.Id) && parent != null)
             {
                 parent.ChildObjects.Add(obj);
+            }
+            else if(obj.ParentId == Guid.Empty && Static.StarSystem.CenterObject == null)
+            {
+                Static.StarSystem.CenterObject = obj;
             }
             else
             {
