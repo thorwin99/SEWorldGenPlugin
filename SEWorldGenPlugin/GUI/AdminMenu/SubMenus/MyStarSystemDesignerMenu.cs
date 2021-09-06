@@ -438,9 +438,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     m_pendingSystemObjects.Add(roid.Id, roid);
                     m_pendingAsteroidData.Add(roid.Id, data);
 
-                    m_selectedObjectId = roid.Id;
-
                     RefreshSystemList();
+                    m_systemObjectsBox.SelectSingleItem(m_itemList[roid.Id]);
+                    OnSystemObjectSelected(m_systemObjectsBox);
                 };
 
                 MyGuiSandbox.AddScreen(asteroidDialog);
@@ -480,9 +480,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                 m_pendingSystemObjects.Add(newObj.Id, newObj);
 
-                m_selectedObjectId = newObj.Id;
-
                 RefreshSystemList();
+                m_systemObjectsBox.SelectSingleItem(m_itemList[newObj.Id]);
+                OnSystemObjectSelected(m_systemObjectsBox);
             }
         }
 
@@ -506,6 +506,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             if (m_selectedObjectId != Guid.Empty)
             {
                 m_systemObjectsBox.SelectSingleItem(m_itemList[m_selectedObjectId]);
+                m_renderer.FocusObject(m_selectedObjectId);
             }
         }
 
