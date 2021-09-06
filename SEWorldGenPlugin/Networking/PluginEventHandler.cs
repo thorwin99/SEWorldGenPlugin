@@ -196,6 +196,36 @@ namespace SEWorldGenPlugin.Networking
         }
 
         /// <summary>
+        /// Serializes the <paramref name="obj"/> of given type <typeparamref name="T"/> to a byte array
+        /// </summary>
+        /// <typeparam name="T">Type of the serialized object</typeparam>
+        /// <param name="obj">Object to serialize</param>
+        /// <returns></returns>
+        public byte[] Serialize<T>(T obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                Serializer.SerializeWithLengthPrefix(ms, obj, PrefixStyle.Base128);
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Deserializes the <paramref name="data"/> for given type <typeparamref name="T"/> to an instance of an object of type <typeparamref name="T"/>
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="data">Byte data of object</param>
+        /// <returns>Object deserialized from data</returns>
+        public T Deserialize<T>(byte[] data)
+        {
+            using (var ms = new MemoryStream(data))
+            {
+                T obj = Serializer.DeserializeWithLengthPrefix<T>(ms, PrefixStyle.Base128);
+                return obj;
+            }
+        }
+
+        /// <summary>
         /// Unloads all data used by this session component
         /// </summary>
         protected override void UnloadData()
