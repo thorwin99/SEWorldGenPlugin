@@ -1,6 +1,7 @@
 using VRage.Game;
 using VRage.Utils;
 using VRageMath;
+using VRageRender;
 
 namespace SEWorldGenPlugin.Draw
 {
@@ -10,7 +11,6 @@ namespace SEWorldGenPlugin.Draw
         public float InnerRadius;
         public float OuterRadius;
         public Color Color;
-        public Color InnerColor;
 
         /// <summary>
         /// Creates a new sphere at the given position with given radius and color.
@@ -25,7 +25,6 @@ namespace SEWorldGenPlugin.Draw
             InnerRadius = innerRadius;
             OuterRadius = outerRadius;
             Color = color;
-            InnerColor = Color.Red;
             LineThickness = lineThickness;
         }
 
@@ -35,9 +34,8 @@ namespace SEWorldGenPlugin.Draw
         /// </summary>
         public override void Draw()
         {
-            MatrixD wm = MatrixD.CreateWorld(Position);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, InnerRadius, ref InnerColor, MySimpleObjectRasterizer.Wireframe, 50, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: LineThickness);
-            MySimpleObjectDraw.DrawTransparentSphere(ref wm, OuterRadius, ref Color, MySimpleObjectRasterizer.Wireframe, 150, lineMaterial: MyStringId.GetOrCompute("GizmoDrawLine"), lineThickness: LineThickness);
+            MyRenderProxy.DebugDrawSphere(Position, InnerRadius, Color, 0.5f, true, false, true, false);
+            MyRenderProxy.DebugDrawSphere(Position, OuterRadius, Color, 0.5f, true, false, true, false);
         }
     }
 }

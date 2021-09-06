@@ -29,6 +29,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         public override void Draw()
         {
             m_render.Color = IsFocused ? Color.Green.ToVector4() : Color.Brown.ToVector4();
+            m_render.InnerRadius = (float)m_data.InnerRadius;
+            m_render.OuterRadius = (float)m_data.OuterRadius;
             m_render.Draw();
         }
 

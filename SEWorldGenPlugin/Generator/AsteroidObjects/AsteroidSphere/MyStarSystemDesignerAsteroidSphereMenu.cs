@@ -53,7 +53,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             m_widthSlider.ValueChanged += UpdateObjectData;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Width"));
-            controlTable.AddTableRow(m_radiusSlider);
+            controlTable.AddTableRow(m_widthSlider);
 
             m_asteroidSizesSlider = new MyGuiControlRangedSlider(32, 1024, 32, 1024, true, width: maxWidth - 0.1f, showLabel: true);
             m_asteroidSizesSlider.ValueChanged += UpdateObjectData;
