@@ -465,6 +465,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 newObj.DisplayName = "New Object";
                 newObj.ParentId = m_selectedObjectId;
 
+                if(newObj is MySystemPlanet)
+                {
+                    (newObj as MySystemPlanet).Diameter = 60000;
+                }
+
                 if (parent != null)
                     newObj.CenterPosition = parent.CenterPosition;
 
