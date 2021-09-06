@@ -7,6 +7,13 @@ generation to worlds aswell as some other neat features. More info in the [wiki]
 
 For installation instructions, please refer to the wiki [here](https://github.com/thorwin99/SEWorldGenPlugin/wiki/Installation)
 
+## Important info for servers
+
+This plugin is not really optimised for server usage. The planetary generation function will always work, however the custom asteroid generation
+can cause problems, if you have high player counts on that server. It is possible to run the plugin on those servers, however it will be very perfomance
+intensive, since it uses a slight hack to get asteroids to generate. You can see the details of the issue with large player counts and servers in the issues
+#109 and issue #80. You can always disable the asteroid generation and use the vanilla one, if you only want to generate the planets and gps for them.
+
 # Troubleshooting
 
 ## Crash on startup
