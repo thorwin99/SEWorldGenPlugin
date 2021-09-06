@@ -200,6 +200,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
         /// <summary>
         /// Creates the sub menu controls, based on the type of selected object and whether it already exists or not.
+        /// Enables the add object button, if the selected object exists in the star system, and if the type supports child objects.
+        /// Enables the apply button if the object was edited.
         /// </summary>
         private void SetSubMenuControls()
         {
@@ -211,6 +213,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             if (m_pendingSystemObjects.ContainsKey(m_selectedObjectId))
             {
                 obj = m_pendingSystemObjects[m_selectedObjectId];
+                m_applyChangesButton.Enabled = true;
             }
             else if (exists)
             {
@@ -232,7 +235,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             };
 
             m_addObjectButton.Enabled = exists;
-            
+
             m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Name"));
             m_subMenuControlTable.AddTableRow(m_objNameBox);
 
@@ -310,6 +313,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
 
             m_systemObjectsBox.SelectedItems[0].Text = name;
+
+            m_applyChangesButton.Enabled = true;
 
             if (!m_pendingSystemObjects.ContainsKey(obj.Id))
             {
