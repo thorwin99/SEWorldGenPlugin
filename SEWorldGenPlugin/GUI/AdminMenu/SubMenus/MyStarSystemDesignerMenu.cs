@@ -521,8 +521,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 {
                     MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId);
                 }
-                
             }
+
+            m_pendingAsteroidData.Remove(m_selectedObjectId);
+            m_pendingSystemObjects.Remove(m_selectedObjectId);
+
+            RefreshSystem(m_refreshSystemButton);
         }
 
         /// <summary>

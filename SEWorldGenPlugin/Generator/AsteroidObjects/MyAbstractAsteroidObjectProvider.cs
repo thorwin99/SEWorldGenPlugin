@@ -1,7 +1,6 @@
-﻿using Sandbox.Game.Multiplayer;
-using SEWorldGenPlugin.Draw;
+﻿using ProtoBuf;
+using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
-using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
@@ -195,6 +194,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         }
 
         /// <summary>
+        /// Serializes the given data for network communication
+        /// </summary>
+        /// <param name="data">Data to serialize</param>
+        /// <returns>The serialized data</returns>
+        protected abstract MySerializedAsteroidData SerializeData(IMyAsteroidData data);
+
+        /// <summary>
+        /// Deserializes the given data from network communication
+        /// </summary>
+        /// <param name="data">Data to serialize</param>
+        /// <returns>The deserialized data</returns>
+        protected abstract IMyAsteroidData DeserializeData(MySerializedAsteroidData data);
+
+        /// <summary>
         /// Server: Fetches all asteroid data for the specified provider from server.
         /// </summary>
         /// <param name="provider">Provider to fetch data for.</param>
@@ -208,7 +221,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(provider, out prov))
             {
-                PluginEventHandler.Static.RaiseStaticEvent(EventFetchDataClient, provider, prov.m_savedData, requesterId);
+                Dictionary<Guid, MySerializedAsteroidData> serializedData = new Dictionary<Guid, MySerializedAsteroidData>();
+                foreach(var entry in prov.m_savedData)
+                {
+                    serializedData.Add(entry.Key, prov.SerializeData(entry.Value));
+                }
+
+                PluginEventHandler.Static.RaiseStaticEvent(EventFetchDataClient, provider, serializedData, requesterId);
             }
         }
 
@@ -219,7 +238,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="data">Data of the provider.</param>
         [Event(4001)]
         [Client]
-        private static void EventFetchDataClient(string provider, Dictionary<Guid, IMyAsteroidData> data)
+        private static void EventFetchDataClient(string provider, Dictionary<Guid, MySerializedAsteroidData> data)
         {
             if (Sync.IsServer) return;
 
@@ -231,7 +250,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 prov.m_savedData.Clear();
                 foreach (var entry in data)
                 {
-                    prov.m_savedData.Add(entry.Key, entry.Value);
+                    prov.m_savedData.Add(entry.Key, prov.DeserializeData(entry.Value));
                 }
             }
         }
@@ -243,7 +262,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="instanceData">The data of the asteroid object.</param>
         [Event(4002)]
         [Server]
-        protected static void EventAddInstanceServer(MySystemAsteroids systemInstance, IMyAsteroidData instanceData)
+        protected static void EventAddInstanceServer(MySystemAsteroids systemInstance, MySerializedAsteroidData instanceData)
         {
             MyPluginLog.Log("Server: Adding new asteroid object instance " + systemInstance.Id + " to system");
 
@@ -253,7 +272,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 var system = MyStarSystemGenerator.Static.StarSystem;
                 if (system.Add(systemInstance))
                 {
-                    prov.m_savedData[systemInstance.Id] = instanceData;
+                    prov.m_savedData[systemInstance.Id] = prov.DeserializeData(instanceData);
                     PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceAdded, systemInstance, instanceData);
                 }
             }
@@ -266,7 +285,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="instanceData">Data of the instance.</param>
         [Event(4003)]
         [Broadcast]
-        private static void BroadcastInstanceAdded(MySystemAsteroids systemInstance, IMyAsteroidData instanceData)
+        private static void BroadcastInstanceAdded(MySystemAsteroids systemInstance, MySerializedAsteroidData instanceData)
         {
             if (Sync.IsServer) return;
 
@@ -278,7 +297,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 var system = MyStarSystemGenerator.Static.StarSystem;
                 if (system.Add(systemInstance))
                 {
-                    prov.m_savedData[systemInstance.Id] = instanceData;
+                    prov.m_savedData[systemInstance.Id] = prov.DeserializeData(instanceData);
                 }
                 else
                 {
@@ -351,7 +370,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="instanceData">Data to set for the asteroid object</param>
         [Event(4006)]
         [Server]
-        protected static void EventSetInstanceData(string providerName, Guid instanceId, IMyAsteroidData instanceData)
+        protected static void EventSetInstanceData(string providerName, Guid instanceId, MySerializedAsteroidData instanceData)
         {
             MyPluginLog.Log("Server: Removing asteroid object instance " + instanceId + " from the system");
 
@@ -361,7 +380,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 var system = MyStarSystemGenerator.Static.StarSystem;
                 if (system.Contains(instanceId))
                 {
-                    prov.m_savedData[instanceId] = instanceData;
+                    prov.m_savedData[instanceId] = prov.DeserializeData(instanceData);
                     PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceDataSet, providerName, instanceId, instanceData);
                 }
                 else
@@ -379,7 +398,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="instanceData">Data that got set for the asteroid object</param>
         [Event(4007)]
         [Broadcast]
-        private static void BroadcastInstanceDataSet(string providerName, Guid instanceId, IMyAsteroidData instanceData)
+        private static void BroadcastInstanceDataSet(string providerName, Guid instanceId, MySerializedAsteroidData instanceData)
         {
             if (Sync.IsServer) return;
 
@@ -388,7 +407,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(providerName, out prov))
             {
-                prov.m_savedData[instanceId] = instanceData;
+                prov.m_savedData[instanceId] = prov.DeserializeData(instanceData);
             }
         }
     }
@@ -423,11 +442,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
 
             if (!(instanceData is T))
             {
-                MyPluginLog.Log("Client: Tried to add an instance with wrong type of data.");
+                MyPluginLog.Log("Client: Tried to add an instance with wrong type of data.", LogLevel.WARNING);
                 return;
             }
 
-            PluginEventHandler.Static.RaiseStaticEvent(EventAddInstanceServer, systemInstance, instanceData);
+            PluginEventHandler.Static.RaiseStaticEvent(EventAddInstanceServer, systemInstance, SerializeData(instanceData));
         }
 
         public override void SetInstanceData(Guid instanceId, IMyAsteroidData instanceData)
@@ -439,10 +458,51 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
 
             if (!(instanceData is T))
             {
-                MyPluginLog.Log("Client: Tried to add an instance with wrong type of data.");
+                MyPluginLog.Log("Client: Tried to add an instance with wrong type of data.", LogLevel.WARNING);
             }
 
-            PluginEventHandler.Static.RaiseStaticEvent(EventSetInstanceData, GetTypeName(), instanceId, instanceData);
+            PluginEventHandler.Static.RaiseStaticEvent(EventSetInstanceData, GetTypeName(), instanceId, SerializeData(instanceData));
+        }
+
+        protected override MySerializedAsteroidData SerializeData(IMyAsteroidData data)
+        {
+            if(data is T)
+            {
+                return new MySerializedAsteroidData(PluginEventHandler.Static.Serialize<T>((T)data));
+            }
+            else
+            {
+                MyPluginLog.Log("Tried to serialize data of another provider. Aborting.", LogLevel.ERROR);
+            }
+
+            return null;
+        }
+
+        protected override IMyAsteroidData DeserializeData(MySerializedAsteroidData data)
+        {
+            try
+            {
+                T d = PluginEventHandler.Static.Deserialize<T>(data.Data);
+                return d;
+            }
+            catch (Exception)
+            {
+                MyPluginLog.Log("Tried to deserialize data of another provider. Aborting.", LogLevel.ERROR);
+            }
+            return null;
+        }
+    }
+
+    [Serializable]
+    [ProtoContract]
+    public class MySerializedAsteroidData
+    {
+        [ProtoMember(1)]
+        public byte[] Data;
+
+        public MySerializedAsteroidData(byte[] data)
+        {
+            Data = data;
         }
     }
 }
