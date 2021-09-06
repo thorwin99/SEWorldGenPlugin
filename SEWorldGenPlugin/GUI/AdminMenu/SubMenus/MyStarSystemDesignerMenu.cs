@@ -231,8 +231,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 OnObjectEdited(obj);
             };
 
-            m_addObjectButton.Enabled = true;
-
+            m_addObjectButton.Enabled = exists;
+            
             m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Name"));
             m_subMenuControlTable.AddTableRow(m_objNameBox);
 
@@ -262,7 +262,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         adminMenu.OnObjectChanged += OnObjectEdited;
                         m_currentObjectMenu = adminMenu;
 
-                        m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild;
+                        m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild && exists;
                     }
                 }
             }
