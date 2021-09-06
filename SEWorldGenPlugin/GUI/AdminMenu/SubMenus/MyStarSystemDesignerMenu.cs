@@ -195,7 +195,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableRow(m_subMenuControlTable);
             parent.AddTableSeparator();
 
-            m_applyChangesButton = MyPluginGuiHelper.CreateDebugButton("Apply", AddNewSystemObject, false, "Apply settings of this object and spawn it if it isnt spawned yet.");
+            m_applyChangesButton = MyPluginGuiHelper.CreateDebugButton("Apply", ApplyChanges, false, "Apply settings of this object and spawn it if it isnt spawned yet.");
             m_applyChangesButton.Size = new Vector2(maxWidth, m_applyChangesButton.Size.Y);
 
             parent.AddTableRow(m_applyChangesButton);
@@ -492,7 +492,37 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="btn"></param>
         private void ApplyChanges(MyGuiControlButton btn)
         {
+            MySystemObject obj = m_pendingSystemObjects[m_selectedObjectId];
 
+            var system = MyStarSystemGenerator.Static.StarSystem;
+
+            if(obj is MySystemAsteroids)
+            {
+                MySystemAsteroids roid = obj as MySystemAsteroids;
+                MyAbstractAsteroidObjectProvider prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[roid.AsteroidTypeName];
+
+                if (system.Contains(m_selectedObjectId))
+                {
+                    prov.SetInstanceData(roid.Id, m_pendingAsteroidData[m_selectedObjectId]);
+                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName);
+                }
+                else
+                {
+                    prov.AddInstance(roid, m_pendingAsteroidData[m_selectedObjectId]);
+                }
+            }
+            else
+            {
+                if (system.Contains(m_selectedObjectId))
+                {
+                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName);
+                }
+                else
+                {
+                    MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId);
+                }
+                
+            }
         }
 
         /// <summary>
