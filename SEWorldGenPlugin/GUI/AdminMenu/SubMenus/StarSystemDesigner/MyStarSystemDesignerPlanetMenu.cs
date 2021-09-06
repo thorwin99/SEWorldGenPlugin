@@ -68,7 +68,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet type"));
             controlTable.AddTableRow(m_planetTypeCombobox);
 
-            m_sizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSizeCap, maxWidth - 0.1f, intValue: true, labelSuffix: " m", showLabel: true);
+            m_sizeSlider = new MyGuiControlClickableSlider(null, 1f, settings.PlanetSizeCap / 1000f, maxWidth - 0.1f, intValue: true, labelSuffix: " km", showLabel: true);
             m_sizeSlider.SetToolTip(new MyToolTips("The size of the planet in meters."));
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet size"));
@@ -197,7 +197,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         private void SetPlanetSize()
         {
             MySystemPlanet planet = m_object as MySystemPlanet;
-            m_sizeSlider.Value = (float)planet.Diameter;
+            m_sizeSlider.Value = (float)planet.Diameter / 1000f;
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         private void OnSizeChanged(MyGuiControlSlider s)
         {
             MySystemPlanet planet = m_object as MySystemPlanet;
-            planet.Diameter = s.Value;
+            planet.Diameter = s.Value * 1000f;
 
             ChangedObject();
         }

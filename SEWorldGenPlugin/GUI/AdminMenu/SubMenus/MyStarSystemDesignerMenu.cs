@@ -311,7 +311,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             }
             name.Append(" *");
 
-
             m_systemObjectsBox.SelectedItems[0].Text = name;
 
             m_applyChangesButton.Enabled = true;
