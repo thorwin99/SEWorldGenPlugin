@@ -38,9 +38,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 case ZoomLevel.ORBIT:
                     return radius;
                 case ZoomLevel.OBJECT_SYSTEM:
-                    return radius * 0.5f;
+                    return radius * 0.75f;
                 case ZoomLevel.OBJECT:
-                    return radius * 0.25f;
+                    return radius * 0.5f;
                 default:
                     return radius;
             }
