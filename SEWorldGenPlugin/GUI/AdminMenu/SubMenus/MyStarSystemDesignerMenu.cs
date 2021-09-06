@@ -40,6 +40,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlButton m_applyChangesButton;
 
         /// <summary>
+        /// Button used to enable the plugin if it is disabled.
+        /// </summary>
+        private MyGuiControlButton m_enablePluginButton;
+
+        /// <summary>
         /// Button used to zoom into the current selected object.
         /// </summary>
         private MyGuiControlButton m_zoomInButton;
@@ -130,6 +135,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             MyPluginLog.Debug("Building Star system designer admin menu");
 
+            if (!MySettingsSession.Static.Settings.Enabled)
+            {
+                m_enablePluginButton = MyPluginGuiHelper.CreateDebugButton("Enable Plugin", OnEnablePlugin, true);
+
+                parent.AddTableRow(m_enablePluginButton);
+
+                return;
+            }
+
             m_adminMenuInst = instance;
             m_usableWidth = maxWidth;
             m_renderer = new MyStarSystemDesignerRenderer();
@@ -196,6 +210,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         public override void Draw()
         {
             m_renderer.Draw();
+        }
+
+        /// <summary>
+        /// Called when plugin should be enabled.
+        /// </summary>
+        private void OnEnablePlugin(MyGuiControlButton btn)
+        {
+
         }
 
         /// <summary>
