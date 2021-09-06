@@ -51,6 +51,25 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
+        /// Return the depth of the object in the system hierarchy.
+        /// </summary>
+        /// <param name="id">Id of the object</param>
+        /// <returns>The depth of the object or -1 if it is not in the system</returns>
+        public int GetDepth(Guid id)
+        {
+            int d = -1;
+            Foreach((depth, obj) =>
+            {
+                if(obj.Id == id)
+                {
+                    d = depth;
+                }
+            });
+
+            return d;
+        }
+
+        /// <summary>
         /// Searches the system for an object with the given
         /// id and returns it if found, else null
         /// </summary>
