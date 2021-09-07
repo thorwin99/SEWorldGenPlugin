@@ -37,7 +37,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             }
             if (data == null)
             {
-                m_data = new MyAsteroidSphereData();
+                Data = new MyAsteroidSphereData();
             }
         }
 
@@ -67,7 +67,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
 
         private void UpdateObjectData(MyGuiControlBase control)
         {
-            var data = m_data as MyAsteroidSphereData;
+            var data = Data as MyAsteroidSphereData;
             var roid = m_object as MySystemAsteroids;
 
             data.InnerRadius = m_radiusSlider.Value * 1000.0;
@@ -84,7 +84,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         {
             MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
-            var data = m_data as MyAsteroidSphereData;
+            var data = Data as MyAsteroidSphereData;
             var roid = m_object as MySystemAsteroids;
 
             if (parent == MyStarSystemGenerator.Static.StarSystem.CenterObject)
@@ -97,7 +97,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                 m_widthSlider.MaxValue = settings.MinMaxOrbitDistance.Min / 1000;
                 m_widthSlider.Value = (float)((data.OuterRadius - data.InnerRadius) / 1000f);
 
-                m_asteroidSizesSlider.SetValues(roid.AsteroidSize.Min, roid.AsteroidSize.Min);
+                m_asteroidSizesSlider.SetValues(roid.AsteroidSize.Min, roid.AsteroidSize.Max);
                 return;
             }
             else
@@ -117,7 +117,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
                         m_widthSlider.MaxValue = (float)planet.Diameter / 5000f;
                         m_widthSlider.Value = (float)((data.OuterRadius - data.InnerRadius) / 1000f);
 
-                        m_asteroidSizesSlider.SetValues(roid.AsteroidSize.Min, roid.AsteroidSize.Min);
+                        m_asteroidSizesSlider.SetValues(roid.AsteroidSize.Min, roid.AsteroidSize.Max);
                         return;
                     }
                 }

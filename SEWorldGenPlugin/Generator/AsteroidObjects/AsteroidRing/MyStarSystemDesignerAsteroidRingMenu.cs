@@ -57,7 +57,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             }
             if(data == null)
             {
-                m_data = new MyAsteroidRingData();
+                Data = new MyAsteroidRingData();
             }
         }
 
@@ -114,7 +114,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// </summary>
         private void GetControlsFromRoid()
         {
-            var data = m_data as MyAsteroidRingData;
+            var data = Data as MyAsteroidRingData;
             var roid = m_object as MySystemAsteroids;
             var planet = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId) as MySystemPlanet;
 
@@ -168,7 +168,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// <param name="control">Control that changed a value for a property of the asteroid ring</param>
         private void OnValueChanged(MyGuiControlBase control)
         {
-            var data = m_data as MyAsteroidRingData;
+            var data = Data as MyAsteroidRingData;
             var roid = m_object as MySystemAsteroids;
 
             data.Radius = m_radiusSlider.Value * 1000f;
