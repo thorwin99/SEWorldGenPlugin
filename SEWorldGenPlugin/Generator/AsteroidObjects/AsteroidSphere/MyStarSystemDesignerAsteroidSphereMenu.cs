@@ -59,6 +59,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             controlTable.AddTableRow(m_asteroidSizesSlider);
 
             SetSliderValues();
+            UpdateObjectData(null);//Update sphere with values from slider, incase previous values were outside of slider range.
 
             m_radiusSlider.ValueChanged += UpdateObjectData;
             m_widthSlider.ValueChanged += UpdateObjectData;

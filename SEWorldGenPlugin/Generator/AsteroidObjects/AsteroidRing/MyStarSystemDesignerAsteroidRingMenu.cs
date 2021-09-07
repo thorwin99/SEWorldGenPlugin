@@ -99,6 +99,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             controlTable.AddTableRow(m_angleZSlider);
 
             GetControlsFromRoid();
+            OnValueChanged(null);//Update ring with values from slider, incase previous values were outside of slider range.
 
             m_radiusSlider.ValueChanged += OnValueChanged;
             m_widthSlider.ValueChanged += OnValueChanged;
