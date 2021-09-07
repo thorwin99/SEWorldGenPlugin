@@ -234,6 +234,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             var StarSystem = MyStarSystemGenerator.Static.StarSystem;
             bool exists = StarSystem.Contains(m_selectedObjectId);
             MySystemObject obj;
+
+            m_applyChangesButton.Enabled = false;
+
             if (m_pendingSystemObjects.ContainsKey(m_selectedObjectId))
             {
                 obj = m_pendingSystemObjects[m_selectedObjectId];
