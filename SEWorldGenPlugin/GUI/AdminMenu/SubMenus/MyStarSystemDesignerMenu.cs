@@ -365,7 +365,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             if (box.SelectedItems.Count < 1) return;
             Guid newId = (Guid)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
-            MyPluginLog.Debug("On selecet " + newId);
 
             SelectSystemObject(newId);
         }
