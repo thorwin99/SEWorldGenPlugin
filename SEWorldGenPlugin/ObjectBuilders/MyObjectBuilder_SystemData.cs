@@ -412,7 +412,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             Type = MySystemObjectType.ASTEROIDS;
             DisplayName = "";
             CenterPosition = Vector3D.Zero;
-            AsteroidSize = new MySerializableMinMax(0, 0);
+            AsteroidSize = new MySerializableMinMax(32, 1024);
         }
     }
 
