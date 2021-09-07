@@ -363,10 +363,28 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             if (box.SelectedItems.Count < 1) return;
             Guid newId = (Guid)box.SelectedItems[box.SelectedItems.Count - 1].UserData;
             MyPluginLog.Debug("On selecet " + newId);
-            m_selectedObjectId = newId;
+
+            SelectSystemObject(newId);
+        }
+
+        /// <summary>
+        /// Selects the given system object
+        /// </summary>
+        /// <param name="objectId"></param>
+        private void SelectSystemObject(Guid objectId)
+        {
+            if(objectId == Guid.Empty)
+            {
+                m_addObjectButton.Enabled = true;
+                m_applyChangesButton.Enabled = false;
+                return;
+            }
+
+            m_systemObjectsBox.SelectSingleItem(m_itemList[objectId]);
+            m_selectedObjectId = objectId;
             SetSubMenuControls();
 
-            m_renderer.FocusObject(newId);
+            m_renderer.FocusObject(objectId);
         }
 
         /// <summary>
@@ -439,8 +457,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     m_pendingAsteroidData.Add(roid.Id, data);
 
                     RefreshSystemList();
-                    m_systemObjectsBox.SelectSingleItem(m_itemList[roid.Id]);
-                    OnSystemObjectSelected(m_systemObjectsBox);
+                    SelectSystemObject(roid.Id);
                 };
 
                 MyGuiSandbox.AddScreen(asteroidDialog);
@@ -481,8 +498,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 m_pendingSystemObjects.Add(newObj.Id, newObj);
 
                 RefreshSystemList();
-                m_systemObjectsBox.SelectSingleItem(m_itemList[newObj.Id]);
-                OnSystemObjectSelected(m_systemObjectsBox);
+                SelectSystemObject(newObj.Id);
             }
         }
 
@@ -500,19 +516,25 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 MySystemAsteroids roid = obj as MySystemAsteroids;
                 MyAbstractAsteroidObjectProvider prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[roid.AsteroidTypeName];
+                IMyAsteroidData data = m_pendingAsteroidData[roid.Id];
+
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
 
                 if (system.Contains(m_selectedObjectId))
                 {
-                    prov.SetInstanceData(roid.Id, m_pendingAsteroidData[m_selectedObjectId]);
+                    prov.SetInstanceData(roid.Id, data);
                     MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName);
                 }
                 else
                 {
-                    prov.AddInstance(roid, m_pendingAsteroidData[m_selectedObjectId]);
+                    prov.AddInstance(roid, data);
                 }
             }
             else
             {
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
                 if (system.Contains(m_selectedObjectId))
                 {
                     MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName);
@@ -522,9 +544,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId);
                 }
             }
-
-            m_pendingAsteroidData.Remove(m_selectedObjectId);
-            m_pendingSystemObjects.Remove(m_selectedObjectId);
 
             RefreshSystem(m_refreshSystemButton);
         }
@@ -537,11 +556,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             RefreshSystemList();
 
-            if (m_selectedObjectId != Guid.Empty)
-            {
-                m_systemObjectsBox.SelectSingleItem(m_itemList[m_selectedObjectId]);
-                m_renderer.FocusObject(m_selectedObjectId);
-            }
+            SelectSystemObject(m_selectedObjectId);
         }
 
         /// <summary>
