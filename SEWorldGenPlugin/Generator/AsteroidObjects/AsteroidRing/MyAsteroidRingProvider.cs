@@ -157,8 +157,15 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             return null;
         }
 
-        public override IMyAsteroidData GetDefaultData()
+        public override IMyAsteroidData GetDefaultData(MySystemObject parent)
         {
+            if(parent is MySystemPlanet)
+            {
+                MyAsteroidRingData data = new MyAsteroidRingData();
+                data.Radius = (parent as MySystemPlanet).Diameter;
+                return data;
+            }
+
             return new MyAsteroidRingData();
         }
     }

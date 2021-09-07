@@ -118,10 +118,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
 
         /// <summary>
         /// Return a default instance of asteroid data for this provider.
+        /// If <paramref name="parent"/> is not null, the data will be set with default
+        /// values for that parent object, if it is null a completely default data will be returned
         /// This instance is not yet associated with ANY asteroid instance.
         /// </summary>
+        /// <param name="parent">A parent for this instance data, that way default values can be set according to the parent.</param>
         /// <returns>A new default instance of data for this provider type.</returns>
-        public abstract IMyAsteroidData GetDefaultData();
+        public abstract IMyAsteroidData GetDefaultData(MySystemObject parent);
 
         /// <summary>
         /// Loads all known data for this provider from the server.

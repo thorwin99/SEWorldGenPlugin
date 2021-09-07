@@ -444,14 +444,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                     MySystemAsteroids roid = new MySystemAsteroids();
                     roid.AsteroidTypeName = typeName;
-                    roid.Type = type;
+                    roid.Type = MySystemObjectType.ASTEROIDS;
                     roid.DisplayName = "New Asteroid";
                     roid.ParentId = m_selectedObjectId;
 
                     if (parent != null)
                         roid.CenterPosition = parent.CenterPosition;
 
-                    IMyAsteroidData data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[typeName].GetDefaultData();
+                    IMyAsteroidData data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[typeName].GetDefaultData(parent);
 
                     m_pendingSystemObjects.Add(roid.Id, roid);
                     m_pendingAsteroidData.Add(roid.Id, data);
@@ -564,7 +564,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         private void RefreshSystemList()
         {
-            MyPluginLog.Debug("Refresh");
             m_systemObjectsBox.ClearItems();
             m_renderer.ClearRenderList();
             m_itemList.Clear();
@@ -621,8 +620,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="obj">Object to add</param>
         private void AddObjectToRenderer(MySystemObject obj)
         {
-            MyAbstractStarSystemDesignerRenderObject render = null;
-
             if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
             {
                 m_renderer.AddObject(obj.Id, new MyPlanetOrbitRenderObject(obj as MySystemPlanet));
@@ -636,22 +633,17 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 {
                     if (m_pendingAsteroidData.ContainsKey(obj.Id))
                     {
-                        render = prov.GetRenderObject(roid, m_pendingAsteroidData[obj.Id]);
+                        m_renderer.AddObject(obj.Id, prov.GetRenderObject(roid, m_pendingAsteroidData[obj.Id]));
                     }
                     else
                     {
-                        render = prov.GetRenderObject(roid, prov.GetInstanceData(roid.Id));
+                        m_renderer.AddObject(obj.Id, prov.GetRenderObject(roid, prov.GetInstanceData(roid.Id)));
                     }
                 }
             }
             else
             {
                 m_renderer.AddObject(obj.Id, new MyEmptyObjectRenderObject(obj));
-            }
-
-            if (render != null)
-            {
-                m_renderer.AddObject(obj.Id, render);
             }
         }
     }

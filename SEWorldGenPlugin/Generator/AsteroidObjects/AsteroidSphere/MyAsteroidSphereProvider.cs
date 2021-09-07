@@ -48,8 +48,15 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
             return null;
         }
 
-        public override IMyAsteroidData GetDefaultData()
+        public override IMyAsteroidData GetDefaultData(MySystemObject parent)
         {
+            if(parent is MySystemPlanet)
+            {
+                MyAsteroidSphereData data = new MyAsteroidSphereData();
+                data.InnerRadius = (parent as MySystemPlanet).Diameter / 2;
+                return data;
+            }
+
             return new MyAsteroidSphereData();
         }
 
