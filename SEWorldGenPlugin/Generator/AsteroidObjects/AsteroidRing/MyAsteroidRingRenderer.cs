@@ -44,6 +44,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             m_render.Radius = (float)(shape.radius + shape.width);
             m_render.InnerRadius = (float)shape.radius;
             m_render.Height = (float)shape.height;
+            m_render.LineThickness = m_render.Radius / 200f;
 
             m_render.Draw();
         }
