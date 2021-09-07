@@ -468,7 +468,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         {
             if(data is T)
             {
-                return new MySerializedAsteroidData(PluginEventHandler.Static.Serialize<T>((T)data));
+                return new MySerializedAsteroidData(PluginEventHandler.Static.Serialize((T)data));
             }
             else
             {
@@ -499,6 +499,10 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
     {
         [ProtoMember(1)]
         public byte[] Data;
+
+        public MySerializedAsteroidData()
+        {
+        }
 
         public MySerializedAsteroidData(byte[] data)
         {

@@ -64,48 +64,49 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)
         {
             m_radiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: 1, labelSuffix: " km", showLabel: true);
-            m_radiusSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Radius"));
             controlTable.AddTableRow(m_radiusSlider);
 
             m_widthSlider = new MyGuiControlClickableSlider(null, 0, 1, maxWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
-            m_widthSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Width"));
             controlTable.AddTableRow(m_widthSlider);
 
             m_heightSlider = new MyGuiControlClickableSlider(null, 0, 1, maxWidth - 0.1f, 0.5f, showLabel: true, labelSuffix: " km");
-            m_heightSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Height"));
             controlTable.AddTableRow(m_heightSlider);
 
             m_asteroidSizesSlider = new MyGuiControlRangedSlider(32, 1024, 32, 1024, true, width: maxWidth - 0.1f, showLabel: true);
-            m_asteroidSizesSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Asteroid sizes"));
             controlTable.AddTableRow(m_asteroidSizesSlider);
 
             m_angleXSlider = new MyGuiControlClickableSlider(null, -90, 90, maxWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
-            m_angleXSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Angle X"));
             controlTable.AddTableRow(m_angleXSlider);
 
             m_angleYSlider = new MyGuiControlClickableSlider(null, -90, 90, maxWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
-            m_angleYSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Angle Y"));
             controlTable.AddTableRow(m_angleYSlider);
 
             m_angleZSlider = new MyGuiControlClickableSlider(null, -90, 90, maxWidth - 0.1f, defaultValue: 0, intValue: true, showLabel: true, labelSuffix: "°");
-            m_angleZSlider.ValueChanged += OnValueChanged;
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Angle Z"));
             controlTable.AddTableRow(m_angleZSlider);
 
             GetControlsFromRoid();
+
+            m_radiusSlider.ValueChanged += OnValueChanged;
+            m_widthSlider.ValueChanged += OnValueChanged;
+            m_heightSlider.ValueChanged += OnValueChanged;
+            m_asteroidSizesSlider.ValueChanged += OnValueChanged;
+            m_angleXSlider.ValueChanged += OnValueChanged;
+            m_angleYSlider.ValueChanged += OnValueChanged;
+            m_angleZSlider.ValueChanged += OnValueChanged;
         }
 
         /// <summary>
