@@ -9,7 +9,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     /// </summary>
     public abstract class MyStarSystemDesignerAsteroidMenu : MyStarSystemDesignerObjectMenu
     {
-        protected IMyAsteroidData m_data;
+        public IMyAsteroidData Data
+        {
+            get;
+            protected set;
+        }
        
         /// <summary>
         /// Creates a new Asteroid object star system designer edit menu for the given object that edits the given
@@ -19,20 +23,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <param name="data">The associated data</param>
         public MyStarSystemDesignerAsteroidMenu(MySystemAsteroids obj, IMyAsteroidData data) : base(obj)
         {
-            m_data = data;
+            Data = data;
         }
 
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)
         {
-        }
-
-        /// <summary>
-        /// Returns the edited Data of the edited asteroid object
-        /// </summary>
-        /// <returns>The <see cref="IMyAsteroidData"/> of the edited object</returns>
-        public IMyAsteroidData GetData()
-        {
-            return m_data;
         }
     }
 }
