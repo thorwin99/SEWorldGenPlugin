@@ -303,6 +303,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                     prov.m_savedData[systemInstance.Id] = prov.DeserializeData(instanceData);
                     PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceAdded, systemInstance, instanceData, callbackId, senderId);
                     callback?.Invoke(true);
+
+                    return;
                 }
             }
 

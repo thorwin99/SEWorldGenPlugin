@@ -110,8 +110,6 @@ namespace SEWorldGenPlugin.Generator
                             callback?.Invoke(true);
                         }
                     }
-
-                    Static.AddAllPersistentGps();
                     return;
                 }
             }
