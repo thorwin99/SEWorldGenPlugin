@@ -127,7 +127,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 m_elevationSldier.Enabled = false;
             }
 
-            ChangedObject(); // Set values to conform to sliders.
+            OnSizeChanged(m_sizeSlider);
+            OnTypeSelected();
+            GetPropertiesFromOrbit();
+            ChangedObject();
         }
 
         /// <summary>
