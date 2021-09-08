@@ -24,7 +24,7 @@ namespace SEWorldGenPlugin.Generator
         public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null, Action<bool> callback = null)
         {
             uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
-            Guid parent = parentId.HasValue ? StarSystem.CenterObject.Id : parentId.Value;
+            Guid parent = !parentId.HasValue ? StarSystem.CenterObject.Id : parentId.Value;
 
             PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parent, callbackId, Sync.MyId);
         }
