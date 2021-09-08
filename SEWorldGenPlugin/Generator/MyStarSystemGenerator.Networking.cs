@@ -92,6 +92,7 @@ namespace SEWorldGenPlugin.Generator
                         obj.ParentId = parentId;
                         PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                         callback?.Invoke(true);
+                        return;
                     }
                     else
                     {
@@ -101,6 +102,7 @@ namespace SEWorldGenPlugin.Generator
                             obj.ParentId = Static.StarSystem.CenterObject.Id;
                             PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                             callback?.Invoke(true);
+                            return;
                         }
                         else
                         {
@@ -108,6 +110,7 @@ namespace SEWorldGenPlugin.Generator
                             obj.ParentId = Guid.Empty;
                             PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                             callback?.Invoke(true);
+                            return;
                         }
                     }
 
