@@ -208,6 +208,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_removeObjectButton = MyPluginGuiHelper.CreateDebugButton("Remove", OnRemoveObject, false, "Removes the object from the system.");
             m_removeObjectButton.Size = new Vector2(maxWidth, m_removeObjectButton.Size.Y);
 
+            parent.AddTableRow(m_removeObjectButton);
+
             MyPluginDrawSession.Static.AddRenderObject(15, m_renderer);
 
             if (MySettingsSession.Static.Settings.Enabled)
@@ -228,6 +230,17 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private void OnEnablePlugin(MyGuiControlButton btn)
         {
 
+        }
+
+        /// <summary>
+        /// Set the enabled flag of all main controls
+        /// </summary>
+        private void ToggleAllControls(bool enable)
+        {
+            m_systemObjectsBox.Enabled = enable;
+            m_refreshSystemButton.Enabled = enable;
+            m_addObjectButton.Enabled = enable;
+            m_removeObjectButton.Enabled = enable;
         }
 
         /// <summary>
@@ -529,7 +542,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             var system = MyStarSystemGenerator.Static.StarSystem;
 
-            if(obj is MySystemAsteroids)
+
+            ToggleAllControls(false);
+
+            if (obj is MySystemAsteroids)
             {
                 MySystemAsteroids roid = obj as MySystemAsteroids;
                 MyAbstractAsteroidObjectProvider prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[roid.AsteroidTypeName];
@@ -571,6 +587,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         {
             MyPluginLog.Log("System object applied. Success = " + success);
 
+            ToggleAllControls(true);
+
             if (success)
             {
                 MyPluginGuiHelper.DisplayMessage("The object was successfully applied.", "Success");
@@ -580,6 +598,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             else
             {
                 MyPluginGuiHelper.DisplayError("The object could not be applied due to some error.", "Error");
+                RefreshSystem(m_refreshSystemButton);
             }
         }
 
@@ -593,11 +612,20 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             if (system.Contains(m_selectedObjectId))
             {
-                MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, null);
-            }
+                ToggleAllControls(false);
 
-            m_pendingSystemObjects.Remove(m_selectedObjectId);
-            m_pendingAsteroidData.Remove(m_selectedObjectId);
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+
+                MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, OnObjectRemoved);
+            }
+            else
+            {
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+
+                OnObjectRemoved(true);
+            }           
         }
 
         /// <summary>
@@ -607,6 +635,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private void OnObjectRemoved(bool success)
         {
             MyPluginLog.Log("System object removed. Success = " + success);
+
+            ToggleAllControls(true);
 
             if (success)
             {
