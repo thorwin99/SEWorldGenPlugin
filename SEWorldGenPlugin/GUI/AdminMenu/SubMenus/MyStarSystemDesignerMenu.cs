@@ -545,7 +545,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 }
                 else
                 {
-                    prov.AddInstance(roid, data);
+                    prov.AddInstance(roid, data, OnApplyComplete);
                 }
             }
             else
