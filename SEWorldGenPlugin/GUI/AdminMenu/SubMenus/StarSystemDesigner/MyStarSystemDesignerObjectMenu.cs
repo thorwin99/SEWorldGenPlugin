@@ -29,6 +29,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         }
 
         /// <summary>
+        /// Whether the object can be removed. Default is true
+        /// </summary>
+        public bool CanBeRemoved
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
         /// The object this menu edits or spawns
         /// </summary>
         /// <param name="obj">The object in the system</param>
@@ -36,6 +45,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         {
             m_object = obj;
             CanAddChild = false;
+            CanBeRemoved = true;
         }
 
         /// <summary>

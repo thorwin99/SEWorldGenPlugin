@@ -49,7 +49,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public MyStarSystemDesignerPlanetMenu(MySystemPlanet obj) : base(obj)
         {
             CanAddChild = true;
-
+            CanBeRemoved = false;
             m_planetTypes = new List<MyPlanetGeneratorDefinition>();
             if(obj == null)
             {
@@ -60,6 +60,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)
         {
+            CanBeRemoved = isEditing;
+
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
             m_planetTypeCombobox = new MyGuiControlCombobox();
             m_planetTypeCombobox.Size = new Vector2(maxWidth - 0.01f, m_planetTypeCombobox.Size.Y);

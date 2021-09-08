@@ -37,6 +37,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlButton m_addObjectButton;
 
         /// <summary>
+        /// Button used to remove an object from the system.
+        /// </summary>
+        private MyGuiControlButton m_removeObjectButton;
+
+        /// <summary>
         /// Button to apply the changes done to a system object.
         /// </summary>
         private MyGuiControlButton m_applyChangesButton;
@@ -195,10 +200,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableRow(m_subMenuControlTable);
             parent.AddTableSeparator();
 
-            m_applyChangesButton = MyPluginGuiHelper.CreateDebugButton("Apply", ApplyChanges, false, "Apply settings of this object and spawn it if it isnt spawned yet.");
+            m_applyChangesButton = MyPluginGuiHelper.CreateDebugButton("Apply", OnApplyChanges, false, "Apply settings of this object and spawn it if it isnt spawned yet.");
             m_applyChangesButton.Size = new Vector2(maxWidth, m_applyChangesButton.Size.Y);
 
             parent.AddTableRow(m_applyChangesButton);
+
+            m_removeObjectButton = MyPluginGuiHelper.CreateDebugButton("Remove", OnRemoveObject, false, "Removes the object from the system.");
+            m_removeObjectButton.Size = new Vector2(maxWidth, m_removeObjectButton.Size.Y);
 
             MyPluginDrawSession.Static.AddRenderObject(15, m_renderer);
 
@@ -293,6 +301,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         m_currentObjectMenu = adminMenu;
 
                         m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild && exists;
+                        m_removeObjectButton.Enabled = m_currentObjectMenu.CanBeRemoved;
                     }
                 }
             }
@@ -314,6 +323,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_currentObjectMenu.OnObjectChanged += OnObjectEdited;
 
             m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild;
+            m_removeObjectButton.Enabled = m_currentObjectMenu.CanBeRemoved;
         }
 
         /// <summary>
@@ -379,6 +389,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 m_addObjectButton.Enabled = true;
                 m_applyChangesButton.Enabled = false;
+                m_removeObjectButton.Enabled = false;
                 return;
             }
 
@@ -508,7 +519,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// Applies the changes of the currently selected system object, if it has changes done to it.
         /// </summary>
         /// <param name="btn"></param>
-        private void ApplyChanges(MyGuiControlButton btn)
+        private void OnApplyChanges(MyGuiControlButton btn)
         {
             MySystemObject obj = m_pendingSystemObjects[m_selectedObjectId];
 
@@ -566,6 +577,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 MyPluginGuiHelper.DisplayError("The object could not be applied due to some error.", "Error");
             }
+        }
+
+        /// <summary>
+        /// Button action to remove the selected object
+        /// </summary>
+        /// <param name="btn">Button that called this</param>
+        private void OnRemoveObject(MyGuiControlButton btn)
+        {
+
         }
 
         /// <summary>
