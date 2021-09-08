@@ -182,6 +182,10 @@ namespace SEWorldGenPlugin.Generator
                     MyAbstractAsteroidObjectProvider prov;
                     if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
                     {
+                        if(callback != null)
+                        {
+                            callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+                        }
                         prov.RemoveInstance(o.Id, callbackId, senderId);
                     }
                     return;
