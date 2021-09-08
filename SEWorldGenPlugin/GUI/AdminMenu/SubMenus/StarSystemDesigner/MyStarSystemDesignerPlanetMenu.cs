@@ -60,7 +60,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)
         {
-            CanBeRemoved = isEditing;
+            CanBeRemoved = !isEditing;
 
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings;
             m_planetTypeCombobox = new MyGuiControlCombobox();
