@@ -139,16 +139,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <param name="systemInstance">Instance that gets added</param>
         /// <param name="instanceData">Data associated the instance</param>
-        public abstract void AddInstance(MySystemAsteroids systemInstance, IMyAsteroidData instanceData);
+        /// <param name="callback">Callback called on success or failure.</param>
+        public abstract void AddInstance(MySystemAsteroids systemInstance, IMyAsteroidData instanceData, Action<bool> callback = null);
 
         /// <summary>
         /// Tries to remove the given asteroid instance from this provider.
         /// </summary>
         /// <param name="instanceId">The id of the instance.</param>
+        /// <param name="callback">Callback called on success or failure.</param>
         /// <returns>True, if removed</returns>
-        public void RemoveInstance(Guid instanceId)
+        public void RemoveInstance(Guid instanceId, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(EventRemoveInstanceServer, GetTypeName(), instanceId);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+
+            PluginEventHandler.Static.RaiseStaticEvent(EventRemoveInstanceServer, GetTypeName(), instanceId, callbackId, Sync.MyId);
         }
 
         /// <summary>
@@ -156,7 +160,8 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <param name="instanceId">Id of the instance to set the data of.</param>
         /// <param name="instanceData">Data to set.</param>
-        public abstract void SetInstanceData(Guid instanceId, IMyAsteroidData instanceData);
+        /// <param name="callback">Callback called on success or failure.</param>
+        public abstract void SetInstanceData(Guid instanceId, IMyAsteroidData instanceData, Action<bool> callback = null);
 
         /// <summary>
         /// Updates the <paramref name="instance"/>.
@@ -263,11 +268,17 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <param name="systemInstance">The asteroid object instance to add to the system.</param>
         /// <param name="instanceData">The data of the asteroid object.</param>
+        /// <param name="callbackId">The id of the callback to call when action is completed.</param>
+        /// <param name="senderId">The client that requested this event.</param>
         [Event(4002)]
         [Server]
-        protected static void EventAddInstanceServer(MySystemAsteroids systemInstance, MySerializedAsteroidData instanceData)
+        protected static void EventAddInstanceServer(MySystemAsteroids systemInstance, MySerializedAsteroidData instanceData, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Adding new asteroid object instance " + systemInstance.Id + " to system");
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
 
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(systemInstance.AsteroidTypeName, out prov))
@@ -276,9 +287,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 if (system.Add(systemInstance))
                 {
                     prov.m_savedData[systemInstance.Id] = prov.DeserializeData(instanceData);
-                    PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceAdded, systemInstance, instanceData);
+                    PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceAdded, systemInstance, instanceData, callbackId, senderId);
+                    callback?.Invoke(true);
                 }
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
@@ -286,13 +301,19 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <param name="systemInstance">Instance that got added.</param>
         /// <param name="instanceData">Data of the instance.</param>
+        /// <param name="callbackId">The id of the callback to call when action is completed.</param>
+        /// <param name="senderId">The client that requested this event.</param>
         [Event(4003)]
         [Broadcast]
-        private static void BroadcastInstanceAdded(MySystemAsteroids systemInstance, MySerializedAsteroidData instanceData)
+        private static void BroadcastInstanceAdded(MySystemAsteroids systemInstance, MySerializedAsteroidData instanceData, uint callbackId, ulong senderId)
         {
             if (Sync.IsServer) return;
 
             MyPluginLog.Log("Received update for asteroid objects, adding new instance " + systemInstance.Id + " to local system");
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
 
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(systemInstance.AsteroidTypeName, out prov))
@@ -301,14 +322,21 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 if (system.Add(systemInstance))
                 {
                     prov.m_savedData[systemInstance.Id] = prov.DeserializeData(instanceData);
+                    callback?.Invoke(true);
+
+                    return;
                 }
                 else
                 {
                     MyPluginLog.Log("System data is out of sync, requesting full update.");
                     MyStarSystemGenerator.Static.GetStarSystemFromServer();
                     prov.FetchDataFromServer();
+
+                    return;
                 }
             }
+
+            callback?.Invoke(false);
         }
 
         /// <summary>
@@ -316,11 +344,17 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <param name="providerName">Name of the provider that the instance gets removed from.</param>
         /// <param name="instanceId">Id of the instance that should be removed.</param>
+        /// <param name="callbackId">The id of the callback to call when action is completed.</param>
+        /// <param name="senderId">The client that requested this event.</param>
         [Event(4004)]
         [Server]
-        protected static void EventRemoveInstanceServer(string providerName, Guid instanceId)
+        protected static void EventRemoveInstanceServer(string providerName, Guid instanceId, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Removing asteroid object instance " + instanceId + " from the system");
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
 
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(providerName, out prov))
@@ -330,9 +364,16 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 {
                     MyGPSManager.Static.RemovePersistentGps(instanceId);
                     prov.m_savedData.Remove(instanceId);
-                    PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceRemoved, providerName, instanceId);
+                    PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceRemoved, providerName, instanceId, callbackId, senderId);
+
+                    callback?.Invoke(true);
+
+                    return;
                 }
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
@@ -340,13 +381,19 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// </summary>
         /// <param name="providerName">Name of the provider the instance was removed from.</param>
         /// <param name="instanceId">The id of the instance.</param>
+        /// <param name="callbackId">The id of the callback to call when action is completed.</param>
+        /// <param name="senderId">The client that requested this event.</param>
         [Event(4005)]
         [Broadcast]
-        private static void BroadcastInstanceRemoved(string providerName, Guid instanceId)
+        private static void BroadcastInstanceRemoved(string providerName, Guid instanceId, uint callbackId, ulong senderId)
         {
             if (Sync.IsServer) return;
 
             MyPluginLog.Log("Received update for asteroid objects, removing instance " + instanceId + " from local system");
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
 
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(providerName, out prov))
@@ -355,14 +402,24 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 if (system.Remove(instanceId))
                 {
                     prov.m_savedData.Remove(instanceId);
+
+                    callback?.Invoke(true);
+
+                    return;
                 }
                 else
                 {
                     MyPluginLog.Log("System data is out of sync, requesting full update.");
                     MyStarSystemGenerator.Static.GetStarSystemFromServer();
                     prov.FetchDataFromServer();
+
+                    callback?.Invoke(false);
+
+                    return;
                 }
             }
+
+            callback?.Invoke(false);
         }
 
         /// <summary>
@@ -371,11 +428,17 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="providerName">Provider name of the asteroid object</param>
         /// <param name="instanceId">Instance id of the asteroid object</param>
         /// <param name="instanceData">Data to set for the asteroid object</param>
+        /// <param name="callbackId">The id of the callback to call when action is completed.</param>
+        /// <param name="senderId">The client that requested this event.</param>
         [Event(4006)]
         [Server]
-        protected static void EventSetInstanceData(string providerName, Guid instanceId, MySerializedAsteroidData instanceData)
+        protected static void EventSetInstanceData(string providerName, Guid instanceId, MySerializedAsteroidData instanceData, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Removing asteroid object instance " + instanceId + " from the system");
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
 
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(providerName, out prov))
@@ -384,13 +447,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 if (system.Contains(instanceId))
                 {
                     prov.m_savedData[instanceId] = prov.DeserializeData(instanceData);
-                    PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceDataSet, providerName, instanceId, instanceData);
+                    PluginEventHandler.Static.RaiseStaticEvent(BroadcastInstanceDataSet, providerName, instanceId, instanceData, callbackId, senderId);
+
+                    callback?.Invoke(true);
+
+                    return;
                 }
                 else
                 {
                     MyPluginLog.Log("Server: Instance does not exist.");
                 }
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
@@ -399,19 +469,46 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <param name="providerName">Provider name of the asteroid object</param>
         /// <param name="instanceId">Instance id of the asteroid object</param>
         /// <param name="instanceData">Data that got set for the asteroid object</param>
+        /// <param name="callbackId">The id of the callback to call when action is completed.</param>
+        /// <param name="senderId">The client that requested this event.</param>
         [Event(4007)]
         [Broadcast]
-        private static void BroadcastInstanceDataSet(string providerName, Guid instanceId, MySerializedAsteroidData instanceData)
+        private static void BroadcastInstanceDataSet(string providerName, Guid instanceId, MySerializedAsteroidData instanceData, uint callbackId, ulong senderId)
         {
             if (Sync.IsServer) return;
 
             MyPluginLog.Log("Received update for asteroid objects, setting instance data o" + instanceId);
 
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             MyAbstractAsteroidObjectProvider prov;
             if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(providerName, out prov))
             {
                 prov.m_savedData[instanceId] = prov.DeserializeData(instanceData);
+
+                callback?.Invoke(true);
+                return;
             }
+
+            callback?.Invoke(false);
+        }
+
+        /// <summary>
+        /// Network event when an action called from a client failed.
+        /// Used to notify client about failure.
+        /// </summary>
+        /// <param name="callbackId">Id of the callback for that action.</param>
+        [Event(4008)]
+        [Client]
+        private static void SendNetActionFailed(uint callbackId)
+        {
+            if (Sync.IsServer) return;
+
+            Action<bool> callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            callback?.Invoke(false);
         }
     }
 
@@ -436,7 +533,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
             return true;
         }
 
-        public override void AddInstance(MySystemAsteroids systemInstance, IMyAsteroidData instanceData)
+        public override void AddInstance(MySystemAsteroids systemInstance, IMyAsteroidData instanceData, Action<bool> callback)
         {
             if (systemInstance == null || instanceData == null)
             {
@@ -449,10 +546,12 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 return;
             }
 
-            PluginEventHandler.Static.RaiseStaticEvent(EventAddInstanceServer, systemInstance, SerializeData(instanceData));
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+
+            PluginEventHandler.Static.RaiseStaticEvent(EventAddInstanceServer, systemInstance, SerializeData(instanceData), callbackId, Sync.MyId);
         }
 
-        public override void SetInstanceData(Guid instanceId, IMyAsteroidData instanceData)
+        public override void SetInstanceData(Guid instanceId, IMyAsteroidData instanceData, Action<bool> callback)
         {
             if (instanceData == null)
             {
@@ -464,7 +563,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
                 MyPluginLog.Log("Client: Tried to add an instance with wrong type of data.", LogLevel.WARNING);
             }
 
-            PluginEventHandler.Static.RaiseStaticEvent(EventSetInstanceData, GetTypeName(), instanceId, SerializeData(instanceData));
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+
+            PluginEventHandler.Static.RaiseStaticEvent(EventSetInstanceData, GetTypeName(), instanceId, SerializeData(instanceData), callbackId, Sync.MyId);
         }
 
         protected override MySerializedAsteroidData SerializeData(IMyAsteroidData data)

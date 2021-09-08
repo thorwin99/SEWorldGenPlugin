@@ -50,6 +50,9 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private readonly List<string> VANILLA_PLANETS = new List<string> { "Alien", "EarthLike", "EarthLikeTutorial", "Europa", "Mars", "MarsTutorial", "Moon", "MoonTutorial", "Pertam", "Titan", "Triton" };
 
+        /// <summary>
+        /// Static reference to the generator component
+        /// </summary>
         public static MyStarSystemGenerator Static;
 
         /// <summary>

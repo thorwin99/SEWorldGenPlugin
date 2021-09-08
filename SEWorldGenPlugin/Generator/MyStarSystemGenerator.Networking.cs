@@ -20,24 +20,30 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="systemObject">Object to add</param>
         /// <param name="parentId">Id of the parent object</param>
-        public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null)
+        /// <param name="callback">The success callback for this action</param>
+        public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentId == null ? StarSystem.CenterObject.Id : parentId.Value);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+            Guid parent = parentId.HasValue ? StarSystem.CenterObject.Id : parentId.Value;
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parent, callbackId, Sync.MyId);
         }
 
         /// <summary>
         /// Removes an object from the system.
         /// </summary>
         /// <param name="objectId">Id of the object to remove</param>
-        public void RemoveObjectFromSystem(Guid objectId)
+        /// <param name="callback">The success callback for this action</param>
+        public void RemoveObjectFromSystem(Guid objectId, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectId);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectId, callbackId, Sync.MyId);
         }
 
         /// <summary>
         /// Gets the current star system as represented on the server
         /// </summary>
-        /// <param name="callback">Callback to call, when star system was retreived</param>
         public void GetStarSystemFromServer()
         {
             MyPluginLog.Debug("Get star system");
@@ -49,9 +55,12 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="objectId">Id of the object to rename</param>
         /// <param name="newName">New name of the object</param>
-        public void RenameObject(Guid objectId, string newName)
+        /// <param name="callback">The success callback for this action</param>
+        public void RenameObject(Guid objectId, string newName, Action<bool> callback = null)
         {
-            PluginEventHandler.Static.RaiseStaticEvent(SendRenameObjectServer, objectId, newName);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendRenameObjectServer, objectId, newName, callbackId, Sync.MyId);
         }
 
         /// <summary>
@@ -59,11 +68,19 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="obj">Object to add</param>
         /// <param name="parentId">Parent of the object to which it is a child</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
         [Event(100)]
         [Server]
-        private static void SendAddSystemObjectServer(MySystemObject obj, Guid parentId)
+        private static void SendAddSystemObjectServer(MySystemObject obj, Guid parentId, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Add object " + obj.DisplayName + " to system");
+
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (obj != null)
             {
                 if (!Static.StarSystem.Contains(obj.Id))
@@ -73,7 +90,8 @@ namespace SEWorldGenPlugin.Generator
                     {
                         parent.ChildObjects.Add(obj);
                         obj.ParentId = parentId;
-                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj);
+                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                        callback?.Invoke(true);
                     }
                     else
                     {
@@ -81,13 +99,15 @@ namespace SEWorldGenPlugin.Generator
                         {
                             Static.StarSystem.CenterObject.ChildObjects.Add(obj);
                             obj.ParentId = Static.StarSystem.CenterObject.Id;
-                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj);
+                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                            callback?.Invoke(true);
                         }
                         else
                         {
                             Static.StarSystem.CenterObject = obj;
                             obj.ParentId = Guid.Empty;
-                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj);
+                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                            callback?.Invoke(true);
                         }
                     }
 
@@ -95,34 +115,46 @@ namespace SEWorldGenPlugin.Generator
                     return;
                 }
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
         /// Broadcast Event: Adds object to local Star system to reflect server changes.
         /// </summary>
         /// <param name="obj">The object to add.</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
         [Event(101)]
         [Broadcast]
-        private static void BroadcastObjectAdded(MySystemObject obj)
+        private static void BroadcastObjectAdded(MySystemObject obj, uint callbackId, ulong senderId)
         {
             if (Sync.IsServer) return;
 
             MyPluginLog.Log("Received update for Star System, adding object " + obj.Id + " to parent " + obj.ParentId);
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
 
             var parent = Static.StarSystem.GetById(obj.ParentId);
 
             if(!Static.StarSystem.Contains(obj.Id) && parent != null)
             {
                 parent.ChildObjects.Add(obj);
+                callback?.Invoke(true);
             }
             else if(obj.ParentId == Guid.Empty && Static.StarSystem.CenterObject == null)
             {
                 Static.StarSystem.CenterObject = obj;
+                callback?.Invoke(true);
             }
             else
             {
                 MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
                 Static.GetStarSystemFromServer();
+                callback?.Invoke(false);
             }
         }
 
@@ -130,12 +162,20 @@ namespace SEWorldGenPlugin.Generator
         /// Server Event: Removes a system object from the servers system data. Cant be the center object
         /// </summary>
         /// <param name="objectId">Id of the object</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
         [Event(102)]
         [Server]
-        private static void SendRemoveSystemObjectServer(Guid objectId)
+        private static void SendRemoveSystemObjectServer(Guid objectId, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Removing object " + objectId.ToString() + " from system");
             MySystemObject o = Static.StarSystem.GetById(objectId);
+
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
                 if(o.Type == MySystemObjectType.ASTEROIDS)
@@ -153,40 +193,52 @@ namespace SEWorldGenPlugin.Generator
                     MyGPSManager.Static.RemovePersistentGps(objectId);
                     if (Static.StarSystem.Remove(objectId))
                     {
-                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId);
+                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId, callbackId, senderId);
+                        callback?.Invoke(true);
                     }
                     return;
                 }
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
         /// Broadcast Event: Notifies all clients that the object <paramref name="objectId"/> was removed.
         /// </summary>
         /// <param name="objectId">The object Id</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
         [Event(103)]
         [Broadcast]
-        private static void BroadcastRemovedObject(Guid objectId)
+        private static void BroadcastRemovedObject(Guid objectId, uint callbackId, ulong senderId)
         {
             if (Sync.IsServer) return;
 
             MyPluginLog.Log("Received update for Star System, removing object " + objectId);
 
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (Static.StarSystem.Contains(objectId))
             {
                 Static.StarSystem.Remove(objectId);
+                callback?.Invoke(true);
             }
             else
             {
                 MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
                 Static.GetStarSystemFromServer();
+                callback?.Invoke(false);
             }
         }
 
         /// <summary>
         /// Server Event: Retreives the whole star system
         /// </summary>
-        /// <param name="callbackId">Id of the callback</param>
         /// <param name="clientId">Id of the client, that requested the system</param>
         [Event(104)]
         [Server]
@@ -197,10 +249,9 @@ namespace SEWorldGenPlugin.Generator
         }
 
         /// <summary>
-        /// Client Event: Calls callback for GetStarSystem event.
+        /// Client Event: Receives star system from server
         /// </summary>
         /// <param name="starSystem">Star system that was retreived</param>
-        /// <param name="callbackId">Callback that will be called with the star system parameter</param>
         [Event(105)]
         [Client]
         private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem)
@@ -214,13 +265,18 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="objectId">Id of the object</param>
         /// <param name="newName">New name of the object</param>
-        /// <param name="callbackId">ID of the client callback for success of this action</param>
-        /// <param name="clientId">ID of the client that called this event</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
         [Event(106)]
         [Server]
-        private static void SendRenameObjectServer(Guid objectId, string newName)
+        private static void SendRenameObjectServer(Guid objectId, string newName, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Renaming object " + objectId.ToString() + " to " + newName);
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (Static.StarSystem.Contains(objectId))
             {
                 MySystemObject obj = Static.StarSystem.GetById(objectId);
@@ -241,9 +297,13 @@ namespace SEWorldGenPlugin.Generator
                     }
                 }
 
-                PluginEventHandler.Static.RaiseStaticEvent(BroadcastRenamedObject, objectId, newName);
+                PluginEventHandler.Static.RaiseStaticEvent(BroadcastRenamedObject, objectId, newName, callbackId, senderId);
+                callback?.Invoke(true);
                 return;
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
@@ -251,23 +311,50 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="objectId">The object Id</param>
         /// <param name="newName">The new Name</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
         [Event(107)]
         [Broadcast]
-        private static void BroadcastRenamedObject(Guid objectId, string newName)
+        private static void BroadcastRenamedObject(Guid objectId, string newName, uint callbackId, ulong senderId)
         {
             if (Sync.IsServer) return;
 
             MyPluginLog.Log("Received update for Star System, renaming object " + objectId + " to " + newName);
 
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (Static.StarSystem.Contains(objectId))
             {
                 Static.StarSystem.GetById(objectId).DisplayName = newName;
+
+                callback?.Invoke(true);
             }
             else
             {
                 MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
                 Static.GetStarSystemFromServer();
+
+                callback?.Invoke(false);
             }
+        }
+
+        /// <summary>
+        /// Network event when an action called from a client failed.
+        /// Used to notify client about failure.
+        /// </summary>
+        /// <param name="callbackId">Id of the callback for that action.</param>
+        [Event(199)]
+        [Client]
+        private static void SendNetActionFailed(uint callbackId)
+        {
+            if (Sync.IsServer) return;
+
+            Action<bool> callback = null;
+            callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            callback?.Invoke(false);
         }
     }
 }
