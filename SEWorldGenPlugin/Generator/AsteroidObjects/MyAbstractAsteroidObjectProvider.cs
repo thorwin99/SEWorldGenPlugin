@@ -156,6 +156,20 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         }
 
         /// <summary>
+        /// Tries to remove the given asteroid instance from this provider.
+        /// This is server only as it does not invoke the RPC event to remove the object.
+        /// </summary>
+        /// <param name="instanceId">The id of the instance.</param>
+        /// <param name="callbackId">The id of the callback to call on success</param>
+        /// <returns>True, if removed</returns>
+        public void RemoveInstance(Guid instanceId, uint callbackId, ulong clientId)
+        {
+            if (!Sync.IsServer) return;
+
+            EventRemoveInstanceServer(GetTypeName(), instanceId, callbackId, clientId);
+        }
+
+        /// <summary>
         /// Tires to set the data of the instance <paramref name="instanceId"/> to <paramref name="instanceData"/>.
         /// </summary>
         /// <param name="instanceId">Id of the instance to set the data of.</param>

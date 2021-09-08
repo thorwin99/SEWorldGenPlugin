@@ -184,7 +184,7 @@ namespace SEWorldGenPlugin.Generator
                     MyAbstractAsteroidObjectProvider prov;
                     if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
                     {
-                        prov.RemoveInstance(o.Id);
+                        prov.RemoveInstance(o.Id, callbackId, senderId);
                     }
                     return;
                 }

@@ -392,6 +392,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 m_removeObjectButton.Enabled = false;
                 return;
             }
+            if (!m_itemList.ContainsKey(objectId))
+            {
+                objectId = MyStarSystemGenerator.Static.StarSystem.CenterObject.Id;
+            }
 
             m_systemObjectsBox.SelectSingleItem(m_itemList[objectId]);
             m_selectedObjectId = objectId;
@@ -585,7 +589,37 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="btn">Button that called this</param>
         private void OnRemoveObject(MyGuiControlButton btn)
         {
+            var system = MyStarSystemGenerator.Static.StarSystem;
 
+            if (system.Contains(m_selectedObjectId))
+            {
+                MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, null);
+            }
+
+            m_pendingSystemObjects.Remove(m_selectedObjectId);
+            m_pendingAsteroidData.Remove(m_selectedObjectId);
+        }
+
+        /// <summary>
+        /// Called when a remove action completes.
+        /// </summary>
+        /// <param name="success"></param>
+        private void OnObjectRemoved(bool success)
+        {
+            MyPluginLog.Log("System object removed. Success = " + success);
+
+            if (success)
+            {
+                MyPluginGuiHelper.DisplayMessage("The object was successfully removed.", "Success");
+
+                RefreshSystem(m_refreshSystemButton);
+            }
+            else
+            {
+                MyPluginGuiHelper.DisplayError("The object could not be removed due to some error.", "Error");
+
+                RefreshSystem(m_refreshSystemButton);
+            }
         }
 
         /// <summary>
