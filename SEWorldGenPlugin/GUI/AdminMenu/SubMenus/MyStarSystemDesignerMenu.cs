@@ -526,7 +526,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 if (system.Contains(m_selectedObjectId))
                 {
                     prov.SetInstanceData(roid.Id, data);
-                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName);
+                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName, OnApplyComplete);
                 }
                 else
                 {
@@ -539,15 +539,33 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 m_pendingSystemObjects.Remove(m_selectedObjectId);
                 if (system.Contains(m_selectedObjectId))
                 {
-                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName);
+                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName, OnApplyComplete);
                 }
                 else
                 {
-                    MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId);
+                    MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId, OnApplyComplete);
                 }
             }
+        }
 
-            RefreshSystem(m_refreshSystemButton);
+        /// <summary>
+        /// Called when an apply action completes.
+        /// </summary>
+        /// <param name="success"></param>
+        private void OnApplyComplete(bool success)
+        {
+            MyPluginLog.Log("System object applied. Success = " + success);
+
+            if (success)
+            {
+                MyPluginGuiHelper.DisplayMessage("The object was successfully applied.", "Success");
+
+                RefreshSystem(m_refreshSystemButton);
+            }
+            else
+            {
+                MyPluginGuiHelper.DisplayError("The object could not be applied due to some error.", "Error");
+            }
         }
 
         /// <summary>
