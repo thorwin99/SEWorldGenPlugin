@@ -3,6 +3,7 @@ using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using System;
 using VRageMath;
 
@@ -144,7 +145,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             double elevation = Math.Asin(forward.Z / radius);
             double orbitRad = Math.Acos(forward.X / Math.Cos(elevation) / radius);
-            
+
+            if (forward.Y < 0)
+            {
+                orbitRad = Math.PI * 2 - orbitRad;
+            }
+
             MatrixD my = MatrixD.CreateRotationY(elevation);
             MatrixD mz = MatrixD.CreateRotationZ(orbitRad);
 
