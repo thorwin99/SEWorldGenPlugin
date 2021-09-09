@@ -123,7 +123,7 @@ namespace SEWorldGenPlugin.Generator
 
             LoadPlanetDefinitions();
 
-            if (StarSystem.Count() <= 0)
+            if (StarSystem.Count() <= 0 && MySettingsSession.Static.Settings.GeneratorSettings.SystemGenerator != SystemGenerationMethod.NONE)
             {
                 StarSystem = GenerateNewStarSystem();
             }

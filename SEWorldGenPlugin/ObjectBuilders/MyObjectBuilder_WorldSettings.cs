@@ -274,6 +274,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// </summary>
     public enum SystemGenerationMethod
     {
+        NONE,
         FULL_RANDOM,
         UNIQUE,
         MANDATORY_FIRST,
