@@ -20,7 +20,6 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="worldMatrix">The world matrix specifying the location, rotation and scale of the cylinder</param>
         /// <param name="radius">The radius of the cylinder</param>
         /// <param name="color">The color of the circle</param>
-        /// <param name="lineStrength">The line strength of the circle</param>
         public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color) : base(0)
         {
             WorldMatrix = worldMatrix;
