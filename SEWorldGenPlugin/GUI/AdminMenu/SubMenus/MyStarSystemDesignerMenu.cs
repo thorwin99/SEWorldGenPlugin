@@ -47,11 +47,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private MyGuiControlButton m_applyChangesButton;
 
         /// <summary>
-        /// Button used to enable the plugin if it is disabled.
-        /// </summary>
-        private MyGuiControlButton m_enablePluginButton;
-
-        /// <summary>
         /// Button used to zoom into the current selected object.
         /// </summary>
         private MyGuiControlButton m_zoomInButton;
@@ -135,21 +130,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
         public override bool IsVisible()
         {
-            return MyPluginSession.Static.ServerVersionMatch && MySession.Static.IsUserAdmin(Sync.MyId) && MySession.Static.IsUserSpaceMaster(Sync.MyId);//Star system designer is only visible, IFF server and client version match up, the user is an admin and space master
+            return MyPluginSession.Static.ServerVersionMatch && MySession.Static.IsUserAdmin(Sync.MyId) && MySession.Static.IsUserSpaceMaster(Sync.MyId) && MySettingsSession.Static.Settings.Enabled;//Star system designer is only visible, IFF server and client version match up, the user is an admin and space master
         }
 
         public override void RefreshInternals(MyGuiControlParentTableLayout parent, float maxWidth, MyAdminMenuExtension instance)
         {
             MyPluginLog.Debug("Building Star system designer admin menu");
-
-            if (!MySettingsSession.Static.Settings.Enabled)
-            {
-                m_enablePluginButton = MyPluginGuiHelper.CreateDebugButton("Enable Plugin", OnEnablePlugin, true);
-
-                parent.AddTableRow(m_enablePluginButton);
-
-                return;
-            }
 
             m_adminMenuInst = instance;
             m_usableWidth = maxWidth;
@@ -222,14 +208,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         public override void Draw()
         {
             m_renderer.Draw();
-        }
-
-        /// <summary>
-        /// Called when plugin should be enabled.
-        /// </summary>
-        private void OnEnablePlugin(MyGuiControlButton btn)
-        {
-
         }
 
         /// <summary>
