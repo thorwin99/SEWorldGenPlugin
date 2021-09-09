@@ -30,6 +30,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
 
+            if (CenterObject == null) return objs;
+
             objs.Add(CenterObject);
 
             foreach (var o in CenterObject.GetAllChildren())
@@ -102,6 +104,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <returns>True, if object was successfully removed.</returns>
         public bool Remove(Guid id)
         {
+            if (CenterObject == null) return false;
             if (id == CenterObject.Id) return false;
             if (!Contains(id)) return false;
 
@@ -125,6 +128,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Tries to add the given System Object <paramref name="obj"/> as a child under <paramref name="parent"/>
         /// The currently set parent id of the object will be ignored, instead use <paramref name="parent"/>
         /// If the parent does not exist, the object wont be added.
+        /// If the parent equals <see cref="Guid.Empty"/> and no center object exists, it will be added as the center object.
         /// </summary>
         /// <param name="obj">The object to add to the system</param>
         /// <param name="parent">The parent of the object</param>
@@ -132,6 +136,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public bool Add(MySystemObject obj, Guid parent)
         {
             if (Contains(obj.Id)) return false;
+
+            if(parent == Guid.Empty && CenterObject == null)
+            {
+                CenterObject = obj;
+                return true;
+            }
+
             var p = GetById(parent);
             if(p != null)
             {
@@ -162,6 +173,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <param name="action">Action to execute for each system object</param>
         public void Foreach(Action<int, MySystemObject> action)
         {
+            if (CenterObject == null) return;
             CenterObject.Iterate(action);
         }
     }
