@@ -168,8 +168,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public void Draw()
         {
-            FocusObject(m_focusedObject);
-
             foreach(var entry in m_systemRenderObjects)
             {
                 entry.Value.Draw();
