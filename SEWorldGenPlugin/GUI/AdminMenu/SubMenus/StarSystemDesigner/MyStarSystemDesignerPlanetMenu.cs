@@ -127,6 +127,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 m_elevationSldier.Enabled = false;
             }
 
+            var parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
+            if(parent == null)
+            {
+                m_orbitRadiusSlider.Enabled = false;
+                m_elevationSldier.Enabled = false;
+                m_orbitPosSlider.Enabled = false;
+            }
+
             OnSizeChanged(m_sizeSlider);
             OnTypeSelected();
             GetPropertiesFromOrbit();
@@ -232,11 +240,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             {
                 parentRel = new Vector3D(m_object.CenterPosition) - new Vector3D(parent.CenterPosition);
                 radius = parentRel.Length();
+            }
 
-                if(radius == 0)
-                {
-                    radius = 1;
-                }
+            if (radius == 0)
+            {
+                m_orbitRadiusSlider.Value = 0;
+                m_elevationSldier.Value = 0;
+                m_orbitPosSlider.Value = 0;
+                return;
             }
 
             double elevation = MathHelperD.ToDegrees(Math.Asin(parentRel.Z / radius));
@@ -261,6 +272,20 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             double radius = m_orbitRadiusSlider.Value * 1000f;
             double elevation = MathHelperD.ToRadians(m_elevationSldier.Value);
             double orbitPos = MathHelperD.ToRadians(m_orbitPosSlider.Value);
+
+            if(radius == 0)
+            {
+                if(parent == null)
+                {
+                    m_object.CenterPosition = Vector3D.Zero;
+                }
+                else
+                {
+                    m_object.CenterPosition = parent.CenterPosition;
+                }
+
+                return;
+            }
 
             Vector3D pos = new Vector3D(radius * Math.Cos(orbitPos) * Math.Cos(elevation), radius * Math.Sin(orbitPos) * Math.Cos(elevation), radius * Math.Sin(elevation));
 
