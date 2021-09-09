@@ -58,7 +58,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             {
                 return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
             }
-            else
+            else if(level == ZoomLevel.ORBIT)
             {
                 var parent = MyStarSystemGenerator.Static.StarSystem.GetById(RenderObject.ParentId);
                 if (parent != null)
@@ -70,6 +70,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                     return CalculateMaxChildOrbit();
                 }
             }
+
+            return 0;
         }
 
         /// <summary>
