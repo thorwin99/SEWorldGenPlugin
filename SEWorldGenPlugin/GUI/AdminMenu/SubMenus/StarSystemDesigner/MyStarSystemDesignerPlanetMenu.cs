@@ -149,12 +149,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             var center = MyStarSystemGenerator.Static.StarSystem.CenterObject;
             if (center != null && m_object.ParentId == center.Id)
             {
-                double rad = 0;
-                foreach(var child in center.ChildObjects)
-                {
-                    rad = Math.Max(rad, Vector3D.Distance(center.CenterPosition, child.CenterPosition));
-                }
-                return rad / 1000.0;
+                int count = center.ChildObjects.Count + 1;
+                return count * MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Max;
             }
             else
             {
