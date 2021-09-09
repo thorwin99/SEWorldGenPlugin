@@ -2,6 +2,7 @@
 using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Session;
 using System;
 using VRageMath;
 
@@ -55,7 +56,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             }
             else if(level == ZoomLevel.OBJECT)
             {
-                return (RenderObject as MySystemPlanet).Diameter;
+                return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
             }
             else
             {
@@ -77,7 +78,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <returns>The max orbit distance of a direct children of this object</returns>
         private double CalculateMaxChildOrbit()
         {
-            double radius = (RenderObject as MySystemPlanet).Diameter;
+            double radius = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
 
             foreach (var child in RenderObject.ChildObjects)
             {
@@ -97,7 +98,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
             var planet = RenderObject as MySystemPlanet;
 
-            if (distance > planet.Diameter * 500)
+            if (distance > MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap * 500)
             {
                 m_planetRender.Radius = Math.Min((float)(planet.Diameter * 200 / 2f), 120000f * 100f);
             }
