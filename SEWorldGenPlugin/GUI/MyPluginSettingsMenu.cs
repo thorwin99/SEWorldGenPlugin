@@ -112,7 +112,7 @@ namespace SEWorldGenPlugin.GUI
 
             m_systemGeneratorCombo = new MyGuiControlCombobox(null, null);
             m_systemGeneratorCombo.SetToolTip(MyPluginTexts.TOOLTIPS.SYS_GEN_MODE_COMBO);
-            m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.FULL_RANDOM, "No generation");
+            m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.NONE, "No generation");
             m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.FULL_RANDOM, "Full random");
             m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.UNIQUE, "Unique");
             m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.MANDATORY_FIRST, "Mandatory first");
