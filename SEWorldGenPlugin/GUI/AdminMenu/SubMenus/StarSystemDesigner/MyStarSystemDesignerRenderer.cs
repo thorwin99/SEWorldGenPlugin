@@ -33,11 +33,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         private Dictionary<Guid, MyAbstractStarSystemDesignerRenderObject> m_systemRenderObjects;
 
         /// <summary>
-        /// The target position of the camera to look at
-        /// </summary>
-        private Vector3D m_targetPos;
-
-        /// <summary>
         /// The id of the currently focused object
         /// </summary>
         private Guid m_focusedObject;
@@ -164,7 +159,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <param name="targetPos">Target position for the camera to look at</param>
         private void SetCameraTarget(Vector3D targetPos, double distance)
         {
-            m_targetPos = targetPos;
             MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.4f, 0, 0.6f)) * distance;
             MySpectatorCameraController.Static.SetTarget(targetPos, new Vector3D(-0.6f, 0, -0.4f));
 
@@ -174,6 +168,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public void Draw()
         {
+            FocusObject(m_focusedObject);
+
             foreach(var entry in m_systemRenderObjects)
             {
                 entry.Value.Draw();
