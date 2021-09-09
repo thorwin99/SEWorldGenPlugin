@@ -136,6 +136,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 MySettingsSession.Static.Settings.Enabled;//Star system designer is only visible, IFF server and client version match up, the user is an admin and space master, and the plugin is enabled
         }
 
+        #region GUI Building
         public override void RefreshInternals(MyGuiControlParentTableLayout parent, float maxWidth, MyAdminMenuExtension instance)
         {
             MyPluginLog.Debug("Building Star system designer admin menu");
@@ -185,6 +186,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 SetSubMenuControls();
             }
+            else
+            {
+                m_subMenuControlTable.RefreshInternals();
+
+                m_addObjectButton.Enabled = true;
+            }
 
             parent.AddTableRow(m_subMenuControlTable);
             parent.AddTableSeparator();
@@ -203,10 +210,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             if (MySettingsSession.Static.Settings.Enabled)
             {
-                m_systemObjectsBox.SelectSingleItem(m_itemList[MyStarSystemGenerator.Static.StarSystem.CenterObject.Id]);
-                OnSystemObjectSelected(m_systemObjectsBox);
+                if(MyStarSystemGenerator.Static.StarSystem.CenterObject != null)
+                {
+                    m_systemObjectsBox.SelectSingleItem(m_itemList[MyStarSystemGenerator.Static.StarSystem.CenterObject.Id]);
+                    OnSystemObjectSelected(m_systemObjectsBox);
+                }
             }
         }
+
+        #endregion
 
         public override void Draw()
         {
@@ -238,6 +250,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             MySystemObject obj;
 
             m_applyChangesButton.Enabled = false;
+            m_addObjectButton.Enabled = exists;
 
             if (m_pendingSystemObjects.ContainsKey(m_selectedObjectId))
             {
@@ -262,8 +275,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 obj.DisplayName = sb.ToString();
                 OnObjectEdited(obj);
             };
-
-            m_addObjectButton.Enabled = exists;
 
             m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Name"));
             m_subMenuControlTable.AddTableRow(m_objNameBox);
@@ -384,6 +395,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 m_addObjectButton.Enabled = true;
                 m_applyChangesButton.Enabled = false;
                 m_removeObjectButton.Enabled = false;
+
+                m_subMenuControlTable.ClearTable();
+                m_subMenuControlTable.RefreshInternals();
                 return;
             }
             if (!m_itemList.ContainsKey(objectId))
@@ -424,7 +438,15 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         private void AddNewSystemObject(MyGuiControlButton btn)
         {
             //Add the object to the local star system manually, sync on apply
-            MyGuiScreenDialogCombobox typeDialog = new MyGuiScreenDialogCombobox("Select type", new List<string>(MySystemObjectType.GetNames(typeof(MySystemObjectType))), "The type of object to add");
+            List<string> types = new List<string>(Enum.GetNames(typeof(MySystemObjectType)));
+
+            if (m_selectedObjectId == Guid.Empty)
+            {
+                types.Remove(MySystemObjectType.ASTEROIDS.ToString());
+                types.Remove(MySystemObjectType.MOON.ToString());
+            }
+
+            MyGuiScreenDialogCombobox typeDialog = new MyGuiScreenDialogCombobox("Select type", types, "The type of object to add");
 
             typeDialog.OnConfirm += OnTypeEntered;
 
@@ -672,6 +694,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     }
                 }
             });
+
+            foreach(var pending in m_pendingSystemObjects)
+            {
+                if (m_itemList.ContainsKey(pending.Key)) continue;
+                AddObjectToList(pending.Value, 0);
+            }
         }
 
         /// <summary>
