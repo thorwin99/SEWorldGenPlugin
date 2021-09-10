@@ -119,7 +119,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override double GetObjectSize()
         {
-            return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
+            return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap / 2;
         }
     }
 }

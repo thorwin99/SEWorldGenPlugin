@@ -77,17 +77,25 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                     SetCameraTarget(parent.CenterPosition, renderSize * 2f);
                     return;
                 }
+                else
+                {
+                    renderSize = CalculateObjectSystemSize(renderer);
+
+                    SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2.5f);
+                }
             }
             else if (FocusZoom == ZoomLevel.OBJECT_SYSTEM)
             {
                 renderSize = CalculateObjectSystemSize(renderer);
+
+                SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2f);
             }
             else
             {
                 renderSize = renderer.GetObjectSize();
-            }
 
-            SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2f);
+                SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
+            }
         }
 
         /// <summary>
@@ -99,16 +107,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             foreach(var child in renderObject.RenderObject.ChildObjects)
             {
-                if(child is MySystemAsteroids)
-                {
-                    //Still no way to get asteroid orbit radius
-                }
-                else
-                {
-                    double childRad = Vector3D.Distance(renderObject.RenderObject.CenterPosition, child.CenterPosition);
+                double childRad = Vector3D.Distance(renderObject.RenderObject.CenterPosition, child.CenterPosition);
 
-                    radius = Math.Max(childRad, radius);
+                if (m_systemRenderObjects.ContainsKey(child.Id))
+                {
+                    childRad += m_systemRenderObjects[child.Id].GetObjectSize();
                 }
+
+                radius = Math.Max(childRad, radius);
             }
 
             radius += renderObject.GetObjectSize();

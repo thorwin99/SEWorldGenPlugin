@@ -31,7 +31,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             }
             var shape = MyAsteroidObjectShapeRing.CreateFromRingItem(data);
 
-            m_render = new RenderHollowCylinder(shape.worldMatrix, (float)(shape.radius + shape.width), (float)shape.radius, (float)shape.height, Color.Brown.ToVector4(), (float)shape.radius / 100f);
+            m_render = new RenderHollowCylinder(shape.worldMatrix, (float)(shape.radius + shape.width), (float)shape.radius, (float)shape.height, Color.Brown.ToVector4(), (float)shape.radius / 50f);
         }
 
         public override void Draw()
