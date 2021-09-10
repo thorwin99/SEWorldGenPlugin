@@ -98,7 +98,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
-        /// Removes the object with the given id. Cant be the center object
+        /// Removes the object with the given id. Cant be the center object.
+        /// All child objects will be removed too.
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>True, if object was successfully removed.</returns>
@@ -113,12 +114,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
             if (parent == null) return false;
 
-            foreach(var child in obj.GetAllChildren())
-            {
-                parent.ChildObjects.Add(child);
-                obj.ChildObjects.Remove(child);
-                child.ParentId = parent.Id;
-            }
             parent.ChildObjects.Remove(obj);
 
             return true;
