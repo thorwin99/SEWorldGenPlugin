@@ -112,6 +112,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             m_teleportToRingButton = MyPluginGuiHelper.CreateDebugButton("Teleport to ring", OnTeleportToRing, true, "Teleports you into the ring");
             m_teleportToRingButton.Enabled = isEditing;
+            m_teleportToRingButton.Size = new Vector2(maxWidth, m_teleportToRingButton.Size.Y);
 
             controlTable.AddTableSeparator();
 
