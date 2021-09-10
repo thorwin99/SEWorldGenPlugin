@@ -198,6 +198,7 @@
     <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.EditMenu.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\MyPlanetSpawnMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyStarSystemDesignerMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyEmptyObjectRenderObject.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyPlanetOrbitRenderObject.cs" />
