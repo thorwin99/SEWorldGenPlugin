@@ -97,7 +97,7 @@ namespace SEWorldGenPlugin.Session
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                MyPluginLog.Log("Registering asteroid object providers in: " + assembly.FullName);
+                MyPluginLog.Debug("Registering asteroid object providers in: " + assembly.FullName);
                 try
                 {
                     foreach (var type in assembly.GetTypes())

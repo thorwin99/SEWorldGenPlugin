@@ -25,7 +25,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                MyPluginLog.Log("Registering admin sub menus in: " + assembly.FullName);
+                MyPluginLog.Debug("Registering admin sub menus in: " + assembly.FullName);
                 try
                 {
                     foreach (var type in assembly.GetTypes())
@@ -41,7 +41,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
                 }
                 catch (ReflectionTypeLoadException)
                 {
-                    MyPluginLog.Log("Couldnt register admin sub menu for assembly " + assembly.FullName, LogLevel.WARNING);
+                    MyPluginLog.Log("Couldnt register admin sub menus for assembly " + assembly.FullName, LogLevel.WARNING);
                 }
             }
         }

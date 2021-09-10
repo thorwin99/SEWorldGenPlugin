@@ -183,20 +183,20 @@ namespace SEWorldGenPlugin.Networking
         {
             foreach(var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                MyPluginLog.Debug("Registering: " + assembly.FullName);
+                MyPluginLog.Debug("Registering event owners in: " + assembly.FullName);
                 try
                 {
                     foreach (var type in assembly.GetTypes())
                     {
                         if (type.GetCustomAttributes(typeof(EventOwnerAttribute), true).Length > 0)
                         {
-                            MyPluginLog.Log("Registering type " + type.Name + " in PluginEventHandler.");
+                            MyPluginLog.Log("Registering event owner " + type.Name);
                             Register(type);
                         }
                     }
                 }catch(ReflectionTypeLoadException)
                 {
-                    MyPluginLog.Log("Couldnt register Types for assembly " + assembly.FullName, LogLevel.WARNING);
+                    MyPluginLog.Log("Couldnt register event owners for assembly " + assembly.FullName, LogLevel.WARNING);
                 }                
             }
         }
@@ -214,7 +214,7 @@ namespace SEWorldGenPlugin.Networking
                 {
                     if (m.CustomAttributes.Any(data => data.AttributeType == typeof(EventAttribute)))
                     {
-                        MyPluginLog.Log("Registering method " + m.Name + " in type " + type.Name);
+                        MyPluginLog.Log("Registering network event " + m.Name + " in type " + type.Name);
                         ulong id = m.GetCustomAttribute<EventAttribute>().Id;
                         if (m_registeredMethods.ContainsKey(id))
                         {
