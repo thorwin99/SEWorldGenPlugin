@@ -196,7 +196,6 @@
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
     <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
-    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.EditMenu.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyPlanetSpawnMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyStarSystemDesignerMenu.cs" />
@@ -211,7 +210,6 @@
     <Compile Include="GUI\Controls\MyGuiScreenDialogCombobox.cs" />
     <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
-    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.cs" />
     <Compile Include="GUI\Controls\MyGuiScreenDialogCoordinate.cs" />
     <Compile Include="GUI\MyPluginGlobalSettings.cs" />
     <Compile Include="GUI\MyPluginGuiHelper.cs" />
@@ -259,7 +257,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <Compile Include="Generator\MyStarSystemGenerator.Networking.cs" />
-    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.SpawnMenu.cs" />
     <None Include="Examples\Readme.md" />
     <None Include="packages.config" />
   </ItemGroup>
