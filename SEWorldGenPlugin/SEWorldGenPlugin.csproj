@@ -178,11 +178,9 @@
     <Compile Include="Generator\AsteroidObjectShapes\IMyAsteroidObjectShape.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeRing.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeSphere.cs" />
-    <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingAdminMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingProvider.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingRenderer.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyStarSystemDesignerAsteroidRingMenu.cs" />
-    <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereAdminMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereProvider.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereRenderer.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyStarSystemDesignerAsteroidSphereMenu.cs" />
