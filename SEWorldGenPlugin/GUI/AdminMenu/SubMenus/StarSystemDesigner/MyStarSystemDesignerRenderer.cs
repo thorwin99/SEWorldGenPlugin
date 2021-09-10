@@ -3,7 +3,6 @@ using Sandbox.Game.World;
 using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
-using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using VRage.Game;

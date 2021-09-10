@@ -1,6 +1,5 @@
 ﻿using Sandbox.Game.Gui;
 using Sandbox.Graphics.GUI;
-using SEWorldGenPlugin.GUI.AdminMenu.SubMenus;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;

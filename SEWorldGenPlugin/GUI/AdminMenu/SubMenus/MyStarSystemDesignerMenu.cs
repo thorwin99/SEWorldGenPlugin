@@ -117,7 +117,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
         public override void Close()
         {
-            MyPluginLog.Debug("Close");
             m_selectedObjectId = Guid.Empty;
             m_adminMenuInst = null;
             m_systemObjectsBox = null;
@@ -591,7 +590,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="success"></param>
         private void OnApplyComplete(bool success)
         {
-            MyPluginLog.Log("System object applied. Success = " + success);
+            MyPluginLog.Debug("System object applied. Success = " + success);
 
             ToggleAllControls(true);
 
@@ -614,7 +613,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="success"></param>
         private void OnObjectRemoved(bool success)
         {
-            MyPluginLog.Log("System object removed. Success = " + success);
+            MyPluginLog.Debug("System object removed. Success = " + success);
 
             ToggleAllControls(true);
 

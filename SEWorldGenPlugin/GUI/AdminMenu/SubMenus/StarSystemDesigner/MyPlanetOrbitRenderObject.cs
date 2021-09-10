@@ -3,7 +3,6 @@ using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
-using SEWorldGenPlugin.Utilities;
 using System;
 using VRageMath;
 

@@ -53,7 +53,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_planetTypes = new List<MyPlanetGeneratorDefinition>();
             if(obj == null)
             {
-                MyPluginLog.Log("Trying to edit a non planet with the planet editing menu.", LogLevel.ERROR);
+                MyPluginLog.Debug("Trying to edit a non planet with the planet editing menu.", LogLevel.ERROR);
                 m_object = new MySystemPlanet();
             }
         }
