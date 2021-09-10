@@ -7,7 +7,7 @@ namespace SEWorldGenPlugin.Draw
     /// <summary>
     /// Simple class that can render a circle into the gameworld.
     /// </summary>
-    public class RenderCircle : AbstractWireframeRenderObject
+    public class RenderCircle : IRenderObject
     {
         public MatrixD WorldMatrix;
         public float Radius;
@@ -20,14 +20,14 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="worldMatrix">The world matrix specifying the location, rotation and scale of the cylinder</param>
         /// <param name="radius">The radius of the cylinder</param>
         /// <param name="color">The color of the circle</param>
-        public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color) : base(0)
+        public RenderCircle(MatrixD worldMatrix, float radius, Vector4 color)
         {
             WorldMatrix = worldMatrix;
             Radius = radius;
             Color = color;
         }
 
-        public override void Draw()
+        public void Draw()
         {
             Vector3D prevVertex = Vector3D.Zero;
             Vector3D vertex;

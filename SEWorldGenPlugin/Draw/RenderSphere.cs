@@ -6,7 +6,7 @@ namespace SEWorldGenPlugin.Draw
     /// <summary>
     /// Simple class that can render a sphere into the gameworld.
     /// </summary>
-    public class RenderSphere : AbstractWireframeRenderObject
+    public class RenderSphere : IRenderObject
     {
         public Vector3D Position;
         public float Radius;
@@ -18,7 +18,7 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="position">The position of the sphere in the world space</param>
         /// <param name="radius">The radius of the sphere</param>
         /// <param name="color">The sphere color</param>
-        public RenderSphere(Vector3D position, float radius, Color color) : base(1000)
+        public RenderSphere(Vector3D position, float radius, Color color)
         {
             Position = position;
             Radius = radius;
@@ -29,7 +29,7 @@ namespace SEWorldGenPlugin.Draw
         /// Draws the sphere in the game world as a solid mesh
         /// with a visible wireframe.
         /// </summary>
-        public override void Draw()
+        public void Draw()
         {
             MyRenderProxy.DebugDrawSphere(Position, Radius, Color, 0.5f, true, false, true, false);
         }

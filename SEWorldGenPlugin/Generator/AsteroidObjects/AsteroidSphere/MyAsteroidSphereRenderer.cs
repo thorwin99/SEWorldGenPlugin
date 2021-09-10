@@ -23,7 +23,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidSphere
         public MyAsteroidSphereRenderer(MySystemAsteroids instance, MyAsteroidSphereData data) : base(instance)
         {
             m_data = data;
-            m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Brown, (float)data.OuterRadius / 200f);
+            m_render = new RenderHollowSphere(instance.CenterPosition, (float)data.InnerRadius, (float)data.OuterRadius, Color.Brown);
         }
 
         public override void Draw()
