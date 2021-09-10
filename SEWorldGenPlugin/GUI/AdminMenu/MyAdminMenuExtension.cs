@@ -1,5 +1,6 @@
 ﻿using Sandbox.Game.Gui;
 using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.GUI.AdminMenu.SubMenus;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
@@ -69,7 +70,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// <summary>
         /// The custom sub menus of the admin menu. This static variable is used
         /// by each instance of the MyAdminMenuExtension and is static, since a new instance
-        /// is created each time the admin menu is opened, but sub menus should only need to be registered once.
+        /// is created each time the admin menu is opened, but sub menus should only need to be registered once per session.
         /// </summary>
         private static readonly List<MyPluginAdminMenuSubMenu> m_subMenus = new List<MyPluginAdminMenuSubMenu>();
 
@@ -87,22 +88,21 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             }
         }
 
+        /// <summary>
+        /// Unregisters all sub menu for admin menus.
+        /// </summary>
+        public static void UnregisterAllSubMenus()
+        {
+            m_subMenus.Clear();
+        }
+
+        /// <summary>
+        /// Static instance of the admin menu
+        /// </summary>
         public static MyAdminMenuExtension Static
         {
             get;
             private set;
-        }
-
-        /// <summary>
-        /// Unregisters a sub menu for admin menus.
-        /// </summary>
-        /// <param name="subMenu"></param>
-        public static void UnregisterSubMenu(MyPluginAdminMenuSubMenu subMenu)
-        {
-            if (m_subMenus.Contains(subMenu))
-            {
-                m_subMenus.Remove(subMenu);
-            }
         }
 
         public MyAdminMenuExtension() : base()
