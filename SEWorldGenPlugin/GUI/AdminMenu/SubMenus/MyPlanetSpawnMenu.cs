@@ -91,7 +91,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 OnSpawnPlanet();
             });
-            m_spawnPlanetButton.Enabled = false;
+            m_spawnPlanetButton.Enabled = true;
             m_spawnPlanetButton.SetToolTip("Activates the mode to spawn the planet where you place it");
 
             parent.AddTableSeparator();
@@ -124,7 +124,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 Diameter = size
             };
 
-            MyPluginItemsClipboard.Static.Activate(planet, SpawnPlanet, size);
+            MyPluginPlanetClipboard.Static.Activate(planet, SpawnPlanet, size);
 
             MyAdminMenuExtension.Static.CloseScreenNow();
         }
