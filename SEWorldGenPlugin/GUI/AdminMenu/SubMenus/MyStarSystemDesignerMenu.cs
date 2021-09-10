@@ -121,7 +121,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_selectedObjectId = Guid.Empty;
             m_adminMenuInst = null;
             m_systemObjectsBox = null;
-            //m_renderer = null;
+            m_renderer = null;
         }
 
         public override string GetTitle()
@@ -206,8 +206,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_removeObjectButton.Size = new Vector2(maxWidth, m_removeObjectButton.Size.Y);
 
             parent.AddTableRow(m_removeObjectButton);
-
-            MyPluginDrawSession.Static.AddRenderObject(15, m_renderer);
 
             if (MySettingsSession.Static.Settings.Enabled)
             {

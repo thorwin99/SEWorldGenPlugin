@@ -7,7 +7,7 @@ using VRage.Game.Components;
 namespace SEWorldGenPlugin.Session
 {
     /// <summary>
-    /// Session component to compare server and client side of the plugin (e.g. version)
+    /// Session component for essential plugin funktions.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 1005)]
     public class MyPluginSession : MySessionComponentBase

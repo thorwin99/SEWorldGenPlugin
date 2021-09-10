@@ -240,7 +240,6 @@
     <Compile Include="Session\MyAsteroidObjectsManager.cs" />
     <Compile Include="Session\MyEntityTrackerComponent.cs" />
     <Compile Include="Session\MyGPSManager.cs" />
-    <Compile Include="Session\MyPluginDrawSession.cs" />
     <Compile Include="Session\MyPluginPlanetClipboard.cs" />
     <Compile Include="Session\MyPluginSession.cs" />
     <Compile Include="Session\MySettingsSession.cs" />

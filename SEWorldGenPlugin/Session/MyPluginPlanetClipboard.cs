@@ -136,8 +136,6 @@ namespace SEWorldGenPlugin.Session
         {
             if (m_isActive)
             {
-                MyPluginDrawSession.Static.RemoveRenderObject(m_copiedPlanet.GetHashCode());
-
                 MatrixD wm = GetPasteMatrix();
 
                 Vector3D posGlobal = wm.Forward * m_distanceToCam;
