@@ -750,7 +750,7 @@ namespace SEWorldGenPlugin.Generator
                         }
                     }
                 }
-                if (!exists)
+                if (!exists && StarSystem.CenterObject != null)
                 {
                     MySystemPlanet vanillaPlanet = new MySystemPlanet();
                     vanillaPlanet.CenterPosition = e.PositionComp.GetPosition();
@@ -758,6 +758,7 @@ namespace SEWorldGenPlugin.Generator
                     vanillaPlanet.DisplayName = GetPlanetNameForPlanetStorageName(e.StorageName);
                     vanillaPlanet.Generated = true;
                     vanillaPlanet.EntityId = p.EntityId;
+
 
                     StarSystem.CenterObject.ChildObjects.Add(vanillaPlanet);
                 }
