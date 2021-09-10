@@ -201,8 +201,6 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             roid.AsteroidSize.Min = (long)m_asteroidSizesSlider.CurrentMin;
             roid.AsteroidSize.Max = (long)m_asteroidSizesSlider.CurrentMax;
 
-            m_teleportToRingButton.Enabled = false;
-
             ChangedObject();
         }
 
