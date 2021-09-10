@@ -72,7 +72,7 @@ namespace SEWorldGenPlugin.GUI
                 if (!VersionCheck.Static.IsNewest() && !OPENED_VERSION_NOTIFICATION)
                 {
                     OPENED_VERSION_NOTIFICATION = true;
-                    MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_BOX), new StringBuilder(MyPluginTexts.MESSAGES.UPDATE_AVAILABLE_TITLE), null, null, null, null, OnUpdateNotifiactionMessageClose));
+                    MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder("A new version of the SEWorldGenPlugin is a available. Do you want to visit the download page now?"), new StringBuilder("SEWorldGenPlugin Update available"), null, null, null, null, OnUpdateNotifiactionMessageClose));
                 }
             }
 
