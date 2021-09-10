@@ -1,8 +1,15 @@
-﻿using Sandbox.Graphics.GUI;
+﻿using Sandbox.Engine.Multiplayer;
+using Sandbox.Game.Gui;
+using Sandbox.Game.World;
+using Sandbox.Graphics.GUI;
+using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
+using SEWorldGenPlugin.GUI;
+using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner;
 using SEWorldGenPlugin.GUI.Controls;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
+using SEWorldGenPlugin.Utilities;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
@@ -46,6 +53,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
         /// The slider for the asteroid ring z axis angle in the spawn menu
         /// </summary>
         private MyGuiControlClickableSlider m_angleZSlider;
+
+        /// <summary>
+        /// Button used to teleport to the ring
+        /// </summary>
+        private MyGuiControlButton m_teleportToRingButton;
 
         public MyStarSystemDesignerAsteroidRingMenu(MySystemAsteroids obj, MyAsteroidRingData data) : base(obj, data)
         {
@@ -97,6 +109,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Angle Z"));
             controlTable.AddTableRow(m_angleZSlider);
+
+            m_teleportToRingButton = MyPluginGuiHelper.CreateDebugButton("Teleport to ring", OnTeleportToRing, true, "Teleports you into the ring");
+            m_teleportToRingButton.Enabled = isEditing;
+
+            controlTable.AddTableSeparator();
+
+            controlTable.AddTableRow(m_teleportToRingButton);
 
             GetControlsFromRoid();
             OnValueChanged(null);//Update ring with values from slider, incase previous values were outside of slider range.
@@ -182,6 +201,30 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             roid.AsteroidSize.Max = (long)m_asteroidSizesSlider.CurrentMax;
 
             ChangedObject();
+        }
+
+        /// <summary>
+        /// Teleports the player into the ring
+        /// </summary>
+        /// <param name="btn"></param>
+        private void OnTeleportToRing(MyGuiControlButton btn)
+        {
+            MyPluginLog.Debug("Teleporting player to " + m_object.DisplayName);
+
+            if (MySession.Static.CameraController != MySession.Static.LocalCharacter || true)
+            {
+                IMyAsteroidObjectShape shape = MyAsteroidRingProvider.Static.GetAsteroidObjectShape(m_object as MySystemAsteroids);
+                if (shape == null)
+                {
+                    MyPluginGuiHelper.DisplayError("Cant teleport to asteroid ring. It does not exist", "Error");
+                    return;
+                }
+
+                MyAdminMenuExtension.Static.CloseScreenNow();
+
+                MyMultiplayer.TeleportControlledEntity(shape.GetPointInShape());
+                MyGuiScreenGamePlay.SetCameraController();
+            }
         }
     }
 }

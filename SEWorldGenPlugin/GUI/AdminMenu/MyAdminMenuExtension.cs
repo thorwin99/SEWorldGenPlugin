@@ -87,6 +87,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             }
         }
 
+        public static MyAdminMenuExtension Static
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// Unregisters a sub menu for admin menus.
         /// </summary>
@@ -103,6 +109,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         {
             m_requestRecreate = false;
             m_isRecreating = false;
+            Static = this;
         }
 
         /// <summary>
@@ -293,6 +300,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             {
                 sub.Close();
             }
+
+            Static = null;
         }
     }
 }
