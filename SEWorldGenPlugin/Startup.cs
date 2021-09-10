@@ -62,6 +62,7 @@ namespace SEWorldGenPlugin
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyAdminMenuExtension);
 
             MyAdminMenuExtension.RegisterSubMenu(new MyStarSystemDesignerMenu());
+            MyAdminMenuExtension.RegisterSubMenu(new MyPlanetSpawnMenu());
 
             TryEnablePatches();
 
