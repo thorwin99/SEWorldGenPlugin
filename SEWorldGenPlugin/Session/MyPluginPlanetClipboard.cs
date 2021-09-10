@@ -10,26 +10,26 @@ using VRageMath;
 namespace SEWorldGenPlugin.Session
 {
     /// <summary>
-    /// Session component that is used to hold and paste a MySystemItem
-    /// into the world. It will update a visual for the item, which currently only works with planets.
+    /// Session component that is used to hold and paste a MySystemPlanet
+    /// into the world. It will update a visual for the item
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-    public class MyPluginItemsClipboard : MySessionComponentBase
+    public class MyPluginPlanetClipboard : MySessionComponentBase
     {
         /// <summary>
         /// Singleton instance of this session component
         /// </summary>
-        public static MyPluginItemsClipboard Static;
+        public static MyPluginPlanetClipboard Static;
 
         /// <summary>
         /// Currently copied item
         /// </summary>
-        private MySystemObject m_copiedItem = null;
+        private MySystemPlanet m_copiedPlanet = null;
 
         /// <summary>
         /// Callpack for the paste event of the currently copied item
         /// </summary>
-        private Action<MySystemObject, Vector3D> m_callback;
+        private Action<MySystemPlanet, Vector3D> m_callback;
 
         /// <summary>
         /// If the clipboard is currently active
@@ -47,6 +47,11 @@ namespace SEWorldGenPlugin.Session
         private Vector3D m_currentPos;
 
         /// <summary>
+        /// The current rendered sphere for the clipboarded planet
+        /// </summary>
+        private RenderSphere m_render;
+
+        /// <summary>
         /// Initializes this session component and its singleton instance
         /// </summary>
         /// <param name="sessionComponent"></param>
@@ -57,17 +62,18 @@ namespace SEWorldGenPlugin.Session
         }
 
         /// <summary>
-        /// Activates this clipboard with the given MySystemItem and sets the callback for the paste event
+        /// Activates this clipboard with the given MySystemPlanet and sets the callback for the paste event
         /// </summary>
-        /// <param name="item">Item to copy and paste</param>
-        /// <param name="callback">Callback to call, when the item gets pasted</param>
+        /// <param name="item">Planet to copy and paste</param>
+        /// <param name="callback">Callback to call, when the Planet gets pasted</param>
         /// <param name="distanceToCam">The distance the object has to the camera</param>
-        public void Activate(MySystemObject item, Action<MySystemObject, Vector3D> callback, float distanceToCam)
+        public void Activate(MySystemPlanet item, Action<MySystemObject, Vector3D> callback, float distanceToCam)
         {
-            m_copiedItem = item;
+            m_copiedPlanet = item;
             m_callback = callback;
             m_isActive = true;
             m_distanceToCam = distanceToCam;
+            m_render = new RenderSphere(item.CenterPosition, (float)item.Diameter / 2f, Color.LightGreen);
         }
 
         /// <summary>
@@ -75,10 +81,11 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public void Deactivate()
         {
-            m_copiedItem = null;
+            m_copiedPlanet = null;
             m_callback = null;
             m_isActive = false;
             m_distanceToCam = 0;
+            m_render = null;
         }
 
         /// <summary>
@@ -88,28 +95,35 @@ namespace SEWorldGenPlugin.Session
         public override void HandleInput()
         {
             base.HandleInput();
+            int scrolled = MyInput.Static.DeltaMouseScrollWheelValue();
+
             if (MyInput.Static.IsNewKeyPressed(MyKeys.Escape))
             {
                 if (m_isActive)
                 {
-                    MyPluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
-                    m_copiedItem = null;
-                    m_callback = null;
-                    m_distanceToCam = 0;
-                    m_isActive = false;
+                    Deactivate();
                 }
                 
+            }
+            if(MyInput.Static.IsAnyCtrlKeyPressed() && scrolled != 0)
+            {
+                m_distanceToCam += scrolled * 1000;
+
+                if(m_distanceToCam < 0)
+                {
+                    m_distanceToCam = 0;
+                }
+                else if(m_distanceToCam > 10000000)
+                {
+                    m_distanceToCam = 10000000;
+                }
             }
             if (MyInput.Static.IsNewLeftMousePressed())
             {
                 if (m_isActive)
                 {
-                    MyPluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
-                    m_callback?.Invoke(m_copiedItem, m_currentPos);
-                    m_copiedItem = null;
-                    m_callback = null;
-                    m_distanceToCam = 0;
-                    m_isActive = false;
+                    m_callback?.Invoke(m_copiedPlanet, m_currentPos);
+                    Deactivate();
                 }
             }
         }
@@ -122,7 +136,7 @@ namespace SEWorldGenPlugin.Session
         {
             if (m_isActive)
             {
-                MyPluginDrawSession.Static.RemoveRenderObject(m_copiedItem.GetHashCode());
+                MyPluginDrawSession.Static.RemoveRenderObject(m_copiedPlanet.GetHashCode());
 
                 MatrixD wm = GetPasteMatrix();
 
@@ -130,8 +144,9 @@ namespace SEWorldGenPlugin.Session
 
                 m_currentPos = wm.Translation + posGlobal;
 
-                if(m_copiedItem.GetType() == typeof(MySystemPlanet))
-                    MyPluginDrawSession.Static.AddRenderObject(m_copiedItem.GetHashCode(), new RenderSphere(m_currentPos, (float)((MySystemPlanet)m_copiedItem).Diameter / 2, Color.LightGreen));
+                m_copiedPlanet.CenterPosition = m_currentPos;
+
+                m_render.Position = m_currentPos;
             }
         }
 
@@ -149,6 +164,14 @@ namespace SEWorldGenPlugin.Session
             else
             {
                 return MySector.MainCamera.WorldMatrix;
+            }
+        }
+
+        public override void Draw()
+        {
+            if(m_isActive && m_render != null)
+            {
+                m_render.Draw();
             }
         }
     }
