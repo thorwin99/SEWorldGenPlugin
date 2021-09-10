@@ -65,7 +65,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_systemRenderObjects[obj].SetFocus(true);
 
             var renderer = m_systemRenderObjects[obj];
-            double renderSize;
+            double renderSize = 0;
 
             if (FocusZoom == ZoomLevel.ORBIT)
             {
@@ -73,14 +73,47 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
                 if(parent != null)
                 {
-                    renderSize = m_systemRenderObjects[parent.Id].GetObjectRenderSize(ZoomLevel.OBJECT_SYSTEM);
+                    renderSize = CalculateObjectSystemSize(m_systemRenderObjects[parent.Id]);
                     SetCameraTarget(parent.CenterPosition, renderSize * 2f);
                     return;
                 }
             }
-            renderSize = renderer.GetObjectRenderSize(FocusZoom);
+            else if (FocusZoom == ZoomLevel.OBJECT_SYSTEM)
+            {
+                renderSize = CalculateObjectSystemSize(renderer);
+            }
+            else
+            {
+                renderSize = renderer.GetObjectSize();
+            }
 
             SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2f);
+        }
+
+        /// <summary>
+        /// Calculates the size of the object system
+        /// </summary>
+        private double CalculateObjectSystemSize(MyAbstractStarSystemDesignerRenderObject renderObject)
+        {
+            double radius = 0;
+
+            foreach(var child in renderObject.RenderObject.ChildObjects)
+            {
+                if(child is MySystemAsteroids)
+                {
+                    //Still no way to get asteroid orbit radius
+                }
+                else
+                {
+                    double childRad = Vector3D.Distance(renderObject.RenderObject.CenterPosition, child.CenterPosition);
+
+                    radius = Math.Max(childRad, radius);
+                }
+            }
+
+            radius += renderObject.GetObjectSize();
+
+            return radius;
         }
 
         /// <summary>

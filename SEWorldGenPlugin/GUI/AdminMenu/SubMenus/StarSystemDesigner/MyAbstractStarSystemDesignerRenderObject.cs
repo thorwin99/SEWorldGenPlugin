@@ -30,11 +30,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         }
 
         /// <summary>
-        /// Returns the size of the focused render object for the given zoom level in world units.
+        /// Returns the size of the object itself. For example for a planet, it is the diameter
         /// </summary>
-        /// <returns>The size of the object in the game world</returns>
-        /// <param name="level">The zoom level the object should return its render size for.</param>
-        public abstract double GetObjectRenderSize(ZoomLevel level);
+        /// <returns></returns>
+        public abstract double GetObjectSize();
 
         /// <summary>
         /// Enables or disables focus for this object

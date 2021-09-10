@@ -49,49 +49,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_planetRender.Draw();
         }
 
-        public override double GetObjectRenderSize(ZoomLevel level)
-        {
-            if(level == ZoomLevel.OBJECT_SYSTEM)
-            {
-                return CalculateMaxChildOrbit();
-            }
-            else if(level == ZoomLevel.OBJECT)
-            {
-                return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
-            }
-            else if(level == ZoomLevel.ORBIT)
-            {
-                var parent = MyStarSystemGenerator.Static.StarSystem.GetById(RenderObject.ParentId);
-                if (parent != null)
-                {
-                    return Vector3D.Distance(parent.CenterPosition, RenderObject.CenterPosition);
-                }
-                else
-                {
-                    return CalculateMaxChildOrbit();
-                }
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Calculates the largest orbit size of a child object
-        /// </summary>
-        /// <returns>The max orbit distance of a direct children of this object</returns>
-        private double CalculateMaxChildOrbit()
-        {
-            double radius = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
-
-            foreach (var child in RenderObject.ChildObjects)
-            {
-                double orbitRad = Vector3D.Distance(child.CenterPosition, RenderObject.CenterPosition);
-                radius = Math.Max(radius, orbitRad);
-            }
-
-            return radius * 2f;
-        }
-
         /// <summary>
         /// Updates the render sphere size to be appropriatly sized
         /// </summary>
@@ -158,6 +115,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             up = Vector3D.Rotate(up, my * mz);
 
             return MatrixD.CreateWorld(center, fn, up);
+        }
+
+        public override double GetObjectSize()
+        {
+            return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
         }
     }
 }
