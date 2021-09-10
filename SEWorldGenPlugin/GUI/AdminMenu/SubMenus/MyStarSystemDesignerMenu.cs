@@ -156,12 +156,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             parent.AddTableRow(m_systemObjectsBox);
 
-            m_refreshSystemButton = MyPluginGuiHelper.CreateDebugButton("Refresh", RefreshSystem, true);
+            m_refreshSystemButton = MyPluginGuiHelper.CreateDebugButton("Refresh", OnRefreshSystem, true);
             m_refreshSystemButton.Size = new Vector2(maxWidth, m_refreshSystemButton.Size.Y);
 
             parent.AddTableRow(m_refreshSystemButton);
 
-            m_addObjectButton = MyPluginGuiHelper.CreateDebugButton("Add new object", AddNewSystemObject, true);
+            m_addObjectButton = MyPluginGuiHelper.CreateDebugButton("Add new object", OnAddNewSystemObject, true);
             m_addObjectButton.Size = new Vector2(maxWidth, m_addObjectButton.Size.Y);
 
             parent.AddTableRow(m_addObjectButton);
@@ -218,24 +218,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             }
         }
 
-        #endregion
-
-        public override void Draw()
-        {
-            m_renderer.Draw();
-        }
-
-        /// <summary>
-        /// Set the enabled flag of all main controls
-        /// </summary>
-        private void ToggleAllControls(bool enable)
-        {
-            m_systemObjectsBox.Enabled = enable;
-            m_refreshSystemButton.Enabled = enable;
-            m_addObjectButton.Enabled = enable;
-            m_removeObjectButton.Enabled = enable;
-        }
-
         /// <summary>
         /// Creates the sub menu controls, based on the type of selected object and whether it already exists or not.
         /// Enables the add object button, if the selected object exists in the star system, and if the type supports child objects.
@@ -279,11 +261,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Name"));
             m_subMenuControlTable.AddTableRow(m_objNameBox);
 
-            if(obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
+            if (obj.Type == MySystemObjectType.PLANET || obj.Type == MySystemObjectType.MOON)
             {
                 BuildPlanetMenuControls(exists, obj as MySystemPlanet);
             }
-            else if(obj.Type == MySystemObjectType.ASTEROIDS)
+            else if (obj.Type == MySystemObjectType.ASTEROIDS)
             {
                 MySystemAsteroids asteroid = obj as MySystemAsteroids;
                 MyAbstractAsteroidObjectProvider prov;
@@ -296,7 +278,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                     }
 
                     var adminMenu = prov.CreateStarSystemDesignerEditMenu(asteroid, data);
-                    if(adminMenu != null)
+                    if (adminMenu != null)
                     {
                         if (m_currentObjectMenu != null)
                             m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
@@ -320,7 +302,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="planet">The planet object itself</param>
         private void BuildPlanetMenuControls(bool exists, MySystemPlanet planet)
         {
-            if(m_currentObjectMenu != null)
+            if (m_currentObjectMenu != null)
                 m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
 
             m_currentObjectMenu = new MyStarSystemDesignerPlanetMenu(planet);
@@ -330,6 +312,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild;
             m_removeObjectButton.Enabled = m_currentObjectMenu.CanBeRemoved;
         }
+
+        #endregion
+
+        #region ControlActions
 
         /// <summary>
         /// Called from sub menus when object gets edited.
@@ -343,11 +329,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             obj.DisplayName = name.ToString();
 
             int depth = MyStarSystemGenerator.Static.StarSystem.GetDepth(obj.Id);
-            if(depth < 0)
+            if (depth < 0)
             {
                 depth = MyStarSystemGenerator.Static.StarSystem.GetDepth(obj.ParentId) + 1;
             }
-            if(depth > 0)
+            if (depth > 0)
             {
                 name.Insert(0, "   ", depth);
             }
@@ -361,10 +347,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 m_pendingSystemObjects.Add(obj.Id, obj);
 
-                if(obj.Type == MySystemObjectType.ASTEROIDS)
+                if (obj.Type == MySystemObjectType.ASTEROIDS)
                 {
                     var roid = obj as MySystemAsteroids;
-                    if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out MyAbstractAsteroidObjectProvider prov))
+                    if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out MyAbstractAsteroidObjectProvider prov))
                     {
                         m_pendingAsteroidData.Add(obj.Id, prov.GetInstanceData(obj.Id));
                     }
@@ -385,40 +371,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         }
 
         /// <summary>
-        /// Selects the given system object
-        /// </summary>
-        /// <param name="objectId"></param>
-        private void SelectSystemObject(Guid objectId)
-        {
-            if(objectId == Guid.Empty)
-            {
-                m_addObjectButton.Enabled = true;
-                m_applyChangesButton.Enabled = false;
-                m_removeObjectButton.Enabled = false;
-
-                m_subMenuControlTable.ClearTable();
-                m_subMenuControlTable.RefreshInternals();
-                return;
-            }
-            if (!m_itemList.ContainsKey(objectId))
-            {
-                objectId = MyStarSystemGenerator.Static.StarSystem.CenterObject.Id;
-            }
-
-            m_systemObjectsBox.SelectSingleItem(m_itemList[objectId]);
-            m_selectedObjectId = objectId;
-            SetSubMenuControls();
-
-            m_renderer.FocusObject(objectId);
-        }
-
-        /// <summary>
         /// The event called when one of the zoom buttons is clicked.
         /// </summary>
         /// <param name="btn"></param>
         private void OnZoomLevelChange(MyGuiControlButton btn)
         {
-            if(btn == m_zoomInButton)
+            if (btn == m_zoomInButton)
             {
                 m_renderer.ZoomInOnObject();
             }
@@ -435,7 +393,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// Opens window to create new System object in the system.
         /// </summary>
         /// <param name="btn"></param>
-        private void AddNewSystemObject(MyGuiControlButton btn)
+        private void OnAddNewSystemObject(MyGuiControlButton btn)
         {
             //Add the object to the local star system manually, sync on apply
             List<string> types = new List<string>(Enum.GetNames(typeof(MySystemObjectType)));
@@ -452,6 +410,94 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             MyGuiSandbox.AddScreen(typeDialog);
         }
+
+        /// <summary>
+        /// Applies the changes of the currently selected system object, if it has changes done to it.
+        /// </summary>
+        /// <param name="btn"></param>
+        private void OnApplyChanges(MyGuiControlButton btn)
+        {
+            MySystemObject obj = m_pendingSystemObjects[m_selectedObjectId];
+
+            var system = MyStarSystemGenerator.Static.StarSystem;
+
+
+            ToggleAllControls(false);
+
+            if (obj is MySystemAsteroids)
+            {
+                MySystemAsteroids roid = obj as MySystemAsteroids;
+                MyAbstractAsteroidObjectProvider prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[roid.AsteroidTypeName];
+                IMyAsteroidData data = m_pendingAsteroidData[roid.Id];
+
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
+
+                if (system.Contains(m_selectedObjectId))
+                {
+                    prov.SetInstanceData(roid.Id, data);
+                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName, OnApplyComplete);
+                }
+                else
+                {
+                    prov.AddInstance(roid, data, OnApplyComplete);
+                }
+            }
+            else
+            {
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
+                if (system.Contains(m_selectedObjectId))
+                {
+                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName, OnApplyComplete);
+                }
+                else
+                {
+                    MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId, OnApplyComplete);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Button action to remove the selected object
+        /// </summary>
+        /// <param name="btn">Button that called this</param>
+        private void OnRemoveObject(MyGuiControlButton btn)
+        {
+            var system = MyStarSystemGenerator.Static.StarSystem;
+
+            if (system.Contains(m_selectedObjectId))
+            {
+                ToggleAllControls(false);
+
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+
+                MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, OnObjectRemoved);
+            }
+            else
+            {
+                m_pendingSystemObjects.Remove(m_selectedObjectId);
+                m_pendingAsteroidData.Remove(m_selectedObjectId);
+
+                OnObjectRemoved(true);
+            }
+        }
+
+        /// <summary>
+        /// Action called to refresh the GUI representing the current system.
+        /// </summary>
+        /// <param name="btn"></param>
+        private void OnRefreshSystem(MyGuiControlButton btn)
+        {
+            RefreshSystemList();
+
+            SelectSystemObject(m_selectedObjectId);
+        }
+
+        #endregion
+
+        #region Callbacks
 
         /// <summary>
         /// Callback for when a type in the type dialog is confirmed.
@@ -515,7 +561,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 newObj.DisplayName = "New Object";
                 newObj.ParentId = m_selectedObjectId;
 
-                if(newObj is MySystemPlanet)
+                if (newObj is MySystemPlanet)
                 {
                     (newObj as MySystemPlanet).Diameter = 60000;
                 }
@@ -523,7 +569,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 if (parent != null)
                     newObj.CenterPosition = parent.CenterPosition;
 
-                if(parent is MySystemPlanet)
+                if (parent is MySystemPlanet)
                 {
                     newObj.CenterPosition = new Vector3D(parent.CenterPosition) + (parent as MySystemPlanet).Diameter * 2;
                 }
@@ -532,53 +578,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
                 RefreshSystemList();
                 SelectSystemObject(newObj.Id);
-            }
-        }
-
-        /// <summary>
-        /// Applies the changes of the currently selected system object, if it has changes done to it.
-        /// </summary>
-        /// <param name="btn"></param>
-        private void OnApplyChanges(MyGuiControlButton btn)
-        {
-            MySystemObject obj = m_pendingSystemObjects[m_selectedObjectId];
-
-            var system = MyStarSystemGenerator.Static.StarSystem;
-
-
-            ToggleAllControls(false);
-
-            if (obj is MySystemAsteroids)
-            {
-                MySystemAsteroids roid = obj as MySystemAsteroids;
-                MyAbstractAsteroidObjectProvider prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[roid.AsteroidTypeName];
-                IMyAsteroidData data = m_pendingAsteroidData[roid.Id];
-
-                m_pendingAsteroidData.Remove(m_selectedObjectId);
-                m_pendingSystemObjects.Remove(m_selectedObjectId);
-
-                if (system.Contains(m_selectedObjectId))
-                {
-                    prov.SetInstanceData(roid.Id, data);
-                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName, OnApplyComplete);
-                }
-                else
-                {
-                    prov.AddInstance(roid, data, OnApplyComplete);
-                }
-            }
-            else
-            {
-                m_pendingAsteroidData.Remove(m_selectedObjectId);
-                m_pendingSystemObjects.Remove(m_selectedObjectId);
-                if (system.Contains(m_selectedObjectId))
-                {
-                    MyStarSystemGenerator.Static.RenameObject(m_selectedObjectId, obj.DisplayName, OnApplyComplete);
-                }
-                else
-                {
-                    MyStarSystemGenerator.Static.AddObjectToSystem(obj, obj.ParentId, OnApplyComplete);
-                }
             }
         }
 
@@ -596,39 +595,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 MyPluginGuiHelper.DisplayMessage("The object was successfully applied.", "Success");
 
-                RefreshSystem(m_refreshSystemButton);
+                OnRefreshSystem(m_refreshSystemButton);
             }
             else
             {
                 MyPluginGuiHelper.DisplayError("The object could not be applied due to some error.", "Error");
-                RefreshSystem(m_refreshSystemButton);
+                OnRefreshSystem(m_refreshSystemButton);
             }
-        }
-
-        /// <summary>
-        /// Button action to remove the selected object
-        /// </summary>
-        /// <param name="btn">Button that called this</param>
-        private void OnRemoveObject(MyGuiControlButton btn)
-        {
-            var system = MyStarSystemGenerator.Static.StarSystem;
-
-            if (system.Contains(m_selectedObjectId))
-            {
-                ToggleAllControls(false);
-
-                m_pendingSystemObjects.Remove(m_selectedObjectId);
-                m_pendingAsteroidData.Remove(m_selectedObjectId);
-
-                MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, OnObjectRemoved);
-            }
-            else
-            {
-                m_pendingSystemObjects.Remove(m_selectedObjectId);
-                m_pendingAsteroidData.Remove(m_selectedObjectId);
-
-                OnObjectRemoved(true);
-            }           
         }
 
         /// <summary>
@@ -645,25 +618,57 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 MyPluginGuiHelper.DisplayMessage("The object was successfully removed.", "Success");
 
-                RefreshSystem(m_refreshSystemButton);
+                OnRefreshSystem(m_refreshSystemButton);
             }
             else
             {
                 MyPluginGuiHelper.DisplayError("The object could not be removed due to some error.", "Error");
 
-                RefreshSystem(m_refreshSystemButton);
+                OnRefreshSystem(m_refreshSystemButton);
             }
         }
 
-        /// <summary>
-        /// Action called to refresh the GUI representing the current system.
-        /// </summary>
-        /// <param name="btn"></param>
-        private void RefreshSystem(MyGuiControlButton btn)
-        {
-            RefreshSystemList();
+        #endregion
 
-            SelectSystemObject(m_selectedObjectId);
+        #region Helpers
+
+        /// <summary>
+        /// Set the enabled flag of all main controls
+        /// </summary>
+        private void ToggleAllControls(bool enable)
+        {
+            m_systemObjectsBox.Enabled = enable;
+            m_refreshSystemButton.Enabled = enable;
+            m_addObjectButton.Enabled = enable;
+            m_removeObjectButton.Enabled = enable;
+        }
+
+        /// <summary>
+        /// Selects the given system object
+        /// </summary>
+        /// <param name="objectId"></param>
+        private void SelectSystemObject(Guid objectId)
+        {
+            if(objectId == Guid.Empty)
+            {
+                m_addObjectButton.Enabled = true;
+                m_applyChangesButton.Enabled = false;
+                m_removeObjectButton.Enabled = false;
+
+                m_subMenuControlTable.ClearTable();
+                m_subMenuControlTable.RefreshInternals();
+                return;
+            }
+            if (!m_itemList.ContainsKey(objectId))
+            {
+                objectId = MyStarSystemGenerator.Static.StarSystem.CenterObject.Id;
+            }
+
+            m_systemObjectsBox.SelectSingleItem(m_itemList[objectId]);
+            m_selectedObjectId = objectId;
+            SetSubMenuControls();
+
+            m_renderer.FocusObject(objectId);
         }
 
         /// <summary>
@@ -758,6 +763,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             {
                 m_renderer.AddObject(obj.Id, new MyEmptyObjectRenderObject(obj));
             }
+        }
+
+        #endregion
+
+        public override void Draw()
+        {
+            m_renderer.Draw();
         }
     }
 }
