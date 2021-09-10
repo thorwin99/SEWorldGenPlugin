@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using VRageMath;
+using static Sandbox.Graphics.GUI.MyGuiScreenMessageBox;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 {
@@ -464,24 +465,29 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="btn">Button that called this</param>
         private void OnRemoveObject(MyGuiControlButton btn)
         {
-            var system = MyStarSystemGenerator.Static.StarSystem;
-
-            if (system.Contains(m_selectedObjectId))
+            MyPluginGuiHelper.DisplayError("Do you really want to delete this object? All children will be removed too.", "Warning", delegate(ResultEnum res)
             {
-                ToggleAllControls(false);
+                if (res != ResultEnum.YES) return;
 
-                m_pendingSystemObjects.Remove(m_selectedObjectId);
-                m_pendingAsteroidData.Remove(m_selectedObjectId);
+                var system = MyStarSystemGenerator.Static.StarSystem;
 
-                MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, OnObjectRemoved);
-            }
-            else
-            {
-                m_pendingSystemObjects.Remove(m_selectedObjectId);
-                m_pendingAsteroidData.Remove(m_selectedObjectId);
+                if (system.Contains(m_selectedObjectId))
+                {
+                    ToggleAllControls(false);
 
-                OnObjectRemoved(true);
-            }
+                    m_pendingSystemObjects.Remove(m_selectedObjectId);
+                    m_pendingAsteroidData.Remove(m_selectedObjectId);
+
+                    MyStarSystemGenerator.Static.RemoveObjectFromSystem(m_selectedObjectId, OnObjectRemoved);
+                }
+                else
+                {
+                    m_pendingSystemObjects.Remove(m_selectedObjectId);
+                    m_pendingAsteroidData.Remove(m_selectedObjectId);
+
+                    OnObjectRemoved(true);
+                }
+            });
         }
 
         /// <summary>
