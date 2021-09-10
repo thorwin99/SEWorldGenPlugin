@@ -6,6 +6,7 @@ using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
+using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
 {
@@ -17,6 +18,7 @@ namespace SEWorldGenPlugin.Generator
         /// <summary>
         /// Adds a new object to the system. If <paramref name="parentId"/> is provided, it will be added as a child to that
         /// object, else it will be added as a child to the sun.
+        /// If no sun is present, an empty one will be created.
         /// </summary>
         /// <param name="systemObject">Object to add</param>
         /// <param name="parentId">Id of the parent object</param>
@@ -24,7 +26,15 @@ namespace SEWorldGenPlugin.Generator
         public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null, Action<bool> callback = null)
         {
             uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
-            Guid parent = !parentId.HasValue ? StarSystem.CenterObject.Id : parentId.Value;
+            Guid parent = Guid.Empty;
+            if(StarSystem.CenterObject != null)
+            {
+                parent = parentId ?? StarSystem.CenterObject.Id;
+            }
+            else
+            {
+                parent = parentId ?? Guid.Empty;
+            }
 
             PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parent, callbackId, Sync.MyId);
         }
@@ -104,10 +114,28 @@ namespace SEWorldGenPlugin.Generator
                         }
                         else
                         {
-                            Static.StarSystem.CenterObject = obj;
-                            obj.ParentId = Guid.Empty;
-                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
-                            callback?.Invoke(true);
+                            if(obj.CenterPosition != Vector3D.Zero)
+                            {
+                                MySystemObject sun = new MySystemObject();
+                                sun.DisplayName = "Center";
+                                sun.Type = MySystemObjectType.EMPTY;
+                                sun.ParentId = Guid.Empty;
+
+                                Static.StarSystem.CenterObject = sun;
+
+                                obj.ParentId = sun.Id;
+                                Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+
+                                PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                                callback?.Invoke(true);
+                            }
+                            else
+                            {
+                                Static.StarSystem.CenterObject = obj;
+                                obj.ParentId = Guid.Empty;
+                                PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                                callback?.Invoke(true);
+                            }
                         }
                     }
                     return;
@@ -145,8 +173,25 @@ namespace SEWorldGenPlugin.Generator
             }
             else if(obj.ParentId == Guid.Empty && Static.StarSystem.CenterObject == null)
             {
-                Static.StarSystem.CenterObject = obj;
-                callback?.Invoke(true);
+                if(obj.CenterPosition != Vector3D.Zero)
+                {
+                    MySystemObject sun = new MySystemObject();
+                    sun.DisplayName = "Center";
+                    sun.Type = MySystemObjectType.EMPTY;
+                    sun.ParentId = Guid.Empty;
+
+                    Static.StarSystem.CenterObject = sun;
+
+                    obj.ParentId = sun.Id;
+                    Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+
+                    callback?.Invoke(true);
+                }
+                else
+                {
+                    Static.StarSystem.CenterObject = obj;
+                    callback?.Invoke(true);
+                }
             }
             else
             {

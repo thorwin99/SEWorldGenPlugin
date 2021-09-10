@@ -47,7 +47,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
         public override string GetTitle()
         {
-            return "Spawn supersized planet";
+            return "Supersized-Planets";
         }
 
         public override bool IsVisible()
@@ -134,14 +134,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         /// <param name="planet">Planet to spawn</param>
         /// <param name="position">Position to spawn at</param>
-        private void SpawnPlanet(MySystemObject planet, Vector3D position)
+        private void SpawnPlanet(MySystemPlanet planet, Vector3D position)
         {
             if (planet.Type == MySystemObjectType.PLANET)
             {
-                MySystemPlanet p = planet as MySystemPlanet;
-                p.CenterPosition = position;
+                planet.CenterPosition = position;
 
-                MyStarSystemGenerator.Static.AddObjectToSystem(p);
+                MyStarSystemGenerator.Static.AddObjectToSystem(planet);
             }
         }
 

@@ -67,7 +67,7 @@ namespace SEWorldGenPlugin.Session
         /// <param name="item">Planet to copy and paste</param>
         /// <param name="callback">Callback to call, when the Planet gets pasted</param>
         /// <param name="distanceToCam">The distance the object has to the camera</param>
-        public void Activate(MySystemPlanet item, Action<MySystemObject, Vector3D> callback, float distanceToCam)
+        public void Activate(MySystemPlanet item, Action<MySystemPlanet, Vector3D> callback, float distanceToCam)
         {
             m_copiedPlanet = item;
             m_callback = callback;
