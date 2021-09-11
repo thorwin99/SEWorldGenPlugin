@@ -132,8 +132,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         public override bool IsVisible()
         {
             return MyPluginSession.Static.ServerVersionMatch && 
-                MySession.Static.IsUserAdmin(Sync.MyId) && 
-                MySession.Static.IsUserSpaceMaster(Sync.MyId) && 
+                (MySession.Static.IsUserAdmin(Sync.MyId) || 
+                MySession.Static.IsUserSpaceMaster(Sync.MyId)) && 
                 MySettingsSession.Static.Settings.Enabled;//Star system designer is only visible, IFF server and client version match up, the user is an admin and space master, and the plugin is enabled
         }
 
