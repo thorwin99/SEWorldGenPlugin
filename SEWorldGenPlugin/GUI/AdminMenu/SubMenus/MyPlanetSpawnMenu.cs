@@ -157,5 +157,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 m_planetDefList.Items.Add(i);
             }
         }
+
+        public override void HandleInput()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

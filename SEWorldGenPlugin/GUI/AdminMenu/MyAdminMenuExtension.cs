@@ -87,6 +87,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             }
         }
 
+        public override void HandleInput(bool receivedFocusInThisUpdate)
+        {
+            base.HandleInput(receivedFocusInThisUpdate);
+
+            int index = m_selectedMenuIndex - m_vanillaSubMenuCount;
+
+            if (index >= 0 && index < m_subMenus.Count)
+                m_subMenus[index].HandleInput();
+        }
+
         /// <summary>
         /// Unregisters all sub menu for admin menus.
         /// </summary>

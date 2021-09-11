@@ -12,6 +12,7 @@ using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using VRage.Input;
 using VRageMath;
 using static Sandbox.Graphics.GUI.MyGuiScreenMessageBox;
 
@@ -134,6 +135,28 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 MySession.Static.IsUserAdmin(Sync.MyId) && 
                 MySession.Static.IsUserSpaceMaster(Sync.MyId) && 
                 MySettingsSession.Static.Settings.Enabled;//Star system designer is only visible, IFF server and client version match up, the user is an admin and space master, and the plugin is enabled
+        }
+
+        public override void HandleInput()
+        {
+            if (MyInput.Static.IsAnyCtrlKeyPressed())
+            {
+                var scrolled = MyInput.Static.DeltaMouseScrollWheelValue();
+
+                m_renderer.ChangeCameraZoom(scrolled);
+
+                if (MyInput.Static.IsMiddleMousePressed())
+                {
+                    m_renderer.ResetCamera();
+                }
+
+                if (MyInput.Static.IsLeftMousePressed())
+                {
+                    var dragged = MyInput.Static.GetCursorPositionDelta();
+
+                    m_renderer.ChangeCameraRotation(dragged);
+                }
+            }
         }
 
         #region GUI Building

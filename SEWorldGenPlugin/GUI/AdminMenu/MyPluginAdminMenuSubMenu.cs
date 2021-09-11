@@ -44,5 +44,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
         /// Draw method for this sub menu. Called on Draw of the game frame
         /// </summary>
         public abstract void Draw();
+
+        /// <summary>
+        /// Handles current frame input
+        /// </summary>
+        public abstract void HandleInput();
     }
 }

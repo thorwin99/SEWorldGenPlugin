@@ -3,6 +3,7 @@ using Sandbox.Game.World;
 using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
 using VRage.Game;
@@ -35,6 +36,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// The id of the currently focused object
         /// </summary>
         private Guid m_focusedObject;
+
+        /// <summary>
+        /// The current zoom of the camera
+        /// </summary>
+        private float m_cameraZoom = 2f;
+
+        /// <summary>
+        /// The current Y, Z rotation of the camera
+        /// </summary>
+        private Vector2D m_cameraRotation = new Vector2D(60, 0);
 
         /// <summary>
         /// The current zoom level of the spectator cam
@@ -73,27 +84,94 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
                 if(parent != null)
                 {
                     renderSize = CalculateObjectSystemSize(m_systemRenderObjects[parent.Id]);
-                    SetCameraTarget(parent.CenterPosition, renderSize * 2f);
+                    SetCameraTarget(parent.CenterPosition, renderSize * m_cameraZoom);
                     return;
                 }
                 else
                 {
                     renderSize = CalculateObjectSystemSize(renderer);
 
-                    SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2.5f);
+                    SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * m_cameraZoom);
                 }
             }
             else if (FocusZoom == ZoomLevel.OBJECT_SYSTEM)
             {
                 renderSize = CalculateObjectSystemSize(renderer);
 
-                SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 2f);
+                SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * m_cameraZoom);
             }
             else
             {
                 renderSize = renderer.GetObjectSize();
 
-                SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * 1.5f);
+                SetCameraTarget(renderer.RenderObject.CenterPosition, renderSize * m_cameraZoom);
+            }
+        }
+
+        public void ResetCamera()
+        {
+            m_cameraZoom = 2f;
+
+            m_cameraRotation.X = 60;
+            m_cameraRotation.Y = 0;
+
+            FocusObject(m_focusedObject);
+        }
+
+        /// <summary>
+        /// Changes the camera zoom by the given delta of the mouse scroll wheel
+        /// </summary>
+        /// <param name="deltaScroll">Delta of mouse scroll wheel</param>
+        public void ChangeCameraZoom(float deltaScroll)
+        {
+            if (deltaScroll == 0) return;
+
+            m_cameraZoom += -deltaScroll / 1000f;
+
+            if(m_cameraZoom < 0.5f)
+            {
+                m_cameraZoom = 1;
+            }
+            if(m_cameraZoom > 100f)
+            {
+                m_cameraZoom = 100f;
+            }
+
+            FocusObject(m_focusedObject);
+        }
+
+        /// <summary>
+        /// Updates the camera rotaton based on the delta position of the mouse cursor
+        /// </summary>
+        /// <param name="deltaPos">Mouse cursor delta position</param>
+        public void ChangeCameraRotation(Vector2 deltaPos)
+        {
+            if(deltaPos.LengthSquared() > 0)
+            {
+                m_cameraRotation.X += deltaPos.Y / 4.0;
+                m_cameraRotation.Y -= deltaPos.X / 4.0;
+
+                if(m_cameraRotation.X < -90)
+                {
+                    m_cameraRotation.X = -90;
+                }
+
+                if (m_cameraRotation.X > 90)
+                {
+                    m_cameraRotation.X = 90;
+                }
+
+                if(m_cameraRotation.Y < -360)
+                {
+                    m_cameraRotation.Y += 360;
+                }
+
+                if (m_cameraRotation.Y > 360)
+                {
+                    m_cameraRotation.Y -= 360;
+                }
+
+                FocusObject(m_focusedObject);
             }
         }
 
@@ -197,11 +275,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <param name="targetPos">Target position for the camera to look at</param>
         private void SetCameraTarget(Vector3D targetPos, double distance)
         {
-            MySpectatorCameraController.Static.Position = targetPos + (new Vector3D(0.4f, 0, 0.6f)) * distance;
-            MySpectatorCameraController.Static.SetTarget(targetPos, new Vector3D(-0.6f, 0, -0.4f));
+            MatrixD rotY = MatrixD.CreateRotationY(MathHelperD.ToRadians(-m_cameraRotation.X));
+            MatrixD rotZ = MatrixD.CreateRotationZ(MathHelperD.ToRadians(m_cameraRotation.Y));
 
-            if(FocusZoom == ZoomLevel.ORBIT)
-                MySpectatorCameraController.Static.Position += Vector3D.UnitX * distance * 0.2f;
+            Vector3D fwd = Vector3D.Rotate(Vector3D.UnitX, rotY * rotZ);
+            Vector3D up = Vector3D.Rotate(Vector3D.UnitZ, rotY * rotZ);
+
+            MySpectatorCameraController.Static.Position = targetPos + fwd * distance;
+            MySpectatorCameraController.Static.SetTarget(targetPos, up);
         }
 
         public void Draw()
