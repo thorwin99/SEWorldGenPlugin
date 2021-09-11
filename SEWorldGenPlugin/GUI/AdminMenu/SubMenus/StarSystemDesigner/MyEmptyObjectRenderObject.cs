@@ -1,6 +1,7 @@
 ﻿using SEWorldGenPlugin.Draw;
 using SEWorldGenPlugin.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
+using SEWorldGenPlugin.Session;
 using System;
 using VRageMath;
 using VRageRender;
@@ -41,7 +42,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override double GetObjectSize()
         {
-            return 0;
+            return MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
         }
 
         /// <summary>
