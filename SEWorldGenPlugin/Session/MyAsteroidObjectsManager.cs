@@ -63,7 +63,7 @@ namespace SEWorldGenPlugin.Session
         {
             MyPluginLog.Log("Asteroid object manager saving");
 
-            if (!MySettingsSession.Static.IsEnabled())
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer)
             {
                 MyPluginLog.Log("Plugin not enabled or client is not server, aborting");
                 return;
@@ -97,12 +97,12 @@ namespace SEWorldGenPlugin.Session
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                MyPluginLog.Log("Registering asteroid object providers in: " + assembly.FullName);
+                MyPluginLog.Debug("Registering asteroid object providers in: " + assembly.FullName);
                 try
                 {
                     foreach (var type in assembly.GetTypes())
                     {
-                        if (type.IsSubclassOf(typeof(MyAbstractAsteroidObjectProvider)))
+                        if (type.IsSubclassOf(typeof(MyAbstractAsteroidObjectProvider)) && !type.IsGenericType)
                         {
                             MyPluginLog.Log("Registering provider " + type.Name);
 

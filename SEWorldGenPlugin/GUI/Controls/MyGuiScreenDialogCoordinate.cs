@@ -84,8 +84,6 @@ namespace SEWorldGenPlugin.GUI.Controls
 
             table.AddTableSeparator();
 
-            table.ApplyRows();
-
             table.Position = new Vector2(0, caption.Position.Y + caption.Size.Y + PADDING.Y);
             table.OriginAlign = VRage.Utils.MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_TOP;
 

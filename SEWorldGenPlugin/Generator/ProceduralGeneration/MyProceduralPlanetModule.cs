@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
             if (system == null || system.CenterObject == null) return;
 
-            var objs = system.GetAllObjects();
+            var objs = system.GetAll();
 
             foreach(var obj in objs)
             {
@@ -75,7 +75,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             if (!(tracker.Entity is MyCharacter)) return;
 
             var entity = tracker.Entity as MyCharacter;
-            var systemObjects = MyStarSystemGenerator.Static.StarSystem.GetAllObjects();
+            var systemObjects = MyStarSystemGenerator.Static.StarSystem.GetAll();
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
 
             if (settings.PlanetGPSMode != MyGPSGenerationMode.DISCOVERY && settings.MoonGPSMode != MyGPSGenerationMode.DISCOVERY) return;

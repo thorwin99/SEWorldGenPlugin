@@ -8,12 +8,12 @@ namespace SEWorldGenPlugin.Draw
     /// <summary>
     /// Simple class that can render a cylinder into the gameworld.
     /// </summary>
-    public class RenderCylinder : IRenderObject
+    public class RenderCylinder : AbstractWireframeRenderObject
     {
-        private MatrixD m_worldMatrix;
-        private float m_radius;
-        private float m_height;
-        private Vector4 m_color;
+        public MatrixD WorldMatrix;
+        public float Radius;
+        public float Height;
+        public Vector4 Color;
 
         /// <summary>
         /// Constructs a new renderable cylinder from a given world matrix, with
@@ -23,20 +23,20 @@ namespace SEWorldGenPlugin.Draw
         /// <param name="radius">The radius of the cylinder</param>
         /// <param name="height">The height of the cylinder</param>
         /// <param name="color">The color of the cylinder</param>
-        public RenderCylinder(MatrixD worldMatrix, float radius, float height, Vector4 color)
+        public RenderCylinder(MatrixD worldMatrix, float radius, float height, Vector4 color) : base(radius * 0.01f)
         {
-            this.m_worldMatrix = worldMatrix;
-            this.m_radius = radius;
-            this.m_height = height;
-            this.m_color = color;
+            this.WorldMatrix = worldMatrix;
+            this.Radius = radius;
+            this.Height = height;
+            this.Color = color;
         }
 
         /// <summary>
         /// Draws the cylinder into the world as a simple, transparent object.
         /// </summary>
-        public void Draw()
+        public override void Draw()
         {
-            MySimpleObjectDraw.DrawTransparentCylinder(ref m_worldMatrix, m_radius, m_radius, m_height, ref m_color, false, 100, 0.01f * m_radius, MyStringId.GetOrCompute("GizmoDrawLine"));
+            MySimpleObjectDraw.DrawTransparentCylinder(ref WorldMatrix, Radius, Radius, Height, ref Color, false, 100, LineThickness, MyStringId.GetOrCompute("GizmoDrawLine"));
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SEWorldGenPlugin.Draw
         /// <returns>A readable string representation of the world matrix, radius and height of the cylinder</returns>
         public override string ToString()
         {
-            return "P:" + m_worldMatrix.ToString() + " R:" + m_radius + " H:" + m_height;
+            return "P:" + WorldMatrix.ToString() + " R:" + Radius + " H:" + Height;
         }
     }
 }

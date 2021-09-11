@@ -513,3 +513,4 @@ MigrationBackup/
 
 # End of https://www.gitignore.io/api/csharp,visualstudio
 *.png
+/0Harmony_old.dll

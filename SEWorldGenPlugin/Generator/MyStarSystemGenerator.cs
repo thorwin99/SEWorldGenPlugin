@@ -1,5 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Game.Entities;
+using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
@@ -49,6 +50,9 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private readonly List<string> VANILLA_PLANETS = new List<string> { "Alien", "EarthLike", "EarthLikeTutorial", "Europa", "Mars", "MarsTutorial", "Moon", "MoonTutorial", "Pertam", "Titan", "Triton" };
 
+        /// <summary>
+        /// Static reference to the generator component
+        /// </summary>
         public static MyStarSystemGenerator Static;
 
         /// <summary>
@@ -105,15 +109,22 @@ namespace SEWorldGenPlugin.Generator
         {
             MyPluginLog.Log("Initializing Star system generator");
 
+            if (!Sync.IsServer)
+            {
+                MyPluginLog.Log("Not the server, fetching system and skipping the initialization of star system generator component.");
+                GetStarSystemFromServer();
+                return;
+            }
+
             if (!MySettingsSession.Static.IsEnabled())
             {
-                MyPluginLog.Log("Plugin is not enabled or client is not the server, aborting");
+                MyPluginLog.Log("Plugin is not enabled, aborting further initialization of star system generator component.");
                 return;
             }
 
             LoadPlanetDefinitions();
 
-            if (StarSystem.Count() <= 0)
+            if (StarSystem.Count() <= 0 && MySettingsSession.Static.Settings.GeneratorSettings.SystemGenerator != SystemGenerationMethod.NONE)
             {
                 StarSystem = GenerateNewStarSystem();
             }
@@ -131,9 +142,7 @@ namespace SEWorldGenPlugin.Generator
 
             Static = this;
 
-            LoadNetworking();
-
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || ! Sync.IsServer) return;
 
             MyPluginLog.Log("Loading definitions and network data");
             var data = LoadSystemData();
@@ -144,7 +153,7 @@ namespace SEWorldGenPlugin.Generator
 
             if(StarSystem != null && StarSystem.CenterObject != null)
             {
-                foreach (var obj in StarSystem.GetAllObjects())
+                foreach (var obj in StarSystem.GetAll())
                 {
                     if (obj.Type == MySystemObjectType.ASTEROIDS)
                     {
@@ -154,7 +163,7 @@ namespace SEWorldGenPlugin.Generator
                         if (!provider.TryLoadObject(asteroid))
                         {
                             MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
-                            StarSystem.RemoveObject(asteroid.Id);
+                            StarSystem.Remove(asteroid.Id);
                         }
                     }
                 }
@@ -177,7 +186,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public override void SaveData()
         {
-            if (MySettingsSession.Static.IsEnabled())
+            if (MySettingsSession.Static.IsEnabled() && Sync.IsServer)
             {
                 MyPluginLog.Log("Saving system data");
 
@@ -203,8 +212,6 @@ namespace SEWorldGenPlugin.Generator
             m_uniqueMoons?.Clear();
             m_uniquePlanets?.Clear();
 
-            UnloadNetworking();
-
             Static = null;
 
             MyPluginLog.Log("Unloading star system generation data completed");
@@ -216,7 +223,7 @@ namespace SEWorldGenPlugin.Generator
         private void AddAllPersistentGps()
         {
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
-            foreach(var item in StarSystem.GetAllObjects())
+            foreach(var item in StarSystem.GetAll())
             {
                 switch (item.Type)
                 {
@@ -278,7 +285,9 @@ namespace SEWorldGenPlugin.Generator
                 long asteroidObjectCount = MyRandom.Instance.Next(asteroidObjectAmount.Min, asteroidObjectAmount.Max + 1);
                 long systemSize = planetCount + asteroidObjectCount;
                 int currentPlanetIndex = 0;
-                int currentAsteroidIndex = 0;
+
+                Dictionary<string, int> currentAsteroidIndices = new Dictionary<string, int>();
+
                 long currentOrbitDistance = 0;
 
                 double planetProb = planetCount / (double)(planetCount + asteroidObjectCount);
@@ -325,7 +334,7 @@ namespace SEWorldGenPlugin.Generator
                         MyAbstractAsteroidObjectProvider provider = null;
                         foreach(var prov in asteroidProviders)
                         {
-                            if (!prov.Value.IsSystemGeneratable()) continue;
+                            if (!prov.Value.IsInstanceGeneratable()) continue;
 
                             if(providerIndex-- == 0)
                             {
@@ -335,7 +344,12 @@ namespace SEWorldGenPlugin.Generator
 
                         if (provider == null) continue;
 
-                        obj = provider.GenerateInstance(currentAsteroidIndex++, null, currentOrbitDistance);
+                        if (!currentAsteroidIndices.ContainsKey(provider.GetTypeName()))
+                        {
+                            currentAsteroidIndices.Add(provider.GetTypeName(), 0);
+                        }
+
+                        obj = provider.GenerateInstance(currentAsteroidIndices[provider.GetTypeName()]++, null, currentOrbitDistance);
 
                         if (obj == null) continue;
 
@@ -380,7 +394,7 @@ namespace SEWorldGenPlugin.Generator
 
             var angle = MyRandom.Instance.GetRandomFloat(0, (float)(2 * Math.PI));
             var elevation = MyRandom.Instance.GetRandomFloat((float)Math.PI / 180f * -genSettings.SystemPlaneDeviation, (float)Math.PI / 180f * genSettings.SystemPlaneDeviation);
-            Vector3D pos = new Vector3D(orbitDistance * Math.Sin(angle) * Math.Cos(elevation), orbitDistance * Math.Cos(angle) * Math.Cos(elevation), orbitDistance * Math.Sin(elevation));
+            Vector3D pos = new Vector3D(orbitDistance * Math.Cos(angle) * Math.Cos(elevation), orbitDistance * Math.Sin(angle) * Math.Cos(elevation), orbitDistance * Math.Sin(elevation));
 
             string name = GetPlanetName(planetIndex, def.Id.SubtypeId.String);
 
@@ -692,14 +706,14 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         private void CheckIntegrityOfSystem()
         {
-            foreach(var obj in StarSystem.GetAllObjects())
+            foreach(var obj in StarSystem.GetAll())
             {
                 if(obj is MySystemPlanet)
                 {
                     if(!MyEntities.EntityExists((obj as MySystemPlanet).EntityId) && (obj as MySystemPlanet).Generated)
                     {
                         MyPluginLog.Debug("Planet " + obj.Id + " does not exist anymore, deleting it", LogLevel.WARNING);
-                        StarSystem.RemoveObject(obj.Id);
+                        StarSystem.Remove(obj.Id);
                         MyGPSManager.Static.RemovePersistentGps(obj.Id);
                     }
                 }
@@ -709,11 +723,11 @@ namespace SEWorldGenPlugin.Generator
 
                     if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(instance.AsteroidTypeName))
                     {
-                        var data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].GetInstanceData(instance);
+                        var data = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].GetInstanceData(instance.Id);
                         if(data == null)
                         {
                             MyPluginLog.Debug("Asteroid instance " + obj.Id + " has no data attached, deleting it", LogLevel.WARNING);
-                            MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].RemoveInstance(instance);
+                            MyAsteroidObjectsManager.Static.AsteroidObjectProviders[instance.AsteroidTypeName].RemoveInstance(instance.Id);
                             MyGPSManager.Static.RemovePersistentGps(obj.Id);
                         }
                     }
@@ -745,7 +759,7 @@ namespace SEWorldGenPlugin.Generator
         {
             base.UpdateBeforeSimulation();
 
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
             CheckIntegrityOfSystem();
 
@@ -755,7 +769,7 @@ namespace SEWorldGenPlugin.Generator
                 var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
                 bool exists = false;
 
-                foreach(var obj in StarSystem.GetAllObjects())
+                foreach(var obj in StarSystem.GetAll())
                 {
                     if(obj is MySystemPlanet)
                     {
@@ -764,7 +778,7 @@ namespace SEWorldGenPlugin.Generator
                         }
                     }
                 }
-                if (!exists)
+                if (!exists && StarSystem.CenterObject != null)
                 {
                     MySystemPlanet vanillaPlanet = new MySystemPlanet();
                     vanillaPlanet.CenterPosition = e.PositionComp.GetPosition();
@@ -774,7 +788,7 @@ namespace SEWorldGenPlugin.Generator
                     vanillaPlanet.EntityId = p.EntityId;
                     vanillaPlanet.ParentId = StarSystem.CenterObject.Id;
 
-                    StarSystem.CenterObject.ChildObjects.Add(vanillaPlanet);
+                    AddObjectToSystem(vanillaPlanet);
                 }
             }
             AddAllPersistentGps();

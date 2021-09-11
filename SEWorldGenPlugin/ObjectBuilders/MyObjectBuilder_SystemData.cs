@@ -26,9 +26,11 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Gets all objects currently in the system
         /// </summary>
         /// <returns>All objects</returns>
-        public HashSet<MySystemObject> GetAllObjects()
+        public HashSet<MySystemObject> GetAll()
         {
             HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
+
+            if (CenterObject == null) return objs;
 
             objs.Add(CenterObject);
 
@@ -51,15 +53,34 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
+        /// Return the depth of the object in the system hierarchy.
+        /// </summary>
+        /// <param name="id">Id of the object</param>
+        /// <returns>The depth of the object or -1 if it is not in the system</returns>
+        public int GetDepth(Guid id)
+        {
+            int d = -1;
+            Foreach((depth, obj) =>
+            {
+                if(obj.Id == id)
+                {
+                    d = depth;
+                }
+            });
+
+            return d;
+        }
+
+        /// <summary>
         /// Searches the system for an object with the given
         /// id and returns it if found, else null
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>The object or null if not found</returns>
-        public MySystemObject GetObjectById(Guid id)
+        public MySystemObject GetById(Guid id)
         {
             if (id == Guid.Empty) return null;
-            foreach(var child in GetAllObjects())
+            foreach(var child in GetAll())
             {
                 if (child.Id == id) return child;
             }
@@ -71,35 +92,84 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>true if it exists</returns>
-        public bool ObjectExists(Guid id)
+        public bool Contains(Guid id)
         {
-            return GetObjectById(id) != null;
+            return GetById(id) != null;
         }
 
         /// <summary>
-        /// Removes the object with the given id. Cant be the center object
+        /// Removes the object with the given id. Cant be the center object.
+        /// All child objects will be removed too.
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>True, if object was successfully removed.</returns>
-        public bool RemoveObject(Guid id)
+        public bool Remove(Guid id)
         {
+            if (CenterObject == null) return false;
             if (id == CenterObject.Id) return false;
-            if (!ObjectExists(id)) return false;
+            if (!Contains(id)) return false;
 
-            var obj = GetObjectById(id);
-            var parent = GetObjectById(obj.ParentId);
+            var obj = GetById(id);
+            var parent = GetById(obj.ParentId);
 
             if (parent == null) return false;
 
-            foreach(var child in obj.GetAllChildren())
-            {
-                parent.ChildObjects.Add(child);
-                obj.ChildObjects.Remove(child);
-                child.ParentId = parent.Id;
-            }
             parent.ChildObjects.Remove(obj);
 
             return true;
+        }
+
+        /// <summary>
+        /// Tries to add the given System Object <paramref name="obj"/> as a child under <paramref name="parent"/>
+        /// The currently set parent id of the object will be ignored, instead use <paramref name="parent"/>
+        /// If the parent does not exist, the object wont be added.
+        /// If the parent equals <see cref="Guid.Empty"/> and no center object exists, it will be added as the center object.
+        /// </summary>
+        /// <param name="obj">The object to add to the system</param>
+        /// <param name="parent">The parent of the object</param>
+        /// <returns>False if the <paramref name="parent"/> does not exist or the system already conains an object with the same id as <paramref name="obj"/></returns>
+        public bool Add(MySystemObject obj, Guid parent)
+        {
+            if (Contains(obj.Id)) return false;
+
+            if(parent == Guid.Empty && CenterObject == null)
+            {
+                CenterObject = obj;
+                return true;
+            }
+
+            var p = GetById(parent);
+            if(p != null)
+            {
+                p.ChildObjects.Add(obj);
+                obj.ParentId = parent;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to add the given System Object <paramref name="obj"/> as a child under its parent.
+        /// The currently set parent id of the object is used.
+        /// If the parent does not exist, the object wont be added.
+        /// </summary>
+        /// <param name="obj">The object to add to the system</param>
+        /// <param name="parent">The parent of the object</param>
+        /// <returns>False if the parent does not exist or the system already conains an object with the same id as <paramref name="obj"/></returns>
+        public bool Add(MySystemObject obj)
+        {
+            return Add(obj, obj.ParentId);
+        }
+
+        /// <summary>
+        /// Executes the <paramref name="action"/> for each object in the system, where the first
+        /// parameter is the depth of the object in the system tree and the second is the object itself.
+        /// </summary>
+        /// <param name="action">Action to execute for each system object</param>
+        public void Foreach(Action<int, MySystemObject> action)
+        {
+            if (CenterObject == null) return;
+            CenterObject.Iterate(action);
         }
     }
 
@@ -203,6 +273,37 @@ namespace SEWorldGenPlugin.ObjectBuilders
             }
 
             return children;
+        }
+
+        /// <summary>
+        /// Starts iteration over this system objects sub tree and executes the <paramref name="iterateAction"/>
+        /// with parameters relative depth and the current iterated object.
+        /// </summary>
+        /// <param name="iterateAction">Action to execute on each object</param>
+        public void Iterate(Action<int, MySystemObject> iterateAction)
+        {
+            iterateAction(0, this);
+
+            foreach(var child in ChildObjects)
+            {
+                child.Iterate(1, iterateAction);
+            }
+        }
+
+        /// <summary>
+        /// Starts iteration over this system objects sub tree and executes the <paramref name="iterateAction"/>
+        /// with parameters depth and the current iterated object.
+        /// </summary>
+        /// <param name="iterateAction">Action to execute on each object</param>
+        /// <param name="depth">The current depth of this object</param>
+        private void Iterate(int depth, Action<int, MySystemObject> iterateAction)
+        {
+            iterateAction(depth, this);
+
+            foreach (var child in ChildObjects)
+            {
+                child.Iterate(depth + 1, iterateAction);
+            }
         }
     }
 
@@ -318,7 +419,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             Type = MySystemObjectType.ASTEROIDS;
             DisplayName = "";
             CenterPosition = Vector3D.Zero;
-            AsteroidSize = new MySerializableMinMax(0, 0);
+            AsteroidSize = new MySerializableMinMax(32, 1024);
         }
     }
 

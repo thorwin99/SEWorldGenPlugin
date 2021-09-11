@@ -1,4 +1,5 @@
-﻿using Sandbox.Game.Screens.Helpers;
+﻿using Sandbox.Game.Multiplayer;
+using Sandbox.Game.Screens.Helpers;
 using Sandbox.Game.World;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
@@ -280,7 +281,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
-            if (MySettingsSession.Static.IsEnabled())
+            if (MySettingsSession.Static.IsEnabled() && Sync.IsServer)
             {
                 foreach (var entry in m_globalGpss.Keys)
                 {
@@ -384,7 +385,7 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void SaveData()
         {
-            if (!MySettingsSession.Static.IsEnabled()) return;
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
             MyPluginLog.Log("Saving GPS manager data");
 

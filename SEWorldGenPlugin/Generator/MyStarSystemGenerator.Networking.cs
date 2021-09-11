@@ -1,11 +1,12 @@
 ﻿using Sandbox.Game.Multiplayer;
+using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
-using System.Collections.Generic;
+using VRageMath;
 
 namespace SEWorldGenPlugin.Generator
 {
@@ -14,133 +15,61 @@ namespace SEWorldGenPlugin.Generator
     /// </summary>
     public partial class MyStarSystemGenerator
     {
-        /// Callback dictionaries and indexes, to track callbacks
-        private Dictionary<ulong, Action<bool, MySystemObject>> m_getActionCallbacks;
-        private Dictionary<ulong, Action<bool>> m_simpleActionsCallbacks;
-        private Dictionary<ulong, Action<MyObjectBuilder_SystemData>> m_getSystemCallbacks;
-        private ulong m_currentGetIndex;
-        private ulong m_currentSimpleIndex;
-        private ulong m_getSystemIndex;
-
         /// <summary>
-        /// Initializes networking for the system generator
-        /// </summary>
-        private void LoadNetworking()
-        {
-            m_getActionCallbacks = new Dictionary<ulong, Action<bool, MySystemObject>>();
-            m_simpleActionsCallbacks = new Dictionary<ulong, Action<bool>>();
-            m_getSystemCallbacks = new Dictionary<ulong, Action<MyObjectBuilder_SystemData>>();
-            m_currentSimpleIndex = 0;
-            m_currentGetIndex = 0;
-            m_getSystemIndex = 0;
-        }
-
-        /// <summary>
-        /// Unloads networking data
-        /// </summary>
-        private void UnloadNetworking()
-        {
-            m_getActionCallbacks.Clear();
-            m_simpleActionsCallbacks.Clear();
-            m_getSystemCallbacks.Clear();
-
-            m_currentGetIndex = 0;
-            m_currentSimpleIndex = 0;
-            m_getSystemIndex = 0;
-        }
-
-        /// <summary>
-        /// Retreives a system object by name from the server.
-        /// </summary>
-        /// <param name="id">Id of the object.</param>
-        /// <param name="callback">Callback to run, when object is retreived.</param>
-        public void GetSystemObjectById(Guid id, Action<bool, MySystemObject> callback)
-        {
-            m_getActionCallbacks.Add(++m_currentGetIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendGetObjectServer, Sync.MyId, id, m_currentGetIndex);
-        }
-
-        /// <summary>
-        /// Adds a new object to the system. If parentName is provided, it will be added as a child to that
+        /// Adds a new object to the system. If <paramref name="parentId"/> is provided, it will be added as a child to that
         /// object, else it will be added as a child to the sun.
+        /// If no sun is present, an empty one will be created.
         /// </summary>
         /// <param name="systemObject">Object to add</param>
         /// <param name="parentId">Id of the parent object</param>
-        /// <param name="callback">Callback to run when object was added</param>
+        /// <param name="callback">The success callback for this action</param>
         public void AddObjectToSystem(MySystemObject systemObject, Guid? parentId = null, Action<bool> callback = null)
         {
-            m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parentId == null ? Guid.Empty : parentId.Value, m_currentSimpleIndex, Sync.MyId);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+            Guid parent = Guid.Empty;
+            if(StarSystem.CenterObject != null)
+            {
+                parent = parentId ?? StarSystem.CenterObject.Id;
+            }
+            else
+            {
+                parent = parentId ?? Guid.Empty;
+            }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendAddSystemObjectServer, systemObject, parent, callbackId, Sync.MyId);
         }
 
         /// <summary>
         /// Removes an object from the system.
         /// </summary>
         /// <param name="objectId">Id of the object to remove</param>
-        /// <param name="callback">Callback to run, if the object was removed or not</param>
+        /// <param name="callback">The success callback for this action</param>
         public void RemoveObjectFromSystem(Guid objectId, Action<bool> callback = null)
         {
-            m_simpleActionsCallbacks.Add(++m_currentSimpleIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectId, m_currentSimpleIndex, Sync.MyId);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendRemoveSystemObjectServer, objectId, callbackId, Sync.MyId);
         }
 
         /// <summary>
         /// Gets the current star system as represented on the server
         /// </summary>
-        /// <param name="callback">Callback to call, when star system was retreived</param>
-        public void GetStarSystem(Action<MyObjectBuilder_SystemData> callback)
+        public void GetStarSystemFromServer()
         {
-            MyPluginLog.Debug("Get star system");
-            m_getSystemCallbacks.Add(++m_getSystemIndex, callback);
-            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, m_getSystemIndex, Sync.MyId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, Sync.MyId);
         }
 
         /// <summary>
-        /// Server Event: Tries to get the system object with given name and send it back to client
+        /// Renames an object in the star system.
         /// </summary>
-        /// <param name="clientId">The client, that requests the object</param>
-        /// <param name="id">The id of the object</param>
-        /// <param name="callbackId">The callback, that should get called on the client</param>
-        [Event(100)]
-        [Server]
-        private static void SendGetObjectServer(ulong clientId, Guid id, ulong callbackId)
+        /// <param name="objectId">Id of the object to rename</param>
+        /// <param name="newName">New name of the object</param>
+        /// <param name="callback">The success callback for this action</param>
+        public void RenameObject(Guid objectId, string newName, Action<bool> callback = null)
         {
-            MyPluginLog.Log("Server: Client requests object. Client ID: " + clientId);
+            uint callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
 
-            bool success = true;
-            if (Static != null)
-            {
-                MySystemObject res = Static.StarSystem.GetObjectById(id);
-                if(res == null)
-                {
-                    res = new MySystemObject();
-                    success = false;
-                }
-                PluginEventHandler.Static.RaiseStaticEvent(SendGetObjectClient, success, res, callbackId, clientId);
-            }
-            else
-            {
-                PluginEventHandler.Static.RaiseStaticEvent(SendGetObjectClient, false, new MySystemObject(), callbackId, clientId);
-            }
-        }
-
-        /// <summary>
-        /// Client Event: Sends a system object to the client
-        /// </summary>
-        /// <param name="success">If getting the object was successfult</param>
-        /// <param name="obj">The object to send</param>
-        /// <param name="callbackId">The callback to call on client</param>
-        [Event(101)]
-        [Client]
-        private static void SendGetObjectClient(bool success, MySystemObject obj, ulong callbackId)
-        {
-            MyPluginLog.Log("Client: Received get object message from server with success " + success);
-
-            if (Static.m_getActionCallbacks.ContainsKey(callbackId))
-            {
-                Static.m_getActionCallbacks[callbackId](success, obj);
-                Static.m_getActionCallbacks.Remove(callbackId);
-            }
+            PluginEventHandler.Static.RaiseStaticEvent(SendRenameObjectServer, objectId, newName, callbackId, Sync.MyId);
         }
 
         /// <summary>
@@ -148,121 +77,330 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="obj">Object to add</param>
         /// <param name="parentId">Parent of the object to which it is a child</param>
-        /// <param name="callbackId">Id of the callback to run</param>
-        /// <param name="clientId">Id of the client, that requested this</param>
-        [Event(102)]
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
+        [Event(100)]
         [Server]
-        private static void SendAddSystemObjectServer(MySystemObject obj, Guid parentId, ulong callbackId, ulong clientId)
+        private static void SendAddSystemObjectServer(MySystemObject obj, Guid parentId, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Add object " + obj.DisplayName + " to system");
+
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (obj != null)
             {
-                if (!Static.StarSystem.ObjectExists(obj.Id))
+                if (!Static.StarSystem.Contains(obj.Id))
                 {
-                    var parent = Static.StarSystem.GetObjectById(parentId);
+                    var parent = Static.StarSystem.GetById(parentId);
                     if (parent != null)
                     {
                         parent.ChildObjects.Add(obj);
                         obj.ParentId = parentId;
-                        PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
+                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                        callback?.Invoke(true);
                     }
                     else
                     {
-                        Static.StarSystem.CenterObject.ChildObjects.Add(obj);
-                        obj.ParentId = Static.StarSystem.CenterObject.Id;
-                        PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, true, callbackId, clientId);
-                    }
+                        if(Static.StarSystem.CenterObject != null)
+                        {
+                            Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+                            obj.ParentId = Static.StarSystem.CenterObject.Id;
+                            PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                            callback?.Invoke(true);
+                        }
+                        else
+                        {
+                            if(obj.CenterPosition != Vector3D.Zero)
+                            {
+                                MySystemObject sun = new MySystemObject();
+                                sun.DisplayName = "Center";
+                                sun.Type = MySystemObjectType.EMPTY;
+                                sun.ParentId = Guid.Empty;
 
-                    Static.AddAllPersistentGps();
+                                Static.StarSystem.CenterObject = sun;
+
+                                obj.ParentId = sun.Id;
+                                Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+
+                                PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                                callback?.Invoke(true);
+                            }
+                            else
+                            {
+                                Static.StarSystem.CenterObject = obj;
+                                obj.ParentId = Guid.Empty;
+                                PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
+                                callback?.Invoke(true);
+                            }
+                        }
+                    }
                     return;
                 }
             }
-            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, callbackId, clientId);
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
         }
 
         /// <summary>
-        /// Client Event: Callback, if a simple action was executed sucessfully 
+        /// Broadcast Event: Adds object to local Star system to reflect server changes.
         /// </summary>
-        /// <param name="success">If the action was sucessfull</param>
-        /// <param name="callbackId">Id of the callback to run</param>
-        [Event(103)]
-        [Client]
-        private static void SendSimpleActionCallbackClient(bool success, ulong callbackId)
+        /// <param name="obj">The object to add.</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
+        [Event(101)]
+        [Broadcast]
+        private static void BroadcastObjectAdded(MySystemObject obj, uint callbackId, ulong senderId)
         {
-            MyPluginLog.Log("Client: Getting simple callback with success=" + success + " from server");
-            if (Static.m_simpleActionsCallbacks.ContainsKey(callbackId))
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Received update for Star System, adding object " + obj.Id + " to parent " + obj.ParentId);
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            var parent = Static.StarSystem.GetById(obj.ParentId);
+
+            if(!Static.StarSystem.Contains(obj.Id) && parent != null)
             {
-                Static.m_simpleActionsCallbacks[callbackId](success);
-                Static.m_simpleActionsCallbacks.Remove(callbackId);
+                parent.ChildObjects.Add(obj);
+                callback?.Invoke(true);
+            }
+            else if(obj.ParentId == Guid.Empty && Static.StarSystem.CenterObject == null)
+            {
+                if(obj.CenterPosition != Vector3D.Zero)
+                {
+                    MySystemObject sun = new MySystemObject();
+                    sun.DisplayName = "Center";
+                    sun.Type = MySystemObjectType.EMPTY;
+                    sun.ParentId = Guid.Empty;
+
+                    Static.StarSystem.CenterObject = sun;
+
+                    obj.ParentId = sun.Id;
+                    Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+
+                    callback?.Invoke(true);
+                }
+                else
+                {
+                    Static.StarSystem.CenterObject = obj;
+                    callback?.Invoke(true);
+                }
+            }
+            else
+            {
+                MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
+                Static.GetStarSystemFromServer();
+                callback?.Invoke(false);
             }
         }
 
         /// <summary>
         /// Server Event: Removes a system object from the servers system data. Cant be the center object
         /// </summary>
-        /// <param name="objectName">Name of the object</param>
-        /// <param name="callbackId">Id of the callback</param>
-        /// <param name="clientId">Id of the client, that send this request</param>
-        [Event(104)]
+        /// <param name="objectId">Id of the object</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
+        [Event(102)]
         [Server]
-        private static void SendRemoveSystemObjectServer(Guid objectId, ulong callbackId, ulong clientId)
+        private static void SendRemoveSystemObjectServer(Guid objectId, uint callbackId, ulong senderId)
         {
             MyPluginLog.Log("Server: Removing object " + objectId.ToString() + " from system");
-            MySystemObject o = Static.StarSystem.GetObjectById(objectId);
+            MySystemObject o = Static.StarSystem.GetById(objectId);
+
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
                 if(o.Type == MySystemObjectType.ASTEROIDS)
                 {
-                    var asteroids = o as MySystemAsteroids;
-                    if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.ContainsKey(asteroids.AsteroidTypeName))
+                    MySystemAsteroids roid = o as MySystemAsteroids;
+                    MyAbstractAsteroidObjectProvider prov;
+                    if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
                     {
-                        bool removed = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName].RemoveInstance(asteroids);
-                        if (removed)
+                        if(callback != null)
                         {
-                            MyGPSManager.Static.RemovePersistentGps(objectId);
-                            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, Static.StarSystem.RemoveObject(objectId), callbackId, clientId);
-                            return;
+                            callbackId = PluginEventHandler.Static.AddNetworkCallback(callback);
                         }
+                        prov.RemoveInstance(o.Id, callbackId, senderId);
                     }
+                    return;
                 }
                 else
                 {
                     MyGPSManager.Static.RemovePersistentGps(objectId);
-                    PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, Static.StarSystem.RemoveObject(objectId), callbackId, clientId);
+                    if (Static.StarSystem.Remove(objectId))
+                    {
+                        PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId, callbackId, senderId);
+                        callback?.Invoke(true);
+                    }
                     return;
                 }
             }
-            PluginEventHandler.Static.RaiseStaticEvent(SendSimpleActionCallbackClient, false, callbackId, clientId);
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
+        }
+
+        /// <summary>
+        /// Broadcast Event: Notifies all clients that the object <paramref name="objectId"/> was removed.
+        /// </summary>
+        /// <param name="objectId">The object Id</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
+        [Event(103)]
+        [Broadcast]
+        private static void BroadcastRemovedObject(Guid objectId, uint callbackId, ulong senderId)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Received update for Star System, removing object " + objectId);
+
+            Action<bool> callback = null;
+
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            if (Static.StarSystem.Contains(objectId))
+            {
+                Static.StarSystem.Remove(objectId);
+                callback?.Invoke(true);
+            }
+            else
+            {
+                MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
+                Static.GetStarSystemFromServer();
+                callback?.Invoke(false);
+            }
         }
 
         /// <summary>
         /// Server Event: Retreives the whole star system
         /// </summary>
-        /// <param name="callbackId">Id of the callback</param>
         /// <param name="clientId">Id of the client, that requested the system</param>
-        [Event(105)]
+        [Event(104)]
         [Server]
-        private static void SendGetStarSystemServer(ulong callbackId, ulong clientId)
+        private static void SendGetStarSystemServer(ulong clientId)
         {
-            MyPluginLog.Debug("Server: Get star system");
-            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemClient, Static.StarSystem, callbackId, clientId);
+            MyPluginLog.Log("Server: Get star system for client " + clientId);
+            PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemClient, Static.StarSystem, clientId);
         }
 
         /// <summary>
-        /// Client Event: Calls callback for GetStarSystem event.
+        /// Client Event: Receives star system from server
         /// </summary>
         /// <param name="starSystem">Star system that was retreived</param>
-        /// <param name="callbackId">Callback that will be called with the star system parameter</param>
-        [Event(106)]
+        [Event(105)]
         [Client]
-        private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem, ulong callbackId)
+        private static void SendGetStarSystemClient(MyObjectBuilder_SystemData starSystem)
         {
-            MyPluginLog.Debug("Client: Received star system");
-            if (Static.m_getSystemCallbacks.ContainsKey(callbackId))
+            MyPluginLog.Log("Client: Received star system");
+            Static.StarSystem = starSystem;
+        }
+
+        /// <summary>
+        /// Event to rename the object with id <paramref name="callbackId"/> to have the name <paramref name="newName"/>
+        /// </summary>
+        /// <param name="objectId">Id of the object</param>
+        /// <param name="newName">New name of the object</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
+        [Event(106)]
+        [Server]
+        private static void SendRenameObjectServer(Guid objectId, string newName, uint callbackId, ulong senderId)
+        {
+            MyPluginLog.Log("Server: Renaming object " + objectId.ToString() + " to " + newName);
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            if (Static.StarSystem.Contains(objectId))
             {
-                Static.m_getSystemCallbacks[callbackId](starSystem);
-                Static.m_getSystemCallbacks.Remove(callbackId);
+                MySystemObject obj = Static.StarSystem.GetById(objectId);
+                string oldName = obj.DisplayName + "";
+                obj.DisplayName = newName;
+
+                if(obj.Type == MySystemObjectType.ASTEROIDS)
+                {
+                    MySystemAsteroids roid = obj as MySystemAsteroids;
+                    MyAbstractAsteroidObjectProvider prov;
+                    if(MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(roid.AsteroidTypeName, out prov))
+                    {
+                        prov.InstanceRenamed(roid, oldName);
+                    }
+                    else
+                    {
+                        MyPluginLog.Log("Asteroid object provider " + roid.AsteroidTypeName + " does not exist. Renaming anyway...");
+                    }
+                }
+
+                PluginEventHandler.Static.RaiseStaticEvent(BroadcastRenamedObject, objectId, newName, callbackId, senderId);
+                callback?.Invoke(true);
+                return;
             }
+
+            PluginEventHandler.Static.RaiseStaticEvent(SendNetActionFailed, callbackId, senderId);
+            callback?.Invoke(false);
+        }
+
+        /// <summary>
+        /// Broadcast Event: Notifies all clients that the name of <paramref name="objectId"/> changed.
+        /// </summary>
+        /// <param name="objectId">The object Id</param>
+        /// <param name="newName">The new Name</param>
+        /// <param name="callbackId">The id of the success callback on the client</param>
+        /// <param name="senderId">The id of the client submitting this request</param>
+        [Event(107)]
+        [Broadcast]
+        private static void BroadcastRenamedObject(Guid objectId, string newName, uint callbackId, ulong senderId)
+        {
+            if (Sync.IsServer) return;
+
+            MyPluginLog.Log("Received update for Star System, renaming object " + objectId + " to " + newName);
+
+            Action<bool> callback = null;
+            if (senderId == Sync.MyId)
+                callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            if (Static.StarSystem.Contains(objectId))
+            {
+                Static.StarSystem.GetById(objectId).DisplayName = newName;
+
+                callback?.Invoke(true);
+            }
+            else
+            {
+                MyPluginLog.Log("The starsystem is out of sync with the server. Requesting full fetch of the system");
+                Static.GetStarSystemFromServer();
+
+                callback?.Invoke(false);
+            }
+        }
+
+        /// <summary>
+        /// Network event when an action called from a client failed.
+        /// Used to notify client about failure.
+        /// </summary>
+        /// <param name="callbackId">Id of the callback for that action.</param>
+        [Event(199)]
+        [Client]
+        private static void SendNetActionFailed(uint callbackId)
+        {
+            if (Sync.IsServer) return;
+
+            Action<bool> callback = null;
+            callback = PluginEventHandler.Static.GetNetworkCallback(callbackId);
+
+            callback?.Invoke(false);
         }
     }
 }

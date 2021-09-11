@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using VRage.Game;
 using VRageMath;
+using static Sandbox.Graphics.GUI.MyGuiScreenMessageBox;
 
 namespace SEWorldGenPlugin.GUI
 {
@@ -63,9 +64,9 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="error">The error message</param>
         /// <param name="caption">The caption of the box</param>
         /// <param name="callback">Callback to call when closed</param>
-        public static void DisplayError(string error, string caption, Action callback = null)
+        public static void DisplayError(string error, string caption, Action<ResultEnum> callback = null)
         {
-            MyGuiScreenMessageBox message = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Error, MyMessageBoxButtonsType.OK, new StringBuilder(error), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, null, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null, onClosing: callback); ;
+            MyGuiScreenMessageBox message = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Error, MyMessageBoxButtonsType.OK, new StringBuilder(error), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, callback, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null); ;
             MyGuiSandbox.AddScreen(message);
         }
         /// <summary>
@@ -74,9 +75,9 @@ namespace SEWorldGenPlugin.GUI
         /// <param name="message">The message</param>
         /// <param name="caption">The caption of the box</param>
         /// <param name="callback">Callback to call when closed</param>
-        public static void DisplayMessage(string message, string caption, Action callback = null)
+        public static void DisplayMessage(string message, string caption, Action<ResultEnum> callback = null)
         {
-            MyGuiScreenMessageBox msg = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.OK, new StringBuilder(message), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, null, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null, onClosing: callback); ;
+            MyGuiScreenMessageBox msg = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.OK, new StringBuilder(message), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, callback, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null); ;
             MyGuiSandbox.AddScreen(msg);
         }
     }

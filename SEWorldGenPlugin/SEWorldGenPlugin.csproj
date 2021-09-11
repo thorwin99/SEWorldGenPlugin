@@ -168,6 +168,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Draw\AbstractWireframeRenderObject.cs" />
+    <Compile Include="Draw\RenderCircle.cs" />
     <Compile Include="Draw\RenderCylinder.cs" />
     <Compile Include="Draw\IRenderObject.cs" />
     <Compile Include="Draw\RenderHollowCylinder.cs" />
@@ -176,10 +178,16 @@
     <Compile Include="Generator\AsteroidObjectShapes\IMyAsteroidObjectShape.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeRing.cs" />
     <Compile Include="Generator\AsteroidObjectShapes\MyAsteroidObjectShapeSphere.cs" />
-    <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingAdminMenu.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidCluster\MyAsteroidClusterProvider.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidCluster\MyAsteroidClusterRenderer.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidCluster\MyAsteroidClusterShape.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingProvider.cs" />
-    <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereAdminMenu.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyAsteroidRingRenderer.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidRing\MyStarSystemDesignerAsteroidRingMenu.cs" />
     <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereProvider.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyAsteroidSphereRenderer.cs" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidSphere\MyStarSystemDesignerAsteroidSphereMenu.cs" />
+    <Compile Include="Generator\AsteroidObjects\IMyAsteroidData.cs" />
     <Compile Include="Generator\AsteroidObjects\MyAbstractAsteroidObjectProvider.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.cs" />
     <Compile Include="Generator\MyStarSystemGenerator.Naming.cs" />
@@ -190,12 +198,24 @@
     <Compile Include="Generator\ProceduralGeneration\MyProceduralGeneratorComponent.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
-    <Compile Include="GUI\AdminMenu\IMyAsteroidAdminMenuCreator.cs" />
-    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.EditMenu.cs" />
+    <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerOrbitMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyOrbitRenderObject.cs" />
+    <Compile Include="Session\MyAdminMenuExtensionRegister.cs" />
+    <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\MyPlanetSpawnMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\MyStarSystemDesignerMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyEmptyObjectRenderObject.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyPlanetOrbitRenderObject.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerAsteroidMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerObjectMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerPlanetMenu.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyAbstractStarSystemDesignerRenderObject.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerRenderer.cs" />
     <Compile Include="GUI\Controls\MyGuiControlClickableSlider.cs" />
+    <Compile Include="GUI\Controls\MyGuiScreenDialogCombobox.cs" />
     <Compile Include="GUI\Controls\MyGuiControlParentTableLayout.cs" />
     <Compile Include="GUI\Controls\MyGuiControlRangedSlider.cs" />
-    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.cs" />
     <Compile Include="GUI\Controls\MyGuiScreenDialogCoordinate.cs" />
     <Compile Include="GUI\MyPluginGlobalSettings.cs" />
     <Compile Include="GUI\MyPluginGuiHelper.cs" />
@@ -226,14 +246,13 @@
     <Compile Include="Session\MyAsteroidObjectsManager.cs" />
     <Compile Include="Session\MyEntityTrackerComponent.cs" />
     <Compile Include="Session\MyGPSManager.cs" />
-    <Compile Include="Session\MyPluginDrawSession.cs" />
-    <Compile Include="Session\MyPluginItemsClipboard.cs" />
+    <Compile Include="Session\MyPluginPlanetClipboard.cs" />
+    <Compile Include="Session\MyPluginSession.cs" />
     <Compile Include="Session\MySettingsSession.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\MyFileUtils.cs" />
     <Compile Include="Utilities\MyNamingUtils.cs" />
-    <Compile Include="Utilities\MyPluginTexts.cs" />
     <Compile Include="Utilities\MyNetUtil.cs" />
     <Compile Include="Utilities\MyPluginLog.cs" />
     <Compile Include="Utilities\MyRandomExtension.cs" />
@@ -243,8 +262,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <Compile Include="Generator\MyStarSystemGenerator.Networking.cs" />
-    <Compile Include="GUI\AdminMenu\MyPluginAdminMenu.SpawnMenu.cs" />
     <None Include="Examples\Readme.md" />
+    <Compile Include="Generator\AsteroidObjects\AsteroidCluster\MyStarSystemDesigneAsteroidClusterMenu.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
