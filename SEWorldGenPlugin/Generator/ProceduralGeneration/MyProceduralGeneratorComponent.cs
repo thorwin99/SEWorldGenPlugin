@@ -155,7 +155,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 foreach (var module in m_objectModules)
                 {
-                    module.UpdateGpsForPlayer(tracker.Value);
+                    if (tracker.Key is MyCharacter)
+                        module.UpdateGpsForPlayer(tracker.Value);
                 }
             }
         }

@@ -129,7 +129,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 else
                 {
                     MyProceduralCell cell = GenerateCellSeeds(cellId);
-                    cell.GetAll(list);
+                    cell.GetAll(list, false);
                 }
             }
         }

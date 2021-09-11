@@ -4,6 +4,7 @@ using Sandbox.Game.World;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using VRage.Game.Components;
 using VRageMath;
@@ -17,7 +18,7 @@ namespace SEWorldGenPlugin.Session
     public class MyGPSManager : MySessionComponentBase
     {
         /// <summary>
-        /// Struct that identifies a gps
+        /// Struct that contains data for gps creation
         /// </summary>
         struct MyGpsData
         {
@@ -54,6 +55,21 @@ namespace SEWorldGenPlugin.Session
             }
         }
 
+        /// <summary>
+        /// Struct used to identify dynamic Gpss
+        /// </summary>
+        struct MyDynamicGpsId
+        {
+            public Guid GpsId;
+
+            public long PlayerId;
+
+            public MyDynamicGpsId(Guid gpsId, long playerId)
+            {
+                GpsId = gpsId;
+                PlayerId = playerId;
+            }
+        }
 
         /// <summary>
         /// File name for the save file containing the gps data
@@ -74,7 +90,17 @@ namespace SEWorldGenPlugin.Session
         /// A map of all dynamic gpss and their corresponding player ids to the hash of the gps,
         /// to allow modification of it.
         /// </summary>
-        private Dictionary<Tuple<Guid, long>, int> m_dynamicGpss;
+        private Dictionary<MyDynamicGpsId, int> m_dynamicGpss;
+
+        /// <summary>
+        /// Dictionary of all dynamic gpss queued to be added
+        /// </summary>
+        private ConcurrentDictionary<MyDynamicGpsId, MyGps> m_newDynamicGpss;
+
+        /// <summary>
+        /// Bag of all dynamic gpss queued to be removed
+        /// </summary>
+        private List<MyDynamicGpsId> m_toDeleteDynamicGpss;
 
         /// <summary>
         /// Adds a new gps persistent gps to all players
@@ -150,7 +176,7 @@ namespace SEWorldGenPlugin.Session
         /// <returns>False, if the gps is already added, else true</returns>
         public bool AddDynamicGps(string name, Color color, Vector3D pos, long playerId, Guid id)
         {
-            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
+            MyDynamicGpsId key = new MyDynamicGpsId(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
@@ -168,8 +194,7 @@ namespace SEWorldGenPlugin.Session
             gps.CalculateHash();
             gps.UpdateHash();
 
-            MySession.Static.Gpss.SendAddGps(playerId, ref gps, playSoundOnCreation: false);
-            m_dynamicGpss.Add(key, gps.Hash);
+            m_newDynamicGpss.TryAdd(key, gps);
 
             return true;
         }
@@ -185,7 +210,7 @@ namespace SEWorldGenPlugin.Session
         /// <returns></returns>
         public bool ModifyDynamicGps(string name, Color color, Vector3D pos, long playerId, Guid id)
         {
-            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
+            MyDynamicGpsId key = new MyDynamicGpsId(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
@@ -198,10 +223,7 @@ namespace SEWorldGenPlugin.Session
                 gps.Name = name;
                 gps.GPSColor = color;
 
-                MySession.Static.Gpss.SendModifyGps(playerId, gps);
-
-                gps.UpdateHash();
-                m_dynamicGpss[key] = gps.Hash;
+                m_newDynamicGpss[key] = gps;
 
                 return true;
 
@@ -217,12 +239,14 @@ namespace SEWorldGenPlugin.Session
         /// <returns></returns>
         public bool RemoveDynamicGps(long playerId, Guid id)
         {
-            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
+            MyDynamicGpsId key = new MyDynamicGpsId(id, playerId);
 
             if (m_dynamicGpss.ContainsKey(key))
             {
-                MySession.Static.Gpss.SendDelete(key.Item2, m_dynamicGpss[key]);
-                m_dynamicGpss.Remove(key);
+                lock (m_toDeleteDynamicGpss)
+                {
+                    m_toDeleteDynamicGpss.Add(key);
+                }
                 return true;
             }
             return false;
@@ -236,12 +260,16 @@ namespace SEWorldGenPlugin.Session
         /// <returns></returns>
         public bool DynamicGpsExists(Guid id, long playerId)
         {
-            Tuple<Guid, long> key = new Tuple<Guid, long>(id, playerId);
+            MyDynamicGpsId key = new MyDynamicGpsId(id, playerId);
 
-            if (m_dynamicGpss.ContainsKey(key) && MySession.Static.Gpss.ExistsForPlayer(playerId))
+            lock (m_dynamicGpss)
             {
-                return MySession.Static.Gpss[playerId].ContainsKey(m_dynamicGpss[key]);
+                if (m_dynamicGpss.ContainsKey(key) && MySession.Static.Gpss.ExistsForPlayer(playerId))
+                {
+                    return MySession.Static.Gpss[playerId].ContainsKey(m_dynamicGpss[key]);
+                }
             }
+            
 
             return false;
         }
@@ -249,6 +277,7 @@ namespace SEWorldGenPlugin.Session
         /// <summary>
         /// Updates before simulation. Will add all persistent gpss to the players,
         /// that dont have them yet.
+        /// Will update all queued dynamic gpss
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
@@ -276,6 +305,37 @@ namespace SEWorldGenPlugin.Session
                         m_globalGpss[entry].Players.Add(p.Identity.IdentityId);
                     }
                 }
+
+                foreach(var entry in m_newDynamicGpss)
+                {
+                    if (m_dynamicGpss.ContainsKey(entry.Key))
+                    {
+                        MyGps gps = entry.Value;
+                        MySession.Static.Gpss.SendModifyGps(entry.Key.PlayerId, gps);
+                        gps.UpdateHash();
+                        m_dynamicGpss[entry.Key] = gps.Hash;
+                    }
+                    else
+                    {
+                        MyGps gps = entry.Value;
+                        MySession.Static.Gpss.SendAddGps(entry.Key.PlayerId, ref gps, playSoundOnCreation: false);
+                        m_dynamicGpss.Add(entry.Key, entry.Value.Hash);
+                    }
+                    m_newDynamicGpss.Remove(entry.Key);
+                }
+
+                lock (m_toDeleteDynamicGpss) lock(m_dynamicGpss)
+                {
+                    foreach (var entry in m_toDeleteDynamicGpss)
+                    {
+                        if (m_dynamicGpss.ContainsKey(entry))
+                        {
+                            MySession.Static.Gpss.SendDelete(entry.PlayerId, m_dynamicGpss[entry]);
+                            m_dynamicGpss.Remove(entry);
+                        }
+                    }
+                    m_toDeleteDynamicGpss.Clear();
+                }
             }
         }
 
@@ -298,7 +358,9 @@ namespace SEWorldGenPlugin.Session
             }
 
             m_globalGpss = new Dictionary<Guid, MyGpsData>();
-            m_dynamicGpss = new Dictionary<Tuple<Guid, long>, int>();
+            m_dynamicGpss = new Dictionary<MyDynamicGpsId, int>();
+            m_newDynamicGpss = new ConcurrentDictionary<MyDynamicGpsId, MyGps>();
+            m_toDeleteDynamicGpss = new List<MyDynamicGpsId>();
 
             foreach(var item in ob.PersistentGpss)
             {
@@ -310,7 +372,7 @@ namespace SEWorldGenPlugin.Session
             {
                 foreach (var key in m_dynamicGpss.Keys)
                 {
-                    MySession.Static.Gpss.SendDelete(key.Item2, m_dynamicGpss[key]);
+                    MySession.Static.Gpss.SendDelete(key.PlayerId, m_dynamicGpss[key]);
                 };
                 m_dynamicGpss.Clear();
             };

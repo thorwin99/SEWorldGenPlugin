@@ -117,6 +117,7 @@ namespace SEWorldGenPlugin.GUI
             m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.UNIQUE, "Unique");
             m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.MANDATORY_FIRST, "Mandatory first");
             m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.MANDATORY_ONLY, "Mandatory only");
+            m_systemGeneratorCombo.AddItem((long)SystemGenerationMethod.MANDATORY_UNIQUE, "Mandatory only unique");
 
             m_systemGeneratorCombo.Size = new Vector2(0.25f, m_systemGeneratorCombo.Size.Y);
 
