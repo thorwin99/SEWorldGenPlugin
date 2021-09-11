@@ -450,7 +450,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         [Server]
         protected static void EventSetInstanceData(string providerName, Guid instanceId, MySerializedAsteroidData instanceData, uint callbackId, ulong senderId)
         {
-            MyPluginLog.Log("Server: Removing asteroid object instance " + instanceId + " from the system");
+            MyPluginLog.Log("Server: Setting asteroid object instance " + instanceId + " data");
 
             Action<bool> callback = null;
             if (senderId == Sync.MyId)
@@ -493,7 +493,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         {
             if (Sync.IsServer) return;
 
-            MyPluginLog.Log("Received update for asteroid objects, setting instance data o" + instanceId);
+            MyPluginLog.Log("Received update for asteroid objects, setting instance data of " + instanceId);
 
             Action<bool> callback = null;
             if (senderId == Sync.MyId)
