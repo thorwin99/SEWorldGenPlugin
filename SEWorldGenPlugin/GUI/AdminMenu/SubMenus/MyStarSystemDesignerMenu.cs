@@ -314,7 +314,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 if (m_currentObjectMenu != null)
                     m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
 
-                m_currentObjectMenu = new MyStarSystemDesignerEmptyMenu(obj);
+                m_currentObjectMenu = new MyStarSystemDesignerOrbitMenu(obj);
                 m_currentObjectMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
                 m_currentObjectMenu.OnObjectChanged += OnObjectEdited;
             }

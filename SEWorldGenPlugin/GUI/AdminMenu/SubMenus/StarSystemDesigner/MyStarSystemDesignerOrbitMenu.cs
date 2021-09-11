@@ -8,24 +8,24 @@ using VRageMath;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 {
-    public class MyStarSystemDesignerEmptyMenu : MyStarSystemDesignerObjectMenu
+    public class MyStarSystemDesignerOrbitMenu : MyStarSystemDesignerObjectMenu
     {
         /// <summary>
         /// A textbox to enter the orbit radius in km
         /// </summary>
-        MyGuiControlClickableSlider m_orbitRadiusSlider;
+        protected MyGuiControlClickableSlider m_orbitRadiusSlider;
 
         /// <summary>
         /// A slider for the position of the planet on the orbit, between 0 and 360 degrees.
         /// </summary>
-        MyGuiControlClickableSlider m_orbitPosSlider;
+        protected MyGuiControlClickableSlider m_orbitPosSlider;
 
         /// <summary>
         /// The slider for the elevation of the planet over the system plane, between -90 and 90 degrees.
         /// </summary>
-        MyGuiControlClickableSlider m_elevationSldier;
+        protected MyGuiControlClickableSlider m_elevationSldier;
 
-        public MyStarSystemDesignerEmptyMenu(MySystemObject obj) : base(obj)
+        public MyStarSystemDesignerOrbitMenu(MySystemObject obj) : base(obj)
         {
             CanAddChild = true;
             CanBeRemoved = true;
@@ -34,7 +34,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)
         {
             m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: (float)CalculateMaxOrbitRadius(), labelSuffix: " km", showLabel: true);
-            m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
+            m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the orbit. Its the distance of the objects center to the system center."));
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
             controlTable.AddTableRow(m_orbitRadiusSlider);
@@ -46,7 +46,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(m_orbitPosSlider);
 
             m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
-            m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the planets orbit above the system plane."));
+            m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the orbit above the system plane."));
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Elevation degrees"));
             controlTable.AddTableRow(m_elevationSldier);
@@ -110,7 +110,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <summary>
         /// Sets the sliders for orbit radius, orbit position and elevation from the edited object.
         /// </summary>
-        private void SetOrbitProperties()
+        protected void SetOrbitProperties()
         {
             MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
             double radius = 0;
@@ -145,7 +145,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// <summary>
         /// Sets the m_object properties based on the current values for the orbit radius, orbit position and elevation controls
         /// </summary>
-        private void GetPropertiesFromOrbit()
+        protected void GetPropertiesFromOrbit()
         {
             MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
 

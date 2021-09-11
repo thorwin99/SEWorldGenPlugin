@@ -14,7 +14,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     /// <summary>
     /// Sub menu for the star system designer to edit or spawn planets
     /// </summary>
-    public class MyStarSystemDesignerPlanetMenu : MyStarSystemDesignerObjectMenu
+    public class MyStarSystemDesignerPlanetMenu : MyStarSystemDesignerOrbitMenu
     {
         /// <summary>
         /// A combobox for the type of planet
@@ -25,21 +25,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// A slider for the size of the planet in m
         /// </summary>
         MyGuiControlClickableSlider m_sizeSlider;
-
-        /// <summary>
-        /// A textbox to enter the orbit radius in km
-        /// </summary>
-        MyGuiControlClickableSlider m_orbitRadiusSlider;
-
-        /// <summary>
-        /// A slider for the position of the planet on the orbit, between 0 and 360 degrees.
-        /// </summary>
-        MyGuiControlClickableSlider m_orbitPosSlider;
-
-        /// <summary>
-        /// The slider for the elevation of the planet over the system plane, between -90 and 90 degrees.
-        /// </summary>
-        MyGuiControlClickableSlider m_elevationSldier;
 
         /// <summary>
         /// A list of planet types to spawn
@@ -76,44 +61,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Planet size"));
             controlTable.AddTableRow(m_sizeSlider);
 
-            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: (float)CalculateMaxOrbitRadius(), labelSuffix: " km", showLabel: true);
-            m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the planets orbit. Its the distance of the planets center to the system center."));
-
-            controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
-            controlTable.AddTableRow(m_orbitRadiusSlider);
-
-            m_orbitPosSlider = new MyGuiControlClickableSlider(null, 0f, 360f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
-            m_orbitPosSlider.SetToolTip(new MyToolTips("The rotation of the orbit itself around the parent."));
-
-            controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit Rotation"));
-            controlTable.AddTableRow(m_orbitPosSlider);
-
-            m_elevationSldier = new MyGuiControlClickableSlider(null, -90f, 90f, maxWidth - 0.1f, 0f, showLabel: true, labelSuffix: "°");
-            m_elevationSldier.SetToolTip(new MyToolTips("The elevation of the planets orbit above the system plane."));
-
-            controlTable.AddTableRow(new MyGuiControlLabel(text: "Elevation degrees"));
-            controlTable.AddTableRow(m_elevationSldier);
+            base.RecreateControls(controlTable, maxWidth, isEditing);
 
             LoadPlanetList();
             LoadPlanetProperties();
-
-            m_elevationSldier.ValueChanged += (s) =>
-            {
-                GetPropertiesFromOrbit();
-                ChangedObject();
-            };
-
-            m_orbitPosSlider.ValueChanged += (s) =>
-            {
-                GetPropertiesFromOrbit();
-                ChangedObject();
-            };
-
-            m_orbitRadiusSlider.ValueChanged += (s) =>
-            {
-                GetPropertiesFromOrbit();
-                ChangedObject();
-            };
 
             m_sizeSlider.ValueChanged += OnSizeChanged;
             m_planetTypeCombobox.ItemSelected += OnTypeSelected;
@@ -122,40 +73,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             {
                 m_planetTypeCombobox.Enabled = false;
                 m_sizeSlider.Enabled = false;
-                m_orbitRadiusSlider.Enabled = false;
-                m_orbitPosSlider.Enabled = false;
-                m_elevationSldier.Enabled = false;
-            }
-
-            var parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
-            if(parent == null)
-            {
-                m_orbitRadiusSlider.Enabled = false;
-                m_elevationSldier.Enabled = false;
-                m_orbitPosSlider.Enabled = false;
             }
 
             OnSizeChanged(m_sizeSlider);
             OnTypeSelected();
-            GetPropertiesFromOrbit();
             ChangedObject();
-        }
-
-        /// <summary>
-        /// Calculates the largest orbit radius possible for this planet
-        /// </summary>
-        private double CalculateMaxOrbitRadius()
-        {
-            var center = MyStarSystemGenerator.Static.StarSystem.CenterObject;
-            if (center != null && m_object.ParentId == center.Id)
-            {
-                int count = center.ChildObjects.Count + 1;
-                return count * MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Max / 1000;
-            }
-            else
-            {
-                return MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
-            }
         }
 
         /// <summary>
@@ -166,7 +88,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             if (m_object == null) return;
             SetPlanetType();
             SetPlanetSize();
-            SetOrbitProperties();
         }
 
         /// <summary>
@@ -221,74 +142,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             planet.Diameter = s.Value * 1000f;
 
             ChangedObject();
-        }
-
-        /// <summary>
-        /// Sets the sliders for orbit radius, orbit position and elevation from the edited object.
-        /// </summary>
-        private void SetOrbitProperties()
-        {
-            MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
-            double radius = 0;
-            Vector3D parentRel = Vector3D.Zero;
-
-            if (parent != null)
-            {
-                parentRel = new Vector3D(m_object.CenterPosition) - new Vector3D(parent.CenterPosition);
-                radius = parentRel.Length();
-            }
-
-            if (radius == 0)
-            {
-                m_orbitRadiusSlider.Value = 0;
-                m_elevationSldier.Value = 0;
-                m_orbitPosSlider.Value = 0;
-                return;
-            }
-
-            double elevation = MathHelperD.ToDegrees(Math.Asin(parentRel.Z / radius));
-            double orbitPos = MathHelperD.ToDegrees(Math.Acos(parentRel.X / Math.Cos(MathHelperD.ToRadians(elevation)) / radius));
-            if (parentRel.Y < 0)
-            {
-                orbitPos = 360 - orbitPos;
-            }
-
-            m_orbitRadiusSlider.Value = (float)radius / 1000f;
-            m_elevationSldier.Value = (float)elevation;
-            m_orbitPosSlider.Value = (float)orbitPos;
-        }
-
-        /// <summary>
-        /// Sets the m_object properties based on the current values for the orbit radius, orbit position and elevation controls
-        /// </summary>
-        private void GetPropertiesFromOrbit()
-        {
-            MySystemObject parent = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId);
-
-            double radius = m_orbitRadiusSlider.Value * 1000f;
-            double elevation = MathHelperD.ToRadians(m_elevationSldier.Value);
-            double orbitPos = MathHelperD.ToRadians(m_orbitPosSlider.Value);
-
-            if(radius == 0)
-            {
-                if(parent == null)
-                {
-                    m_object.CenterPosition = Vector3D.Zero;
-                }
-                else
-                {
-                    m_object.CenterPosition = parent.CenterPosition;
-                }
-
-                return;
-            }
-
-            Vector3D pos = new Vector3D(radius * Math.Cos(orbitPos) * Math.Cos(elevation), radius * Math.Sin(orbitPos) * Math.Cos(elevation), radius * Math.Sin(elevation));
-
-            if(parent != null)
-                pos += parent.CenterPosition;
-
-            m_object.CenterPosition = pos;
         }
 
         /// <summary>
