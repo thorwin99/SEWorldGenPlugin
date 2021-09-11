@@ -75,7 +75,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             m_systemRenderObjects[obj].SetFocus(true);
 
             var renderer = m_systemRenderObjects[obj];
-            double renderSize = 0;
+            double renderSize;
 
             if (FocusZoom == ZoomLevel.ORBIT)
             {
@@ -108,6 +108,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             }
         }
 
+        /// <summary>
+        /// Resets the current camera properties
+        /// </summary>
         public void ResetCamera()
         {
             m_cameraZoom = 2f;
