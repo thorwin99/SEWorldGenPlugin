@@ -425,7 +425,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
             var system = MyStarSystemGenerator.Static.StarSystem;
 
-
             ToggleAllControls(false);
 
             if (obj is MySystemAsteroids)
@@ -515,7 +514,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="name"></param>
         private void OnTypeEntered(long typeKey, string name)
         {
-            MySystemObjectType type = (MySystemObjectType)typeKey;
+            MySystemObjectType type = (MySystemObjectType) Enum.Parse(typeof(MySystemObjectType), name);
 
             if (type == MySystemObjectType.ASTEROIDS)
             {
