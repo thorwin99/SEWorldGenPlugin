@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using VRage.Game;
 using VRageMath;
+using VRageRender;
 
 namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 {
@@ -129,11 +130,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         {
             if (deltaScroll == 0) return;
 
-            m_cameraZoom += -deltaScroll / 1000f;
+            m_cameraZoom += -deltaScroll / 1000.0f;
 
             if(m_cameraZoom < 0.5f)
             {
-                m_cameraZoom = 1;
+                m_cameraZoom = 0.5f;
             }
             if(m_cameraZoom > 100f)
             {
@@ -288,8 +289,29 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             MySpectatorCameraController.Static.SetTarget(targetPos, up);
         }
 
+        private void PrintControls()
+        {
+            Vector2 coord = Vector2.Zero;
+
+            MyRenderProxy.DebugDrawText2D(coord, "Controls:", Color.White, 0.75f);
+
+            coord.Y += 20;
+
+            MyRenderProxy.DebugDrawText2D(coord, "Camera zoom: Ctrl + Scrollwhell up / down", Color.White, 0.75f);
+
+            coord.Y += 20;
+
+            MyRenderProxy.DebugDrawText2D(coord, "Camera rotation: Ctrl + Mouse drag", Color.White, 0.75f);
+
+            coord.Y += 20;
+
+            MyRenderProxy.DebugDrawText2D(coord, "Camera reset: Ctrl + Scrollwheel press", Color.White, 0.75f);
+        }
+
         public void Draw()
         {
+            PrintControls();
+
             foreach(var entry in m_systemRenderObjects)
             {
                 entry.Value.Draw();
