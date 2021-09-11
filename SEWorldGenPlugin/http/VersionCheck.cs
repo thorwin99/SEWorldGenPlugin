@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace SEWorldGenPlugin.http
 {
@@ -169,21 +168,6 @@ namespace SEWorldGenPlugin.http
             //Add timeout
             m_versionCheckCallbacks.Add(++m_currentCallbackIndex, callback);
             PluginEventHandler.Static.RaiseStaticEvent(GetServerVersion, Sync.MyId, m_currentCallbackIndex);
-
-            Timer timeout = null;
-            timeout = new Timer((key) => 
-            {
-                if (!m_versionCheckCallbacks.ContainsKey((uint)key))
-                {
-                    timeout?.Dispose();
-                    return;
-                }
-
-                callback(false);
-                m_versionCheckCallbacks.Remove((uint)key);
-
-                timeout?.Dispose();
-            }, m_currentCallbackIndex, 1000, 1000);
         }
 
         [Event(1)]
@@ -197,6 +181,8 @@ namespace SEWorldGenPlugin.http
         [Client]
         private static void GetServerVersionClient(string versionString, uint callbackId)
         {
+            MyPluginLog.Debug(versionString + "  " + Static.m_version);
+
             if (Static.m_versionCheckCallbacks.ContainsKey(callbackId))
             {
                 Static.m_versionCheckCallbacks[callbackId](Static.CompareVersions(Static.m_version, versionString) == 0);
