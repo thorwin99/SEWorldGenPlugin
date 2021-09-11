@@ -285,7 +285,9 @@ namespace SEWorldGenPlugin.Generator
                 long asteroidObjectCount = MyRandom.Instance.Next(asteroidObjectAmount.Min, asteroidObjectAmount.Max + 1);
                 long systemSize = planetCount + asteroidObjectCount;
                 int currentPlanetIndex = 0;
-                int currentAsteroidIndex = 0;
+
+                Dictionary<string, int> currentAsteroidIndices = new Dictionary<string, int>();
+
                 long currentOrbitDistance = 0;
 
                 double planetProb = planetCount / (double)(planetCount + asteroidObjectCount);
@@ -342,7 +344,12 @@ namespace SEWorldGenPlugin.Generator
 
                         if (provider == null) continue;
 
-                        obj = provider.GenerateInstance(currentAsteroidIndex++, null, currentOrbitDistance);
+                        if (!currentAsteroidIndices.ContainsKey(provider.GetTypeName()))
+                        {
+                            currentAsteroidIndices.Add(provider.GetTypeName(), 0);
+                        }
+
+                        obj = provider.GenerateInstance(currentAsteroidIndices[provider.GetTypeName()]++, null, currentOrbitDistance);
 
                         if (obj == null) continue;
 
