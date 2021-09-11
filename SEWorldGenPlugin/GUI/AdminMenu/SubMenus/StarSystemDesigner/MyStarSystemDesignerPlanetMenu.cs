@@ -150,7 +150,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             if (center != null && m_object.ParentId == center.Id)
             {
                 int count = center.ChildObjects.Count + 1;
-                return count * MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Max;
+                return count * MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Max / 1000;
             }
             else
             {
