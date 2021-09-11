@@ -41,14 +41,20 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
             var planet = RenderObject as MySystemPlanet;
 
-            if (distance > MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap * 500)
+            double multiplier = distance / 5000000f;
+
+            double size = planet.Diameter * multiplier;
+
+            if (multiplier > 100)
             {
-                m_planetRender.Radius = Math.Min((float)(planet.Diameter * 200 / 2f), 120000f * 100f);
+                size = planet.Diameter * 100;
             }
-            else
+            else if(size < planet.Diameter / 2f)
             {
-                m_planetRender.Radius = (float)(planet.Diameter / 2f);
+                size = (float)(planet.Diameter / 2f);
             }
+
+            m_planetRender.Radius = (float)size;
         }
 
         public override double GetObjectSize()
