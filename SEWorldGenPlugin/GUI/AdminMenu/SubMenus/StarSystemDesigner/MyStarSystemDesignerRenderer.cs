@@ -297,7 +297,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
             coord.Y += 20;
 
-            MyRenderProxy.DebugDrawText2D(coord, "Camera zoom: Ctrl + Scrollwhell up / down", Color.White, 0.75f);
+            MyRenderProxy.DebugDrawText2D(coord, "Camera zoom: Ctrl + Scrollwheel up / down", Color.White, 0.75f);
 
             coord.Y += 20;
 
