@@ -760,8 +760,7 @@ namespace SEWorldGenPlugin.Generator
                     vanillaPlanet.Generated = true;
                     vanillaPlanet.EntityId = p.EntityId;
 
-
-                    StarSystem.CenterObject.ChildObjects.Add(vanillaPlanet);
+                    AddObjectToSystem(vanillaPlanet);
                 }
             }
             AddAllPersistentGps();
