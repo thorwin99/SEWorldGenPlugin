@@ -196,6 +196,7 @@
     <Compile Include="Generator\ProceduralGeneration\MyProceduralPlanetModule.cs" />
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
     <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerEmptyMenu.cs" />
     <Compile Include="Session\MyAdminMenuExtensionRegister.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyPlanetSpawnMenu.cs" />

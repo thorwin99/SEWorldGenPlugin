@@ -286,6 +286,14 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         m_currentObjectMenu = adminMenu;
                     }
                 }
+            }else if(obj.Type == MySystemObjectType.EMPTY)
+            {
+                if (m_currentObjectMenu != null)
+                    m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
+
+                m_currentObjectMenu = new MyStarSystemDesignerEmptyMenu(obj);
+                m_currentObjectMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
+                m_currentObjectMenu.OnObjectChanged += OnObjectEdited;
             }
 
             m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild && exists;
