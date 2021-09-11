@@ -113,6 +113,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 MyPluginLog.Log("Not the server, fetching system and skipping the initialization of star system generator component.");
                 GetStarSystemFromServer();
+                return;
             }
 
             if (!MySettingsSession.Static.IsEnabled())
