@@ -284,12 +284,13 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         adminMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
                         adminMenu.OnObjectChanged += OnObjectEdited;
                         m_currentObjectMenu = adminMenu;
-
-                        m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild && exists;
-                        m_removeObjectButton.Enabled = m_currentObjectMenu.CanBeRemoved;
                     }
                 }
             }
+
+            m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild && exists;
+            m_removeObjectButton.Enabled = m_currentObjectMenu.CanBeRemoved && obj.ParentId != Guid.Empty;
+
             m_adminMenuInst.RequestResize();
         }
 
@@ -306,9 +307,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_currentObjectMenu = new MyStarSystemDesignerPlanetMenu(planet);
             m_currentObjectMenu.RecreateControls(m_subMenuControlTable, m_usableWidth, exists);
             m_currentObjectMenu.OnObjectChanged += OnObjectEdited;
-
-            m_addObjectButton.Enabled = m_currentObjectMenu.CanAddChild;
-            m_removeObjectButton.Enabled = m_currentObjectMenu.CanBeRemoved;
         }
 
         #endregion
