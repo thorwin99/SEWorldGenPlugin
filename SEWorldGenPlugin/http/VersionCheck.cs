@@ -19,8 +19,8 @@ namespace SEWorldGenPlugin.http
     {
         public static VersionCheck Static;
 
-        private readonly string m_version;
-        private string m_latestBuild;
+        private readonly Version m_version;
+        private Version m_latestBuild;
         private string m_latestPage;
 
         private Dictionary<uint, Action<bool>> m_versionCheckCallbacks;
@@ -33,7 +33,7 @@ namespace SEWorldGenPlugin.http
         public VersionCheck()
         {
             Static = this;
-            m_version = typeof(Startup).Assembly.GetName().Version.ToString();
+            m_version = typeof(Startup).Assembly.GetName().Version;
             m_versionCheckCallbacks = new Dictionary<uint, Action<bool>>();
             GetNewestVersion();
         }
@@ -44,14 +44,14 @@ namespace SEWorldGenPlugin.http
         /// <returns>The current installed version of this plugin</returns>
         public string GetVersion()
         {
-            return m_version;
+            return m_version.ToString();
         }
 
         /// <summary>
         /// Fetches the latest plugin version from github and processes the result.
         /// </summary>
         /// <returns>The latest version</returns>
-        public string GetNewestVersion()
+        public Version GetNewestVersion()
         {
             HttpWebRequest request = WebRequest.Create("https://api.github.com/repos/thorwin99/SEWorldGenPlugin/releases/latest") as HttpWebRequest;
             request.Method = "GET";
@@ -62,7 +62,8 @@ namespace SEWorldGenPlugin.http
 
                 JsonRelease latest = GitHubVersionResponse.Deserialize(response.GetResponseStream());
 
-                m_latestBuild = latest.tag_name.Trim().Substring(1) + ".0";
+                m_latestBuild = Version.Parse(latest.tag_name.Trim().Substring(1));
+
                 m_latestPage = latest.html_url;
                 return m_latestBuild;
             }catch(Exception e)
@@ -89,7 +90,7 @@ namespace SEWorldGenPlugin.http
         /// <returns>True, if it is the latest version</returns>
         public bool IsNewest()
         {
-            int vres = CompareVersions(m_version, m_latestBuild);
+            int vres = m_version.CompareTo(m_latestBuild);
 
             return vres >= 0;
         }
@@ -181,11 +182,9 @@ namespace SEWorldGenPlugin.http
         [Client]
         private static void GetServerVersionClient(string versionString, uint callbackId)
         {
-            MyPluginLog.Debug(versionString + "  " + Static.m_version);
-
             if (Static.m_versionCheckCallbacks.ContainsKey(callbackId))
             {
-                Static.m_versionCheckCallbacks[callbackId](Static.CompareVersions(Static.m_version, versionString) == 0);
+                Static.m_versionCheckCallbacks[callbackId](Static.m_version.CompareTo(Version.Parse(versionString)) == 0);
                 Static.m_versionCheckCallbacks.Remove(callbackId);
             }
         }
