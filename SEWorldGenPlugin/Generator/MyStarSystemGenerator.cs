@@ -111,7 +111,7 @@ namespace SEWorldGenPlugin.Generator
 
             if (!Sync.IsServer)
             {
-                MyPluginLog.Log("Fetching Star system from server.");
+                MyPluginLog.Log("Not the server, fetching system and skipping the initialization of star system generator component.");
                 GetStarSystemFromServer();
             }
 

@@ -56,7 +56,6 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         public void GetStarSystemFromServer()
         {
-            MyPluginLog.Debug("Get star system");
             PluginEventHandler.Static.RaiseStaticEvent(SendGetStarSystemServer, Sync.MyId);
         }
 
