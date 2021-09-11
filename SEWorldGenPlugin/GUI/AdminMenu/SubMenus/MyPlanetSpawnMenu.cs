@@ -160,7 +160,6 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
 
         public override void HandleInput()
         {
-            throw new NotImplementedException();
         }
     }
 }
