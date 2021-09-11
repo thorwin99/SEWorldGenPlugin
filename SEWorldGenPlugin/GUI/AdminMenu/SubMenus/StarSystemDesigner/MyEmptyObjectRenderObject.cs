@@ -32,7 +32,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override void Draw()
         {
-            Color color = IsFocused ? Color.Green : Color.LightBlue;
+            Color color = IsFocused ? Color.LightBlue : Color.Green;
             MyRenderProxy.DebugDrawText3D(RenderObject.CenterPosition, RenderObject.DisplayName, color, 0.25f, true, align: VRage.Utils.MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER);
 
             m_orbitRender.Radius = (float)CalculateRadius();
