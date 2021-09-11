@@ -9,7 +9,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
     /// <summary>
     /// Class to visualize Asteroid clusters in the star system designer
     /// </summary>
-    public class MyAsteroidClusterRenderer : MyStarSystemDesignerOrbitRenderObject
+    public class MyAsteroidClusterRenderer : MyOrbitRenderObject
     {
         /// <summary>
         /// Data associated with the cluster

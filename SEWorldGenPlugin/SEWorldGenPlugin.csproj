@@ -200,7 +200,7 @@
     <Compile Include="Generator\ProceduralGeneration\MyEntityExtension.cs" />
     <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerOrbitMenu.cs" />
-    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerOrbitRenderObject.cs" />
+    <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyOrbitRenderObject.cs" />
     <Compile Include="Session\MyAdminMenuExtensionRegister.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyPlanetSpawnMenu.cs" />

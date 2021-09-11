@@ -10,7 +10,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     /// A class simply used to implement the <see cref="MyAbstractStarSystemDesignerRenderObject"/> for
     /// objects that have an orbit
     /// </summary>
-    public abstract class MyStarSystemDesignerOrbitRenderObject : MyAbstractStarSystemDesignerRenderObject
+    public abstract class MyOrbitRenderObject : MyAbstractStarSystemDesignerRenderObject
     {
         /// <summary>
         /// The circle for orbit visualization
@@ -22,7 +22,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private MySystemObject m_parent;
 
-        public MyStarSystemDesignerOrbitRenderObject(MySystemObject obj) : base(obj)
+        public MyOrbitRenderObject(MySystemObject obj) : base(obj)
         {
             m_parent = MyStarSystemGenerator.Static.StarSystem.GetById(obj.ParentId);
             m_orbitRender = new RenderCircle(CalculateWorldMatrix(), (float)CalculateRadius(), Color.Orange.ToVector4());

@@ -12,7 +12,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     /// A class simply used to implement the <see cref="MyAbstractStarSystemDesignerRenderObject"/> for
     /// objects that wont be rendered, but still can be focused, such as the system center
     /// </summary>
-    public class MyEmptyObjectRenderObject : MyStarSystemDesignerOrbitRenderObject
+    public class MyEmptyObjectRenderObject : MyOrbitRenderObject
     {
         public MyEmptyObjectRenderObject(MySystemObject obj) : base(obj)
         {

@@ -10,7 +10,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
     /// <summary>
     /// A class that is used to render a planet and its orbit into the scene
     /// </summary>
-    public class MyPlanetOrbitRenderObject : MyStarSystemDesignerOrbitRenderObject
+    public class MyPlanetOrbitRenderObject : MyOrbitRenderObject
     {
         /// <summary>
         /// The render object used to render the planets sphere
