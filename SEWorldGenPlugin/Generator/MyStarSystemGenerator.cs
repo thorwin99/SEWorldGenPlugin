@@ -159,7 +159,8 @@ namespace SEWorldGenPlugin.Generator
                     {
                         var asteroid = obj as MySystemAsteroids;
 
-                        var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
+                        if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out var provider)) continue;
+                        
                         if (!provider.TryLoadObject(asteroid))
                         {
                             MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
