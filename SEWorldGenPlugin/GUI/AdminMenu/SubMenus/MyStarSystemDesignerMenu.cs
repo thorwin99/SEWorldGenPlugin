@@ -309,7 +309,12 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                         m_currentObjectMenu = adminMenu;
                     }
                 }
-            }else if(obj.Type == MySystemObjectType.EMPTY)
+                else
+                {
+                    m_subMenuControlTable.AddTableRow(new MyGuiControlLabel(text: "Unknown asteroid type", font: "Red"));
+                }
+            }
+            else if(obj.Type == MySystemObjectType.EMPTY)
             {
                 if (m_currentObjectMenu != null)
                     m_currentObjectMenu.OnObjectChanged -= OnObjectEdited;
