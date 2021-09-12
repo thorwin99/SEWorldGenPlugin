@@ -215,7 +215,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 MySystemAsteroids asteroid = obj as MySystemAsteroids;
                 Vector3D entityPosition = player.PositionComp.GetPosition();
-                var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroid.AsteroidTypeName];
+
+                if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out var provider)) continue;
 
                 IMyAsteroidObjectShape shape = provider.GetAsteroidObjectShape(asteroid);
 
@@ -350,7 +351,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 if (obj.Type != MySystemObjectType.ASTEROIDS) continue;
                 var asteroids = obj as MySystemAsteroids;
 
-                var prov = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[asteroids.AsteroidTypeName];
+                if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroids.AsteroidTypeName, out var prov)) continue;
 
                 IMyAsteroidObjectShape shape = prov.GetAsteroidObjectShape(asteroids);
 
