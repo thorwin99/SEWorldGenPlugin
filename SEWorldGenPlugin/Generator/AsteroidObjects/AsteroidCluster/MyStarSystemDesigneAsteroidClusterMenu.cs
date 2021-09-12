@@ -48,10 +48,10 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
         {
             base.RecreateControls(controlTable, maxWidth, isEditing);
 
-            m_sizeSlider = new MyGuiControlClickableSlider(null, 0, MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 20, maxWidth - 0.1f, (float)Data.Size, labelSuffix: " m", showLabel: true);
+            m_sizeSlider = new MyGuiControlClickableSlider(null, 0, MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 20000, maxWidth - 0.1f, (float)Data.Size / 1000f, labelSuffix: " km", showLabel: true);
             m_sizeSlider.ValueChanged += delegate (MyGuiControlSlider s)
             {
-                Data.Size = s.Value;
+                Data.Size = s.Value * 1000f;
                 ChangedObject();
             };
 
