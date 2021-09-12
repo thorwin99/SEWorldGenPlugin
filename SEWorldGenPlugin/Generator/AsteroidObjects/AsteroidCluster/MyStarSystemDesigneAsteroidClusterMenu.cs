@@ -74,17 +74,25 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
 
             if (MySession.Static.CameraController != MySession.Static.LocalCharacter || true)
             {
-                IMyAsteroidObjectShape shape = MyAsteroidRingProvider.Static.GetAsteroidObjectShape(m_object as MySystemAsteroids);
-                if (shape == null)
+                if (MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue((m_object as MySystemAsteroids).AsteroidTypeName, out var prov))
                 {
-                    MyPluginGuiHelper.DisplayError("Cant teleport to the asteroid cluster. It does not exist", "Error");
+                    IMyAsteroidObjectShape shape = prov.GetAsteroidObjectShape(m_object as MySystemAsteroids);
+                    if (shape == null)
+                    {
+                        MyPluginGuiHelper.DisplayError("Cant teleport to the asteroid cluster. It does not exist", "Error");
+                        return;
+                    }
+
+                    MyAdminMenuExtension.Static.CloseScreenNow();
+
+                    MyMultiplayer.TeleportControlledEntity(shape.GetPointInShape());
+                    MyGuiScreenGamePlay.SetCameraController();
+                }
+                else
+                {
+                    MyPluginGuiHelper.DisplayError("Unknown asteroid type", "Error");
                     return;
                 }
-
-                MyAdminMenuExtension.Static.CloseScreenNow();
-
-                MyMultiplayer.TeleportControlledEntity(shape.GetPointInShape());
-                MyGuiScreenGamePlay.SetCameraController();
             }
         }
     }
