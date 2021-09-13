@@ -37,6 +37,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// </summary>
         private MyGuiControlButton m_spawnPlanetButton;
 
+        /// <summary>
+        /// Button to spawn the planet at a given coordinate
+        /// </summary>
+        private MyGuiControlButton m_spawnAtCoordButton;
+
         public override void Close()
         {
         }
@@ -87,6 +92,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableRow(new MyGuiControlLabel(text: "Name"));
             parent.AddTableRow(m_nameBox);
 
+
+            parent.AddTableSeparator();
+
             m_spawnPlanetButton = MyPluginGuiHelper.CreateDebugButton(maxWidth, "Spawn planet", delegate (MyGuiControlButton button)
             {
                 OnSpawnPlanet();
@@ -94,11 +102,48 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_spawnPlanetButton.Enabled = true;
             m_spawnPlanetButton.SetToolTip("Activates the mode to spawn the planet where you place it");
 
-            parent.AddTableSeparator();
+            m_spawnAtCoordButton = MyPluginGuiHelper.CreateDebugButton(maxWidth, "Spawn planet at coordinates", delegate (MyGuiControlButton button)
+            {
+                OnSpawnPlanetCoord();
+            });
 
             parent.AddTableRow(m_spawnPlanetButton);
 
+            parent.AddTableRow(m_spawnAtCoordButton);
+
             LoadPlanetDefs();
+        }
+
+        /// <summary>
+        /// Spawns the planet at a fixed coordinate
+        /// </summary>
+        private void OnSpawnPlanetCoord()
+        {
+            StringBuilder name = new StringBuilder();
+            m_nameBox.GetText(name);
+            if (name.ToString().Trim().Length <= 3)
+            {
+                MyPluginGuiHelper.DisplayError("The name must be at least 4 letters long", "Error");
+                return;
+            }
+
+            MyGuiScreenDialogCoordinate coordinateInput = new MyGuiScreenDialogCoordinate("Planet coordinate");
+
+            coordinateInput.OnConfirmed += delegate (Vector3D coord)
+            {
+                MySystemPlanet p = new MySystemPlanet()
+                {
+                    CenterPosition = coord,
+                    SubtypeId = ((MyPlanetGeneratorDefinition)m_planetDefList.GetLastSelected().UserData).Id.SubtypeId.ToString(),
+                    Generated = false,
+                    DisplayName = name.ToString().Trim(),
+                    Diameter = m_planetSizeSlider.Value
+                };
+
+                SpawnPlanet(p, coord);
+            };
+
+            MyGuiSandbox.AddScreen(coordinateInput);
         }
 
         /// <summary>
