@@ -1,4 +1,5 @@
-﻿using Sandbox.Game.Multiplayer;
+﻿using Sandbox.Game.Entities;
+using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Networking;
 using SEWorldGenPlugin.Networking.Attributes;
@@ -220,6 +221,13 @@ namespace SEWorldGenPlugin.Generator
 
             if (o != null && o.DisplayName != Static.StarSystem.CenterObject.DisplayName)
             {
+                foreach(var child in o.GetAllChildren())
+                {
+                    if (child is MySystemPlanet)
+                    {
+                        MyEntities.Remove(MyEntities.GetEntityById((o as MySystemPlanet).EntityId));
+                    }
+                }
                 if(o.Type == MySystemObjectType.ASTEROIDS)
                 {
                     MySystemAsteroids roid = o as MySystemAsteroids;
@@ -239,6 +247,11 @@ namespace SEWorldGenPlugin.Generator
                     MyGPSManager.Static.RemovePersistentGps(objectId);
                     if (Static.StarSystem.Remove(objectId))
                     {
+                        if(o is MySystemPlanet)
+                        {
+                            MyEntities.Remove(MyEntities.GetEntityById((o as MySystemPlanet).EntityId));
+                        }
+
                         PluginEventHandler.Static.RaiseStaticEvent(BroadcastRemovedObject, objectId, callbackId, senderId);
                         callback?.Invoke(true);
                     }
