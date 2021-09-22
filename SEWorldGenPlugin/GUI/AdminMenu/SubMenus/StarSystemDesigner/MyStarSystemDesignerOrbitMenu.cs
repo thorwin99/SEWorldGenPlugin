@@ -103,7 +103,16 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             }
             else
             {
-                return MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
+                MySystemPlanet p = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId) as MySystemPlanet;
+
+                if(p == null)
+                {
+                    return MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
+                }
+                else
+                {
+                    return p.Diameter + MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
+                }
             }
         }
 
