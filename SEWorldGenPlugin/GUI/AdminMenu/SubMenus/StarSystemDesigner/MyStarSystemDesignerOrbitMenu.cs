@@ -33,7 +33,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
         public override void RecreateControls(MyGuiControlParentTableLayout controlTable, float maxWidth, bool isEditing = false)
         {
-            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: 0, maxValue: (float)CalculateMaxOrbitRadius(), labelSuffix: " km", showLabel: true);
+            m_orbitRadiusSlider = new MyGuiControlClickableSlider(width: maxWidth - 0.1f, minValue: (float)CalculateMinOrbitRadius(), maxValue: (float)CalculateMaxOrbitRadius(), labelSuffix: " km", showLabel: true);
             m_orbitRadiusSlider.SetToolTip(new MyToolTips("The radius of the orbit. Its the distance of the objects center to the system center."));
 
             controlTable.AddTableRow(new MyGuiControlLabel(text: "Orbit radius"));
@@ -107,11 +107,37 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
 
                 if(p == null)
                 {
-                    return MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
+                    return MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 1000.0;
                 }
                 else
                 {
-                    return p.Diameter + MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 2000.0;
+                    return p.Diameter / 2000.0 + MySettingsSession.Static.Settings.GeneratorSettings.MinMaxOrbitDistance.Min / 1000.0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the min orbit radius of the object around its parent
+        /// </summary>
+        /// <returns>The min orbit radius</returns>
+        private double CalculateMinOrbitRadius()
+        {
+            var center = MyStarSystemGenerator.Static.StarSystem.CenterObject;
+            if (center != null && m_object.ParentId == center.Id)
+            {
+                return 0.0;
+            }
+            else
+            {
+                MySystemPlanet p = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId) as MySystemPlanet;
+
+                if (p == null)
+                {
+                    return 0.0;
+                }
+                else
+                {
+                    return p.Diameter / 2000.0;
                 }
             }
         }
