@@ -40,7 +40,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
             Vector3D v = point - Position;
             Vector3D norm = Vector3D.Normalize(v);
 
-            return norm * Size;
+            return Position + norm * Size;
         }
 
         public Vector3D GetPointInShape(bool random = false)
