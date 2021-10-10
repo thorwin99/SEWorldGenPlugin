@@ -51,7 +51,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
 
             var genSettings = MySettingsSession.Static.Settings.GeneratorSettings;
 
-            m_sizeSlider = new MyGuiControlClickableSlider(null, 0, Math.Max((int)genSettings.MinMaxOrbitDistance.Min / 20, genSettings.PlanetSettings.PlanetSizeCap / 2), maxWidth - 0.1f, (float)Data.Size / 1000f, labelSuffix: " km", showLabel: true);
+            m_sizeSlider = new MyGuiControlClickableSlider(null, 0, Math.Max((int)genSettings.MinMaxOrbitDistance.Min / 20, genSettings.PlanetSettings.PlanetSizeCap / 2) / 1000, maxWidth - 0.1f, (float)Data.Size / 1000f, labelSuffix: " km", showLabel: true);
             m_sizeSlider.ValueChanged += delegate (MyGuiControlSlider s)
             {
                 Data.Size = s.Value * 1000f;
