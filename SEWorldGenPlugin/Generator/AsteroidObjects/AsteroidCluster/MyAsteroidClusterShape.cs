@@ -24,7 +24,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
 
             if (dist > Size) return ContainmentType.Disjoint;
 
-            MyRandom inst = new MyRandom(seed);
+            return ContainmentType.Contains;
+
+            /*MyRandom inst = new MyRandom(seed);
 
             double baseProp = inst.NextDouble();
 
@@ -32,7 +34,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
 
             if(baseProp + linProp > 0.5) return ContainmentType.Contains;
 
-            return ContainmentType.Disjoint;
+            return ContainmentType.Disjoint;*/
         }
 
         public Vector3D GetClosestPoint(Vector3D point)
