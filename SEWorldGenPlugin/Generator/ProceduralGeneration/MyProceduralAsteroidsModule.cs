@@ -222,13 +222,15 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                 if (shape == null) continue;
 
-                if(shape.Contains(entityPosition) != ContainmentType.Disjoint)
+                if (shape.Contains(entityPosition) != ContainmentType.Disjoint)
                 {
                     MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
+                    continue;
                 }
 
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
                 double distance = Vector3D.Distance(entityPosition, closestPos);
+
                 if (distance > 5000000)
                 {
                     MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
