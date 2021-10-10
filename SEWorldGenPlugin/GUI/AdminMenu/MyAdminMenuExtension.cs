@@ -272,7 +272,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu
             }
             else
             {
-                m_vanillaComboBox.SelectItemByKey(m_selectedMenuIndex);
+                m_vanillaComboBox.SelectItemByIndex(m_selectedMenuIndex);
                 RecreateControls(false);
             }
         }
