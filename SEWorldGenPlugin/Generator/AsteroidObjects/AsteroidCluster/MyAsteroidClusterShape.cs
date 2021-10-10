@@ -22,11 +22,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
 
             double dist = Vector3D.Distance(point, Position);
 
+            if (dist > Size) return ContainmentType.Disjoint;
+
             MyRandom inst = new MyRandom(seed);
 
             double baseProp = inst.NextDouble();
 
-            double linProp = 0.5 - dist / Size;
+            double linProp = 0.7 - dist / Size;
 
             if(baseProp + linProp > 0.5) return ContainmentType.Contains;
 
