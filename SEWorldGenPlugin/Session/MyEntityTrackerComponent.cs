@@ -52,18 +52,7 @@ namespace SEWorldGenPlugin.Session
 
             foreach(var entity in entities)
             {
-                if(entity is MyCharacter)
-                {
-                    TrackEntity(entity);
-                }
-                if(entity is MyCubeGrid grid)
-                {
-                    if(grid.PlayerPresenceTier == VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
-                    {
-                        TrackEntity(entity);
-                        grid.PlayerPresenceTierChanged += OnGridPlayerPresenceUpdate;
-                    }
-                }
+                TrackEntity(entity);
             }
 
             lock (m_toUntrackEntities) lock (m_entityTrackers)
@@ -120,8 +109,20 @@ namespace SEWorldGenPlugin.Session
         {
             if (m_trackedEntities != null && m_newTrackedEntities != null && !m_trackedEntities.Contains(entity))
             {
-                m_newTrackedEntities.Add(entity);
-                entity.OnMarkForClose += OnEntityClose;
+                if (entity is MyCharacter)
+                {
+                    m_newTrackedEntities.Add(entity);
+                    entity.OnMarkForClose += OnEntityClose;
+                }
+                if (entity is MyCubeGrid grid)
+                {
+                    if (grid.PlayerPresenceTier == VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
+                    {
+                        m_newTrackedEntities.Add(entity);
+                        entity.OnMarkForClose += OnEntityClose;
+                        grid.PlayerPresenceTierChanged += OnGridPlayerPresenceUpdate;
+                    }
+                }
             }
         }
 
