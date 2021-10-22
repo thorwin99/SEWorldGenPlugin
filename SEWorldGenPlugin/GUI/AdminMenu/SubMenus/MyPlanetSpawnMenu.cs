@@ -71,6 +71,11 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             m_planetDefList.VisibleRowsCount = 8;
             m_planetDefList.MultiSelect = false;
             m_planetDefList.Size = new Vector2(maxWidth, m_planetDefList.Size.Y);
+            m_planetDefList.ItemsSelected += delegate (MyGuiControlListbox box)
+            {
+                m_spawnAtCoordButton.Enabled = m_planetDefList.GetLastSelected() != null;
+                m_spawnPlanetButton.Enabled = m_spawnAtCoordButton.Enabled;
+            };
 
             parent.AddTableRow(new MyGuiControlLabel(text: "Type"));
             parent.AddTableRow(m_planetDefList);
@@ -112,6 +117,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
             parent.AddTableRow(m_spawnAtCoordButton);
 
             LoadPlanetDefs();
+
+            m_spawnAtCoordButton.Enabled = m_planetDefList.GetLastSelected() != null;
+            m_spawnPlanetButton.Enabled = m_spawnAtCoordButton.Enabled;
         }
 
         /// <summary>
