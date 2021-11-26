@@ -147,7 +147,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 m_radiusSlider.MaxValue = settings.WorldSize < 0 ? int.MaxValue / 1000 : settings.WorldSize / 1000;
                 m_radiusSlider.Value = (float)data.Radius / 1000;
 
-                m_widthSlider.MinValue = settings.MinMaxOrbitDistance.Min / 1000;
+                m_widthSlider.MinValue = settings.MinMaxOrbitDistance.Min / 2000;
                 m_widthSlider.MaxValue = settings.MinMaxOrbitDistance.Max / 1000;
                 m_widthSlider.Value = (float)data.Width / 1000;
 
