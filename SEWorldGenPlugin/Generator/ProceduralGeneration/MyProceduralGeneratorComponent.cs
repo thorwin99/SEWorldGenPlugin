@@ -99,7 +99,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
             //Add default impl of registering of standard generator components
             RegisterModule(new MyProceduralPlanetModule(m_seed));
-            RegisterModule(new MyProceduralAsteroidsModule(m_seed));
+
+
+            if(MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator != ObjectBuilders.AsteroidGenerationMethod.VANILLA)
+                RegisterModule(new MyProceduralAsteroidsModule(m_seed));
 
             MyPluginLog.Log("Loading Procedural Generator Component completed");
         }
