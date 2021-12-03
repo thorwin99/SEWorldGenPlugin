@@ -30,14 +30,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
         {
             HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
 
-            if (CenterObject == null) return objs;
-
-            objs.Add(CenterObject);
-
-            foreach (var o in CenterObject.GetAllChildren())
+            Foreach(delegate (int i, MySystemObject obj)
             {
-                objs.Add(o);
-            }
+                objs.Add(obj);
+            });
 
             return objs;
         }
