@@ -165,11 +165,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             }
 
             m_radiusSlider.MinValue = (int)planet.Diameter / 1000 * 0.75f;
-            m_radiusSlider.MaxValue = (int)planet.Diameter / 1000 * 2f;
+            m_radiusSlider.MaxValue = (int)planet.Diameter / 1000 * 5f;
             m_radiusSlider.Value = (float)data.Radius / 1000;
 
             m_widthSlider.MinValue = (int)planet.Diameter / 1000 / 20f;
-            m_widthSlider.MaxValue = (int)planet.Diameter / 1000 / 1.25f;
+            m_widthSlider.MaxValue = (int)planet.Diameter / 1000 * 5f;
             m_widthSlider.Value = (float)data.Width / 1000;
 
             m_heightSlider.MinValue = m_widthSlider.MinValue / 10;
