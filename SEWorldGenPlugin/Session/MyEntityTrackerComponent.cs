@@ -48,13 +48,6 @@ namespace SEWorldGenPlugin.Session
         {
             if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
-            var entities = MyEntities.GetEntities();
-
-            foreach(var entity in entities)
-            {
-                TrackEntity(entity);
-            }
-
             lock (m_toUntrackEntities) lock (m_entityTrackers)
             {
                 foreach(var entity in m_toUntrackEntities)
@@ -70,7 +63,7 @@ namespace SEWorldGenPlugin.Session
             }
 
             lock (m_newTrackedEntities) lock (m_trackedEntities) lock (m_entityTrackers)
-                    {
+            {
                 foreach(var entity in m_newTrackedEntities)
                 {
                     foreach(var tracker in m_entityTrackers)
@@ -98,7 +91,16 @@ namespace SEWorldGenPlugin.Session
             m_newTrackedEntities = new List<MyEntity>();
             m_toUntrackEntities = new List<MyEntity>();
 
+            MyEntities.OnEntityAdd += TrackEntity;
+
             MyPluginLog.Log("Entity tracker loading data completed");
+        }
+
+        protected override void UnloadData()
+        {
+            base.UnloadData();
+
+            MyEntities.OnEntityAdd -= TrackEntity;
         }
 
         /// <summary>
@@ -107,21 +109,25 @@ namespace SEWorldGenPlugin.Session
         /// <param name="entity">Entity to register</param>
         public void TrackEntity(MyEntity entity)
         {
-            if (m_trackedEntities != null && m_newTrackedEntities != null && !m_trackedEntities.Contains(entity))
+            if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
+
+            
+            if (entity is MyCharacter)
             {
-                if (entity is MyCharacter)
+                if (m_trackedEntities == null || m_newTrackedEntities == null || m_trackedEntities.Contains(entity)) return;
+    
+                m_newTrackedEntities.Add(entity);
+                entity.OnMarkForClose += OnEntityClose;
+            }
+            if (entity is MyCubeGrid grid)
+            {
+                if (m_trackedEntities == null || m_newTrackedEntities == null || m_trackedEntities.Contains(entity)) return;
+
+                if (grid.PlayerPresenceTier == VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
                 {
                     m_newTrackedEntities.Add(entity);
                     entity.OnMarkForClose += OnEntityClose;
-                }
-                if (entity is MyCubeGrid grid)
-                {
-                    if (grid.PlayerPresenceTier == VRage.Game.ModAPI.MyUpdateTiersPlayerPresence.Normal)
-                    {
-                        m_newTrackedEntities.Add(entity);
-                        entity.OnMarkForClose += OnEntityClose;
-                        grid.PlayerPresenceTierChanged += OnGridPlayerPresenceUpdate;
-                    }
+                    grid.PlayerPresenceTierChanged += OnGridPlayerPresenceUpdate;
                 }
             }
         }
