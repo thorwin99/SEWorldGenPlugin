@@ -111,7 +111,7 @@ namespace SEWorldGenPlugin.Session
         {
             if (!MySettingsSession.Static.IsEnabled() || !Sync.IsServer) return;
 
-            
+
             if (entity is MyCharacter)
             {
                 if (m_trackedEntities == null || m_newTrackedEntities == null || m_trackedEntities.Contains(entity)) return;

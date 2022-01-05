@@ -91,6 +91,38 @@ namespace SEWorldGenPlugin.GUI
             var moonNameLabel = new MyGuiControlLabel(null, null, "Moon name format");
             var beltNameLabel = new MyGuiControlLabel(null, null, "Belt name format");
 
+            var enablePatchingLabel = new MyGuiControlLabel(null, null, "Enable Patching?");
+
+            MyGuiControlCheckbox enablePatchingCheckbox = new MyGuiControlCheckbox(null, null, "Requires Restart. Enables patching for the plugin. Please read the wiki for more information about it.");
+            enablePatchingCheckbox.IsChecked = MySettings.Static.Settings.EnablePatching;
+            enablePatchingCheckbox.IsCheckedChanged += delegate
+            {
+                if (enablePatchingCheckbox.IsChecked)
+                {
+                    MyPluginGuiHelper.DisplayQuestion("Do you want to enable Patching?", "Warning", delegate (MyGuiScreenMessageBox.ResultEnum res)
+                    {
+                        if(res == MyGuiScreenMessageBox.ResultEnum.YES)
+                        {
+                            MySettings.Static.Settings.EnablePatching = true;
+                        }
+                        else
+                        {
+                            MySettings.Static.Settings.EnablePatching = false;
+                            enablePatchingCheckbox.IsChecked = false;
+                        }
+                    });
+                }
+                else
+                {
+                    MySettings.Static.Settings.EnablePatching = false;
+                    enablePatchingCheckbox.IsChecked = false;
+                }
+            };
+
+            parent.AddTableRow(enablePatchingLabel, enablePatchingCheckbox);
+
+            parent.AddTableSeparator();
+
             #region Tables
 
             ///Moons table

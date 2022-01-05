@@ -80,5 +80,17 @@ namespace SEWorldGenPlugin.GUI
             MyGuiScreenMessageBox msg = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.OK, new StringBuilder(message), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, callback, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null); ;
             MyGuiSandbox.AddScreen(msg);
         }
+
+        /// <summary>
+        /// Displays a question box to the user and calls the given callback, when it is closed.
+        /// </summary>
+        /// <param name="message">The question</param>
+        /// <param name="caption">The caption of the box</param>
+        /// <param name="callback">Callback to call when closed</param>
+        public static void DisplayQuestion(string message, string caption, Action<ResultEnum> callback = null)
+        {
+            MyGuiScreenMessageBox msg = new MyGuiScreenMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder(message), new StringBuilder(caption), MyCommonTexts.Ok, MyCommonTexts.Cancel, MyCommonTexts.Yes, MyCommonTexts.No, callback, 10000, MyGuiScreenMessageBox.ResultEnum.CANCEL, true, null); ;
+            MyGuiSandbox.AddScreen(msg);
+        }
     }
 }
