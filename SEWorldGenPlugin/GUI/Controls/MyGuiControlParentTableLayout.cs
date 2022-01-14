@@ -143,7 +143,7 @@ namespace SEWorldGenPlugin.GUI.Controls
         /// <returns></returns>
         public void AddTableSeparator()
         {
-            MyGuiControlSeparatorList sep = new MyGuiControlSeparatorList();
+            MyGuiTableSeperator sep = new MyGuiTableSeperator();
             m_tableRows.Add(new MyGuiControlBase[] { sep });
             m_tableHeight += MARGIN_ROWS;
 
@@ -232,9 +232,9 @@ namespace SEWorldGenPlugin.GUI.Controls
                 {
                     var control = row[i];
 
-                    if(control != null && control is MyGuiControlSeparatorList)
+                    if(control != null && control is MyGuiTableSeperator)
                     {
-                        var sep = control as MyGuiControlSeparatorList;
+                        var sep = control as MyGuiTableSeperator;
                         sep.Clear();
                         sep.AddHorizontal(currentRowTopLeft, Size.X - MARGIN_COLUMNS);
                     }
@@ -253,5 +253,9 @@ namespace SEWorldGenPlugin.GUI.Controls
                 currentRowTopLeft += new Vector2(0, rowHeight + MARGIN_ROWS);
             }
         }
+    }
+
+    internal class MyGuiTableSeperator : MyGuiControlSeparatorList
+    {
     }
 }
