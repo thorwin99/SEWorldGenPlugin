@@ -90,6 +90,7 @@ namespace SEWorldGenPlugin
                 catch (Exception e)
                 {
                     MyPluginLog.Log("Something went wrong while patching: ", LogLevel.ERROR);
+                    MyPluginLog.Log(e.Message, LogLevel.ERROR);
                     MyPluginLog.Log(e.StackTrace, LogLevel.ERROR);
                 }
             }
@@ -108,6 +109,8 @@ namespace SEWorldGenPlugin
 
             var asteroidPatch = new PatchOverlapAllAsteroidSeedsInSphere();
             asteroidPatch.ApplyPatch(harmony);
+            var encounterPatch = new PatchAsteroidGeneration();
+            encounterPatch.ApplyPatch(harmony);
         }
     }
 }
