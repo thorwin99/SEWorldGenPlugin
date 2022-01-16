@@ -191,6 +191,12 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(6)]
         public MySerializableMinMax MinMaxMoons = new MySerializableMinMax(1, 25);
 
+        /// <summary>
+        /// The falloff power of gravity wells of planets, the smaller the number, the larger the gravity well is.
+        /// </summary>
+        [ProtoMember(7)]
+        public float GravityFalloff = 7;
+
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_PlanetGenerationSettings();
@@ -209,6 +215,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             MyValueVerifier.VerifyFloat(0, 1, 0f, "PlanetSizeDeviation", ref PlanetSizeDeviation);
             MyValueVerifier.VerifyFloat(0, 1, 0.3f, "BaseMoonProbability", ref BaseMoonProbability);
             MyValueVerifier.VerifyFloat(0, 1, 0.25f, "BaseRingProbability", ref BaseRingProbability);
+            MyValueVerifier.VerifyFloat(0, 10, 7, "GravityFalloff", ref GravityFalloff);
         }
     }
 

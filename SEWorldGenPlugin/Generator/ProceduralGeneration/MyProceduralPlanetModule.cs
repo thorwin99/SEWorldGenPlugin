@@ -6,7 +6,6 @@ using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
-using SEWorldGenPlugin.Utilities;
 using VRage.Game.Voxels;
 using VRage.Library.Utils;
 using VRage.Utils;
@@ -54,6 +53,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 var definition = MyDefinitionManager.Static.GetDefinition<MyPlanetGeneratorDefinition>(MyStringHash.GetOrCompute(planet.SubtypeId));
 
                 if (definition == null) continue;
+
+                definition.GravityFalloffPower = MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.GravityFalloff;
 
                 long id = MyRandom.Instance.NextLong();
                 string name = GetPlanetStorageName(planet);

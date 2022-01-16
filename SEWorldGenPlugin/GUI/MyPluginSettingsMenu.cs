@@ -55,6 +55,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlClickableSlider m_planetSizeCapSlider;
         private MyGuiControlClickableSlider m_planetSizeMultSlider;
         private MyGuiControlClickableSlider m_planetSizeDeviationSlider;
+        private MyGuiControlClickableSlider m_planetGravityFalloffSlider;
         private MyGuiControlClickableSlider m_planetMoonBasePropSlider;
         private MyGuiControlClickableSlider m_planetRingBasePropSlider;
         private MyGuiControlRangedSlider m_planetMoonMinMaxSlider;
@@ -103,6 +104,7 @@ namespace SEWorldGenPlugin.GUI
             var planetSizeCapLabel = new MyGuiControlLabel(null, null, "Planet size cap");
             var planetSizeMultLabel = new MyGuiControlLabel(null, null, "Planet size multiplier");
             var planetSizeDeviationLabel = new MyGuiControlLabel(null, null, "Planet size deviation");
+            var planetGravityFalloffLabel = new MyGuiControlLabel(null, null, "Planet gravity falloff");
             var planetMoonPropLabel = new MyGuiControlLabel(null, null, "Planet moon probability");
             var planetRingPropLabel = new MyGuiControlLabel(null, null, "Planet ring probability");
             var planetMoonCountLabel = new MyGuiControlLabel(null, null, "Planet moon count");
@@ -195,6 +197,11 @@ namespace SEWorldGenPlugin.GUI
             m_planetSizeDeviationSlider.SetToolTip("The percentage the planets diameter can deviate from the calculated planet size (surfaceGravity * 120km * SizeMultiplier). The deviation is random but wont exceed this value.");
 
             parent.AddTableRow(planetSizeDeviationLabel, m_planetSizeDeviationSlider);
+
+            m_planetGravityFalloffSlider = new MyGuiControlClickableSlider(minValue: 0f, maxValue: 10f, defaultValue: 7f, width: 0.25f, showLabel: true);
+            m_planetGravityFalloffSlider.SetToolTip("The falloff scale for planet gravity wells. The smaller the number, the larger the gravity well. Default: 7");
+
+            parent.AddTableRow(planetGravityFalloffLabel, m_planetGravityFalloffSlider);
 
             m_planetMoonBasePropSlider = new MyGuiControlClickableSlider(minValue: 0f, maxValue: 1f, defaultValue: 0.5f, width: 0.25f, showLabel: true);
             m_planetMoonBasePropSlider.SetToolTip("The base probability for a planet to generate moons. Scales with gravity, so higher gravity means higher probability.");
@@ -293,6 +300,7 @@ namespace SEWorldGenPlugin.GUI
             m_planetSizeCapSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeCap;
             m_planetSizeMultSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier;
             m_planetSizeDeviationSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.PlanetSizeDeviation;
+            m_planetGravityFalloffSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.GravityFalloff;
             m_planetMoonBasePropSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.BaseMoonProbability;
             m_planetRingBasePropSlider.Value = worldSettings.GeneratorSettings.PlanetSettings.BaseRingProbability;
             m_planetMoonMinMaxSlider.SetValues(worldSettings.GeneratorSettings.PlanetSettings.MinMaxMoons.Min, worldSettings.GeneratorSettings.PlanetSettings.MinMaxMoons.Max);
@@ -322,6 +330,7 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.PlanetSettings.PlanetSizeCap = (int)m_planetSizeCapSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeMultiplier = m_planetSizeMultSlider.Value;
             settings.GeneratorSettings.PlanetSettings.PlanetSizeDeviation = m_planetSizeDeviationSlider.Value;
+            settings.GeneratorSettings.PlanetSettings.GravityFalloff = m_planetGravityFalloffSlider.Value;
             settings.GeneratorSettings.PlanetSettings.BaseMoonProbability = m_planetMoonBasePropSlider.Value;
             settings.GeneratorSettings.PlanetSettings.BaseRingProbability = m_planetRingBasePropSlider.Value;
             settings.GeneratorSettings.PlanetSettings.MinMaxMoons = new MySerializableMinMax((long)m_planetMoonMinMaxSlider.CurrentMin, (long)m_planetMoonMinMaxSlider.CurrentMax);
