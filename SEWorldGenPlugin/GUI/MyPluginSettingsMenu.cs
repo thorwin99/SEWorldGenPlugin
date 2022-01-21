@@ -166,7 +166,7 @@ namespace SEWorldGenPlugin.GUI
 
             parent.AddTableRow(planeDeviationLabel, m_systemPlaneDeviationSlider);
 
-            m_asteroidDensitySlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 1, defaultValue: 0.6f, width: 0.25f, showLabel: true);
+            m_asteroidDensitySlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 0.99f, defaultValue: 0.6f, width: 0.25f, showLabel: true);
             m_asteroidDensitySlider.SetToolTip("The density for asteroid generation. 1 is the densest.");
 
             parent.AddTableRow(asteroidDensityLabel, m_asteroidDensitySlider);
