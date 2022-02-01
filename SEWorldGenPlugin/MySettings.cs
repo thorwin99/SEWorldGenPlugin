@@ -93,6 +93,7 @@ namespace SEWorldGenPlugin
                     Settings.BlacklistedPlanetDefinitions.Add("MoonTutorial");
                     Settings.BlacklistedPlanetDefinitions.Add("SystemTestMap");
                     Settings.BlacklistedPlanetDefinitions.Add("EarthLikeModExample");
+                    Settings.FixedPlanetSizes.Add(new PlanetSizeDefinition("Example", 1000000));
                 }
             }
             else
@@ -108,6 +109,7 @@ namespace SEWorldGenPlugin
                 Settings.BlacklistedPlanetDefinitions.Add("MoonTutorial");
                 Settings.BlacklistedPlanetDefinitions.Add("SystemTestMap");
                 Settings.BlacklistedPlanetDefinitions.Add("EarthLikeModExample");
+                Settings.FixedPlanetSizes.Add(new PlanetSizeDefinition("Example", 1000000));
             }
             Settings.Verify();
             MyPluginLog.Log("Config loaded");

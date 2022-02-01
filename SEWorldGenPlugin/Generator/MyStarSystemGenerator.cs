@@ -570,8 +570,16 @@ namespace SEWorldGenPlugin.Generator
             do
             {
                 def = planets[MyRandom.Instance.Next(0, planets.Count)];
-                diameter = CalculatePlanetDiameter(def);
 
+                var sizeDef = TryGetSizeDef(def.Id.SubtypeId.ToString());
+                if(sizeDef != null)
+                {
+                    diameter = sizeDef.Diameter;
+                }
+                else
+                {
+                    diameter = CalculatePlanetDiameter(def);
+                }
             } while (diameter > maxDiameter && ++tries < MAX_DEF_FIND_ROUNDS);
 
             if(settings.SystemGenerator == SystemGenerationMethod.MANDATORY_FIRST)
@@ -584,6 +592,28 @@ namespace SEWorldGenPlugin.Generator
                 planets.Remove(def);
             }
             return def;
+        }
+
+        /// <summary>
+        /// Tries to get the planet size definition from the global settings.
+        /// </summary>
+        /// <param name="subtypeId"></param>
+        /// <returns>The size definition or null if none is found</returns>
+        private PlanetSizeDefinition TryGetSizeDef(string subtypeId)
+        {
+            foreach(var def in MySettings.Static.Settings.FixedPlanetSizes)
+            {
+                if(def.SubtypeId == subtypeId)
+                {
+                    if (def.Diameter > MySettingsSession.Static.Settings.GeneratorSettings.PlanetSettings.PlanetSizeCap)
+                    {
+                        MyPluginLog.Log("Tried to use fixed diameter " + def.Diameter + " for planet " + subtypeId + " but it was larger than planet size cap setting.", LogLevel.WARNING);
+                    }
+
+                    return def;
+                }
+            }
+            return null;
         }
 
         /// <summary>

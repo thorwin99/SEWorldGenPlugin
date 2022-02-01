@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 
 namespace SEWorldGenPlugin.ObjectBuilders
@@ -8,6 +9,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
     /// Those are valid for all worlds.
     /// </summary>
     [ProtoContract]
+    [Serializable]
     public class MyObjectBuilder_GlobalSettings : MyAbstractConfigObjectBuilder
     {
         public MyObjectBuilder_GlobalSettings() : base()
@@ -47,11 +49,19 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public HashSet<string> MandatoryPlanetDefinitions = new HashSet<string>();
 
         /// <summary>
+        /// A list of tuples containing a planet name and a planet size. This size will always be used for the planet
+        /// when generating a system. The planet will never generate with randomized size or size affected by settings set for the world.
+        /// It wont be used when diameter set here is larger than the planet size cap for the world.
+        /// </summary>
+        [ProtoMember(6)]
+        public HashSet<PlanetSizeDefinition> FixedPlanetSizes = new HashSet<PlanetSizeDefinition>();
+
+        /// <summary>
         /// Name format for planets. This is used for the generated gpss for planets.
         /// Available variables are [ObjectNumber], [ObjectNumberGreek], [ObjectNumberRoman],
         /// [ObjectLetterLower], [ObjectLetterUpper], [ObjectId].
         /// </summary>
-        [ProtoMember(6)]
+        [ProtoMember(7)]
         public string PlanetNameFormat = "Planet [ObjectNumber]";
 
         /// <summary>
@@ -59,7 +69,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Available variables are [ObjectNumber], [ObjectNumberGreek], [ObjectNumberRoman],
         /// [ObjectLetterLower], [ObjectLetterUpper], [ObjectId], [MoonPlanetName].
         /// </summary>
-        [ProtoMember(7)]
+        [ProtoMember(8)]
         public string MoonNameFormat = "Moon [ObjectNumber]";
 
         /// <summary>
@@ -67,13 +77,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// Available variables are [ObjectNumber], [ObjectNumberGreek], [ObjectNumberRoman],
         /// [ObjectLetterLower], [ObjectLetterUpper].
         /// </summary>
-        [ProtoMember(8)]
+        [ProtoMember(9)]
         public string BeltNameFormat = "Belt [ObjectNumberGreek]";
 
         /// <summary>
         /// Wether or not patches are enabled.
         /// </summary>
-        [ProtoMember(9)]
+        [ProtoMember(10)]
         public bool EnablePatching = false;
 
         public override MyAbstractConfigObjectBuilder copy()
@@ -84,6 +94,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
             copy.GasGiantDefinitions = GasGiantDefinitions;
             copy.BlacklistedPlanetDefinitions = BlacklistedPlanetDefinitions;
             copy.MandatoryPlanetDefinitions = MandatoryPlanetDefinitions;
+            copy.FixedPlanetSizes = FixedPlanetSizes;
             copy.PlanetNameFormat = PlanetNameFormat;
             copy.MoonNameFormat = MoonNameFormat;
             copy.BeltNameFormat = BeltNameFormat;
@@ -94,6 +105,38 @@ namespace SEWorldGenPlugin.ObjectBuilders
 
         public override void Verify()
         {
+        }
+    }
+
+    /// <summary>
+    /// Data structure for storing fixed planet sizes.
+    /// </summary>
+    [ProtoContract]
+    [Serializable]
+    public class PlanetSizeDefinition
+    {
+        /// <summary>
+        /// The subtype id of the planet
+        /// </summary>
+        [ProtoMember(1)]
+        public string SubtypeId;
+
+        /// <summary>
+        /// The diameter of the planet in meters
+        /// </summary>
+        [ProtoMember(1)]
+        public double Diameter;
+
+        public PlanetSizeDefinition()
+        {
+            SubtypeId = "";
+            Diameter = 0;
+        }
+
+        public PlanetSizeDefinition(string subtypeId, double diameter)
+        {
+            SubtypeId = subtypeId;
+            Diameter = diameter;
         }
     }
 }
