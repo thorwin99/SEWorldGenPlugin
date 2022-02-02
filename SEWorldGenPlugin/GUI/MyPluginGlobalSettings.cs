@@ -2,6 +2,7 @@ using Sandbox;
 using Sandbox.Game.Screens;
 using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.GUI.Controls;
+using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Text;
@@ -51,6 +52,7 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlTable m_sunDefsTable;
         private MyGuiControlTable m_mandatoryDefsTable;
         private MyGuiControlTable m_blacklistDefsTable;
+        private MyGuiControlTable m_fixedPlanetSizeTable;
         private MyGuiControlTextbox m_planetNameBox;
         private MyGuiControlTextbox m_moonNameBox;
         private MyGuiControlTextbox m_beltNameBox;
@@ -87,6 +89,7 @@ namespace SEWorldGenPlugin.GUI
             var sunLabel = new MyGuiControlLabel(null, null, "Suns");
             var mandatoryLabel = new MyGuiControlLabel(null, null, "Mandatory planets and moons");
             var blacklistLabel = new MyGuiControlLabel(null, null, "Blacklisted planets and moons");
+            var fixedPlanetSizeLabel = new MyGuiControlLabel(null, null, "Fixed planet sizes");
             var planetNameLabel = new MyGuiControlLabel(null, null, "Planet name format");
             var moonNameLabel = new MyGuiControlLabel(null, null, "Moon name format");
             var beltNameLabel = new MyGuiControlLabel(null, null, "Belt name format");
@@ -313,6 +316,92 @@ namespace SEWorldGenPlugin.GUI
             parent.AddTableRow(blacklistLabel);
             parent.AddTableRow(m_blacklistDefsTable);
             parent.AddTableRow(addBlacklistBtn, remBlacklistBtn);
+
+            parent.AddTableSeparator();
+
+            m_fixedPlanetSizeTable = new MyGuiControlTable();
+            m_fixedPlanetSizeTable.VisibleRowsCount = 8;
+            m_fixedPlanetSizeTable.Size = new Vector2(WIDTH, m_fixedPlanetSizeTable.Size.Y);
+            m_fixedPlanetSizeTable.ColumnsCount = 2;
+            m_fixedPlanetSizeTable.SetCustomColumnWidths(new float[] { WIDTH, WIDTH});
+            m_fixedPlanetSizeTable.SetColumnName(0, new StringBuilder("Subtype ID"));
+            m_fixedPlanetSizeTable.SetColumnName(1, new StringBuilder("Diameter"));
+
+            var addFixedSizeBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Add", delegate
+            {
+                MyGuiScreenDialogText inputBox = new MyGuiScreenDialogText();
+                inputBox.OnConfirmed += delegate (string text)
+                {
+                    if (Regex.Match(text, ILLEGAL_XML).Success)
+                    {
+                        MyPluginGuiHelper.DisplayError("The entered subtype id contains invalid characters (& < >).", "Error, invalid character");
+                        return;
+                    }
+
+                    var prop = MySettings.Static.Settings.FixedPlanetSizes;
+
+                    foreach(var planet in prop)
+                    {
+                        if(planet.SubtypeId == text)
+                        {
+                            MyPluginGuiHelper.DisplayError("The entered subtype id was already added.", "Error, already added");
+                            return;
+                        }
+                    }
+
+                    var def = new PlanetSizeDefinition(text, 120000);
+                    var row = new MyGuiControlTable.Row(def);
+                    row.AddCell(new MyGuiControlTable.Cell(text));
+                    row.AddCell(new MyGuiControlTable.Cell("120000 m"));
+
+                    m_fixedPlanetSizeTable.Add(row);
+                    prop.Add(def);
+                };
+                MyGuiSandbox.AddScreen(inputBox);
+            });
+            var remFixedSizeBtn = MyPluginGuiHelper.CreateDebugButton(DBG_BTN_WIDTH, "Remove", delegate
+            {
+                if (m_fixedPlanetSizeTable.SelectedRow == null) return;
+
+                PlanetSizeDefinition def = m_fixedPlanetSizeTable.SelectedRow.UserData as PlanetSizeDefinition;
+
+                MySettings.Static.Settings.FixedPlanetSizes.Remove(def);
+
+                m_fixedPlanetSizeTable.Remove(m_fixedPlanetSizeTable.SelectedRow);
+            });
+            remFixedSizeBtn.Enabled = false;
+
+            m_fixedPlanetSizeTable.FocusChanged += delegate
+            {
+                remFixedSizeBtn.Enabled = m_fixedPlanetSizeTable.HasFocus && m_fixedPlanetSizeTable.SelectedRow != null;
+            };
+            m_fixedPlanetSizeTable.ItemSelected += delegate (MyGuiControlTable table, MyGuiControlTable.EventArgs args)
+            {
+                remFixedSizeBtn.Enabled = table.SelectedRow != null;
+            };
+            m_fixedPlanetSizeTable.ItemDoubleClicked += delegate (MyGuiControlTable table, MyGuiControlTable.EventArgs args)
+            {
+                PlanetSizeDefinition def = table.GetRow(args.RowIndex).UserData as PlanetSizeDefinition;
+
+                MyGuiScreenDialogAmount inputBox = new MyGuiScreenDialogAmount(0, 2400000, MyCommonTexts.Blank, parseAsInteger: true, defaultAmount: (float)def.Diameter);
+
+                inputBox.OnConfirmed += delegate (float diameter)
+                {
+                    def.Diameter = diameter;
+                    table.Remove(table.GetRow(args.RowIndex));
+                    var row = new MyGuiControlTable.Row(def);
+                    row.AddCell(new MyGuiControlTable.Cell(def.SubtypeId));
+                    row.AddCell(new MyGuiControlTable.Cell(def.Diameter.ToString() + " m"));
+
+                    table.Add(row);
+                };
+
+                MyGuiSandbox.AddScreen(inputBox);
+            };
+
+            parent.AddTableRow(fixedPlanetSizeLabel);
+            parent.AddTableRow(m_fixedPlanetSizeTable);
+            parent.AddTableRow(addFixedSizeBtn, remFixedSizeBtn);
 
             #endregion
 
@@ -587,6 +676,14 @@ namespace SEWorldGenPlugin.GUI
                 row.AddCell(new MyGuiControlTable.Cell(blacklisted));
 
                 m_blacklistDefsTable.Add(row);
+            }
+            foreach(var def in MySettings.Static.Settings.FixedPlanetSizes)
+            {
+                var row = new MyGuiControlTable.Row(def);
+                row.AddCell(new MyGuiControlTable.Cell(def.SubtypeId));
+                row.AddCell(new MyGuiControlTable.Cell(def.Diameter.ToString() + " m"));
+
+                m_fixedPlanetSizeTable.Add(row);
             }
             m_planetNameBox.SetText(new StringBuilder(MySettings.Static.Settings.PlanetNameFormat));
             m_moonNameBox.SetText(new StringBuilder(MySettings.Static.Settings.MoonNameFormat));
