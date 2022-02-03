@@ -1,5 +1,6 @@
 ﻿using Sandbox.Definitions;
 using Sandbox.Engine.Voxels;
+using Sandbox.Engine.Voxels.Planet;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
