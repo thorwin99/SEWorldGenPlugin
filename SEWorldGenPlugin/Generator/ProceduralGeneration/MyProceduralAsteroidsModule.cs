@@ -231,7 +231,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
                 double distance = Vector3D.Distance(entityPosition, closestPos);
 
-                if (distance > 5000000)
+                if (distance > settings.AsteroidDiscoveryDistance * 1000.0)
                 {
                     MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
                 }

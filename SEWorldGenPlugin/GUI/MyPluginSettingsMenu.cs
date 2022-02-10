@@ -63,6 +63,9 @@ namespace SEWorldGenPlugin.GUI
         private MyGuiControlCombobox m_planetGPSModeCombo;
         private MyGuiControlCombobox m_moonGPSModeCombo;
         private MyGuiControlCombobox m_asteroidGPSModeCombo;
+        private MyGuiControlClickableSlider m_planetDiscoveryDistSlider;
+        private MyGuiControlClickableSlider m_moonDiscoveryDistSlider;
+        private MyGuiControlClickableSlider m_asteroidDiscoveryDistSlider;
 
         public MyPluginSettingsMenu(bool isNewGame) : base(new Vector2(0.5f, 0.5f), MyGuiConstants.SCREEN_BACKGROUND_COLOR, SIZE, false, null, MySandboxGame.Config.UIBkOpacity, MySandboxGame.Config.UIOpacity)
         {
@@ -111,6 +114,9 @@ namespace SEWorldGenPlugin.GUI
             var planetGpsModeLabel = new MyGuiControlLabel(null, null, "Planet gps mode");
             var moonGpsModeLabel = new MyGuiControlLabel(null, null, "Moon gps mode");
             var asteroidGpsModeLabel = new MyGuiControlLabel(null, null, "Asteroid gps mode");
+            var planetDiscLabel = new MyGuiControlLabel(null, null, "Planet discovery range");
+            var moonDiscLabel = new MyGuiControlLabel(null, null, "Moon discovery range");
+            var asteroidDiscLabel = new MyGuiControlLabel(null, null, "Asteroid discovery range");
 
             m_systemGeneratorCombo = new MyGuiControlCombobox(null, null);
             m_systemGeneratorCombo.SetToolTip("The generation method for planets and moons to use with this world.");
@@ -225,9 +231,26 @@ namespace SEWorldGenPlugin.GUI
             m_planetGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT_HIDDEN, "Persistent hidden");
             m_planetGPSModeCombo.AddItem((long)MyGPSGenerationMode.NONE, "None");
 
+            m_planetGPSModeCombo.ItemSelected += delegate
+            {
+                if(m_planetGPSModeCombo.GetSelectedKey() == (long)MyGPSGenerationMode.DISCOVERY)
+                {
+                    m_planetDiscoveryDistSlider.Enabled = true;
+                }
+                else
+                {
+                    m_planetDiscoveryDistSlider.Enabled = false;
+                }
+            };
+
             m_planetGPSModeCombo.Size = new Vector2(0.25f, m_planetGPSModeCombo.Size.Y);
 
             parent.AddTableRow(planetGpsModeLabel, m_planetGPSModeCombo);
+
+            m_planetDiscoveryDistSlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 10000000, defaultValue: 50000, width: 0.25f, intValue: true, showLabel: true, labelSuffix: " Km");
+            m_planetDiscoveryDistSlider.SetToolTip("The distance used when discovering planets for gps generation.");
+
+            parent.AddTableRow(planetDiscLabel, m_planetDiscoveryDistSlider);
 
             m_moonGPSModeCombo = new MyGuiControlCombobox();
             m_moonGPSModeCombo.SetToolTip("The generation mode for moons gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.");
@@ -236,9 +259,26 @@ namespace SEWorldGenPlugin.GUI
             m_moonGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT_HIDDEN, "Persistent hidden");
             m_moonGPSModeCombo.AddItem((long)MyGPSGenerationMode.NONE, "None");
 
+            m_moonGPSModeCombo.ItemSelected += delegate
+            {
+                if (m_moonGPSModeCombo.GetSelectedKey() == (long)MyGPSGenerationMode.DISCOVERY)
+                {
+                    m_moonDiscoveryDistSlider.Enabled = true;
+                }
+                else
+                {
+                    m_moonDiscoveryDistSlider.Enabled = false;
+                }
+            };
+
             m_moonGPSModeCombo.Size = new Vector2(0.25f, m_moonGPSModeCombo.Size.Y);
 
             parent.AddTableRow(moonGpsModeLabel, m_moonGPSModeCombo);
+
+            m_moonDiscoveryDistSlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 10000000, defaultValue: 50000, width: 0.25f, intValue: true, showLabel: true, labelSuffix: " Km");
+            m_moonDiscoveryDistSlider.SetToolTip("The distance used when discovering moons for gps generation.");
+
+            parent.AddTableRow(moonDiscLabel, m_moonDiscoveryDistSlider);
 
             m_asteroidGPSModeCombo = new MyGuiControlCombobox();
             m_asteroidGPSModeCombo.SetToolTip("The generation mode for asteroid gpss. Discovery means a player needs to be within 50k km to see the dynamic gps.");
@@ -247,9 +287,26 @@ namespace SEWorldGenPlugin.GUI
             m_asteroidGPSModeCombo.AddItem((long)MyGPSGenerationMode.PERSISTENT_HIDDEN, "Persistent hidden");
             m_asteroidGPSModeCombo.AddItem((long)MyGPSGenerationMode.NONE, "None");
 
+            m_asteroidGPSModeCombo.ItemSelected += delegate
+            {
+                if (m_asteroidGPSModeCombo.GetSelectedKey() == (long)MyGPSGenerationMode.DISCOVERY)
+                {
+                    m_asteroidDiscoveryDistSlider.Enabled = true;
+                }
+                else
+                {
+                    m_asteroidDiscoveryDistSlider.Enabled = false;
+                }
+            };
+
             m_asteroidGPSModeCombo.Size = new Vector2(0.25f, m_asteroidGPSModeCombo.Size.Y);
 
             parent.AddTableRow(asteroidGpsModeLabel, m_asteroidGPSModeCombo);
+
+            m_asteroidDiscoveryDistSlider = new MyGuiControlClickableSlider(minValue: 0, maxValue: 10000000, defaultValue: 5000, width: 0.25f, intValue: true, showLabel: true, labelSuffix: " Km");
+            m_asteroidDiscoveryDistSlider.SetToolTip("The distance usedused when discovering asteroid objects (rings, belts, clusters) for gps generation.");
+
+            parent.AddTableRow(asteroidDiscLabel, m_asteroidDiscoveryDistSlider);
 
             Vector2 start = SIZE / -2 + PADDING + new Vector2(0, caption.Size.Y) + CHILD_MARGINS_VERT * 2;
             Vector2 end = new Vector2(SIZE.X / 2 - PADDING.X, SIZE.Y / 2 - PADDING.Y - OkButton.Size.Y) - CHILD_MARGINS_VERT * 2;
@@ -308,6 +365,10 @@ namespace SEWorldGenPlugin.GUI
             m_planetGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.PlanetGPSMode);
             m_asteroidGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.AsteroidGPSMode);
             m_moonGPSModeCombo.SelectItemByKey((long)worldSettings.GeneratorSettings.GPSSettings.MoonGPSMode);
+
+            m_planetDiscoveryDistSlider.Value = (float)worldSettings.GeneratorSettings.GPSSettings.PlanetDiscoveryDistance;
+            m_moonDiscoveryDistSlider.Value = (float)worldSettings.GeneratorSettings.GPSSettings.MoonDiscoveryDistance;
+            m_asteroidDiscoveryDistSlider.Value = (float)worldSettings.GeneratorSettings.GPSSettings.AsteroidDiscoveryDistance;
         }
 
         /// <summary>
@@ -338,6 +399,9 @@ namespace SEWorldGenPlugin.GUI
             settings.GeneratorSettings.GPSSettings.PlanetGPSMode = (MyGPSGenerationMode)m_planetGPSModeCombo.GetSelectedKey();
             settings.GeneratorSettings.GPSSettings.MoonGPSMode = (MyGPSGenerationMode)m_moonGPSModeCombo.GetSelectedKey();
             settings.GeneratorSettings.GPSSettings.AsteroidGPSMode = (MyGPSGenerationMode)m_asteroidGPSModeCombo.GetSelectedKey();
+            settings.GeneratorSettings.GPSSettings.PlanetDiscoveryDistance = (long)m_planetDiscoveryDistSlider.Value;
+            settings.GeneratorSettings.GPSSettings.MoonDiscoveryDistance = (long)m_moonDiscoveryDistSlider.Value;
+            settings.GeneratorSettings.GPSSettings.AsteroidDiscoveryDistance = (long)m_asteroidDiscoveryDistSlider.Value;
 
             return settings;
         }

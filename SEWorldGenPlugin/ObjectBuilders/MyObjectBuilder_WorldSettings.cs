@@ -244,18 +244,42 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(3)]
         public MyGPSGenerationMode AsteroidGPSMode = MyGPSGenerationMode.DISCOVERY;
 
+        /// <summary>
+        /// Discovery distance used for gps generation for planets in km
+        /// </summary>
+        [ProtoMember(4)]
+        public long PlanetDiscoveryDistance = 50000;
+
+        /// <summary>
+        /// Discovery distance used for gps generation for moons in km
+        /// </summary>
+        [ProtoMember(4)]
+        public long MoonDiscoveryDistance = 50000;
+
+        /// <summary>
+        /// Discovery distance used for gps generation for planets in km
+        /// </summary>
+        [ProtoMember(4)]
+        public long AsteroidDiscoveryDistance = 5000;
+
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_GPSGenerationSettings();
             copy.PlanetGPSMode = PlanetGPSMode;
             copy.MoonGPSMode = MoonGPSMode;
             copy.AsteroidGPSMode = AsteroidGPSMode;
+            copy.PlanetDiscoveryDistance = PlanetDiscoveryDistance;
+            copy.MoonDiscoveryDistance = MoonDiscoveryDistance;
+            copy.AsteroidDiscoveryDistance = AsteroidDiscoveryDistance;
 
             return copy;
         }
 
         public override void Verify()
         {
+            MyValueVerifier.VerifyLong(0, long.MaxValue, 50000, "PlanetDiscoveryDistance", ref PlanetDiscoveryDistance);
+            MyValueVerifier.VerifyLong(0, long.MaxValue, 50000, "MoonDiscoveryDistance", ref MoonDiscoveryDistance);
+            MyValueVerifier.VerifyLong(0, long.MaxValue, 5000, "AsteroidDiscoveryDistance", ref AsteroidDiscoveryDistance);
         }
     }
 

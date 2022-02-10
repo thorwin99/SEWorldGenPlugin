@@ -88,7 +88,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 {
                     var distance = Vector3D.Distance(tracker.CurrentPosition, obj.CenterPosition);
 
-                    if(distance <= 50000000)
+                    var discoveryDistance = obj.Type == MySystemObjectType.PLANET ? settings.PlanetDiscoveryDistance : settings.MoonDiscoveryDistance;
+
+                    if(distance <= discoveryDistance * 1000.0)
                     {
                         if (MyGPSManager.Static.DynamicGpsExists(obj.Id, entity.GetPlayerIdentityId()))
                         {
