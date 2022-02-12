@@ -74,7 +74,7 @@ namespace SEWorldGenPlugin
         /// Tries to apply the harmony patches to fix more complicated bugs.
         /// Will only actually patch, if 0harmony.dll is found AND patching is enabled in the global settings.
         /// </summary>
-        private void TryEnablePatches()
+        private bool TryEnablePatches()
         {
             if (settings.Settings.EnablePatching)
             {
@@ -83,6 +83,8 @@ namespace SEWorldGenPlugin
                     MyPluginLog.Log("Patching...");
                     Patch();
                     MyPluginLog.Log("Patches applied");
+
+                    return true;
                 }
                 catch (FileNotFoundException)
                 {
@@ -99,6 +101,8 @@ namespace SEWorldGenPlugin
             {
                 MyPluginLog.Log("Patching is disabled, skipping patches.");
             }
+
+            return false;
         }
 
         /// <summary>
