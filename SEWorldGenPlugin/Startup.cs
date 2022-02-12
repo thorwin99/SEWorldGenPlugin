@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Sandbox.Game;
+using Sandbox.Graphics.GUI;
 using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.GUI.AdminMenu;
 using SEWorldGenPlugin.http;
@@ -111,6 +112,14 @@ namespace SEWorldGenPlugin
             asteroidPatch.ApplyPatch(harmony);
             var encounterPatch = new PatchAsteroidGeneration();
             encounterPatch.ApplyPatch(harmony);
+        }
+
+        /// <summary>
+        /// Used with PluginLoader only. Opens the global plugin config menu for SEWG
+        /// </summary>
+        public void OpenConfigDialog()
+        {
+            MyGuiSandbox.AddScreen(new MyPluginGlobalSettings());
         }
     }
 }
