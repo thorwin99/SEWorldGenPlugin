@@ -253,13 +253,13 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <summary>
         /// Discovery distance used for gps generation for moons in km
         /// </summary>
-        [ProtoMember(4)]
+        [ProtoMember(5)]
         public long MoonDiscoveryDistance = 50000;
 
         /// <summary>
         /// Discovery distance used for gps generation for planets in km
         /// </summary>
-        [ProtoMember(4)]
+        [ProtoMember(6)]
         public long AsteroidDiscoveryDistance = 5000;
 
         public override MyAbstractConfigObjectBuilder copy()
