@@ -4,6 +4,7 @@ using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
 using Sandbox.Game.World.Generator;
+using Sandbox.ModAPI;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -174,12 +175,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if (exists) continue;
 
-                    var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
+                    //var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
 
-                    MyVoxelMap voxelMap;
-
-                    voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
+                    MyVoxelMap voxelMap = MyAPIGateway.Session.VoxelMaps.CreateProceduralVoxelMap(seed.Params.Seed, seed.Size, MatrixD.CreateWorld(pos, Vector3D.Forward, Vector3D.Up)) as MyVoxelMap;
+                    //voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
                     if (voxelMap == null) continue;
 
                     MyVoxelBase.StorageChanged del = null;
