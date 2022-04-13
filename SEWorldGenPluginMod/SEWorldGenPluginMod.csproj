@@ -35,10 +35,14 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Data\Scripts\Networking\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Reference Include="ProtoBuf.Net">
+      <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\ProtoBuf.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="ProtoBuf.Net.Core">
+      <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\ProtoBuf.Net.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Sandbox.Common">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\Sandbox.Common.dll</HintPath>
     </Reference>
@@ -63,6 +67,7 @@
     <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
     <Reference Include="VRage">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\VRage.dll</HintPath>
     </Reference>
@@ -125,6 +130,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Scripts\Networking\NetworkComponent.cs" />
+    <Compile Include="Data\Scripts\ObjectBuilders\MyObjectBuilder_SystemData.cs" />
+    <Compile Include="Data\Scripts\ObjectBuilders\MySerializableMinMax.cs" />
     <Compile Include="Data\Scripts\SessionComponents\ProceduralAsteroidGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
