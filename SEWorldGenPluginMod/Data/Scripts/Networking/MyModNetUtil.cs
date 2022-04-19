@@ -1,4 +1,5 @@
 ﻿using Sandbox.ModAPI;
+using SEWorldGenPluginMod.Data.Scripts;
 using System;
 using System.Collections.Generic;
 
@@ -36,11 +37,12 @@ namespace SEWorldGenPlugin.Utilities
         {
             Action<ushort, byte[], ulong, bool> newHandler = delegate (ushort s, byte[] data, ulong i, bool b)
             {
-                ulong sender = NetDataToMsg(data, out string msg);
-                handler(sender, msg);
+                MyTuple<ulong, string> ret = NetDataToMsg(data);
+                ulong sender = ret.Item1;
+                handler(sender, ret.Item2);
             };
             MyAPIGateway.Multiplayer.RegisterSecureMessageHandler(id, newHandler);
-            if (unregActions.TryGetValue(id, out Action value))
+            if (unregActions.ContainsKey(id))
             {
                 unregActions[id] += delegate
                 {
@@ -67,11 +69,13 @@ namespace SEWorldGenPlugin.Utilities
         {
             Action<ushort, byte[], ulong, bool> newHandler = delegate (ushort s, byte[] data, ulong i, bool b)
             {
-                ulong sender = ReadSenderId(data, out byte[] rawData);
+                MyTuple<ulong, byte[]> ret = ReadSenderId(data);
+                ulong sender = ret.Item1;
+                byte[] rawData = ret.Item2;
                 handler(sender, rawData);
             };
             MyAPIGateway.Multiplayer.RegisterSecureMessageHandler(id, newHandler);
-            if (unregActions.TryGetValue(id, out Action value))
+            if (unregActions.ContainsKey(id))
             {
                 unregActions[id] += delegate
                 {
@@ -93,9 +97,9 @@ namespace SEWorldGenPlugin.Utilities
         /// <param name="id">Id of the message handler</param>
         public static void UnregisterMessageHandlers(ushort id)
         {
-            if(unregActions.TryGetValue(id, out Action value))
+            if(unregActions.ContainsKey(id))
             {
-                value();
+                unregActions[id]();
                 unregActions.Remove(id);
             }
         }
@@ -210,10 +214,10 @@ namespace SEWorldGenPlugin.Utilities
         /// <param name="data">The incoming data</param>
         /// <param name="msg">The output string message contained in data</param>
         /// <returns>The sender id of the sender</returns>
-        public static ulong NetDataToMsg(byte[] data, out string msg)
+        public static MyTuple<ulong, string> NetDataToMsg(byte[] data)
         {
             ulong id = 0;
-            msg = "";
+            string msg = "";
             for(int i = 0; i < data.Length; i++)
             {
                 if(i < 8)
@@ -226,7 +230,7 @@ namespace SEWorldGenPlugin.Utilities
                     i++;
                 }
             }
-            return id;
+            return new MyTuple<ulong, string>(id, msg);
         }
 
         /// <summary>
@@ -236,9 +240,9 @@ namespace SEWorldGenPlugin.Utilities
         /// <param name="data">Incoming network data</param>
         /// <param name="rawData">Output raw data without sender id</param>
         /// <returns>Sender id of the sender</returns>
-        private static ulong ReadSenderId(byte[] data, out byte[] rawData)
+        private static MyTuple<ulong, byte[]> ReadSenderId(byte[] data)
         {
-            rawData = new byte[data.Length - 8];
+            byte[] rawData = new byte[data.Length - 8];
             ulong id = 0;
             for (int i = 0; i < data.Length; i++)
             {
@@ -252,7 +256,7 @@ namespace SEWorldGenPlugin.Utilities
                 }
             }
 
-            return id;
+            return new MyTuple<ulong, byte[]>(id, rawData);
         }
 
         /// <summary>
