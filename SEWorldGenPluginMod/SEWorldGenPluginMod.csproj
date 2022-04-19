@@ -35,7 +35,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Data\Scripts\ObjectBuilders\" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="ProtoBuf.Net">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\ProtoBuf.Net.dll</HintPath>
@@ -130,9 +132,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Scripts\Networking\MyModNetUtil.cs" />
     <Compile Include="Data\Scripts\Networking\NetworkComponent.cs" />
-    <Compile Include="Data\Scripts\ObjectBuilders\MyObjectBuilder_SystemData.cs" />
-    <Compile Include="Data\Scripts\ObjectBuilders\MySerializableMinMax.cs" />
     <Compile Include="Data\Scripts\SessionComponents\ProceduralAsteroidGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
