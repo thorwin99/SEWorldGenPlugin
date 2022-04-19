@@ -207,6 +207,7 @@
     <Compile Include="GUI\AdminMenu\MyAdminMenuExtension.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerOrbitMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyOrbitRenderObject.cs" />
+    <Compile Include="Networking\ModEventHandler.cs" />
     <Compile Include="Patches\PatchAsteroidGeneration.cs" />
     <Compile Include="Session\MyAdminMenuExtensionRegister.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />

@@ -18,17 +18,11 @@ namespace SEWorldGenPlugin.Utilities
         private static Dictionary<ushort, Action> unregActions;
 
         /// <summary>
-        /// id of the current ping, essentially a ping counter
-        /// </summary>
-        private static int pingId;
-
-        /// <summary>
         /// Creates a new net util instance
         /// </summary>
         static MyModNetUtil()
         {
             unregActions = new Dictionary<ushort, Action>();
-            pingId = 0;
         }
 
         /// <summary>
