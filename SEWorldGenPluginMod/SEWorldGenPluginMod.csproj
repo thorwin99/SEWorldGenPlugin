@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>C:\bin\Mod\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,9 +38,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\Scripts\ObjectBuilders\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Reference Include="ProtoBuf.Net">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\ProtoBuf.Net.dll</HintPath>
@@ -72,6 +70,7 @@
     <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="VRage">
       <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\VRage.dll</HintPath>
@@ -135,10 +134,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Scripts\MyTuple.cs" />
-    <Compile Include="Data\Scripts\Networking\MyModNetUtil.cs" />
-    <Compile Include="Data\Scripts\Networking\MyPositionLookupEventHandler.cs" />
-    <Compile Include="Data\Scripts\SessionComponents\MyClientProceduralAsteroidGenerator.cs" />
+    <Compile Include="Source\SessionComponents\MyClientProceduralAsteroidGenerator.cs" />
+    <Compile Include="Source\MyTuple.cs" />
+    <Compile Include="Source\Networking\MyModNetUtil.cs" />
+    <Compile Include="Source\Networking\MyPositionLookupEventHandler.cs" />
+    <Compile Include="Source\ObjectBuilders\MyGeneratorSettings.cs" />
+    <Compile Include="Source\SessionComponents\MyGeneratorSettingsSession.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

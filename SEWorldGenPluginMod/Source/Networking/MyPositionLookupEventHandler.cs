@@ -1,12 +1,10 @@
 ﻿using Sandbox.ModAPI;
-using SEWorldGenPlugin.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using VRage;
 using VRage.Game.Components;
 
-namespace SEWorldGenPluginMod.Data.Scripts.Networking
+namespace SEWorldGenPluginMod.Source.Networking
 {
     /// <summary>
     /// Session component used for mod communication with plugin
@@ -19,11 +17,21 @@ namespace SEWorldGenPluginMod.Data.Scripts.Networking
         /// </summary>
         private const ushort HANDLER_ID = 2779;
 
-        private Action<BitArray> m_lookupCallback;
+        /// <summary>
+        /// Static instance for this class
+        /// </summary>
+        public static MyPositionLookupEventHandler Static;
+
+        /// <summary>
+        /// Callback for lookup response
+        /// </summary>
+        private Action<List<float>> m_lookupCallback;
 
         public override void LoadData()
         {
             if (MyAPIGateway.Multiplayer.IsServer) return;
+
+            Static = this;
 
             MyModNetUtil.RegisterMessageHandler(HANDLER_ID, LookupResponseHandler);
         }
@@ -32,6 +40,8 @@ namespace SEWorldGenPluginMod.Data.Scripts.Networking
         {
             if (MyAPIGateway.Multiplayer.IsServer) return;
 
+            Static = null;
+
             MyModNetUtil.UnregisterMessageHandlers(HANDLER_ID);
         }
 
@@ -39,7 +49,7 @@ namespace SEWorldGenPluginMod.Data.Scripts.Networking
         /// Sets a lookup callback which is called, when lookup responses come from the server.
         /// </summary>
         /// <param name="lookupCallback">Callback to call when lookup responses arrive.</param>
-        public void SetCallback(Action<BitArray> lookupCallback)
+        public void SetCallback(Action<List<float>> lookupCallback)
         {
             m_lookupCallback = lookupCallback;
         }
@@ -60,7 +70,7 @@ namespace SEWorldGenPluginMod.Data.Scripts.Networking
         /// <param name="data">Data to unpack</param>
         private void LookupResponseHandler(ulong senderId, byte[] data)
         {
-            if(m_lookupCallback != null)
+            if (m_lookupCallback != null)
             {
                 m_lookupCallback(UnpackData(data));
             }
@@ -71,9 +81,9 @@ namespace SEWorldGenPluginMod.Data.Scripts.Networking
         /// </summary>
         /// <param name="data">Data to unpack</param>
         /// <returns>BitArray represented by data</returns>
-        private BitArray UnpackData(byte[] data)
+        private List<float> UnpackData(byte[] data)
         {
-            return MyAPIGateway.Utilities.SerializeFromBinary<BitArray>(data);
+            return MyAPIGateway.Utilities.SerializeFromBinary<List<float>>(data);
         }
 
         /// <summary>

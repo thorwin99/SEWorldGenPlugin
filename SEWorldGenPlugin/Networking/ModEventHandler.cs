@@ -6,11 +6,10 @@ using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using VRage;
 using VRage.Game.Components;
+using VRage.Library.Utils;
 using VRageMath;
 
 namespace SEWorldGenPlugin.Networking
@@ -22,15 +21,21 @@ namespace SEWorldGenPlugin.Networking
     public class ModEventHandler : MySessionComponentBase
     {
         /// <summary>
-        /// Handler ID for mod communication
+        /// Handler ID for mod communication.
         /// </summary>
         private const ushort HANDLER_ID = 2779;
+
+        /// <summary>
+        /// Handler id for generator settings requests.
+        /// </summary>
+        private const ushort SETTINGS_REQUEST_ID = 2780;
 
         public override void LoadData()
         {
             if (!Sync.IsServer) return;
 
             MyNetUtil.RegisterMessageHandler(HANDLER_ID, PositionCheckerBytes);
+            MyNetUtil.RegisterMessageHandler(SETTINGS_REQUEST_ID, SettingsRequestHandler);
         }
 
         protected override void UnloadData()
@@ -38,6 +43,7 @@ namespace SEWorldGenPlugin.Networking
             if (!Sync.IsServer) return;
 
             MyNetUtil.UnregisterMessageHandlers(HANDLER_ID);
+            MyNetUtil.UnregisterMessageHandlers(SETTINGS_REQUEST_ID);
         }
 
         /// <summary>
@@ -47,9 +53,24 @@ namespace SEWorldGenPlugin.Networking
         /// <param name="packedData">Packed data to be checked</param>
         private void PositionCheckerBytes(ulong clientID, byte[] packedData)
         {
-            List<SerializableVector3D> positions = UnpackData(packedData);
+            List<SerializableVector3D> positions = UnpacLocationkData(packedData);
 
             CheckPositions(clientID, positions);
+        }
+
+        /// <summary>
+        /// Handler for settings requests, which returns certain generator settings to the client
+        /// </summary>
+        /// <param name="clientID">Client id</param>
+        /// <param name="packedData">Empty packet</param>
+        private void SettingsRequestHandler(ulong clientID, byte[] packedData)
+        {
+            MyGeneratorSettings settings = new MyGeneratorSettings();
+            settings.AsteroidDensity = MySettingsSession.Static.Settings.GeneratorSettings.AsteroidDensity;
+            settings.UsePluginGenerator = MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator != AsteroidGenerationMethod.VANILLA;
+            settings.WorldSize = MySettingsSession.Static.Settings.GeneratorSettings.WorldSize;
+
+            MyNetUtil.SendPacket(SETTINGS_REQUEST_ID, PackSettingsData(settings), clientID);
         }
 
         /// <summary>
@@ -59,16 +80,26 @@ namespace SEWorldGenPlugin.Networking
         /// <param name="positions">Positions to check</param>
         private void CheckPositions(ulong clientID, List<SerializableVector3D> positions)
         {
-            bool[] results = new bool[positions.Count];
+            List<float> results = new List<float>(positions.Count);
 
-            for(int i = 0; i < positions.Count; i++)
+            for (int i = 0; i < positions.Count; i++)
             {
                 var obj = GetAsteroidObjectAt(positions[i]);
 
-                results[i] = obj != null;
+                if(obj == null)
+                {
+                    results[i] = -1f;
+                }
+                else
+                {
+                    MyRandom r = new MyRandom();
+                    r.PushSeed(((Vector3D)positions[i]).GetHashCode());
+
+                    results[i] = r.Next(obj.AsteroidSize.Min, obj.AsteroidSize.Max);
+                }
             }
 
-            byte[] packedData = PackData(results);
+            byte[] packedData = PackResultData(results);
 
             MyNetUtil.SendPacket(HANDLER_ID, packedData, clientID);
         }
@@ -105,7 +136,7 @@ namespace SEWorldGenPlugin.Networking
         /// </summary>
         /// <param name="data">Data to unpack</param>
         /// <returns>List of Vector3Ds unpacked from data</returns>
-        private List<SerializableVector3D> UnpackData(byte[] data)
+        private List<SerializableVector3D> UnpacLocationkData(byte[] data)
         {
             return MyAPIGateway.Utilities.SerializeFromBinary<List<SerializableVector3D>>(data);
         }
@@ -115,9 +146,39 @@ namespace SEWorldGenPlugin.Networking
         /// </summary>
         /// <param name="data">Data to pack</param>
         /// <returns>Byte[] representation of data</returns>
-        private byte[] PackData(bool[] data)
+        private byte[] PackResultData(List<float> data)
         {
             return MyAPIGateway.Utilities.SerializeToBinary(data);
         }
+
+        private byte[] PackSettingsData(MyGeneratorSettings settings)
+        {
+            return MyAPIGateway.Utilities.SerializeToBinary(settings);
+        }
+    }
+
+    /// <summary>
+    /// Mod side generator settings structure
+    /// </summary>
+    [ProtoContract]
+    public class MyGeneratorSettings
+    {
+        /// <summary>
+        /// Whether to even generate anything
+        /// </summary>
+        [ProtoMember(1)]
+        public bool UsePluginGenerator;
+
+        /// <summary>
+        /// Density of asteroids
+        /// </summary>
+        [ProtoMember(2)]
+        public float AsteroidDensity;
+
+        /// <summary>
+        /// World size
+        /// </summary>
+        [ProtoMember(3)]
+        public long WorldSize;
     }
 }

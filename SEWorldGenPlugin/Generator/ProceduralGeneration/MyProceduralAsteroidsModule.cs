@@ -283,7 +283,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if (ring == null) continue;
 
-                    var cellObjectSeed = new MyObjectSeed(cell, position, MyRandom.Instance.Next(ring.AsteroidSize.Min, ring.AsteroidSize.Max));
+                    MyRandom r = new MyRandom();
+                    r.PushSeed(position.GetHashCode());
+
+                    var cellObjectSeed = new MyObjectSeed(cell, position, r.Next(ring.AsteroidSize.Min, ring.AsteroidSize.Max));
                     cellObjectSeed.Params.Type = VRage.Game.MyObjectSeedType.Asteroid;
                     cellObjectSeed.Params.Seed = MyRandom.Instance.Next();
                     cellObjectSeed.Params.Index = index++;

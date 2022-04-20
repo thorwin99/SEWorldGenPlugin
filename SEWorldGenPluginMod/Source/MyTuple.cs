@@ -1,4 +1,4 @@
-﻿namespace SEWorldGenPluginMod.Data.Scripts
+﻿namespace SEWorldGenPluginMod.Source
 {
     /// <summary>
     /// Class representing 2 item tuple

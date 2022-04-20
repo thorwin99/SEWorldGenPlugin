@@ -1,9 +1,8 @@
 ﻿using Sandbox.ModAPI;
-using SEWorldGenPluginMod.Data.Scripts;
 using System;
 using System.Collections.Generic;
 
-namespace SEWorldGenPlugin.Utilities
+namespace SEWorldGenPluginMod.Source.Networking
 {
     /// <summary>
     /// Utility class for network operation and plugin pingin. Can send and receive messages over network
@@ -97,7 +96,7 @@ namespace SEWorldGenPlugin.Utilities
         /// <param name="id">Id of the message handler</param>
         public static void UnregisterMessageHandlers(ushort id)
         {
-            if(unregActions.ContainsKey(id))
+            if (unregActions.ContainsKey(id))
             {
                 unregActions[id]();
                 unregActions.Remove(id);
@@ -192,11 +191,11 @@ namespace SEWorldGenPlugin.Utilities
         {
             char[] chars = msg.ToCharArray();
             byte[] bytes = new byte[8 + chars.Length * 2];
-            for(int i = 0; i < bytes.Length; i++)
+            for (int i = 0; i < bytes.Length; i++)
             {
-                if(i < 8)
+                if (i < 8)
                 {
-                    bytes[i] = (byte)((senderId & (ulong)0xFF00000000000000 >> i * 8) >> 56 - i * 8);
+                    bytes[i] = (byte)((senderId & 0xFF00000000000000 >> i * 8) >> 56 - i * 8);
                 }
                 else
                 {
@@ -218,15 +217,15 @@ namespace SEWorldGenPlugin.Utilities
         {
             ulong id = 0;
             string msg = "";
-            for(int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
-                if(i < 8)
+                if (i < 8)
                 {
-                    id = id | (ulong)((long)data[i] << ((7 - i) * 8));
+                    id = id | (ulong)((long)data[i] << (7 - i) * 8);
                 }
                 else
                 {
-                    msg += (char)((data[i] << 8) | data[i + 1]);
+                    msg += (char)(data[i] << 8 | data[i + 1]);
                     i++;
                 }
             }
@@ -246,9 +245,9 @@ namespace SEWorldGenPlugin.Utilities
             ulong id = 0;
             for (int i = 0; i < data.Length; i++)
             {
-                if(i < 8)
+                if (i < 8)
                 {
-                    id = id | (ulong)((long)data[i] << ((7 - i) * 8));
+                    id = id | (ulong)((long)data[i] << (7 - i) * 8);
                 }
                 else
                 {
@@ -268,11 +267,11 @@ namespace SEWorldGenPlugin.Utilities
         private static byte[] PrefixDataWithId(ulong id, byte[] data)
         {
             byte[] newData = new byte[data.Length + 8];
-            for(int i = 0; i < newData.Length; i++)
+            for (int i = 0; i < newData.Length; i++)
             {
-                if(i < 8)
+                if (i < 8)
                 {
-                    newData[i] = (byte)((id & (ulong)0xFF00000000000000 >> i * 8) >> 56 - i * 8);
+                    newData[i] = (byte)((id & 0xFF00000000000000 >> i * 8) >> 56 - i * 8);
                 }
                 else
                 {
