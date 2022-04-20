@@ -54,11 +54,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
             MySession.Static.OnSavingCheckpoint += delegate
             {
-                foreach(var roid in m_tmpAsteroids)
+                /*foreach(var roid in m_tmpAsteroids)
                 {
                     roid.Save = false;
                 }
-                m_isSaving = true;
+                m_isSaving = true;*/
             };
         }
 
@@ -165,10 +165,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                             }
                             exists = true;
 
-                            if (tmp_voxelMaps.Contains(tmp))
+                            /*if (tmp_voxelMaps.Contains(tmp))
                             {
                                 tmp.Save = true;
-                            }
+                            }*/
                             break;
                         }
                     }
@@ -178,7 +178,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     //var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
 
+                    MyPluginLog.Debug("SEED: " + seed.Params.Seed);
+
                     MyVoxelMap voxelMap = MyAPIGateway.Session.VoxelMaps.CreateProceduralVoxelMap(seed.Params.Seed, seed.Size, MatrixD.CreateWorld(pos, Vector3D.Forward, Vector3D.Up)) as MyVoxelMap;
+                    voxelMap.Save = false;
+
                     //voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
                     if (voxelMap == null) continue;
 
@@ -380,14 +384,14 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
         public override void UpdateCells()
         {
-            if(m_isSaving && !MySession.Static.IsSaveInProgress)
+            /*if(m_isSaving && !MySession.Static.IsSaveInProgress)
             {
                 foreach(var roid in m_tmpAsteroids)
                 {
                     roid.Save = true;
                 }
                 m_isSaving = false;
-            }
+            }*/
         }
 
         /// <summary>
