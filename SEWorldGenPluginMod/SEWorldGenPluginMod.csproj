@@ -137,8 +137,8 @@
   <ItemGroup>
     <Compile Include="Data\Scripts\MyTuple.cs" />
     <Compile Include="Data\Scripts\Networking\MyModNetUtil.cs" />
-    <Compile Include="Data\Scripts\Networking\NetworkComponent.cs" />
-    <Compile Include="Data\Scripts\SessionComponents\ProceduralAsteroidGenerator.cs" />
+    <Compile Include="Data\Scripts\Networking\MyPositionLookupEventHandler.cs" />
+    <Compile Include="Data\Scripts\SessionComponents\MyClientProceduralAsteroidGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
