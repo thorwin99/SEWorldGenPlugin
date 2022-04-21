@@ -4,6 +4,7 @@ using Sandbox.ModAPI;
 using SEWorldGenPluginMod.Source.Networking;
 using SEWorldGenPluginMod.Source.ObjectBuilders;
 using System.Collections.Generic;
+using VRage;
 using VRage.Collections;
 using VRage.Game.Components;
 using VRage.Library.Utils;
@@ -80,6 +81,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
 
             m_enabled = !MyAPIGateway.Multiplayer.IsServer;
             m_definition = GetData();
+
+            MyModLog.Log("Loaded data for client side procedural asteroid generator. Enabled: " + m_enabled);
         }
 
         public override void BeforeStart()
@@ -100,6 +103,9 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
 
             if (m_settings == null)
             {
+
+                MyModLog.Log("Settings are null, trying to retreive.");
+
                 if (MyGeneratorSettingsSession.Static == null) return;
                 m_settings = MyGeneratorSettingsSession.Static.Settings;
 
@@ -107,6 +113,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             }
 
             if (m_waitingForResponse) return;
+
+            MyModLog.Log("Not waiting for response, generating world");
 
             MarkToLoadCellsInBounds(new BoundingSphereD(player.GetPosition(), range));
             UnloadCells();
@@ -125,6 +133,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// <param name="bounds">Spherical bounds</param>
         public void MarkToLoadCellsInBounds(BoundingSphereD bounds)
         {
+            MyModLog.Log("Marking cells to load...");
+
             BoundingBoxD box = BoundingBoxD.CreateFromSphere(bounds);
             Vector3I cellId = Vector3I.Floor(box.Min / CELL_SIZE);
 
@@ -139,6 +149,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             }
 
             m_toLoadCells.ApplyAdditions();
+
+            MyModLog.Log(m_toLoadCells.Count + " cells marked.");
         }
 
         /// <summary>
@@ -147,6 +159,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// </summary>
         public void UnloadCells()
         {
+            MyModLog.Log("Unloading cells");
+
             List<MyProceduralCell> unloadCells = new List<MyProceduralCell>();
             foreach (var cell in m_loadedCells.Values)
             {
@@ -181,6 +195,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// </summary>
         public void LoadCells()
         {
+            MyModLog.Log("Loading cells");
+
             m_toLoadCells.ApplyAdditions();
 
             foreach (var cellId in m_toLoadCells)
@@ -208,7 +224,9 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// </summary>
         private void SendLookupRequest()
         {
-            List<Vector3D> positions = new List<Vector3D>();
+            MyModLog.Log("Sending lookup request");
+
+            List<SerializableVector3D> positions = new List<SerializableVector3D>();
             List<MyObjectSeed> seeds = new List<MyObjectSeed>();
 
             foreach (var cell in m_pendingCells.Values)
@@ -220,6 +238,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             {
                 positions.Add(seed.Position);
             }
+
+            MyPositionLookupEventHandler.Static.RequestPositionLookup(positions);
         }
 
         /// <summary>
@@ -228,6 +248,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// <param name="sizes">List of sizes where there index indicates the object the size corresponds to.</param>
         private void ResponseHandler(List<float> sizes)
         {
+            MyModLog.Log("Received lookup response, loading cells...");
+
             List<MyObjectSeed> seeds = new List<MyObjectSeed>();
 
             foreach (var cell in m_pendingCells.Values)
@@ -244,6 +266,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             m_pendingCells.Clear();
 
             m_waitingForResponse = false;
+
+            MyModLog.Log("No longer waiting for response, continue generating...");
         }
 
         /// <summary>
@@ -266,6 +290,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             if (m_settings.UsePluginGenerator) return null;
 
             if (m_loadedCells.ContainsKey(cellId)) return null;
+
+            MyModLog.Log("Generating cell seeds...");
 
             MyProceduralCell cell = new MyProceduralCell(cellId, CELL_SIZE);
             int cellSeed = CalculateCellSeed(cellId);
@@ -307,6 +333,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// </summary>
         public void GenerateLoadedCellObjects()
         {
+            MyModLog.Log("Generating loaded cells objects");
+
             List<MyObjectSeed> seeds = new List<MyObjectSeed>();
 
             foreach (var cell in m_loadedCells.Values)
@@ -409,6 +437,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// <param name="seed">The MyObjectSeed of the object that should be removed.</param>
         public void CloseObject(MyObjectSeed seed)
         {
+            //MyModLog.Log("Closing object...");
+
             m_existingObjectSeeds.Remove(seed);
             MyVoxelBase voxelMap;
 

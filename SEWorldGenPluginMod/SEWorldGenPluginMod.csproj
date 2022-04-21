@@ -134,6 +134,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\MyModLog.cs" />
     <Compile Include="Source\SessionComponents\MyClientProceduralAsteroidGenerator.cs" />
     <Compile Include="Source\MyTuple.cs" />
     <Compile Include="Source\Networking\MyModNetUtil.cs" />

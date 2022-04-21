@@ -32,6 +32,7 @@ namespace SEWorldGenPlugin.Networking
 
         public override void LoadData()
         {
+            MyPluginLog.Log("Loading data for Mod communication. Enabling mod communication: " + Sync.IsServer);
             if (!Sync.IsServer) return;
 
             MyNetUtil.RegisterMessageHandler(HANDLER_ID, PositionCheckerBytes);
@@ -40,6 +41,7 @@ namespace SEWorldGenPlugin.Networking
 
         protected override void UnloadData()
         {
+            MyPluginLog.Log("Unloading data for Mod communication.");
             if (!Sync.IsServer) return;
 
             MyNetUtil.UnregisterMessageHandlers(HANDLER_ID);
@@ -55,6 +57,8 @@ namespace SEWorldGenPlugin.Networking
         {
             List<SerializableVector3D> positions = UnpacLocationkData(packedData);
 
+            MyPluginLog.Debug("Client " + clientID + "send lookup request with " + positions.Count + " positions to lookup");
+
             CheckPositions(clientID, positions);
         }
 
@@ -65,10 +69,14 @@ namespace SEWorldGenPlugin.Networking
         /// <param name="packedData">Empty packet</param>
         private void SettingsRequestHandler(ulong clientID, byte[] packedData)
         {
+            MyPluginLog.Debug("Client " + clientID + " send request to retreive asteroid generator settings.");
+
             MyGeneratorSettings settings = new MyGeneratorSettings();
             settings.AsteroidDensity = MySettingsSession.Static.Settings.GeneratorSettings.AsteroidDensity;
             settings.UsePluginGenerator = MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator != AsteroidGenerationMethod.VANILLA;
             settings.WorldSize = MySettingsSession.Static.Settings.GeneratorSettings.WorldSize;
+
+            MyPluginLog.Debug("Sending settings to " + clientID + ".");
 
             MyNetUtil.SendPacket(SETTINGS_REQUEST_ID, PackSettingsData(settings), clientID);
         }
@@ -100,6 +108,8 @@ namespace SEWorldGenPlugin.Networking
             }
 
             byte[] packedData = PackResultData(results);
+
+            MyPluginLog.Debug("Sending " + results.Count + " lookup results to client " + clientID);
 
             MyNetUtil.SendPacket(HANDLER_ID, packedData, clientID);
         }

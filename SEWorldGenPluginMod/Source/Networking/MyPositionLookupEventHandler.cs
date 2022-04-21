@@ -29,6 +29,8 @@ namespace SEWorldGenPluginMod.Source.Networking
 
         public override void LoadData()
         {
+            MyModLog.Log("Enabling plugin communications: " + !MyAPIGateway.Multiplayer.IsServer);
+
             if (MyAPIGateway.Multiplayer.IsServer) return;
 
             Static = this;
@@ -38,6 +40,8 @@ namespace SEWorldGenPluginMod.Source.Networking
 
         protected override void UnloadData()
         {
+            MyModLog.Log("Disabling plugin communications.");
+
             if (MyAPIGateway.Multiplayer.IsServer) return;
 
             Static = null;
@@ -51,6 +55,8 @@ namespace SEWorldGenPluginMod.Source.Networking
         /// <param name="lookupCallback">Callback to call when lookup responses arrive.</param>
         public void SetCallback(Action<List<float>> lookupCallback)
         {
+            MyModLog.Log("Set callback for lookup requests.");
+
             m_lookupCallback = lookupCallback;
         }
 
@@ -60,6 +66,8 @@ namespace SEWorldGenPluginMod.Source.Networking
         /// <param name="positions">List of positions</param>
         public void RequestPositionLookup(List<SerializableVector3D> positions)
         {
+            MyModLog.Log("Requesting position lookup for " + positions.Count + " positions");
+
             MyModNetUtil.SendPacketToServer(HANDLER_ID, PackData(positions));
         }
 
@@ -70,6 +78,8 @@ namespace SEWorldGenPluginMod.Source.Networking
         /// <param name="data">Data to unpack</param>
         private void LookupResponseHandler(ulong senderId, byte[] data)
         {
+            MyModLog.Log("Received lookup response.");
+
             if (m_lookupCallback != null)
             {
                 m_lookupCallback(UnpackData(data));

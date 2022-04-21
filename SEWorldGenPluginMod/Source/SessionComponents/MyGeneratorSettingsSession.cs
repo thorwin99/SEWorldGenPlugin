@@ -30,14 +30,18 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         {
             if (MyAPIGateway.Multiplayer.IsServer) return;
 
+            MyModLog.Log("Sending request to retreive settings from server");
+
             MyModNetUtil.SendPacketToServer(SETTINGS_REQUEST_ID, "GetSettings");
         }
 
         public override void LoadData()
         {
-            Static = this;
+            MyModLog.Log("Enabling generator settings component: " + !MyAPIGateway.Multiplayer.IsServer);
 
             if (MyAPIGateway.Multiplayer.IsServer) return;
+
+            Static = this;
 
             MyModNetUtil.RegisterMessageHandler(SETTINGS_REQUEST_ID, SettingsRequestHandler);
         }
@@ -51,6 +55,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         {
             var settings = UnpackSettings(data);
 
+            MyModLog.Log("Received settings from server." + (settings != null));
+
             if (settings == null) return;
 
             Settings = settings;
@@ -58,7 +64,9 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
 
         protected override void UnloadData()
         {
-            Static = null;
+            MyModLog.Log("Enabling generator settings component");
+
+           Static = null;
 
             if (MyAPIGateway.Multiplayer.IsServer) return;
 
