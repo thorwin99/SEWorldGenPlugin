@@ -285,8 +285,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     var ring = GetAsteroidObjectAt(position);
 
-                    if (ring == null) continue;
-
                     MyRandom r = new MyRandom();
                     r.PushSeed(position.GetHashCode());
 
@@ -295,6 +293,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     cellObjectSeed.Params.Seed = MyRandom.Instance.Next();
                     cellObjectSeed.Params.Index = index++;
                     cellObjectSeed.Params.GeneratorSeed = m_definition.UseGeneratorSeed ? MyRandom.Instance.Next() : 0;
+
+                    if (ring == null) continue;
 
                     cell.AddObject(cellObjectSeed);
                 }
