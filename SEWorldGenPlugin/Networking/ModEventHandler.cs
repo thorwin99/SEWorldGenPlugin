@@ -57,7 +57,7 @@ namespace SEWorldGenPlugin.Networking
         {
             List<SerializableVector3D> positions = UnpacLocationkData(packedData);
 
-            MyPluginLog.Debug("Client " + clientID + "send lookup request with " + positions.Count + " positions to lookup");
+            MyPluginLog.Debug("Client " + clientID + " send lookup request with " + positions.Count + " positions to lookup");
 
             CheckPositions(clientID, positions);
         }
@@ -88,7 +88,7 @@ namespace SEWorldGenPlugin.Networking
         /// <param name="positions">Positions to check</param>
         private void CheckPositions(ulong clientID, List<SerializableVector3D> positions)
         {
-            List<float> results = new List<float>(positions.Count);
+            float[] results = new float[positions.Count];
 
             for (int i = 0; i < positions.Count; i++)
             {
@@ -107,9 +107,9 @@ namespace SEWorldGenPlugin.Networking
                 }
             }
 
-            byte[] packedData = PackResultData(results);
+            byte[] packedData = PackResultData(new List<float>(results));
 
-            MyPluginLog.Debug("Sending " + results.Count + " lookup results to client " + clientID);
+            MyPluginLog.Debug("Sending " + results.Length + " lookup results to client " + clientID);
 
             MyNetUtil.SendPacket(HANDLER_ID, packedData, clientID);
         }

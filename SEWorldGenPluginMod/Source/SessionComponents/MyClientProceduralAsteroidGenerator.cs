@@ -3,6 +3,7 @@ using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
 using SEWorldGenPluginMod.Source.Networking;
 using SEWorldGenPluginMod.Source.ObjectBuilders;
+using System;
 using System.Collections.Generic;
 using VRage;
 using VRage.Collections;
@@ -187,6 +188,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
                 m_cellsTree.RemoveProxy(cell.ProxyId);
             }
 
+            MyModLog.Log("Unloaded " + unloadCells.Count + " cells");
+
             return;
         }
 
@@ -212,6 +215,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             }
 
             m_toLoadCells.Clear();
+
+            MyModLog.Log("Loaded " + m_pendingCells.Count + " cells");
 
             m_waitingForResponse = true;
 
@@ -260,6 +265,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
 
             for (int i = 0; i < sizes.Count; i++)
             {
+                MyModLog.Log("Response size: " + sizes[i]);
+
                 seeds[i].Size = sizes[i];
             }
 
@@ -287,7 +294,7 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
         /// <returns>Procedural cell with its seeds.</returns>
         protected MyProceduralCell GenerateCellSeeds(Vector3I cellId)
         {
-            if (m_settings.UsePluginGenerator) return null;
+            if (!m_settings.UsePluginGenerator) return null;
 
             if (m_loadedCells.ContainsKey(cellId)) return null;
 
@@ -348,6 +355,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
             {
                 if (seed.Generated) continue;
 
+                MyModLog.Log("Generating seed " + seed.Seed);
+
                 seed.Generated = true;
 
                 if (seed.Size < 0) continue;
@@ -371,11 +380,7 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
                                 m_existingObjectSeeds.Add(seed);
                             }
                             exists = true;
-
-                            if (tmp_voxelMaps.Contains(tmp))
-                            {
-                                tmp.Save = true;
-                            }
+                            MyModLog.Log("Exists");
                             break;
                         }
                     }
@@ -383,9 +388,10 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
                     if (exists) continue;
 
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
-
                     MyVoxelMap voxelMap = MyAPIGateway.Session.VoxelMaps.CreateProceduralVoxelMap(seed.Seed, seed.Size, MatrixD.CreateWorld(pos, Vector3D.Forward, Vector3D.Up)) as MyVoxelMap;
+                    MyModLog.Log("Voxelmap result: " + (voxelMap != null));
                     if (voxelMap == null) continue;
+                    voxelMap.Save = false;
 
                     MyVoxelBase.StorageChanged del = null;
                     del = delegate (MyVoxelBase voxel, Vector3I minVoxelChanged, Vector3I maxVoxelChanged, MyStorageDataTypeFlags changedData)
@@ -401,6 +407,8 @@ namespace SEWorldGenPluginMod.Source.SessionComponents
                     seed.UserData = voxelMap;
                     m_tmpAsteroids.Add(voxelMap);
                 }
+
+                MyModLog.Log("Generated");
             }
         }
 

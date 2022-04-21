@@ -178,8 +178,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     //var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
 
-                    MyPluginLog.Debug("SEED: " + seed.Params.Seed);
-
                     MyVoxelMap voxelMap = MyAPIGateway.Session.VoxelMaps.CreateProceduralVoxelMap(seed.Params.Seed, seed.Size, MatrixD.CreateWorld(pos, Vector3D.Forward, Vector3D.Up)) as MyVoxelMap;
                     voxelMap.Save = false;
 
@@ -288,13 +286,18 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     MyRandom r = new MyRandom();
                     r.PushSeed(position.GetHashCode());
 
+                    if (ring == null)
+                    {
+                        MyRandom.Instance.Next(); //just execute to move random forward...
+                        if (m_definition.UseGeneratorSeed) MyRandom.Instance.Next();
+                        continue;
+                    }
+
                     var cellObjectSeed = new MyObjectSeed(cell, position, r.Next(ring.AsteroidSize.Min, ring.AsteroidSize.Max));
                     cellObjectSeed.Params.Type = VRage.Game.MyObjectSeedType.Asteroid;
                     cellObjectSeed.Params.Seed = MyRandom.Instance.Next();
                     cellObjectSeed.Params.Index = index++;
                     cellObjectSeed.Params.GeneratorSeed = m_definition.UseGeneratorSeed ? MyRandom.Instance.Next() : 0;
-
-                    if (ring == null) continue;
 
                     cell.AddObject(cellObjectSeed);
                 }
