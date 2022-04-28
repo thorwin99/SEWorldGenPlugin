@@ -158,7 +158,7 @@ namespace SEWorldGenPlugin.Session
 
                 foreach (var playerId in m_globalGpss[id].Players)
                 {
-                    MySession.Static.Gpss.SendDelete(playerId, gps.CalculateHash());
+                    MySession.Static.Gpss.SendDeleteGpsRequest(playerId, gps.CalculateHash());
                 }
 
                 m_globalGpss.Remove(id);
@@ -301,7 +301,7 @@ namespace SEWorldGenPlugin.Session
 
                         gps.CalculateHash();
 
-                        MySession.Static.Gpss.SendAddGps(p.Identity.IdentityId, ref gps, playSoundOnCreation: false);
+                        MySession.Static.Gpss.SendAddGpsRequest(p.Identity.IdentityId, ref gps, playSoundOnCreation: false);
                         m_globalGpss[entry].Players.Add(p.Identity.IdentityId);
                     }
                 }
@@ -311,14 +311,14 @@ namespace SEWorldGenPlugin.Session
                     if (m_dynamicGpss.ContainsKey(entry.Key))
                     {
                         MyGps gps = entry.Value;
-                        MySession.Static.Gpss.SendModifyGps(entry.Key.PlayerId, gps);
+                        MySession.Static.Gpss.SendModifyGpsRequest(entry.Key.PlayerId, gps);
                         gps.UpdateHash();
                         m_dynamicGpss[entry.Key] = gps.Hash;
                     }
                     else
                     {
                         MyGps gps = entry.Value;
-                        MySession.Static.Gpss.SendAddGps(entry.Key.PlayerId, ref gps, playSoundOnCreation: false);
+                        MySession.Static.Gpss.SendAddGpsRequest(entry.Key.PlayerId, ref gps, playSoundOnCreation: false);
                         m_dynamicGpss.Add(entry.Key, entry.Value.Hash);
                     }
                     m_newDynamicGpss.Remove(entry.Key);
@@ -330,7 +330,7 @@ namespace SEWorldGenPlugin.Session
                     {
                         if (m_dynamicGpss.ContainsKey(entry))
                         {
-                            MySession.Static.Gpss.SendDelete(entry.PlayerId, m_dynamicGpss[entry]);
+                            MySession.Static.Gpss.SendDeleteGpsRequest(entry.PlayerId, m_dynamicGpss[entry]);
                             m_dynamicGpss.Remove(entry);
                         }
                     }
@@ -372,7 +372,7 @@ namespace SEWorldGenPlugin.Session
             {
                 foreach (var key in m_dynamicGpss.Keys)
                 {
-                    MySession.Static.Gpss.SendDelete(key.PlayerId, m_dynamicGpss[key]);
+                    MySession.Static.Gpss.SendDeleteGpsRequest(key.PlayerId, m_dynamicGpss[key]);
                 };
                 m_dynamicGpss.Clear();
             };
