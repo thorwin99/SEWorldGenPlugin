@@ -158,7 +158,7 @@ namespace SEWorldGenPlugin.Session
 
                 foreach (var playerId in m_globalGpss[id].Players)
                 {
-                    MySession.Static.Gpss.SendDelete(playerId, gps.CalculateHash());
+                    MySession.Static.Gpss.SendDeleteGpsRequest(playerId, gps.CalculateHash());
                 }
 
                 m_globalGpss.Remove(id);
@@ -311,7 +311,7 @@ namespace SEWorldGenPlugin.Session
                     if (m_dynamicGpss.ContainsKey(entry.Key))
                     {
                         MyGps gps = entry.Value;
-                        MySession.Static.Gpss.SendModifyGps(entry.Key.PlayerId, gps);
+                        MySession.Static.Gpss.SendModifyGpsRequest(entry.Key.PlayerId, gps);
                         gps.UpdateHash();
                         m_dynamicGpss[entry.Key] = gps.Hash;
                     }
@@ -330,7 +330,7 @@ namespace SEWorldGenPlugin.Session
                     {
                         if (m_dynamicGpss.ContainsKey(entry))
                         {
-                            MySession.Static.Gpss.SendDelete(entry.PlayerId, m_dynamicGpss[entry]);
+                            MySession.Static.Gpss.SendDeleteGpsRequest(entry.PlayerId, m_dynamicGpss[entry]);
                             m_dynamicGpss.Remove(entry);
                         }
                     }
@@ -372,7 +372,7 @@ namespace SEWorldGenPlugin.Session
             {
                 foreach (var key in m_dynamicGpss.Keys)
                 {
-                    MySession.Static.Gpss.SendDelete(key.PlayerId, m_dynamicGpss[key]);
+                    MySession.Static.Gpss.SendDeleteGpsRequest(key.PlayerId, m_dynamicGpss[key]);
                 };
                 m_dynamicGpss.Clear();
             };
