@@ -301,7 +301,7 @@ namespace SEWorldGenPlugin.Session
 
                         gps.CalculateHash();
 
-                        MySession.Static.Gpss.SendAddGps(p.Identity.IdentityId, ref gps, playSoundOnCreation: false);
+                        MySession.Static.Gpss.SendAddGpsRequest(p.Identity.IdentityId, ref gps, playSoundOnCreation: false);
                         m_globalGpss[entry].Players.Add(p.Identity.IdentityId);
                     }
                 }
@@ -318,7 +318,7 @@ namespace SEWorldGenPlugin.Session
                     else
                     {
                         MyGps gps = entry.Value;
-                        MySession.Static.Gpss.SendAddGps(entry.Key.PlayerId, ref gps, playSoundOnCreation: false);
+                        MySession.Static.Gpss.SendAddGpsRequest(entry.Key.PlayerId, ref gps, playSoundOnCreation: false);
                         m_dynamicGpss.Add(entry.Key, entry.Value.Hash);
                     }
                     m_newDynamicGpss.Remove(entry.Key);
