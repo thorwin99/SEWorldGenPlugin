@@ -5,6 +5,7 @@ using Sandbox.Game.World;
 using SEWorldGenPlugin.Generator.AsteroidObjects;
 using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using SEWorldGenPlugin.Generator.AsteroidObjectShapes;
+using SEWorldGenPlugin.GUI;
 using SEWorldGenPlugin.Networking.Attributes;
 using SEWorldGenPlugin.ObjectBuilders;
 using SEWorldGenPlugin.Session;
@@ -286,6 +287,19 @@ namespace SEWorldGenPlugin.Generator
                 long asteroidObjectCount = MyRandom.Instance.Next(asteroidObjectAmount.Min, asteroidObjectAmount.Max + 1);
                 long systemSize = planetCount + asteroidObjectCount;
                 int currentPlanetIndex = 0;
+
+                if(m_planets.Count <= 0)
+                {
+                    //Inform about 0 planets loaded
+                    MyPluginGuiHelper.DisplayMessage("You have excluded all planets from generation. No planets will be generated.", "No planet generation.");
+                    MyPluginLog.Log("You have excluded all planets from generation. No planets will be generated.");
+                }
+                else if(planetCount == 0)
+                {
+                    //Inform about 0 planets
+                    MyPluginGuiHelper.DisplayMessage("From your min / max planet count, the generator randomly choose 0. No planets will be generated.", "No planet generation.");
+                    MyPluginLog.Log("From your min / max planet count, the generator randomly choose 0. No planets will be generated.");
+                }
 
                 Dictionary<string, int> currentAsteroidIndices = new Dictionary<string, int>();
 
