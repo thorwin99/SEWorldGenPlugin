@@ -152,6 +152,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     MyGamePruningStructure.GetAllVoxelMapsInBox(ref bounds, tmp_voxelMaps);
 
                     string storageName = string.Format("Asteroid_{0}_{1}_{2}_{3}_{4}", seed.CellId.X, seed.CellId.Y, seed.CellId.Z, seed.Params.Index, seed.Params.Seed);
+                    long id = GetAsteroidEntityId(storageName);
+
+                    if (MyEntities.EntityExists(id)) continue;
 
                     bool exists = false;
                     foreach(var tmp in tmp_voxelMaps)
@@ -179,7 +182,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     MyVoxelMap voxelMap;
 
-                    voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, GetAsteroidEntityId(storageName));
+                    voxelMap = MyWorldGenerator.AddVoxelMap(storageName, storage, pos, id);
                     if (voxelMap == null) continue;
 
                     MyVoxelBase.StorageChanged del = null;
