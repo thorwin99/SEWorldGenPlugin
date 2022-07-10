@@ -299,12 +299,23 @@ namespace SEWorldGenPlugin.Session
                 {
                     foreach (var gps in player.DynamicGpss)
                     {
-                        var collection = MySession.Static.Gpss[player.PlayerId];
-                        var mgps = collection[gps.Hash];
+                        try
+                        {
+                            var collection = MySession.Static.Gpss[player.PlayerId];
 
-                        if (mgps == null) continue;
+                            if (collection == null) continue;
 
-                        m_dynamicGpss.Add(new MyDynamicGpsId(gps.ID, player.PlayerId), mgps);
+                            var mgps = collection[gps.Hash];
+
+                            if (mgps == null) continue;
+
+                            m_dynamicGpss.Add(new MyDynamicGpsId(gps.ID, player.PlayerId), mgps);
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            MyPluginLog.Log("Could not load dynamic GPS " + gps.ID + " for player " + player.PlayerId, LogLevel.ERROR);
+                            continue;
+                        }
                     }
                 }
                 loadedDynamicGpss = true;
