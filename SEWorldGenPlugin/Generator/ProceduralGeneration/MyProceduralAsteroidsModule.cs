@@ -234,26 +234,21 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 Vector3D closestPos = shape.GetClosestPoint(entityPosition);
                 double distance = Vector3D.Distance(entityPosition, closestPos);
 
-                if (distance > settings.AsteroidDiscoveryDistance * 1000.0)
+                if (distance <= settings.AsteroidDiscoveryDistance * 1000.0 && distance > 5)
                 {
-                    MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
-                }
-                else if(distance > 5)
-                {
-                    if(MyGPSManager.Static.DynamicGpsExists(asteroid.Id, player.GetPlayerIdentityId()))
+                    if (MyGPSManager.Static.DynamicGpsExists(asteroid.Id, player.GetPlayerIdentityId()))
                     {
                         MyGPSManager.Static.ModifyDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId(), asteroid.Id);
-                        continue;
                     }
                     else
                     {
                         MyGPSManager.Static.AddDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId(), asteroid.Id);
                     }
+                    continue;
+
                 }
-                else
-                {
-                    MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
-                }
+
+                MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
             }
         }
 

@@ -14,6 +14,9 @@ namespace SEWorldGenPlugin.ObjectBuilders
     {
         [ProtoMember(1)]
         public HashSet<PersistentGpsData> PersistentGpss = new HashSet<PersistentGpsData>();
+
+        [ProtoMember(2)]
+        public HashSet<DynamicGpsData> DynamicGpss = new HashSet<DynamicGpsData>();
     }
 
     [ProtoContract]
@@ -54,5 +57,48 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// </summary>
         [ProtoMember(6)]
         public HashSet<long> PlayerIds = new HashSet<long>();
+    }
+
+    [ProtoContract]
+    public class DynamicGpsData
+    {
+        /// <summary>
+        /// Player id which currently holds dynamic gpss
+        /// </summary>
+        [ProtoMember(1)]
+        public long PlayerId;
+
+        /// <summary>
+        /// List of identifiers of dynamic gpss
+        /// </summary>
+        [ProtoMember(2)]
+        public HashSet<DynamicGpsId> DynamicGpss = new HashSet<DynamicGpsId>();
+    }
+
+    [ProtoContract]
+    public class DynamicGpsId
+    {
+        /// <summary>
+        /// Id of gps object
+        /// </summary>
+        [ProtoMember(1)]
+        public Guid ID = Guid.Empty;
+
+        /// <summary>
+        /// Hash of gps
+        /// </summary>
+        [ProtoMember(2)]
+        public int Hash;
+
+        public DynamicGpsId()
+        {
+
+        }
+
+        public DynamicGpsId(Guid iD, int hash)
+        {
+            ID = iD;
+            Hash = hash;
+        }
     }
 }

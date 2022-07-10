@@ -6,6 +6,7 @@ using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using VRage.Game;
 using VRage.Game.Components;
 using VRageMath;
 
@@ -103,6 +104,16 @@ namespace SEWorldGenPlugin.Session
         private List<MyDynamicGpsId> m_toDeleteDynamicGpss;
 
         /// <summary>
+        /// Reference to read save data of this component after loading it
+        /// </summary>
+        private MyObjectBuilder_WorldGpsData m_loadedData;
+
+        /// <summary>
+        /// Whether dynamic gps data was loaded from file yet or not. Needs to be done in the first simulation loop
+        /// </summary>
+        private bool loadedDynamicGpss = false;
+
+        /// <summary>
         /// Adds a new gps persistent gps to all players
         /// </summary>
         /// <param name="name">Name of the gps</param>
@@ -181,6 +192,8 @@ namespace SEWorldGenPlugin.Session
             if (m_dynamicGpss.ContainsKey(key))
             {
                 RemoveDynamicGps(playerId, id);
+
+                return false;
             }
             MyGps gps = new MyGps
             {
@@ -280,6 +293,23 @@ namespace SEWorldGenPlugin.Session
         /// </summary>
         public override void UpdateBeforeSimulation()
         {
+            if (!loadedDynamicGpss)
+            {
+                foreach (var player in m_loadedData.DynamicGpss)
+                {
+                    foreach (var gps in player.DynamicGpss)
+                    {
+                        var collection = MySession.Static.Gpss[player.PlayerId];
+                        var mgps = collection[gps.Hash];
+
+                        if (mgps == null) continue;
+
+                        m_dynamicGpss.Add(new MyDynamicGpsId(gps.ID, player.PlayerId), mgps);
+                    }
+                }
+                loadedDynamicGpss = true;
+            }
+
             if (MySettingsSession.Static.IsEnabled() && Sync.IsServer)
             {
                 foreach (var entry in m_globalGpss.Keys)
@@ -345,14 +375,13 @@ namespace SEWorldGenPlugin.Session
             MyPluginLog.Log("Loading GPS manager data");
             Static = this;
 
-            MyObjectBuilder_WorldGpsData ob;
             if (MyFileUtils.FileExistsInWorldStorage(FILENAME))
             {
-                ob = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldGpsData>(FILENAME);
+                m_loadedData = MyFileUtils.ReadXmlFileFromWorld<MyObjectBuilder_WorldGpsData>(FILENAME);
             }
             else
             {
-                ob = new MyObjectBuilder_WorldGpsData();
+                m_loadedData = new MyObjectBuilder_WorldGpsData();
             }
 
             m_globalGpss = new Dictionary<Guid, MyGpsData>();
@@ -360,21 +389,11 @@ namespace SEWorldGenPlugin.Session
             m_newDynamicGpss = new ConcurrentDictionary<MyDynamicGpsId, MyGps>();
             m_toDeleteDynamicGpss = new List<MyDynamicGpsId>();
 
-            foreach(var item in ob.PersistentGpss)
+            foreach (var item in m_loadedData.PersistentGpss)
             {
                 var data = new MyGpsData(item.Name, item.Color, item.Position, item.Id, item.PlayerIds, item.Hidden);
                 m_globalGpss[item.Id] = data;
             }
-
-            MySession.Static.OnSavingCheckpoint += delegate
-            {
-                foreach (var key in m_dynamicGpss.Keys)
-                {
-                    MySession.Static.Gpss[key.PlayerId].Remove(m_dynamicGpss[key].Hash);
-                    MySession.Static.Gpss.SendDeleteGpsRequest(key.PlayerId, m_dynamicGpss[key].Hash);
-                };
-                m_dynamicGpss.Clear();
-            };
 
             MyPluginLog.Log("Loading GPS manager data completed");
         }
@@ -388,7 +407,7 @@ namespace SEWorldGenPlugin.Session
 
             MyPluginLog.Log("Saving GPS manager data");
 
-            MyObjectBuilder_WorldGpsData ob = new MyObjectBuilder_WorldGpsData();
+            m_loadedData = new MyObjectBuilder_WorldGpsData();
             foreach(var entry in m_globalGpss)
             {
                 PersistentGpsData item = new PersistentGpsData();
@@ -399,10 +418,28 @@ namespace SEWorldGenPlugin.Session
                 item.Id = entry.Key;
                 item.Hidden = entry.Value.Hidden;
 
-                ob.PersistentGpss.Add(item);
+                m_loadedData.PersistentGpss.Add(item);
             }
 
-            MyFileUtils.WriteXmlFileToWorld(ob, FILENAME);
+            Dictionary<long, DynamicGpsData> buffer = new Dictionary<long, DynamicGpsData>();
+
+            foreach(var entry in m_dynamicGpss)
+            {
+                if (!buffer.ContainsKey(entry.Key.PlayerId))
+                {
+                    buffer.Add(entry.Key.PlayerId, new DynamicGpsData());
+                    buffer[entry.Key.PlayerId].PlayerId = entry.Key.PlayerId;
+                }
+
+                buffer[entry.Key.PlayerId].DynamicGpss.Add(new DynamicGpsId(entry.Key.GpsId, entry.Value.Hash));
+            }
+
+            foreach(var data in buffer.Values)
+            {
+                m_loadedData.DynamicGpss.Add(data);
+            }
+
+            MyFileUtils.WriteXmlFileToWorld(m_loadedData, FILENAME);
 
             MyPluginLog.Log("Saving GPS manager data completed");
         }
