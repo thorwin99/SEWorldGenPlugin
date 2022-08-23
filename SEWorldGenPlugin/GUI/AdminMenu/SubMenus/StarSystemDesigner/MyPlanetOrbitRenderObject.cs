@@ -17,6 +17,9 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private RenderSphere m_planetRender;
 
+        /// <summary>
+        /// Max diameter of a planet. Only used for visual clamping of visualization sphere, so larger planets dont appear as gigantic spheres.
+        /// </summary>
         private const double MAX_DIAM = 240000;
 
         public MyPlanetOrbitRenderObject(MySystemPlanet planet) : base(planet)

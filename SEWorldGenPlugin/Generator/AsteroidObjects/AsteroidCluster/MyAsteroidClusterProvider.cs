@@ -87,6 +87,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
     [Serializable]
     public class MyAsteroidClusterData : IMyAsteroidData
     {
+        /// <summary>
+        /// The radius of the asteroid cluster
+        /// </summary>
         [ProtoMember(1)]
         public double Size;
     }

@@ -17,6 +17,11 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
         private MyAsteroidClusterData m_data;
 
         /// <summary>
+        /// Max radius of an asteroid cluster. Only used for visual clamping of visualization sphere, so larger asteroid clusters dont appear as gigantic spheres.
+        /// </summary>
+        private const double MAX_RAD = 240000;
+
+        /// <summary>
         /// Render object for the cluster
         /// </summary>
         private RenderSphere m_render;
@@ -53,17 +58,19 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
             var specPos = MySpectatorCameraController.Static.Position;
             double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
 
-            double multiplier = distance / 10000000f;
+            double multiplier = distance / 20000000f;
 
             double size = m_data.Size * multiplier;
 
-            if (multiplier > 1000)
+            double radius = m_data.Size > MAX_RAD ? MAX_RAD : m_data.Size;
+
+            if (size > radius * 1000)
             {
-                size = m_data.Size * 1000;
+                size = radius * 1000;
             }
-            else if (size < m_data.Size / 2f)
+            else if (size < m_data.Size)
             {
-                size = (float)(m_data.Size / 2f);
+                size = (float)(m_data.Size);
             }
 
             m_render.Radius = (float)size;
