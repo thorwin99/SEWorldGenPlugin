@@ -53,13 +53,13 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
             var specPos = MySpectatorCameraController.Static.Position;
             double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
 
-            double multiplier = distance / 5000000f;
+            double multiplier = distance / 10000000f;
 
             double size = m_data.Size * multiplier;
 
-            if (multiplier > 30)
+            if (multiplier > 300)
             {
-                size = m_data.Size * 30;
+                size = m_data.Size * 300;
             }
             else if (size < m_data.Size / 2f)
             {

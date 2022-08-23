@@ -17,6 +17,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
         /// </summary>
         private RenderSphere m_planetRender;
 
+        private const double MAX_DIAM = 240000;
+
         public MyPlanetOrbitRenderObject(MySystemPlanet planet) : base(planet)
         {
             m_planetRender = new RenderSphere(planet.CenterPosition, (float)planet.Diameter / 2, Color.DarkGreen.ToVector4());
@@ -41,15 +43,18 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             double distance = Vector3D.Distance(RenderObject.CenterPosition, specPos);
             var planet = RenderObject as MySystemPlanet;
 
-            double multiplier = distance / 5000000f;
+            double multiplier = distance / 10000000f;
 
-            double size = planet.Diameter * multiplier;
+            double diameter = planet.Diameter > MAX_DIAM ? MAX_DIAM : planet.Diameter;
 
-            if (multiplier > 100)
+            double size = diameter * multiplier;
+
+            if (size > diameter * 10000)
             {
-                size = planet.Diameter * 100;
+                size = diameter * 10000;
             }
-            else if(size < planet.Diameter / 2f)
+            
+            if(size < planet.Diameter / 2f)
             {
                 size = (float)(planet.Diameter / 2f);
             }
