@@ -116,6 +116,8 @@ namespace SEWorldGenPlugin
             asteroidPatch.ApplyPatch(harmony);
             var encounterPatch = new PatchAsteroidGeneration();
             encounterPatch.ApplyPatch(harmony);
+            var copyDirectoryPatch = new CopyDirectoryPatch();
+            copyDirectoryPatch.ApplyPatch(harmony);
         }
 
         /// <summary>

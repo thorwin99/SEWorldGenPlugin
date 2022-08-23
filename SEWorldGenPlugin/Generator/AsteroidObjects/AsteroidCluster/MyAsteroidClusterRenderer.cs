@@ -57,9 +57,9 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidCluster
 
             double size = m_data.Size * multiplier;
 
-            if (multiplier > 300)
+            if (multiplier > 1000)
             {
-                size = m_data.Size * 300;
+                size = m_data.Size * 1000;
             }
             else if (size < m_data.Size / 2f)
             {
