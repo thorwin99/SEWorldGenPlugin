@@ -64,6 +64,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                 if(generatedPlanet != null)
                 {
                     generatedPlanet.DisplayNameText = planet.DisplayName;
+                    generatedPlanet.Name = planet.DisplayName;
                     generatedPlanet.AsteroidName = planet.DisplayName;
 
                     planet.Generated = true;
