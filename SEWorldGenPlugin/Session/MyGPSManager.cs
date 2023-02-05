@@ -231,7 +231,6 @@ namespace SEWorldGenPlugin.Session
                 if (!found) // Delete the gps info stored
                 {
                     RemoveDynamicGps(playerId, id);
-                    MyPluginLog.Log("DELETED GPS");
                     return false;
                 }
 
