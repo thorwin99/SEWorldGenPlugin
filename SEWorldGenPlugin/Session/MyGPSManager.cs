@@ -191,8 +191,6 @@ namespace SEWorldGenPlugin.Session
 
             if (m_dynamicGpss.ContainsKey(key))
             {
-                RemoveDynamicGps(playerId, id);
-
                 return false;
             }
             MyGps gps = new MyGps
@@ -228,14 +226,19 @@ namespace SEWorldGenPlugin.Session
             if (m_dynamicGpss.ContainsKey(key))
             {
                 MyGps gps;
-                MySession.Static.Gpss[playerId].TryGetValue(m_dynamicGpss[key].Hash, out gps);
+                bool found = MySession.Static.Gpss[playerId].TryGetValue(m_dynamicGpss[key].Hash, out gps);
 
-                if (gps == null) return false;
+                if (!found) // Delete the gps info stored
+                {
+                    RemoveDynamicGps(playerId, id);
+                    MyPluginLog.Log("DELETED GPS");
+                    return false;
+                }
 
                 gps.Coords = pos;
                 gps.Name = name;
                 gps.GPSColor = color;
-                m_newDynamicGpss[key] = gps;
+                m_newDynamicGpss.TryAdd(key, gps);
 
                 return true;
 
@@ -360,8 +363,8 @@ namespace SEWorldGenPlugin.Session
                         MySession.Static.Gpss.SendAddGpsRequest(entry.Key.PlayerId, ref gps, playSoundOnCreation: false);
                         m_dynamicGpss.Add(entry.Key, entry.Value);
                     }
-                    m_newDynamicGpss.Remove(entry.Key);
                 }
+                m_newDynamicGpss.Clear();
 
                 lock (m_toDeleteDynamicGpss) lock(m_dynamicGpss)
                 {
@@ -371,6 +374,10 @@ namespace SEWorldGenPlugin.Session
                         {
                             MySession.Static.Gpss.SendDeleteGpsRequest(entry.PlayerId, m_dynamicGpss[entry].Hash);
                             m_dynamicGpss.Remove(entry);
+                        }
+                        else
+                        {
+                                MySession.Static.Gpss.SendDeleteGpsRequest(entry.PlayerId, m_dynamicGpss[entry].Hash);
                         }
                     }
                     m_toDeleteDynamicGpss.Clear();

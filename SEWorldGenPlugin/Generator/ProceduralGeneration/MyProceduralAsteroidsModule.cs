@@ -244,11 +244,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     {
                         MyGPSManager.Static.AddDynamicGps(asteroid.DisplayName, Color.Yellow, closestPos, player.GetPlayerIdentityId(), asteroid.Id);
                     }
-                    continue;
-
                 }
-
-                MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
+                else
+                {
+                    MyGPSManager.Static.RemoveDynamicGps(player.GetPlayerIdentityId(), asteroid.Id);
+                }
             }
         }
 
