@@ -301,21 +301,28 @@ namespace SEWorldGenPlugin.Session
                 {
                     foreach (var gps in player.DynamicGpss)
                     {
-                        try
+                        if (!MySession.Static.Gpss.ExistsForPlayer(player.PlayerId))
                         {
-                            var collection = MySession.Static.Gpss[player.PlayerId];
+                            MyPluginLog.Log("Could not load dynamic GPS " + gps.ID + " for player " + player.PlayerId + ". Player has no GPS data.", LogLevel.WARNING);
+                            continue;
+                        }
+                        var collection = MySession.Static.Gpss[player.PlayerId];
 
-                            if (collection == null) continue;
+                        if (collection == null) continue;
 
+                        if(collection.ContainsKey(gps.Hash))
+                        {
                             var mgps = collection[gps.Hash];
 
                             if (mgps == null) continue;
 
                             m_dynamicGpss.Add(new MyDynamicGpsId(gps.ID, player.PlayerId), mgps);
+
+                            MyPluginLog.Log("Successfully loaded dynamic gps " + gps.ID + " for player " + player.PlayerId);
                         }
-                        catch (KeyNotFoundException)
+                        else
                         {
-                            MyPluginLog.Log("Could not load dynamic GPS " + gps.ID + " for player " + player.PlayerId, LogLevel.ERROR);
+                            MyPluginLog.Log("2Could not load dynamic GPS " + gps.ID + " for player " + player.PlayerId + ". GPS does not exist.", LogLevel.WARNING);
                             continue;
                         }
                     }
