@@ -166,7 +166,7 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus.StarSystemDesigner
             }
 
             double elevation = MathHelperD.ToDegrees(Math.Asin(parentRel.Z / radius));
-            double orbitPos = MathHelperD.ToDegrees(Math.Acos(parentRel.X / Math.Cos(MathHelperD.ToRadians(elevation)) / radius));
+            double orbitPos = elevation == 90 ? 0 : MathHelperD.ToDegrees(Math.Acos(parentRel.X / Math.Cos(MathHelperD.ToRadians(elevation)) / radius));
             if (parentRel.Y < 0)
             {
                 orbitPos = 360 - orbitPos;
