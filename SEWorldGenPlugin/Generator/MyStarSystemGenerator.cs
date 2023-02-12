@@ -12,6 +12,7 @@ using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
@@ -128,7 +129,7 @@ namespace SEWorldGenPlugin.Generator
 
             if (StarSystem.Count() <= 0 && MySettingsSession.Static.Settings.GeneratorSettings.SystemGenerator != SystemGenerationMethod.NONE)
             {
-                StarSystem = GenerateNewStarSystem();
+                GenerateNewStarSystem();
             }
 
             MyPluginLog.Log("Initializing Star system generator completed");
@@ -155,19 +156,16 @@ namespace SEWorldGenPlugin.Generator
 
             if(StarSystem != null && StarSystem.CenterObject != null)
             {
-                foreach (var obj in StarSystem.GetAll())
+                foreach (var obj in StarSystem.GetAllByType(MySystemObjectType.ASTEROIDS))
                 {
-                    if (obj.Type == MySystemObjectType.ASTEROIDS)
-                    {
-                        var asteroid = obj as MySystemAsteroids;
+                    var asteroid = obj as MySystemAsteroids;
 
-                        if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out var provider)) continue;
+                    if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroid.AsteroidTypeName, out var provider)) continue;
                         
-                        if (!provider.TryLoadObject(asteroid))
-                        {
-                            MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
-                            StarSystem.Remove(asteroid.Id);
-                        }
+                    if (!provider.TryLoadObject(asteroid))
+                    {
+                        MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
+                        StarSystem.Remove(asteroid.Id);
                     }
                 }
             }
@@ -266,12 +264,12 @@ namespace SEWorldGenPlugin.Generator
         /// world settings.
         /// </summary>
         /// <returns></returns>
-        private MyObjectBuilder_SystemData GenerateNewStarSystem()
+        private void GenerateNewStarSystem()
         {
             MyPluginLog.Log("Generating a new Solar system ...");
 
             int seed = MySession.Static.Settings.ProceduralSeed + Guid.NewGuid().GetHashCode();
-            MyObjectBuilder_SystemData system = new MyObjectBuilder_SystemData();
+            StarSystem = new MyObjectBuilder_SystemData();
 
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
@@ -316,18 +314,21 @@ namespace SEWorldGenPlugin.Generator
                     sun.SubtypeId = sunDef.Id.SubtypeId.String;
                     sun.DisplayName = sunDef.Id.SubtypeId.String;
                     sun.Diameter = CalculatePlanetDiameter(sunDef) * 2;
-                    sun.ChildObjects = new HashSet<MySystemObject>();
                     sun.Generated = false;
                     sun.Type = MySystemObjectType.PLANET;
 
-                    system.CenterObject = sun;
+                    StarSystem.Add(sun);
                     currentOrbitDistance += (long)sun.Diameter * 2 + (long)sunDef.AtmosphereHeight;
                 }
                 else
                 {
-                    system.CenterObject = new MySystemObject();
-                    system.CenterObject.Type = MySystemObjectType.EMPTY;
-                    system.CenterObject.DisplayName = "System center";
+                    MySystemObject center;
+
+                    center = new MySystemObject();
+                    center.Type = MySystemObjectType.EMPTY;
+                    center.DisplayName = "System center";
+
+                    StarSystem.Add(center);
                 }
 
                 while(planetCount > 0 || asteroidObjectCount > 0)
@@ -335,13 +336,11 @@ namespace SEWorldGenPlugin.Generator
                     currentOrbitDistance += MyRandom.Instance.Next(orbitDistances.Min, orbitDistances.Max);
 
                     //Maybe rework to override orbit distance, so all objects fit
-                    if (worldSize >= 0 && currentOrbitDistance >= worldSize) return system;
-
-                    MySystemObject obj = null;
+                    if (worldSize >= 0 && currentOrbitDistance >= worldSize) return;
 
                     if (asteroidObjectCount <= 0 || (MyRandom.Instance.NextDouble() <= planetProb && planetCount > 0)) // Generate planet
                     {
-                        obj = GeneratePlanet(currentPlanetIndex++, Math.Sin((system.Count() - 1) * Math.PI / systemSize), currentOrbitDistance);
+                        GeneratePlanet(currentPlanetIndex++, Math.Sin((StarSystem.Count() - 1) * Math.PI / systemSize), currentOrbitDistance, StarSystem.CenterObject.Id);
                         planetCount--;
                     }
                     else if (asteroidObjectCount > 0) // Generate asteroid object
@@ -365,34 +364,31 @@ namespace SEWorldGenPlugin.Generator
                             currentAsteroidIndices.Add(provider.GetTypeName(), 0);
                         }
 
-                        obj = provider.GenerateInstance(currentAsteroidIndices[provider.GetTypeName()]++, null, currentOrbitDistance);
+                        MySystemAsteroids roid = provider.GenerateInstance(currentAsteroidIndices[provider.GetTypeName()]++, StarSystem.CenterObject, currentOrbitDistance);
+                        roid.ParentId = StarSystem.CenterObject.Id;
 
-                        if (obj == null) continue;
+                        if (roid == null) continue;
 
-                        (obj as MySystemAsteroids).AsteroidTypeName = provider.GetTypeName();
+                        roid.AsteroidTypeName = provider.GetTypeName();
+
+                        StarSystem.Add(roid);
 
                         asteroidObjectCount--;
                     }
-                    if (obj == null) continue;
-
-                    obj.ParentId = system.CenterObject.Id;
-                    system.CenterObject.ChildObjects.Add(obj);
                 }
             }
 
             MyPluginLog.Log("Solar system generated ...");
-
-            return system;
         }
 
         /// <summary>
-        /// Generates a planet for the star system.
+        /// Generates a planet for the star system and adds it to the system.
         /// </summary>
         /// <param name="planetIndex">Index of the planet in the system</param>
         /// <param name="maxDiameter">The largest diameter the planet should have</param>
         /// <param name="orbitDistance">The distance the planet is away from Vector3D.Zero</param>
         /// <returns>A new MySystemPlanet</returns>
-        private MySystemPlanet GeneratePlanet(int planetIndex, double maxDiameter, long orbitDistance)
+        private MySystemPlanet GeneratePlanet(int planetIndex, double maxDiameter, long orbitDistance, Guid parent)
         {
             MyPluginLog.Log("Generating new planet");
 
@@ -421,11 +417,15 @@ namespace SEWorldGenPlugin.Generator
                 DisplayName = name,
                 Generated = false,
                 SubtypeId = def.Id.SubtypeId.String,
+                ParentId = parent
             };
+
+            StarSystem.Add(planet);
 
             if(MyRandom.Instance.NextFloat() < settings.BaseRingProbability * def.SurfaceGravity)
             {
-                planet.ChildObjects.Add(GenrateRing(planet));
+                MySystemAsteroids ring = GenrateRing(planet);
+                StarSystem.Add(ring);
             }
 
             if (MyRandom.Instance.NextFloat() < settings.BaseMoonProbability * def.SurfaceGravity)
@@ -433,7 +433,7 @@ namespace SEWorldGenPlugin.Generator
                 foreach(var moon in GeneratePlanetMoons(planet))
                 {
                     if (moon == null) continue;
-                    planet.ChildObjects.Add(moon);
+                    StarSystem.Add(moon);
                 }
             }
             MyPluginLog.Log("Planet generated");
@@ -511,6 +511,7 @@ namespace SEWorldGenPlugin.Generator
 
             var provider = MyAsteroidObjectsManager.Static.AsteroidObjectProviders[MyAsteroidRingProvider.TYPE_NAME];
             var ring = provider.GenerateInstance(0, parentPlanet, 0);
+            ring.ParentId = parentPlanet.Id;
 
             return ring;
         }
@@ -806,6 +807,8 @@ namespace SEWorldGenPlugin.Generator
                     data = new MyObjectBuilder_SystemData();
                 }
 
+                data.RebuildCache();
+
                 return data;
             }
             return new MyObjectBuilder_SystemData();
@@ -825,7 +828,7 @@ namespace SEWorldGenPlugin.Generator
                 var e = MyEntities.GetEntityById(p.EntityId) as MyPlanet;
                 bool exists = false;
 
-                foreach(var obj in StarSystem.GetAll())
+                foreach(var obj in StarSystem.GetAllByType(MySystemObjectType.PLANET))
                 {
                     if(obj is MySystemPlanet)
                     {

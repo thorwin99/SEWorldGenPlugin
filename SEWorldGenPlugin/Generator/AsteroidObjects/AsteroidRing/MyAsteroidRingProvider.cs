@@ -80,6 +80,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
                 asteroidObject.CenterPosition = Vector3D.Zero;
                 asteroidObject.AsteroidSize = new MySerializableMinMax(256, 1024);
                 asteroidObject.AsteroidTypeName = GetTypeName();
+                asteroidObject.ParentId = parent != null ? parent.Id : Guid.Empty;
 
                 MyAsteroidRingData belt = new MyAsteroidRingData();
                 belt.AngleDegrees = Vector3D.Zero;

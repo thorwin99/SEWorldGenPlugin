@@ -209,13 +209,11 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             var settings = MySettingsSession.Static.Settings.GeneratorSettings.GPSSettings;
             if (settings.AsteroidGPSMode != MyGPSGenerationMode.DISCOVERY) return;
 
-            var objects = MyStarSystemGenerator.Static.StarSystem.GetAll();
+            var objects = MyStarSystemGenerator.Static.StarSystem.GetAllByType(MySystemObjectType.ASTEROIDS);
             MyCharacter player = entity.Entity as MyCharacter;
 
             foreach(var obj in objects)
             {
-                if (obj.Type != MySystemObjectType.ASTEROIDS) continue;
-
                 MySystemAsteroids asteroid = obj as MySystemAsteroids;
                 Vector3D entityPosition = player.PositionComp.GetPosition();
 
@@ -347,11 +345,10 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <returns>The first ring found, that contains the given position.</returns>
         private MySystemAsteroids GetAsteroidObjectAt(Vector3D position)
         {
-            var systemObjects = MyStarSystemGenerator.Static.StarSystem.GetAll();
+            var systemObjects = MyStarSystemGenerator.Static.StarSystem.GetAllByType(MySystemObjectType.ASTEROIDS);
 
             foreach(var obj in systemObjects)
             {
-                if (obj.Type != MySystemObjectType.ASTEROIDS) continue;
                 var asteroids = obj as MySystemAsteroids;
 
                 if (!MyAsteroidObjectsManager.Static.AsteroidObjectProviders.TryGetValue(asteroids.AsteroidTypeName, out var prov)) continue;

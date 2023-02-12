@@ -2,6 +2,8 @@
 using SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Xml.Serialization;
 using VRage;
 using VRage.Serialization;
@@ -17,10 +19,49 @@ namespace SEWorldGenPlugin.ObjectBuilders
     public class MyObjectBuilder_SystemData
     {
         /// <summary>
-        /// Objects that are located in this star system.
+        /// A fast access cache to quickly retrieve system objects and avoid traversal of system tree each time.
+        /// </summary>
+        private Dictionary<Guid, MySystemObject> m_objectCache = new Dictionary<Guid, MySystemObject>();
+
+        /// <summary>
+        /// A fast access cache to quickly retrieve system objects fo certain type and avoid traversal of system tree each time.
+        /// </summary>
+        private Dictionary<MySystemObjectType, HashSet<MySystemObject>> m_objectTypeCache = new Dictionary<MySystemObjectType, HashSet<MySystemObject>>();
+
+        /// <summary>
+        /// Objects that are located in this star system. Do not set directly unless you are calling <see cref="RebuildCache"/> afterwards.
         /// </summary>
         [ProtoMember(1)]
         public MySystemObject CenterObject;
+
+        /// <summary>
+        /// Constructs new System Data object builder and initializes cache.
+        /// </summary>
+        public MyObjectBuilder_SystemData()
+        {
+            RebuildCache();
+        }
+
+        /// <summary>
+        /// Rebuilds the system cache for fast access. Rebuild cache after setting system center object 
+        /// or loading the system it from a storage file.
+        /// When adding or removing objects, the cache is automatically updated.
+        /// </summary>
+        public void RebuildCache()
+        {
+            m_objectCache.Clear();
+            m_objectTypeCache.Clear();
+            m_objectTypeCache.Add(MySystemObjectType.ASTEROIDS, new HashSet<MySystemObject>());
+            m_objectTypeCache.Add(MySystemObjectType.PLANET, new HashSet<MySystemObject>());
+            m_objectTypeCache.Add(MySystemObjectType.MOON, new HashSet<MySystemObject>());
+            m_objectTypeCache.Add(MySystemObjectType.EMPTY, new HashSet<MySystemObject>());
+
+            Foreach(delegate (int i, MySystemObject obj)
+            {
+                m_objectCache.Add(obj.Id, obj);
+                m_objectTypeCache[obj.Type].Add(obj);
+            });
+        }
 
         /// <summary>
         /// Gets all objects currently in the system
@@ -28,14 +69,17 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <returns>All objects</returns>
         public HashSet<MySystemObject> GetAll()
         {
-            HashSet<MySystemObject> objs = new HashSet<MySystemObject>();
+            return m_objectCache.Values.ToHashSet();
+        }
 
-            Foreach(delegate (int i, MySystemObject obj)
-            {
-                objs.Add(obj);
-            });
-
-            return objs;
+        /// <summary>
+        /// Accesses system cache to return all objects of a specific system object type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public HashSet<MySystemObject> GetAllByType(MySystemObjectType type)
+        {
+            return m_objectTypeCache[type];
         }
 
         /// <summary>
@@ -45,7 +89,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public int Count()
         {
             if (CenterObject == null) return 0;
-            return 1 + CenterObject.ChildCount();
+            return m_objectCache.Count;
         }
 
         /// <summary>
@@ -68,17 +112,15 @@ namespace SEWorldGenPlugin.ObjectBuilders
         }
 
         /// <summary>
-        /// Searches the system for an object with the given
-        /// id and returns it if found, else null
+        /// Accesses system cache to quickly retrieve the object associated with the given id.
         /// </summary>
         /// <param name="id">Id of the object</param>
         /// <returns>The object or null if not found</returns>
         public MySystemObject GetById(Guid id)
         {
-            if (id == Guid.Empty) return null;
-            foreach(var child in GetAll())
+            if(m_objectCache.TryGetValue(id, out MySystemObject obj))
             {
-                if (child.Id == id) return child;
+                return obj;
             }
             return null;
         }
@@ -90,7 +132,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         /// <returns>true if it exists</returns>
         public bool Contains(Guid id)
         {
-            return GetById(id) != null;
+            return m_objectCache.ContainsKey(id);
         }
 
         /// <summary>
@@ -111,6 +153,8 @@ namespace SEWorldGenPlugin.ObjectBuilders
             if (parent == null) return false;
 
             parent.ChildObjects.Remove(obj);
+            m_objectCache.Remove(id);
+            m_objectTypeCache[obj.Type].Remove(obj);
 
             return true;
         }
@@ -131,6 +175,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
             if(parent == Guid.Empty && CenterObject == null)
             {
                 CenterObject = obj;
+
+                m_objectCache.Add(obj.Id, obj);
+                m_objectTypeCache[obj.Type].Add(obj);
+
                 return true;
             }
 
@@ -139,6 +187,10 @@ namespace SEWorldGenPlugin.ObjectBuilders
             {
                 p.ChildObjects.Add(obj);
                 obj.ParentId = parent;
+
+                m_objectCache.Add(obj.Id, obj);
+                m_objectTypeCache[obj.Type].Add(obj);
+
                 return true;
             }
             return false;
@@ -212,7 +264,7 @@ namespace SEWorldGenPlugin.ObjectBuilders
         public Guid ParentId;
 
         /// <summary>
-        /// All Child objects, such as moons.
+        /// All Child objects, such as moons. Do not directly add or remove objects, as it will break the Solar system object cache.
         /// </summary>
         [ProtoMember(6)]
         [Serialize(MyObjectFlags.Nullable)]

@@ -98,8 +98,8 @@ namespace SEWorldGenPlugin.Generator
                     var parent = Static.StarSystem.GetById(parentId);
                     if (parent != null)
                     {
-                        parent.ChildObjects.Add(obj);
                         obj.ParentId = parentId;
+                        Static.StarSystem.Add(obj);
                         PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                         callback?.Invoke(true);
                     }
@@ -107,8 +107,8 @@ namespace SEWorldGenPlugin.Generator
                     {
                         if(Static.StarSystem.CenterObject != null)
                         {
-                            Static.StarSystem.CenterObject.ChildObjects.Add(obj);
                             obj.ParentId = Static.StarSystem.CenterObject.Id;
+                            Static.StarSystem.Add(obj);
                             PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                             callback?.Invoke(true);
                         }
@@ -121,18 +121,18 @@ namespace SEWorldGenPlugin.Generator
                                 sun.Type = MySystemObjectType.EMPTY;
                                 sun.ParentId = Guid.Empty;
 
-                                Static.StarSystem.CenterObject = sun;
+                                Static.StarSystem.Add(sun);
 
                                 obj.ParentId = sun.Id;
-                                Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+                                Static.StarSystem.Add(obj);
 
                                 PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                                 callback?.Invoke(true);
                             }
                             else
                             {
-                                Static.StarSystem.CenterObject = obj;
                                 obj.ParentId = Guid.Empty;
+                                Static.StarSystem.Add(obj);
                                 PluginEventHandler.Static.RaiseStaticEvent(BroadcastObjectAdded, obj, callbackId, senderId);
                                 callback?.Invoke(true);
                             }
@@ -168,7 +168,7 @@ namespace SEWorldGenPlugin.Generator
 
             if(!Static.StarSystem.Contains(obj.Id) && parent != null)
             {
-                parent.ChildObjects.Add(obj);
+                Static.StarSystem.Add(obj);
                 callback?.Invoke(true);
             }
             else if(obj.ParentId == Guid.Empty && Static.StarSystem.CenterObject == null)
@@ -180,16 +180,16 @@ namespace SEWorldGenPlugin.Generator
                     sun.Type = MySystemObjectType.EMPTY;
                     sun.ParentId = Guid.Empty;
 
-                    Static.StarSystem.CenterObject = sun;
+                    Static.StarSystem.Add(sun);
 
                     obj.ParentId = sun.Id;
-                    Static.StarSystem.CenterObject.ChildObjects.Add(obj);
+                    Static.StarSystem.Add(obj);
 
                     callback?.Invoke(true);
                 }
                 else
                 {
-                    Static.StarSystem.CenterObject = obj;
+                    Static.StarSystem.Add(obj);
                     callback?.Invoke(true);
                 }
             }
