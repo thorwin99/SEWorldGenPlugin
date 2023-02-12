@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using VRage.Game;
 using VRage.Game.Components;
+using VRage.Game.Entity;
 using VRage.Library.Utils;
 using VRageMath;
 
@@ -761,6 +762,16 @@ namespace SEWorldGenPlugin.Generator
                         StarSystem.Remove(obj.Id);
                         MyGPSManager.Static.RemovePersistentGps(obj.Id);
                     }
+                    else if((obj as MySystemPlanet).Generated)
+                    {
+                        MyEntity e = MyEntities.GetEntityById((obj as MySystemPlanet).EntityId);
+                        Vector3D pos = e.PositionComp.GetPosition();
+                        if(double.IsNaN(obj.CenterPosition.x) || double.IsNaN(obj.CenterPosition.y) || double.IsNaN(obj.CenterPosition.z))
+                        {
+                            obj.CenterPosition = pos;
+                            MyPluginLog.Log("Planet " + obj.DisplayName + " position is NaN, fixing it...", LogLevel.WARNING);
+                        }
+                    }
                 }
                 else if(obj is MySystemAsteroids)
                 {
@@ -834,6 +845,10 @@ namespace SEWorldGenPlugin.Generator
                     vanillaPlanet.ParentId = StarSystem.CenterObject.Id;
 
                     AddObjectToSystem(vanillaPlanet);
+                }
+                else
+                {
+
                 }
             }
             AddAllPersistentGps();
