@@ -322,7 +322,7 @@ namespace SEWorldGenPlugin.Session
                         }
                         else
                         {
-                            MyPluginLog.Log("2Could not load dynamic GPS " + gps.ID + " for player " + player.PlayerId + ". GPS does not exist.", LogLevel.WARNING);
+                            MyPluginLog.Log("Could not load dynamic GPS " + gps.ID + " for player " + player.PlayerId + ". GPS does not exist.", LogLevel.WARNING);
                             continue;
                         }
                     }
@@ -383,7 +383,7 @@ namespace SEWorldGenPlugin.Session
                         }
                         else
                         {
-                                MySession.Static.Gpss.SendDeleteGpsRequest(entry.PlayerId, m_dynamicGpss[entry].Hash);
+                            MyPluginLog.Debug("Cannot delete gps " + entry.GpsId + " since it doesn't exist.", LogLevel.WARNING);
                         }
                     }
                     m_toDeleteDynamicGpss.Clear();
