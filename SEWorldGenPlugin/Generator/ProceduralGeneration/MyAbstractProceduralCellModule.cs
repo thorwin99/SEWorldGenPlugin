@@ -124,12 +124,12 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             {
                 if (m_loadedCells.ContainsKey(cellId))
                 {
-                    m_loadedCells[cellId].GetAll(list, false);
+                    m_loadedCells[cellId].OverlapAllBoundingSphere(ref bounds, list, false);
                 }
                 else
                 {
                     MyProceduralCell cell = GenerateCellSeeds(cellId);
-                    cell.GetAll(list, false);
+                    cell.OverlapAllBoundingSphere(ref bounds, list, false);
                 }
             }
         }
