@@ -317,6 +317,7 @@ namespace SEWorldGenPlugin.Generator
         {
             MyPluginLog.Log("Client: Received star system");
             Static.StarSystem = starSystem;
+            Static.StarSystem.RebuildCache();
         }
 
         /// <summary>
