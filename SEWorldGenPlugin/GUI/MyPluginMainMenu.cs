@@ -75,21 +75,21 @@ namespace SEWorldGenPlugin.GUI
                     OPENED_VERSION_NOTIFICATION = true;
                     MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(MyMessageBoxStyleEnum.Info, MyMessageBoxButtonsType.YES_NO, new StringBuilder("A new version of the SEWorldGenPlugin is a available. Do you want to visit the download page now?"), new StringBuilder("SEWorldGenPlugin Update available"), null, null, null, null, OnUpdateNotifiactionMessageClose));
                 }
+
+                MyGuiControlLabel pluginVersionLabel = new MyGuiControlLabel();
+                pluginVersionLabel.Text = string.Format(PLUGIN_LOADED.ToString(), VersionCheck.Static.GetVersion());
+                pluginVersionLabel.Position = MyGuiManager.ComputeFullscreenGuiCoordinate(MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM, 8, 8);
+                pluginVersionLabel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+                pluginVersionLabel.PositionY -= pluginVersionLabel.Size.Y / 2;
+
+                MyGuiControlButton pluginSettingsBtn = MyPluginGuiHelper.CreateDebugButton("Settings", OnPluginSettingsClick);
+                pluginSettingsBtn.Position = pluginVersionLabel.Position;
+                pluginSettingsBtn.PositionX += pluginVersionLabel.Size.X + (8 / MyGuiConstants.GUI_OPTIMAL_SIZE.X);
+                pluginSettingsBtn.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
+
+                Controls.Add(pluginVersionLabel);
+                Controls.Add(pluginSettingsBtn);
             }
-
-            MyGuiControlLabel pluginVersionLabel = new MyGuiControlLabel();
-            pluginVersionLabel.Text = string.Format(PLUGIN_LOADED.ToString(), VersionCheck.Static.GetVersion());
-            pluginVersionLabel.Position = MyGuiManager.ComputeFullscreenGuiCoordinate(MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_BOTTOM, 8, 8);
-            pluginVersionLabel.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
-            pluginVersionLabel.PositionY -= pluginVersionLabel.Size.Y / 2;
-
-            MyGuiControlButton pluginSettingsBtn = MyPluginGuiHelper.CreateDebugButton("Settings", OnPluginSettingsClick);
-            pluginSettingsBtn.Position = pluginVersionLabel.Position;
-            pluginSettingsBtn.PositionX += pluginVersionLabel.Size.X + (8 / MyGuiConstants.GUI_OPTIMAL_SIZE.X);
-            pluginSettingsBtn.OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER;
-
-            Controls.Add(pluginVersionLabel);
-            Controls.Add(pluginSettingsBtn);
         }
 
         /// <summary>
