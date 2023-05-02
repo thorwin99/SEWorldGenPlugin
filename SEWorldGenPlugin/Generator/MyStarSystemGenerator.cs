@@ -430,7 +430,7 @@ namespace SEWorldGenPlugin.Generator
 
             if (MyRandom.Instance.NextFloat() < settings.BaseMoonProbability * def.SurfaceGravity)
             {
-                foreach(var moon in GeneratePlanetMoons(planet))
+                foreach(var moon in GeneratePlanetMoons(planet, def))
                 {
                     if (moon == null) continue;
                     StarSystem.Add(moon);
@@ -445,7 +445,7 @@ namespace SEWorldGenPlugin.Generator
         /// </summary>
         /// <param name="parentPlanet"></param>
         /// <returns></returns>
-        private MySystemPlanetMoon[] GeneratePlanetMoons(MySystemPlanet parentPlanet)
+        private MySystemPlanetMoon[] GeneratePlanetMoons(MySystemPlanet parentPlanet, MyPlanetGeneratorDefinition def)
         {
             MyPluginLog.Log("Generating moons for planet " + parentPlanet.DisplayName);
             var settings = MySettingsSession.Static.Settings.GeneratorSettings;
@@ -467,7 +467,7 @@ namespace SEWorldGenPlugin.Generator
             {
                 MyPluginLog.Log("Generating moon " + i);
 
-                double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(1f, 1.5f);
+                double distance = parentPlanet.Diameter * (i + 1) + parentPlanet.Diameter * MyRandom.Instance.GetRandomFloat(1f, 1.5f) + def.AtmosphereHeight;
                 double diameter;
 
                 var definition = FindPlanetDefinitionForSize(parentPlanet.Diameter * 0.75f, out diameter, true);
