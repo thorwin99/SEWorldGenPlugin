@@ -837,6 +837,16 @@ namespace SEWorldGenPlugin.Generator
                         }
                     }
                 }
+                foreach (var obj in StarSystem.GetAllByType(MySystemObjectType.MOON))
+                {
+                    if (obj is MySystemPlanetMoon)
+                    {
+                        if ((obj as MySystemPlanetMoon).EntityId == p.EntityId)
+                        {
+                            exists = true;
+                        }
+                    }
+                }
                 if (!exists && StarSystem.CenterObject != null)
                 {
                     MySystemPlanet vanillaPlanet = new MySystemPlanet();
