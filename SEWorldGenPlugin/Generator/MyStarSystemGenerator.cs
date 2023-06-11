@@ -156,6 +156,7 @@ namespace SEWorldGenPlugin.Generator
 
             if(StarSystem != null && StarSystem.CenterObject != null)
             {
+                List<Guid> removalList = new List<Guid>(); 
                 foreach (var obj in StarSystem.GetAllByType(MySystemObjectType.ASTEROIDS))
                 {
                     var asteroid = obj as MySystemAsteroids;
@@ -165,8 +166,12 @@ namespace SEWorldGenPlugin.Generator
                     if (!provider.TryLoadObject(asteroid))
                     {
                         MyPluginLog.Log("No data found associated with asteroid object " + asteroid.DisplayName + " (" + asteroid.Id + "), Removing it.", LogLevel.WARNING);
-                        StarSystem.Remove(asteroid.Id);
+                        removalList.Add(asteroid.Id);
                     }
+                }
+                foreach(var id in removalList)
+                {
+                    StarSystem.Remove(id);
                 }
             }
 

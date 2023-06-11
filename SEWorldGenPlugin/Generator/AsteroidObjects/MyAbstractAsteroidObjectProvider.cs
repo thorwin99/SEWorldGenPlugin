@@ -74,7 +74,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         /// <summary>
         /// Tries to load the given asteroid.
         /// </summary>
-        /// <returns>True if file was loaded sucessfully</returns>
+        /// <returns>True if file was loaded sucessfully, or it already was loaded</returns>
         public abstract bool TryLoadObject(MySystemAsteroids asteroid);
 
         /// <summary>
@@ -538,7 +538,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects
         {
             if (!Sync.IsServer) return false;
 
-            if (m_savedData.ContainsKey(asteroid.Id)) return false;
+            if (m_savedData.ContainsKey(asteroid.Id)) return true;
 
             var data = MyFileUtils.ReadXmlFileFromWorld<T>(GetFileName(asteroid));
 
