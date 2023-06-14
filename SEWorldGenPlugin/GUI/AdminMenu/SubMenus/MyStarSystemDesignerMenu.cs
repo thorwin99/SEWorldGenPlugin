@@ -585,8 +585,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 switch (type)
                 {
                     case MySystemObjectType.PLANET:
-                    case MySystemObjectType.MOON:
                         newObj = new MySystemPlanet();
+                        break;
+                    case MySystemObjectType.MOON:
+                        newObj = new MySystemPlanetMoon();
                         break;
                     default:
                         newObj = new MySystemObject();
