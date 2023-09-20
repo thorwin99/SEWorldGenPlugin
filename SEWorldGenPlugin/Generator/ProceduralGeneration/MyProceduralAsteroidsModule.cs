@@ -31,9 +31,9 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         private const double CELL_SIZE = OBJECT_SIZE_MAX * 10;
 
         /// <summary>
-        /// Reflexion of asteroid creation method of SE
+        /// Reflection of asteroid creation method of SE
         /// </summary>
-        private MethodInfo m_createRoid;
+        private MethodInfo m_createAsteroidShape;
         private Type m_providerType;
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         {
             m_tmpAsteroids = new List<MyVoxelBase>();
             m_providerType = typeof(MyProceduralWorldGenerator).Assembly.GetType("Sandbox.Game.World.Generator.MyCompositeShapeProvider");
-            m_createRoid = m_providerType.GetMethod("CreateAsteroidShape");
+            m_createAsteroidShape = m_providerType.GetMethod("CreateAsteroidShape");
             m_definition = GetData();
 
             MySession.Static.OnSavingCheckpoint += delegate
@@ -177,7 +177,8 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if (exists) continue;
 
-                    var storage = CreateAsteroidStorage(GetAsteroidVoxelSize(seed.Size), seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
+                    var dataProvider = CreateAsteroidShape(seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
+                    var storage = newMyOctreeStorage(dataProvider, GetAsteroidVoxelSize(seed.Size));
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
 
                     MyVoxelMap voxelMap;
@@ -296,23 +297,29 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         }
 
         /// <summary>
-        /// Creates a new Asteroid voxel storage.
+        /// Creates a new Asteroid shape provider.
         /// </summary>
-        /// <param name="storageSize">Size of the voxel storage</param>
         /// <param name="seed">Seed of the asteroid</param>
         /// <param name="size">Size of the generated asteroid</param>
         /// <param name="generatorSeed">Seed of the asteroid generator</param>
         /// <param name="generator">The asteroid generator ID</param>
-        /// <returns>The storage of the asteroid</returns>
-        private MyOctreeStorage CreateAsteroidStorage(Vector3I storageSize, int seed, float size, int generatorSeed = 0, int? generator = default(int?))
+        /// <returns>The opaque MyCompositeShapeProvider instance</returns>
+        private object CreateAsteroidShape(int seed, float size, int generatorSeed = 0, int? generator = default(int?))
         {
             object[] args = new object[] { seed, size, generatorSeed, generator };
+            return m_createAsteroidShape.Invoke(null, args);
+        }
 
-            object prov = m_createRoid.Invoke(null, args);
-
+        /// <summary>
+        /// Creates a new Asteroid voxel storage.
+        /// </summary>
+        /// <param name="dataProvider">Opaque MyCompositeShapeProvider instance</param>
+        /// <param name="storageSize">Size of the voxel storage</param>
+        /// <returns>The storage of the asteroid</returns>
+        private MyOctreeStorage newMyOctreeStorage(object dataProvider, Vector3I storageSize)
+        {
             ConstructorInfo ctor = typeof(MyOctreeStorage).GetConstructor(new Type[] { m_providerType, typeof(Vector3I) });
-            MyOctreeStorage instance = (MyOctreeStorage)ctor.Invoke(new object[] { prov, storageSize });
-            return instance;
+            return (MyOctreeStorage)ctor.Invoke(new object[] { dataProvider, storageSize });
         }
 
         /// <summary>
