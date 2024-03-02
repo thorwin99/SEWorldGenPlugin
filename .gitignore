@@ -515,3 +515,4 @@ MigrationBackup/
 *.png
 /0Harmony_old.dll
 /Install.ps1
+/Bin64
