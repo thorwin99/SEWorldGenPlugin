@@ -139,7 +139,7 @@ namespace SEWorldGenPlugin.Generator.AsteroidObjects.AsteroidRing
             var roid = m_object as MySystemAsteroids;
             var planet = MyStarSystemGenerator.Static.StarSystem.GetById(m_object.ParentId) as MySystemPlanet;
 
-            if (planet == null)
+            if (planet == null || planet == MyStarSystemGenerator.Static.StarSystem.CenterObject)
             {
                 var settings = MySettingsSession.Static.Settings.GeneratorSettings;
 
