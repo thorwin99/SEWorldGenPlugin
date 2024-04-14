@@ -719,7 +719,12 @@ namespace SEWorldGenPlugin.Generator
                         m_mandatoryMoons.Add(planet);
                     }
 
-                    continue;
+                    // If no moons are defined, we also want to add
+                    // them as planets.
+                    if (settings.MoonDefinitions.Count > 0)
+                    {
+                        continue;
+                    }
                 }
                 
                 if (settings.SunDefinitions.Contains(subtypeId))
