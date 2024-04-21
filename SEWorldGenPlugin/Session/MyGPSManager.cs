@@ -164,7 +164,8 @@ namespace SEWorldGenPlugin.Session
                     GPSColor = m_globalGpss[id].Color,
                     ShowOnHud = true,
                     AlwaysVisible = false,
-                    DiscardAt = null
+                    DiscardAt = null,
+                    Description = ""
                 };
 
                 foreach (var playerId in m_globalGpss[id].Players)
@@ -200,7 +201,8 @@ namespace SEWorldGenPlugin.Session
                 GPSColor = color,
                 ShowOnHud = true,
                 AlwaysVisible = false,
-                DiscardAt = null
+                DiscardAt = null,
+                Description = ""
             };
             gps.CalculateHash();
             gps.UpdateHash();
@@ -345,7 +347,8 @@ namespace SEWorldGenPlugin.Session
                             GPSColor = m_globalGpss[entry].Color,
                             ShowOnHud = !m_globalGpss[entry].Hidden,
                             AlwaysVisible = false,
-                            DiscardAt = null
+                            DiscardAt = null,
+                            Description = ""
                         };
 
                         gps.CalculateHash();
