@@ -56,8 +56,9 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>G:\SteamLibrary\steamapps\common\SpaceEngineers\Bin64\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="netstandard" />
     <Reference Include="ProtoBuf.Net">
