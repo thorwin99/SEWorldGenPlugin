@@ -54,8 +54,6 @@ namespace SEWorldGenPlugin
             MyPluginLog.Log("Version is " + updater.GetVersion());
             MyPluginLog.Log("Latest Version is " + updater.GetNewestVersion());
 
-            MyPerGameSettings.GUI.MainMenu = typeof(MyPluginMainMenu);
-            MyPerGameSettings.GUI.EditWorldSettingsScreen = typeof(PluginWorldSettings);
             MyPerGameSettings.GUI.AdminMenuScreen = typeof(MyAdminMenuExtension);
 
             TryEnablePatches();
@@ -76,30 +74,23 @@ namespace SEWorldGenPlugin
         /// </summary>
         private bool TryEnablePatches()
         {
-            if (settings.Settings.EnablePatching)
+            try
             {
-                try
-                {
-                    MyPluginLog.Log("Patching...");
-                    Patch();
-                    MyPluginLog.Log("Patches applied");
+                MyPluginLog.Log("Patching...");
+                Patch();
+                MyPluginLog.Log("Patches applied");
 
-                    return true;
-                }
-                catch (FileNotFoundException)
-                {
-                    MyPluginLog.Log("0harmony.dll not found, skipping patching.", LogLevel.WARNING);
-                }
-                catch (Exception e)
-                {
-                    MyPluginLog.Log("Something went wrong while patching: ", LogLevel.ERROR);
-                    MyPluginLog.Log(e.Message, LogLevel.ERROR);
-                    MyPluginLog.Log(e.StackTrace, LogLevel.ERROR);
-                }
+                return true;
             }
-            else
+            catch (FileNotFoundException)
             {
-                MyPluginLog.Log("Patching is disabled, skipping patches.");
+                MyPluginLog.Log("0harmony.dll not found, skipping patching. It is required for this plugin to function correctly.", LogLevel.ERROR);
+            }
+            catch (Exception e)
+            {
+                MyPluginLog.Log("Something went wrong while patching: ", LogLevel.ERROR);
+                MyPluginLog.Log(e.Message, LogLevel.ERROR);
+                MyPluginLog.Log(e.StackTrace, LogLevel.ERROR);
             }
 
             return false;
@@ -118,6 +109,12 @@ namespace SEWorldGenPlugin
             encounterPatch.ApplyPatch(harmony);
             var copyDirectoryPatch = new CopyDirectoryPatch();
             copyDirectoryPatch.ApplyPatch(harmony);
+            var mainMenuPatch = new MainMenuPatch();
+            mainMenuPatch.ApplyPatch(harmony);
+            var worldSettingsPatch = new WorldSettingsMenuPatch();
+            worldSettingsPatch.ApplyPatch(harmony);
+            var scenarioCustomizationPatch = new ScenarioCustomizationPatch();
+            scenarioCustomizationPatch.ApplyPatch(harmony);
         }
 
         /// <summary>

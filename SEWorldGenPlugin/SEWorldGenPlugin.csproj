@@ -208,7 +208,10 @@
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyStarSystemDesignerOrbitMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyOrbitRenderObject.cs" />
     <Compile Include="Patches\CopyDirectoryPatch.cs" />
+    <Compile Include="Patches\MainMenuPatch.cs" />
+    <Compile Include="Patches\WorldSettingsMenuPatch.cs" />
     <Compile Include="Patches\PatchAsteroidGeneration.cs" />
+    <Compile Include="Patches\ScenarioCustomizationPatch.cs" />
     <Compile Include="Session\MyAdminMenuExtensionRegister.cs" />
     <Compile Include="GUI\AdminMenu\MyPluginAdminMenuSubMenu.cs" />
     <Compile Include="GUI\AdminMenu\SubMenus\MyPlanetSpawnMenu.cs" />
@@ -230,7 +233,6 @@
     <Compile Include="GUI\MyPluginSettingsMenu.cs" />
     <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
     <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
-    <Compile Include="GUI\MyPluginMainMenu.cs" />
     <Compile Include="GUI\PluginWorldSettings.cs" />
     <Compile Include="http\Responses\GitHubVersionResponse.cs" />
     <Compile Include="http\VersionCheck.cs" />

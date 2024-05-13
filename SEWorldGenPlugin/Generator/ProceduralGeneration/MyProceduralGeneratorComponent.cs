@@ -90,11 +90,6 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             m_procDensity = MySession.Static.Settings.ProceduralDensity;
             m_seed = MySession.Static.Settings.ProceduralSeed;
 
-            if (MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == ObjectBuilders.AsteroidGenerationMethod.PLUGIN && !MySettings.Static.Settings.EnablePatching)
-            {
-                MySession.Static.Settings.ProceduralDensity = 0f;
-            }
-
             m_isEnabled = true;
 
             //Add default impl of registering of standard generator components

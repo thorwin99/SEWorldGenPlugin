@@ -80,12 +80,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
         [ProtoMember(9)]
         public string BeltNameFormat = "Belt [ObjectNumberGreek]";
 
-        /// <summary>
-        /// Wether or not patches are enabled.
-        /// </summary>
-        [ProtoMember(10)]
-        public bool EnablePatching = false;
-
         public override MyAbstractConfigObjectBuilder copy()
         {
             var copy = new MyObjectBuilder_GlobalSettings();
@@ -98,7 +92,6 @@ namespace SEWorldGenPlugin.ObjectBuilders
             copy.PlanetNameFormat = PlanetNameFormat;
             copy.MoonNameFormat = MoonNameFormat;
             copy.BeltNameFormat = BeltNameFormat;
-            copy.EnablePatching = EnablePatching;
 
             return copy;
         }
