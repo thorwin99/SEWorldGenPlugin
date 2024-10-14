@@ -277,7 +277,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
                     position *= subCellSize;
                     position += ((Vector3D)cellId) * CELL_SIZE;
 
-                    if (!MyEntities.IsInsideWorld(position) || (settings.WorldSize >= 0 && position.Length() > settings.WorldSize)) continue;
+                    if (!MySession.IsInsideWorld(position) || (settings.WorldSize >= 0 && position.Length() > settings.WorldSize)) continue;
 
                     var ring = GetAsteroidObjectAt(position);
 

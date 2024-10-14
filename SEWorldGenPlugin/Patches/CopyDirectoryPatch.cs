@@ -1,12 +1,11 @@
 ﻿using HarmonyLib;
-using SEWorldGenPlugin.Utilities;
 using System.IO;
-using VRage.Utils;
+using VRage.Private;
 
 namespace SEWorldGenPlugin.Patches
 {
     /// <summary>
-    /// Class to patch the <see cref="MyUtils.CopyDirectory"/> function to also copy sub directories.
+    /// Class to patch the <see cref="MyKeenUtils.CopyDirectory"/> function to also copy sub directories.
     /// </summary>
     public class CopyDirectoryPatch : HarmonyPatchBase
     {
@@ -24,7 +23,7 @@ namespace SEWorldGenPlugin.Patches
                     string destFileName = Path.Combine(destination, fileName);
 
                     Directory.CreateDirectory(destFileName);
-                    MyUtils.CopyDirectory(text, destFileName);
+                    MyKeenUtils.CopyDirectory(text, destFileName);
                 }
             }
         }
@@ -33,7 +32,7 @@ namespace SEWorldGenPlugin.Patches
         {
             base.ApplyPatch(harmony);
 
-            var baseMethod = typeof(MyUtils).GetMethod("CopyDirectory");
+            var baseMethod = typeof(MyKeenUtils).GetMethod("CopyDirectory");
             var postfix = typeof(CopyDirectoryPatch).GetMethod("Postfix");
 
             harmony.Patch(baseMethod, postfix: new HarmonyMethod(postfix));
