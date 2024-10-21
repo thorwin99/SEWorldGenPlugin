@@ -7,6 +7,7 @@ using SEWorldGenPlugin.Session;
 using SEWorldGenPlugin.Utilities;
 using System.Collections.Generic;
 using System.Threading;
+using System.Collections.Concurrent;
 using VRage.Game;
 using VRage.Game.Components;
 using VRage.Game.Entity;
@@ -42,7 +43,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <summary>
         /// All currently tracked entities
         /// </summary>
-        private Dictionary<MyEntity, MyEntityTracker> m_trackedEntities = new Dictionary<MyEntity, MyEntityTracker>();
+        private ConcurrentDictionary<MyEntity, MyEntityTracker> m_trackedEntities = new ConcurrentDictionary<MyEntity, MyEntityTracker>();
 
         /// <summary>
         /// List of all registered cell modules
@@ -242,7 +243,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
             else
             {
                 MyEntityTracker tracker = new MyEntityTracker(entity, range);
-                m_trackedEntities.Add(entity, tracker);
+                m_trackedEntities[entity] = tracker;
             }
         }
 
