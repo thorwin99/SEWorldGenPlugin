@@ -115,6 +115,8 @@ namespace SEWorldGenPlugin
             worldSettingsPatch.ApplyPatch(harmony);
             var scenarioCustomizationPatch = new ScenarioCustomizationPatch();
             scenarioCustomizationPatch.ApplyPatch(harmony);
+            var ghostAsteroidServerPatch = new MultiplayerGhostAsteroidPatch();
+            ghostAsteroidServerPatch.ApplyPatch(harmony);
         }
 
         /// <summary>

@@ -210,6 +210,7 @@
     <Compile Include="GUI\AdminMenu\SubMenus\StarSystemDesigner\MyOrbitRenderObject.cs" />
     <Compile Include="Patches\CopyDirectoryPatch.cs" />
     <Compile Include="Patches\MainMenuPatch.cs" />
+    <Compile Include="Patches\MultiplayerGhostAsteroidPatch.cs" />
     <Compile Include="Patches\WorldSettingsMenuPatch.cs" />
     <Compile Include="Patches\PatchAsteroidGeneration.cs" />
     <Compile Include="Patches\ScenarioCustomizationPatch.cs" />
