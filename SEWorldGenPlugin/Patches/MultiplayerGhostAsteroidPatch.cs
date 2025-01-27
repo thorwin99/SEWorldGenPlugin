@@ -16,11 +16,11 @@ namespace SEWorldGenPlugin.Patches
         {
         }
 
-        public static void Postfix(bool includeEntities, bool isClientRequest, ref MyObjectBuilder_World __result)
+        public static void Postfix(string saveName, bool isClientRequest, ref MyObjectBuilder_Checkpoint __result)
         {
             if (Sync.IsServer && isClientRequest && MySettingsSession.Static.Settings.GeneratorSettings.AsteroidGenerator == ObjectBuilders.AsteroidGenerationMethod.PLUGIN)
             {
-                __result.Checkpoint.Settings.ProceduralDensity = 0;
+                __result.Settings.ProceduralDensity = 0;
             }
         }
 
@@ -28,7 +28,7 @@ namespace SEWorldGenPlugin.Patches
         {
             base.ApplyPatch(harmony);
 
-            var baseMethod = typeof(MySession).GetMethod("GetWorld", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var baseMethod = typeof(MySession).GetMethod("GetCheckpoint", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             var postfix = typeof(MultiplayerGhostAsteroidPatch).GetMethod("Postfix");
 
             harmony.Patch(baseMethod, postfix: new HarmonyMethod(postfix));
