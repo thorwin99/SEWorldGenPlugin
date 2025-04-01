@@ -177,7 +177,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
 
                     if (exists) continue;
 
-                    var dataProvider = CreateAsteroidShape(seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0);
+                    var dataProvider = CreateAsteroidShape(seed.Params.Seed, seed.Size, m_definition.UseGeneratorSeed ? seed.Params.GeneratorSeed : 0, null);
                     var storage = newMyOctreeStorage(dataProvider, GetAsteroidVoxelSize(seed.Size));
                     Vector3D pos = seed.BoundingVolume.Center - MathHelper.GetNearestBiggerPowerOfTwo(seed.Size) / 2;
 
@@ -304,7 +304,7 @@ namespace SEWorldGenPlugin.Generator.ProceduralGeneration
         /// <param name="generatorSeed">Seed of the asteroid generator</param>
         /// <param name="generator">The asteroid generator ID</param>
         /// <returns>The opaque MyCompositeShapeProvider instance</returns>
-        private object CreateAsteroidShape(int seed, float size, int generatorSeed = 0, int? generator = default(int?))
+        private object CreateAsteroidShape(int seed, float size, int generatorSeed = 0, int? generator = null)
         {
             object[] args = new object[] { seed, size, generatorSeed, generator };
             return m_createAsteroidShape.Invoke(null, args);
