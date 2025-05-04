@@ -687,6 +687,10 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
         /// <param name="objectId"></param>
         private void SelectSystemObject(Guid objectId)
         {
+            if (m_selectedObjectId == objectId)
+            {
+                return;
+            }
             if(objectId == Guid.Empty)
             {
                 m_addObjectButton.Enabled = true;
@@ -702,8 +706,8 @@ namespace SEWorldGenPlugin.GUI.AdminMenu.SubMenus
                 objectId = MyStarSystemGenerator.Static.StarSystem.CenterObject.Id;
             }
 
-            m_systemObjectsBox.SelectSingleItem(m_itemList[objectId]);
             m_selectedObjectId = objectId;
+            m_systemObjectsBox.SelectSingleItem(m_itemList[objectId]);
             SetSubMenuControls();
 
             m_renderer.FocusObject(objectId);
