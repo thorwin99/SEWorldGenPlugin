@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<PluginData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="GitHubPlugin">
+  <Id>thorwin99/SEWorldGenPlugin</Id>
+  <FriendlyName>SEWorldGenPlugin V2</FriendlyName>
+  <Author>thorwin99</Author>
+  <GroupId>SEWorldGenPlugin</GroupId>
+  <Commit>d1aa08c0ee7a3aa365febf59c051c52c9cae2844</Commit>
+</PluginData>

@@ -81,7 +81,7 @@ namespace SEWorldGenPlugin.Patches
             Controls.Add(m_enablePlugin);
             Controls.Add(m_pluginSettingsButton);
 
-            m_enablePluginLabel.Position = vector + value * 5;
+            m_enablePluginLabel.Position = vector + value * 6;
             m_enablePluginLabel.PositionY += MyGuiConstants.BACK_BUTTON_SIZE.Y * 2;
             m_pluginSettingsButton.Enabled = m_enablePlugin.IsChecked;
             m_enablePlugin.Position = GetControlPosition(Controls);
