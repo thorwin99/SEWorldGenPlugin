@@ -233,9 +233,6 @@
     <Compile Include="GUI\MyPluginGlobalSettings.cs" />
     <Compile Include="GUI\MyPluginGuiHelper.cs" />
     <Compile Include="GUI\MyPluginSettingsMenu.cs" />
-    <Compile Include="GUI\PluginGuiScreenNewGame.cs" />
-    <Compile Include="GUI\PluginGuiScreenWorkshopGame.cs" />
-    <Compile Include="GUI\PluginWorldSettings.cs" />
     <Compile Include="http\Responses\GitHubVersionResponse.cs" />
     <Compile Include="http\VersionCheck.cs" />
     <Compile Include="MySettings.cs" />

@@ -37,11 +37,12 @@ namespace SEWorldGenPlugin.Patches
         /// <param name="__instance">Instance of MyGuiScreenScenarioSelectionCustomizeScreen that is patched.</param>
         /// <param name="___m_currentPosition">Member of MyGuiScreenScenarioSelectionCustomizeScreen, current position of the UI elements while building the UI.</param>
         /// <param name="___m_mainSettingsParent">Member of MyGuiScreenScenarioSelectionCustomizeScreen, parent of all settings elements.</param>
-        /// <param name="___m_defaultStartingPosition">Member of MyGuiScreenScenarioSelectionCustomizeScreen, teh default starting position for the UI elements.</param>
+        /// <param name="___m_defaultStartingPosition">Member of MyGuiScreenScenarioSelectionCustomizeScreen, the default starting position for the UI elements.</param>
         /// <param name="___m_startButton">Member of MyGuiScreenScenarioSelectionCustomizeScreen, the button that starts the game.</param>
         public static void CreateModButton(MyGuiScreenScenarioSelectionCustomizeScreen __instance, ref Vector2 ___m_currentPosition, MyGuiControlParent ___m_mainSettingsParent, Vector2 ___m_defaultStartingPosition, MyGuiControlButton ___m_startButton)
         {
             m_defaultStartingPosition = ___m_defaultStartingPosition;
+            float previousX = ___m_currentPosition.X;
 
             MyGuiControlParent m_mainSettingsParent = ___m_mainSettingsParent;
             MyGuiControlButton m_startButton = ___m_startButton;
@@ -90,6 +91,8 @@ namespace SEWorldGenPlugin.Patches
             };
 
             PlSettings = new MyObjectBuilder_WorldSettings();
+
+            ___m_currentPosition.X = previousX;
 
         }
 
