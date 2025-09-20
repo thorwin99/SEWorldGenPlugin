@@ -1,4 +1,5 @@
-﻿using Sandbox.Game.Multiplayer;
+﻿using Sandbox.Definitions;
+using Sandbox.Game.Multiplayer;
 using SEWorldGenPlugin.http;
 using SEWorldGenPlugin.Utilities;
 using VRage.Game;
@@ -7,7 +8,7 @@ using VRage.Game.Components;
 namespace SEWorldGenPlugin.Session
 {
     /// <summary>
-    /// Session component for essential plugin funktions.
+    /// Session component for essential plugin functions.
     /// </summary>
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate, 1005)]
     public class MyPluginSession : MySessionComponentBase

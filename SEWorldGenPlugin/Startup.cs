@@ -109,8 +109,6 @@ namespace SEWorldGenPlugin
             encounterPatch.ApplyPatch(harmony);
             var copyDirectoryPatch = new CopyDirectoryPatch();
             copyDirectoryPatch.ApplyPatch(harmony);
-            var mainMenuPatch = new MainMenuPatch();
-            mainMenuPatch.ApplyPatch(harmony);
             var worldSettingsPatch = new WorldSettingsMenuPatch();
             worldSettingsPatch.ApplyPatch(harmony);
             var scenarioCustomizationPatch = new ScenarioCustomizationPatch();
